@@ -7,7 +7,7 @@ import "./Login.css";
 
 export default function Login() {
   const git = useNavigate();
-  const { girisiTamamla, kullanici, authYuklendi } = useApp();
+  const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
   const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
   const [beniHatirla, setBeniHatirla] = useState(true);
@@ -93,7 +93,10 @@ export default function Login() {
         </button>
       </p>
 
-      <button className="login-misafir-link" onClick={() => git("/anasayfa")}>
+      <button className="login-misafir-link" onClick={() => {
+        setMisafir(true);
+        git("/anasayfa");
+      }}>
         Misafir olarak devam et
       </button>
     </div>
