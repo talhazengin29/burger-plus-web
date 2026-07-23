@@ -1,0 +1,194 @@
+/* --- Alt sayfalarda ortak üst bar (geri + başlık) --- */
+.alt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--margin);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 5;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.05);
+}
+.geri-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  display: grid; place-items: center;
+}
+.geri-btn svg { width: 22px; height: 22px; }
+.alt-header-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+}
+.alt-header-bosluk { width: 40px; }
+
+/* Ödeme ekranlarında alt bar sabit olduğu için gövdeye ekstra alt boşluk */
+.cart { display: flex; flex-direction: column; }
+.cart-govde { flex: 1; padding: 16px var(--margin); padding-bottom: 160px; }
+
+.cart-liste { display: flex; flex-direction: column; gap: 14px; }
+
+.cart-satir {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 12px;
+  box-shadow: var(--shadow-card);
+}
+.cart-gorsel {
+  width: 68px; height: 68px;
+  border-radius: var(--r-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.cart-gorsel--bos {
+  display: grid;
+  place-items: center;
+  background: var(--surface-container-high);
+  font-size: 30px;
+}
+.cart-kisi {
+  display: block;
+  font-size: 12px;
+  color: var(--charcoal-soft);
+  margin-top: 3px;
+}
+.cart-adet-rozet {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--primary-container);
+  background: var(--primary-fixed);
+  padding: 6px 12px;
+  border-radius: var(--r-full);
+}
+.cart-orta { flex: 1; min-width: 0; }
+.cart-ad { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+.cart-birim { color: var(--primary-container); font-weight: 700; font-size: 15px; }
+.cart-sag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.cart-sil {
+  color: var(--charcoal-soft);
+  display: grid; place-items: center;
+}
+.cart-sil svg { width: 20px; height: 20px; }
+
+/* Adet artır/azalt */
+.adet-kontrol {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-container-high);
+  border-radius: var(--r-full);
+  padding: 4px;
+}
+.adet-kontrol button {
+  width: 28px; height: 28px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  display: grid; place-items: center;
+}
+.adet-kontrol button svg { width: 16px; height: 16px; }
+.adet-kontrol button:active { transform: scale(0.9); }
+.adet-sayi { min-width: 20px; text-align: center; font-weight: 700; font-size: 15px; }
+
+/* --- Alt sabit bar (toplam + ödeme) --- */
+.cart-alt-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface-container-lowest);
+  padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 20px rgba(27, 28, 25, 0.1);
+  border-top-left-radius: var(--r-xl);
+  border-top-right-radius: var(--r-xl);
+}
+.cart-toplam-satir {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.cart-toplam-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--primary-container);
+}
+.cart-secim-baslik {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.cart-masa-bilgi {
+  background: var(--primary-fixed);
+  color: var(--on-surface);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px;
+  border-radius: var(--r-md);
+  text-align: center;
+  margin-bottom: 12px;
+  border: 2px solid var(--primary-container);
+}
+.cart-secim-butonlar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.siparis-tip-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border-radius: var(--r-lg);
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 15px;
+  transition: transform 0.1s;
+}
+.siparis-tip-btn:active { transform: scale(0.97); }
+.siparis-tip-emoji { font-size: 26px; }
+.siparis-tip-btn--algotur {
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  border: 2px solid var(--outline-variant);
+}
+.siparis-tip-btn--masa {
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.3);
+}
+
+/* --- Boş sepet --- */
+.sepet-bos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+}
+.sepet-bos-ikon { width: 64px; height: 64px; color: var(--charcoal-soft); opacity: 0.5; }
+.sepet-bos-yazi { color: var(--charcoal-soft); font-size: 16px; }
+.sepet-bos-btn {
+  padding: 14px 28px;
+  border-radius: var(--r-lg);
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+}

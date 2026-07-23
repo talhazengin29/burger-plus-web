@@ -1,0 +1,231 @@
+.orders-brand {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary);
+}
+.orders-govde { padding: 8px var(--margin) 0; }
+.orders-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.orders-liste { display: flex; flex-direction: column; gap: 16px; }
+
+/* --- Sipariş kartı --- */
+.siparis-kart {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+.siparis-kart-ust {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.siparis-ust-sol { display: flex; flex-direction: column; gap: 4px; }
+.siparis-tip-rozet {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--on-surface);
+}
+.siparis-tarih { font-size: 12px; color: var(--charcoal-soft); }
+.siparis-durum-rozet {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-container);
+  background: var(--primary-fixed);
+  padding: 6px 12px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+}
+
+/* --- Ürün satırları (görselli) --- */
+.siparis-urunler {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(27, 28, 25, 0.06);
+  border-bottom: 1px solid rgba(27, 28, 25, 0.06);
+  margin-bottom: 12px;
+}
+.siparis-urun-satir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.siparis-urun-gorsel {
+  width: 48px; height: 48px;
+  border-radius: var(--r-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.siparis-urun-orta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.siparis-urun-ad { font-weight: 600; font-size: 15px; }
+.siparis-urun-birim { font-size: 13px; color: var(--charcoal-soft); }
+.siparis-urun-adet {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--primary-container);
+}
+
+/* --- Alt (toplam + puan) --- */
+.siparis-alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.siparis-toplam {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.siparis-toplam-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary-container);
+}
+.siparis-puan {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--basari, #2e7d32);
+  background: rgba(46, 125, 50, 0.12);
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+}
+
+.siparis-not {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.siparis-not--odendi {
+  background: var(--primary-fixed);
+  color: var(--primary);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* --- Boş durum --- */
+.orders-bos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 60px 20px;
+}
+.orders-bos-ikon {
+  width: 60px; height: 60px;
+  color: var(--charcoal-soft);
+  opacity: 0.4;
+  margin-bottom: 8px;
+}
+.orders-bos-yazi {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--on-surface);
+}
+.orders-bos-alt { color: var(--charcoal-soft); font-size: 14px; margin-bottom: 12px; }
+.orders-bos-btn {
+  padding: 14px 28px;
+  border-radius: var(--r-lg);
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+}
+.orders-bos-btn:active { transform: scale(0.98); }
+
+/* --- Bölümler (Senin Siparişlerin / Masanın Tamamı) --- */
+.orders-bolum { margin-bottom: 28px; }
+.orders-bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 14px;
+  color: var(--on-surface);
+}
+.masa-ozet-baslik-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.masa-ozet-baslik-satir .orders-bolum-baslik { margin-bottom: 0; }
+.masa-ozet-rozet {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-container);
+  background: var(--primary-fixed);
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+}
+.masa-ozet-aciklama {
+  font-size: 13px;
+  color: var(--charcoal-soft);
+  margin-bottom: 14px;
+}
+.masa-ozet-kart {
+  border: 2px solid var(--primary-fixed);
+}
+.masa-ozet-adet {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--primary-fixed);
+  color: var(--primary-container);
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: var(--r-md);
+}
+.masa-ozet-kisi {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--charcoal-soft);
+  background: var(--surface-container-high);
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+}
+
+/* Sipariş durumu renkleri (canlı) */
+.siparis-durum-rozet.durum--hazir {
+  background: rgba(46, 125, 50, 0.15);
+  color: #2e7d32;
+}
+.siparis-durum-rozet.durum--hazirlaniyor {
+  background: var(--primary-fixed);
+  color: var(--primary-container);
+}
+.siparis-durum-rozet.durum--yeni {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+/* Geçmiş siparişler biraz daha sakin görünür */
+.siparis-kart--gecmis {
+  opacity: 0.88;
+  border: 1px solid rgba(27, 28, 25, 0.06);
+}

@@ -1,0 +1,173 @@
+.profil-brand {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.profile-govde { padding: 8px var(--margin) 0; }
+
+/* --- Avatar bloğu --- */
+.profil-avatar-blok { text-align: center; padding: 12px 0 24px; }
+.profil-avatar-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 14px;
+}
+.profil-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-full);
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: var(--shadow-card);
+}
+/* Baş harfli büyük profil avatarı */
+.profil-avatar-harf {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 42px;
+}
+.profil-duzenle {
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 38px; height: 38px;
+  border-radius: var(--r-full);
+  background: var(--primary-container);
+  color: #fff;
+  display: grid; place-items: center;
+  border: 3px solid var(--surface);
+}
+.profil-duzenle svg { width: 18px; height: 18px; }
+.profil-ad {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.profil-uyelik { color: var(--on-surface-variant); font-size: 15px; }
+
+/* --- Puan kartı --- */
+.profil-puan-kart {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 22px;
+}
+.profil-puan-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.profil-puan-etiket { font-weight: 700; font-size: 16px; }
+.profil-puan-deger { color: var(--primary-container); font-weight: 700; font-size: 15px; }
+.profil-puan-not {
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+/* --- Menü satırları --- */
+.profil-menu {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.profil-menu-satir {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 18px;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.06);
+  text-align: left;
+}
+.profil-menu-satir:last-child { border-bottom: none; }
+.profil-menu-ikon-daire {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.profil-menu-ikon-daire svg { width: 22px; height: 22px; color: var(--primary-container); }
+.profil-menu-ad { flex: 1; font-weight: 600; font-size: 17px; color: var(--on-surface); }
+.profil-menu-ok { width: 20px; height: 20px; color: var(--charcoal-soft); }
+
+/* --- İşletme bölümü --- */
+.profil-isletme-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+.isletme-satir {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+.isletme-ikon {
+  background: var(--primary-container) !important;
+}
+.isletme-ikon svg { color: #fff !important; }
+.isletme-metin { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.isletme-alt { font-size: 13px; color: var(--charcoal-soft); }
+
+/* --- Tema aç/kapa anahtarı --- */
+.tema-anahtar {
+  width: 52px;
+  height: 30px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-highest);
+  position: relative;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+.tema-anahtar-top {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-full);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+.tema-anahtar--acik { background: var(--primary-container); }
+.tema-anahtar--acik .tema-anahtar-top { transform: translateX(22px); }
+
+/* --- Çıkış --- */
+.cikis-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--charcoal);
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+}
+.cikis-ikon { width: 22px; height: 22px; }
+.cikis-btn:active { transform: scale(0.99); }

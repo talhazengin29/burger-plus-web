@@ -1,0 +1,103 @@
+.table-order { display: flex; flex-direction: column; }
+.table-govde { flex: 1; padding: 16px var(--margin); padding-bottom: 130px; }
+
+/* Masa rozeti */
+.masa-rozet-kart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  border-radius: var(--r-xl);
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
+}
+.masa-rozet-etiket {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+}
+.masa-rozet-no {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 32px;
+  color: #fff;
+}
+
+.table-bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.table-liste {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 4px 16px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+}
+.table-satir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.06);
+}
+.table-satir:last-child { border-bottom: none; }
+.table-adet {
+  font-weight: 700;
+  color: var(--primary-container);
+  font-size: 15px;
+  min-width: 28px;
+}
+.table-ad { flex: 1; font-weight: 600; font-size: 15px; }
+.table-fiyat { font-weight: 700; font-size: 15px; }
+
+.table-toplam {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 4px 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.table-toplam-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--primary-container);
+}
+
+.table-bilgi {
+  background: var(--surface-container-high);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+.table-alt-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface-container-lowest);
+  padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 20px rgba(27, 28, 25, 0.1);
+  border-top-left-radius: var(--r-xl);
+  border-top-right-radius: var(--r-xl);
+}
+.gonder-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+}
+.gonder-btn:active { transform: scale(0.99); }

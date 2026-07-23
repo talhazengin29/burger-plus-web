@@ -1,0 +1,101 @@
+.table-welcome {
+  background: linear-gradient(160deg, #ff6b00, #d9540b 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 28px;
+}
+.tw-icerik {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tw-masa-daire {
+  width: 130px;
+  height: 130px;
+  border-radius: var(--r-full);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.tw-masa-no {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 64px;
+  color: var(--primary-container);
+  line-height: 1;
+}
+
+.tw-hosgeldin-etiket {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.tw-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.tw-alt {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 36px;
+}
+
+.tw-butonlar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.tw-btn {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+.tw-btn:active { transform: scale(0.99); }
+.tw-btn-alt {
+  font-family: 'Plus Jakarta Sans';
+  font-weight: 500;
+  font-size: 13px;
+  opacity: 0.75;
+}
+/* Üye girişi — beyaz, öne çıkan */
+.tw-btn--uye {
+  background: #fff;
+  color: var(--primary);
+}
+/* Misafir — çerçeveli, ikincil */
+.tw-btn--misafir {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow: none;
+}
+
+.tw-not {
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+}
+
+.tw-emoji { font-size: 56px; margin-bottom: 16px; }

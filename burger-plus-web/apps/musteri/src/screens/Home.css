@@ -1,0 +1,220 @@
+/* Ortak ekran kaidesi — tüm ekranlar alt menü için altta boşluk bırakır */
+.ekran {
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 90px;
+  /* Kaydırma barını gizle ama scroll çalışsın */
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+}
+.ekran::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
+
+/* --- Üst bar --- */
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--margin);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.05);
+}
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-logo {
+  width: 36px; height: 36px;
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-sm);
+  object-fit: contain;
+  padding: 3px;
+  box-shadow: var(--shadow-card);
+}
+.brand-name {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+.home-header-sag { display: flex; align-items: center; gap: 14px; }
+.ikon-btn { color: var(--primary); display: grid; place-items: center; }
+.sepet-btn { position: relative; }
+.sepet-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  background: var(--primary-container);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.avatar-sm {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  object-fit: cover;
+  border: 2px solid var(--primary-container);
+}
+/* Baş harfli avatar (gerçek kullanıcı görseli yerine) */
+.avatar-harf {
+  display: grid;
+  place-items: center;
+  background: var(--primary-container);
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  border: none;
+}
+
+.home-govde { padding: 16px var(--margin) 0; }
+
+/* --- Damga kartı --- */
+.damga-kart {
+  background: linear-gradient(135deg, #fff6f0, #fdece2);
+  border-radius: var(--r-xl);
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+}
+[data-tema="karanlik"] .damga-kart {
+  background: linear-gradient(135deg, #2b2320, #332019);
+}
+.damga-rozet {
+  display: inline-block;
+  background: var(--charcoal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  letter-spacing: 0.02em;
+}
+.damga-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.15;
+  margin: 12px 0 18px;
+  color: var(--on-surface);
+}
+.damga-baslik .vurgu { color: var(--primary-container); }
+.damga-alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.damga-durum { color: var(--on-surface); font-weight: 600; }
+.damga-ikon { color: var(--primary-container); font-size: 18px; }
+
+/* İlerleme çubuğu (hap uçlu) */
+.ilerleme-ray {
+  height: 12px;
+  background: var(--surface-container-highest);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.ilerleme-dolgu {
+  height: 100%;
+  background: var(--primary-container);
+  border-radius: var(--r-full);
+  transition: width 0.4s ease;
+}
+
+/* --- Chip'ler --- */
+.chip-satir {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 22px;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+}
+.chip-satir.suruklorken { cursor: grabbing; }
+.chip-satir::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 11px 20px;
+  border-radius: var(--r-full);
+  box-shadow: var(--shadow-card);
+  transition: all 0.15s;
+}
+.chip--aktif { background: var(--charcoal); color: #fff; }
+
+.bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+/* --- Ürün grid --- */
+.urun-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.urun-kart {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.urun-gorsel-wrap { aspect-ratio: 1 / 1; overflow: hidden; }
+.urun-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.urun-alt {
+  padding: 14px;
+}
+.urun-ad {
+  font-family: 'Plus Jakarta Sans';
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--on-surface);
+  /* Adı iki satıra sabitle — tek/çift satır farkı hizayı bozmasın */
+  min-height: calc(1.25em * 2);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.urun-fiyat-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.urun-fiyat {
+  color: var(--primary-container);
+  font-weight: 700;
+  font-size: 16px;
+}
+.ekle-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(255, 107, 0, 0.4);
+}
+.ekle-btn:active { transform: scale(0.92); }
+.ekle-ikon { width: 20px; height: 20px; }

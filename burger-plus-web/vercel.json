@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/personel/:path((?!assets/).*)",
+      "destination": "/personel/index.html"
+    },
+    {
+      "source": "/((?!assets/|personel|.*\\.[a-zA-Z0-9]+$).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

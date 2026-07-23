@@ -1,0 +1,103 @@
+.camp-header {
+  display: flex;
+  justify-content: center;
+  padding: 18px var(--margin);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 5;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.05);
+}
+.camp-brand {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.camp-govde { padding: 20px var(--margin) 0; }
+.camp-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.camp-alt {
+  text-align: center;
+  color: var(--charcoal-soft);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.camp-liste { display: flex; flex-direction: column; gap: 24px; }
+
+.camp-kart {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.camp-gorsel-wrap { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.camp-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.camp-rozet {
+  position: absolute;
+  top: 14px; left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--charcoal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: var(--r-full);
+}
+.rozet-ikon { width: 14px; height: 14px; }
+.rozet-emoji { font-size: 13px; }
+
+.camp-icerik { padding: 18px; }
+.camp-baslik-satir {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.camp-kart-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 22px;
+}
+.camp-fiyat {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--primary-container);
+}
+.camp-aciklama {
+  color: var(--charcoal-soft);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.camp-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: var(--r-lg);
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  transition: transform 0.1s;
+}
+.camp-btn:active { transform: scale(0.99); }
+.camp-btn--primary {
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+}
+.camp-btn--charcoal {
+  background: var(--charcoal);
+  color: #fff;
+}

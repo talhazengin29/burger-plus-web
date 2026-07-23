@@ -1,0 +1,15 @@
+{
+  "name": "burger-plus-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Burger Plus — musteri ve personel uygulamalari tek catida (Vercel)",
+  "scripts": {
+    "install:all": "cd apps/musteri && npm install && cd ../personel && npm install",
+    "build:musteri": "cd apps/musteri && npm install && npm run build",
+    "build:personel": "cd apps/personel && npm install && VITE_BASE=/personel/ npm run build",
+    "build": "npm run build:musteri && npm run build:personel && node birlestir.js",
+    "dev:musteri": "cd apps/musteri && npm run dev",
+    "dev:personel": "cd apps/personel && npm run dev"
+  }
+}

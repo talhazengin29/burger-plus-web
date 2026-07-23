@@ -1,0 +1,118 @@
+/* ==========================================================================
+   Flame & Frame — Burger+ tasarım sistemi
+   Renkler, tipografi ve ortak değerler tek yerde. Bir ekranı değiştirmek
+   burayı etkilemez; burayı değiştirmek tüm ekranlara yansır.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Yüzeyler */
+  --surface: #fbf9f4;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f5f3ee;
+  --surface-container: #f0eee9;
+  --surface-container-high: #eae8e3;
+  --surface-container-highest: #e4e2dd;
+
+  /* Metin */
+  --on-surface: #1b1c19;
+  --on-surface-variant: #5a4136;
+  --outline: #8e7164;
+  --outline-variant: #e2bfb0;
+
+  /* Marka rengi — turuncu */
+  --primary: #a04100;
+  --primary-container: #ff6b00;
+  --on-primary: #ffffff;
+  --on-primary-container: #572000;
+  --primary-fixed: #ffdbcc;
+
+  /* Buton gradyanı (tasarımdaki "tıklanabilir" his) */
+  --primary-grad-start: #ff6b00;
+  --primary-grad-end: #ff914d;
+
+  /* Charcoal — ikincil / koyu */
+  --charcoal: #30312e;
+  --charcoal-soft: #5f5e5e;
+
+  --error: #ba1a1a;
+
+  /* Köşe yuvarlaklıkları */
+  --r-sm: 0.25rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;
+  --r-xl: 1.5rem;
+  --r-full: 9999px;
+
+  /* Boşluklar */
+  --margin: 20px;
+  --gutter: 16px;
+  --gap-section: 32px;
+
+  /* Gölge */
+  --shadow-card: 0 4px 16px rgba(27, 28, 25, 0.12);
+  --shadow-modal: 0 8px 24px rgba(27, 28, 25, 0.2);
+}
+
+/* ==========================================================================
+   KARANLIK TEMA
+   Aynı değişkenleri karanlık değerlerle eziyoruz. Tüm ekranlar bu
+   değişkenleri kullandığı için hiçbir ekran dosyasına dokunmaya gerek yok.
+   ========================================================================== */
+[data-tema="karanlik"] {
+  --surface: #17181a;
+  --surface-container-lowest: #1f2023;
+  --surface-container-low: #202124;
+  --surface-container: #26272b;
+  --surface-container-high: #2e2f33;
+  --surface-container-highest: #37383c;
+
+  --on-surface: #f0eee9;
+  --on-surface-variant: #d6b8a8;
+  --outline: #a98a7b;
+  --outline-variant: #4a3b34;
+
+  /* Marka turuncusu karanlıkta biraz daha parlak okunur */
+  --primary: #ff924d;
+  --primary-container: #ff7a1a;
+  --on-primary: #1b1c19;
+  --on-primary-container: #ffdbcc;
+  --primary-fixed: #47250f;
+
+  /* charcoal her iki temada KOYU kalır — üstünde hep beyaz yazı taşıyan
+     rozet/chip/buton zeminleri için. Metin rengi olarak on-surface kullanılır. */
+  --charcoal: #3a3b3e;
+  --charcoal-soft: #b8b6b2;
+
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Tema geçişini yumuşat */
+body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
+.puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,
+.bottom-nav, .chip {
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--surface);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tipografi yardımcıları */
+.t-headline-xl { font-family: 'Montserrat'; font-size: 40px; font-weight: 800; line-height: 48px; letter-spacing: -0.02em; }
+.t-headline-lg { font-family: 'Montserrat'; font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -0.01em; }
+.t-headline-mobile { font-family: 'Montserrat'; font-size: 24px; font-weight: 700; line-height: 30px; }
+.t-title-md { font-family: 'Montserrat'; font-size: 20px; font-weight: 600; line-height: 26px; }
+.t-body-lg { font-family: 'Plus Jakarta Sans'; font-size: 16px; font-weight: 500; line-height: 24px; }
+.t-body-sm { font-family: 'Plus Jakarta Sans'; font-size: 14px; font-weight: 400; line-height: 20px; }
+.t-label-bold { font-family: 'Plus Jakarta Sans'; font-size: 12px; font-weight: 700; line-height: 16px; }
+
+button { font-family: inherit; color: inherit; cursor: pointer; border: none; background: none; }
+img { display: block; max-width: 100%; }

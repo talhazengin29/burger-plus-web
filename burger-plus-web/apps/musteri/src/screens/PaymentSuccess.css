@@ -1,0 +1,186 @@
+.success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px var(--margin);
+}
+.success-icerik {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Onay dairesi */
+.success-daire {
+  width: 96px; height: 96px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(255, 107, 0, 0.4);
+  animation: pop 0.35s ease;
+}
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-check { width: 48px; height: 48px; color: #fff; }
+
+.success-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+.success-alt {
+  color: var(--charcoal-soft);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* --- Sipariş durum kartı (al götür) --- */
+.siparis-durum-kart {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-container-high);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  border: 2px solid transparent;
+  transition: background 0.3s, border-color 0.3s;
+}
+.siparis-durum-kart--hazir {
+  background: var(--primary-fixed);
+  border-color: var(--primary-container);
+}
+.durum-ikon { font-size: 30px; flex-shrink: 0; }
+.durum-metin {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+.durum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--on-surface);
+}
+.durum-alt { font-size: 13px; color: var(--on-surface-variant); }
+
+/* Dönen bekleme göstergesi */
+.durum-spinner {
+  width: 22px; height: 22px;
+  border: 3px solid var(--outline-variant);
+  border-top-color: var(--primary-container);
+  border-radius: var(--r-full);
+  animation: don 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes don {
+  to { transform: rotate(360deg); }
+}
+
+/* Ödenen tutar */
+.success-tutar-kart {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+}
+.success-tutar-etiket { font-weight: 600; font-size: 15px; }
+.success-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 22px;
+}
+
+/* Kazanılan puan kartı — vurgulu */
+.success-puan-kart {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #fff6f0, #fdece2);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-card);
+}
+[data-tema="karanlik"] .success-puan-kart {
+  background: linear-gradient(135deg, #2b2320, #332019);
+}
+.success-puan-ust {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+.success-puan-buyuk {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 52px;
+  color: var(--primary-container);
+  line-height: 1;
+}
+.success-puan-toplam {
+  font-size: 14px;
+  color: var(--charcoal-soft);
+  margin-top: 6px;
+}
+
+.success-misafir-not {
+  width: 100%;
+  background: var(--surface-container-high);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  margin-bottom: 32px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+/* Butonlar */
+.success-butonlar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.success-btn-ana {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+}
+.success-btn-puan {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: transparent;
+  border: 1.5px solid var(--outline-variant);
+  color: var(--on-surface);
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+}
+.success-btn-ana:active, .success-btn-puan:active { transform: scale(0.99); }

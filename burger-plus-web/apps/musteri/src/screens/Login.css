@@ -1,0 +1,150 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--margin) 40px;
+}
+
+/* Üst logo bölümü */
+.login-ust {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+.login-logo {
+  max-width: 240px;
+  width: 70%;
+  height: auto;
+  margin: 0 auto 12px;
+  display: block;
+}
+.login-slogan { color: var(--charcoal-soft); font-size: 15px; }
+
+/* Beni hatırla */
+.beni-hatirla {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  user-select: none;
+}
+.beni-hatirla input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-xl);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-card);
+}
+.kayit-form { margin-top: 16px; }
+.login-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+.login-etiket {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  margin-bottom: 6px;
+}
+.login-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  border: 1.5px solid transparent;
+  color: var(--on-surface);
+  font-size: 15px;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+}
+.login-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.login-input::placeholder { color: var(--charcoal-soft); opacity: 0.7; }
+
+/* Kayıt: ad-soyad yan yana */
+.kayit-ikili { display: flex; gap: 12px; }
+.kayit-alan {
+  flex: 1;
+  min-width: 0;              /* flex çocuğunun küçülebilmesi için (taşmayı önler) */
+  display: flex;
+  flex-direction: column;
+}
+.kayit-alan .login-input { width: 100%; }
+
+/* Cinsiyet seçimi */
+.cinsiyet-secim { display: flex; gap: 8px; margin-bottom: 16px; }
+.cinsiyet-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  border: 1.5px solid transparent;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.cinsiyet-btn--aktif {
+  background: var(--primary-fixed);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.login-hata {
+  color: var(--error, #d32f2f);
+  font-size: 14px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: rgba(211, 47, 47, 0.1);
+  border-radius: var(--r-md);
+}
+
+.login-giris-btn {
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+  transition: opacity 0.15s;
+}
+.login-giris-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.login-giris-btn:not(:disabled):active { transform: scale(0.99); }
+
+/* Kayıt/giriş yönlendirme */
+.login-kayit-yonlendir {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 15px;
+  color: var(--on-surface-variant);
+}
+.login-kayit-link {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 15px;
+}
+.login-misafir-link {
+  display: block;
+  margin: 16px auto 0;
+  color: var(--charcoal-soft);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+}

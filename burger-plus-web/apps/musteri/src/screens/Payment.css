@@ -1,0 +1,210 @@
+.payment { display: flex; flex-direction: column; }
+.payment-govde { flex: 1; padding: 16px var(--margin); padding-bottom: 170px; }
+
+.odeme-masa-rozet {
+  background: var(--primary-fixed);
+  color: var(--on-surface);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+  text-align: center;
+  border: 2px solid var(--primary-container);
+}
+.misafir-rozet {
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.odeme-bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+/* --- Yöntem kartları --- */
+.yontem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.yontem-kart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border-radius: var(--r-lg);
+  background: var(--surface-container-lowest);
+  box-shadow: var(--shadow-card);
+  border: 2px solid transparent;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.yontem-kart:active { transform: scale(0.97); }
+.yontem-kart--aktif {
+  border-color: var(--primary-container);
+  background: var(--primary-fixed);
+}
+.yontem-ikon { width: 28px; height: 28px; color: var(--primary-container); }
+.yontem-ad { font-weight: 700; font-size: 13px; color: var(--on-surface); }
+.yontem-aciklama { font-size: 10px; color: var(--charcoal-soft); line-height: 1.3; }
+
+/* --- Seçim kutuları (eşit böl / ürüne göre) --- */
+.secim-kutu {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 20px;
+}
+.secim-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 16px;
+}
+
+/* Kişi seçici */
+.kisi-secici {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.kisi-secici button {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  display: grid; place-items: center;
+}
+.kisi-secici button svg { width: 20px; height: 20px; }
+.kisi-secici button:active { transform: scale(0.9); }
+.kisi-sayi {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 32px;
+  min-width: 50px;
+  text-align: center;
+}
+.kisi-not {
+  text-align: center;
+  margin-top: 14px;
+  color: var(--primary-container);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Ürün seçme listesi */
+.urun-sec-liste { display: flex; flex-direction: column; gap: 10px; }
+.urun-sec-satir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  text-align: left;
+  transition: background 0.15s;
+}
+.urun-sec-satir--secili { background: var(--primary-fixed); }
+.sec-kutu {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--outline);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.sec-kutu--dolu {
+  background: var(--primary-container);
+  border-color: var(--primary-container);
+  color: #fff;
+}
+.sec-kutu svg { width: 16px; height: 16px; }
+.urun-sec-ad { flex: 1; font-weight: 600; font-size: 15px; }
+.urun-sec-fiyat { font-weight: 700; color: var(--primary-container); font-size: 15px; }
+
+/* --- Puan bilgi şeridi --- */
+.puan-bilgi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-container-high);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--on-surface);
+}
+.puan-bilgi strong { color: var(--primary-container); }
+.puan-bilgi-ikon { font-size: 18px; }
+
+/* --- Alt sabit ödeme bar --- */
+.payment-alt-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface-container-lowest);
+  padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 20px rgba(27, 28, 25, 0.1);
+  border-top-left-radius: var(--r-xl);
+  border-top-right-radius: var(--r-xl);
+}
+.odenecek-satir {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.odenecek-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--primary-container);
+}
+.ode-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+}
+.ode-btn:active { transform: scale(0.99); }
+.ode-btn--pasif {
+  background: var(--surface-container-highest);
+  color: var(--charcoal-soft);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.odeme-bos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  color: var(--charcoal-soft);
+}
+.odeme-bos button {
+  padding: 14px 28px;
+  border-radius: var(--r-lg);
+  background: var(--primary-container);
+  color: #fff;
+  font-weight: 700;
+}

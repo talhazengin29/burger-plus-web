@@ -1,0 +1,33 @@
+/* Web'de telefon çerçevesi — uygulama ortada bir telefon içinde görünür */
+.telefon {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d6cf;
+  padding: 24px 0;
+}
+
+.telefon-ekran {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  max-height: calc(100vh - 48px);
+  background: var(--surface);
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 10px solid #1b1c19;
+}
+
+/* Dar ekranlarda çerçeveyi kaldır, tam ekran yap */
+@media (max-width: 480px) {
+  .telefon { padding: 0; background: var(--surface); }
+  .telefon-ekran {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+}

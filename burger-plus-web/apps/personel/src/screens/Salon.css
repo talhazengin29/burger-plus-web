@@ -1,0 +1,142 @@
+.salon { min-height: 100%; }
+
+.salon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.salon-etiket {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+.salon-header-sag { display: flex; align-items: center; gap: 18px; }
+.salon-sayi { color: var(--metin-soluk); font-size: 14px; }
+
+/* Liste */
+.salon-liste {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.salon-kart {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.salon-kart-ust {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.salon-masa-baslik { display: flex; flex-direction: column; gap: 3px; }
+.salon-masa-no {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--metin);
+}
+.salon-masa-sure { font-size: 12px; color: var(--metin-soluk); }
+.salon-hesap {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* Kalemler */
+.salon-kalemler {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.salon-kalem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.salon-kalem-adet {
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 26px;
+}
+.salon-kalem-ad { flex: 1; font-weight: 500; }
+.salon-kalem-durum {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.salon-kalem-durum.durum-yeni { background: rgba(59,130,246,0.15); color: var(--info); }
+.salon-kalem-durum.durum-hazirlaniyor { background: rgba(245,158,11,0.15); color: var(--uyari); }
+.salon-kalem-durum.durum-hazir { background: rgba(16,185,129,0.15); color: var(--basari); }
+.salon-kalem-kisi {
+  font-size: 11px;
+  color: var(--metin-soluk);
+  background: var(--panel-3);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Alt: kapat butonu */
+.salon-kart-alt { margin-top: 2px; }
+.salon-btn-ana {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--panel-3);
+  color: var(--metin);
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+.salon-btn-ana:hover { background: var(--tehlike); color: #fff; }
+
+/* Kapat onayı */
+.salon-onay {
+  background: var(--panel-2);
+  border-radius: var(--r-md);
+  padding: 12px;
+}
+.salon-onay-yazi {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--metin);
+}
+.salon-onay-butonlar { display: flex; gap: 8px; }
+.salon-btn-iptal {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--panel-3);
+  color: var(--metin);
+  font-weight: 600;
+  font-size: 14px;
+}
+.salon-btn-kapat {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--tehlike);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+.salon-btn-kapat:hover { filter: brightness(1.1); }

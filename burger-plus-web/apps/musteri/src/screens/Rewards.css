@@ -1,0 +1,197 @@
+/* --- Basit üst bar (Puan & Profil ekranlarında ortak stil) --- */
+.basit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px var(--margin);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 5;
+}
+.basit-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--primary);
+}
+.ikon-btn.koyu { color: var(--primary); }
+.daire-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--charcoal-soft);
+  display: grid; place-items: center;
+}
+.daire-btn svg { width: 20px; height: 20px; }
+
+.rewards-govde { padding: 8px var(--margin) 0; }
+
+/* --- Toplam puan kartı --- */
+.puan-kart {
+  position: relative;
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-xl);
+  padding: 26px 22px 22px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.puan-ust-cizgi {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--primary-container);
+}
+.puan-kart-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.puan-buyuk {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 48px;
+  color: var(--primary-container);
+  line-height: 1;
+  margin-bottom: 18px;
+}
+.puan-birim {
+  font-size: 16px;
+  margin-left: 6px;
+  font-weight: 700;
+}
+.puan-etiket-satir {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--charcoal-soft);
+  margin-bottom: 8px;
+}
+.puan-hedef { color: var(--primary-container); font-weight: 600; }
+.puan-kalan {
+  font-size: 14px;
+  color: var(--charcoal-soft);
+  margin-top: 12px;
+}
+.puan-kalan strong { color: var(--on-surface); }
+
+/* --- QR CTA --- */
+.qr-cta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+  margin-bottom: 28px;
+}
+.qr-cta-ikon { width: 26px; height: 26px; }
+.qr-cta:active { transform: scale(0.99); }
+
+/* --- Bölüm başlığı + ikon --- */
+.bolum-basrivi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;      /* QR butonu kaldırıldı, boşluğu burada dengeliyoruz */
+  margin-bottom: 16px;
+}
+.bolum-ikon { color: var(--primary-container); width: 24px; height: 24px; }
+
+/* --- Ödül grid --- */
+.odul-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.odul-kart {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.odul-gorsel-wrap { aspect-ratio: 4 / 3; overflow: hidden; }
+.odul-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.odul-ikon-kutu {
+  width: 100%; height: 100%;
+  background: var(--surface-container-high);
+  display: grid; place-items: center;
+}
+.odul-buyuk-ikon { width: 48px; height: 48px; color: var(--primary-container); }
+.odul-alt { padding: 12px 14px 14px; }
+.odul-ad { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+.odul-fiyat-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.odul-puan { color: var(--primary-container); font-weight: 600; font-size: 14px; }
+.odul-ekle {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--charcoal-soft);
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.odul-ekle svg {
+  display: block;   /* satır-içi boşluk kalmasın → tam ortada */
+}
+.odul-ekle:active { transform: scale(0.9); }
+
+/* --- Puan geçmişi --- */
+.gecmis-baslik { margin-bottom: 14px; }
+.gecmis-liste {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 4px 16px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 14px;
+}
+.gecmis-satir {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(27, 28, 25, 0.06);
+}
+.gecmis-satir:last-child { border-bottom: none; }
+.gecmis-ikon-daire {
+  width: 42px; height: 42px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.gecmis-ikon { width: 20px; height: 20px; color: var(--primary); }
+.gecmis-orta { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.gecmis-ad { font-weight: 600; font-size: 15px; }
+.gecmis-tarih { font-size: 13px; color: var(--charcoal-soft); }
+.gecmis-puan { font-family: 'Montserrat'; font-weight: 700; font-size: 20px; }
+.gecmis-puan.arti { color: var(--primary-container); }
+.gecmis-puan.eksi { color: var(--on-surface); }
+
+.tumunu-gor {
+  display: block;
+  margin: 0 auto;
+  color: var(--primary-container);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px;
+}

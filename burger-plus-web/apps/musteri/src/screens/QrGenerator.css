@@ -1,0 +1,126 @@
+.qr-gen-govde { padding: 16px var(--margin) 40px; }
+
+/* --- Kontrol paneli --- */
+.qr-gen-kontrol {
+  background: var(--surface-container-lowest);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+}
+.qr-gen-label {
+  display: block;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+.qr-gen-secici {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+.qr-gen-secici button {
+  width: 46px; height: 46px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  font-size: 24px;
+  display: grid; place-items: center;
+}
+.qr-gen-secici button:active { transform: scale(0.9); }
+.qr-gen-sayi {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 36px;
+  min-width: 60px;
+  text-align: center;
+}
+.qr-gen-uret-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.3);
+}
+.qr-gen-yazdir-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: var(--r-lg);
+  background: var(--charcoal);
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+}
+.qr-gen-uret-btn:active, .qr-gen-yazdir-btn:active { transform: scale(0.99); }
+.qr-gen-bilgi {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* --- QR kartları --- */
+.qr-gen-liste {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.qr-kart {
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border: 2px solid var(--surface-container-high);
+}
+.qr-kart-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: #1b1c19;
+  margin-bottom: 10px;
+}
+.qr-kart-img {
+  width: 100%;
+  height: auto;
+  max-width: 140px;
+  margin: 0 auto 10px;
+}
+.qr-kart-marka {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 13px;
+  color: #a04100;
+  margin-bottom: 4px;
+}
+.qr-kart-alt {
+  font-size: 11px;
+  color: #5f5e5e;
+}
+
+/* --- Yazdırma düzeni --- */
+@media print {
+  .no-print { display: none !important; }
+  .qr-gen-govde { padding: 0; }
+  .qr-gen-liste {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .qr-kart {
+    break-inside: avoid;
+    border: 1px dashed #999;
+    box-shadow: none;
+    padding: 20px;
+  }
+  .qr-kart-img { max-width: 200px; }
+}
