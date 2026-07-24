@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
-  IconMenu, IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconMoon, IconQr,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconMoon, IconQr,
 } from "../components/Icons";
+import OrtakHeader from "../components/OrtakHeader";
+import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
 import "./Profile.css";
 
@@ -33,13 +35,8 @@ export default function Profile() {
 
   return (
     <div className="ekran profile">
-      <header className="basit-header">
-        <button className="ikon-btn koyu" aria-label="Menü"><IconMenu /></button>
-        <span className="profil-brand">BURGER PLUS</span>
-        <span className="avatar-sm avatar-harf">
-          {kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
-        </span>
-      </header>
+      <OrtakHeader />
+      <SayfaSarici>
 
       <div className="profile-govde">
         {/* Avatar bloğu */}
@@ -121,6 +118,7 @@ export default function Profile() {
           Çıkış Yap
         </button>
       </div>
+      </SayfaSarici>
     </div>
   );
 }

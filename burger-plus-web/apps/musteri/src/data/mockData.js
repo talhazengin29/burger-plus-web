@@ -79,7 +79,7 @@ export const urunler = [
     ad: "Ayran",
     fiyat: 35,
     kategori: "İçecekler",
-    gorsel: "https://images.unsplash.com/photo-1626196340104-2d6a05b6b0f0?w=400&h=400&fit=crop",
+    gorsel: "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&h=400&fit=crop",
   },
   {
     id: 10,
@@ -93,7 +93,7 @@ export const urunler = [
     ad: "Soda",
     fiyat: 30,
     kategori: "İçecekler",
-    gorsel: "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=400&h=400&fit=crop",
+    gorsel: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&h=400&fit=crop",
   },
   {
     id: 12,

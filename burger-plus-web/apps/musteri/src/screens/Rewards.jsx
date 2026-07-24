@@ -1,13 +1,18 @@
+import { motion } from "framer-motion";
 import { sadakatVarsayilan, oduller, puanGecmisi } from "../data/mockData";
 import { useApp } from "../context/AppContext";
-import { IconMenu, IconUser, IconShop, IconTicket, IconCutlery, IconGift } from "../components/Icons";
+import { IconShop, IconTicket, IconCutlery, IconGift } from "../components/Icons";
+import OrtakHeader from "../components/OrtakHeader";
+import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
+import { siraliKonteyner, siraliOge, barDolumu } from "../lib/animasyonlar";
 import "./Rewards.css";
+
+const ODUL_IKONLARI = { IconTicket, IconCutlery, IconGift };
 
 export default function Rewards() {
   const { puan, misafir } = useApp();
 
-  // Misafir puan bölümüne giremez — üyeliğe davet ekranı göster
   if (misafir) {
     return (
       <UyeOl
@@ -23,84 +28,87 @@ export default function Rewards() {
 
   return (
     <div className="ekran rewards">
-      {/* Basit üst bar */}
-      <header className="basit-header">
-        <button className="ikon-btn koyu" aria-label="Menü"><IconMenu /></button>
-        <span className="basit-baslik">BURGER PLUS</span>
-        <button className="daire-btn" aria-label="Profil"><IconUser /></button>
-      </header>
-
-      <div className="rewards-govde">
-        {/* Toplam puan kartı */}
-        <section className="puan-kart">
-          <span className="puan-ust-cizgi" />
-          <h2 className="puan-kart-baslik">Toplam Puanım</h2>
-          <div className="puan-buyuk">
-            {puan.toLocaleString("tr-TR")}<span className="puan-birim">Puan</span>
-          </div>
-          <div className="puan-etiket-satir">
-            <span>Başlangıç</span>
-            <span className="puan-hedef">Hediye Burger ({hedef.toLocaleString("tr-TR")} Puan)</span>
-          </div>
-          <div className="ilerleme-ray">
-            <div className="ilerleme-dolgu" style={{ width: `${yuzde}%` }} />
-          </div>
-          <p className="puan-kalan">
-            Hediyeye sadece <strong>{kalan.toLocaleString("tr-TR")} puan</strong> kaldı!
-          </p>
-        </section>
-
-        {/* Ödül Marketi */}
-        <div className="bolum-basrivi">
-          <h3 className="bolum-baslik">Ödül Marketi</h3>
-          <IconShop className="bolum-ikon" />
-        </div>
-
-        <div className="odul-grid">
-          {oduller.map((o) => (
-            <article key={o.id} className="odul-kart">
-              <div className="odul-gorsel-wrap">
-                {o.gorsel ? (
-                  <img className="odul-gorsel" src={o.gorsel} alt={o.ad} />
-                ) : (
-                  <div className="odul-ikon-kutu"><IconTicket className="odul-buyuk-ikon" /></div>
-                )}
-              </div>
-              <div className="odul-alt">
-                <h4 className="odul-ad">{o.ad}</h4>
-                <div className="odul-fiyat-satir">
-                  <span className="odul-puan">{o.puan.toLocaleString("tr-TR")} Puan</span>
-                  <button className="odul-ekle" aria-label={`${o.ad} al`}>
-                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* Puan Geçmişi */}
-        <h3 className="bolum-baslik gecmis-baslik">Puan Geçmişi</h3>
-        <div className="gecmis-liste">
-          {puanGecmisi.map((g) => (
-            <div key={g.id} className="gecmis-satir">
-              <div className="gecmis-ikon-daire">
-                {g.tip === "kazanc" ? <IconCutlery className="gecmis-ikon" /> : <IconGift className="gecmis-ikon" />}
-              </div>
-              <div className="gecmis-orta">
-                <span className="gecmis-ad">{g.baslik}</span>
-                <span className="gecmis-tarih">{g.tarih}</span>
-              </div>
-              <span className={"gecmis-puan " + (g.tip === "kazanc" ? "arti" : "eksi")}>
-                {g.puan > 0 ? `+${g.puan}` : g.puan}
-              </span>
+      <OrtakHeader />
+      <SayfaSarici>
+        <div className="rewards-govde">
+          {/* Toplam puan kartı */}
+          <motion.section
+            className="puan-kart"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h2 className="puan-kart-baslik">Toplam Puanım</h2>
+            <div className="puan-buyuk">
+              <span className="puan-sayi">{puan.toLocaleString("tr-TR")}</span>
+              <span className="puan-etiket">Puan</span>
             </div>
-          ))}
+            <div className="puan-ilerleme-bilgi">
+              <span>Başlangıç</span>
+              <span className="puan-hedef">Hediye Burger ({hedef.toLocaleString("tr-TR")} Puan)</span>
+            </div>
+            <div className="puan-ilerleme-ray">
+              <motion.div className="puan-ilerleme-dolgu" {...barDolumu(yuzde)} />
+            </div>
+            <p className="puan-kalan">Hediyeye sadece <strong>{kalan.toLocaleString("tr-TR")} puan</strong> kaldı!</p>
+          </motion.section>
+
+          {/* Ödül Marketi */}
+          <div className="bolum-basrivi">
+            <h3 className="bolum-baslik">Ödül Marketi</h3>
+            <IconShop className="bolum-ikon" />
+          </div>
+
+          <motion.div className="odul-grid" {...siraliKonteyner} initial="initial" animate="animate">
+            {oduller.map((o) => {
+              const Ikon = ODUL_IKONLARI[o.ikon] || IconGift;
+              return (
+                <motion.article key={o.id} className="odul-kart" variants={siraliOge}>
+                  <div className="odul-gorsel-wrap">
+                    {o.gorsel
+                      ? <img className="odul-gorsel" src={o.gorsel} alt={o.ad} />
+                      : <div className="odul-gorsel-yer"><Ikon /></div>}
+                  </div>
+                  <div className="odul-alt">
+                    <h4 className="odul-ad">{o.ad}</h4>
+                    <div className="odul-fiyat-satir">
+                      <span className="odul-puan">{o.puan.toLocaleString("tr-TR")} Puan</span>
+                      <motion.button
+                        className="odul-ekle"
+                        aria-label={`${o.ad} al`}
+                        whileTap={{ scale: 0.85 }}
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                        </svg>
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </motion.div>
+
+          {/* Puan geçmişi */}
+          <div className="bolum-basrivi">
+            <h3 className="bolum-baslik">Puan Geçmişi</h3>
+          </div>
+          <div className="gecmis-liste">
+            {puanGecmisi.map((g) => (
+              <div key={g.id} className="gecmis-satir">
+                <div className="gecmis-sol">
+                  <span className="gecmis-baslik">{g.baslik}</span>
+                  <span className="gecmis-tarih">{g.tarih}</span>
+                </div>
+                <span className={"gecmis-puan " + (g.tip === "kazanc" ? "arti" : "eksi")}>
+                  {g.puan > 0 ? `+${g.puan}` : g.puan}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button className="tumunu-gor">Tümünü Gör</button>
         </div>
-        <button className="tumunu-gor">Tümünü Gör</button>
-      </div>
+      </SayfaSarici>
     </div>
   );
 }

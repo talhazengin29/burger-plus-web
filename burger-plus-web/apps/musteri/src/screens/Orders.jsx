@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { IconBag } from "../components/Icons";
+import OrtakHeader from "../components/OrtakHeader";
+import SayfaSarici from "../components/SayfaSarici";
 import "./Orders.css";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
@@ -121,9 +123,8 @@ export default function Orders() {
 
   return (
     <div className="ekran orders">
-      <header className="basit-header">
-        <span className="orders-brand">BURGER PLUS</span>
-      </header>
+      <OrtakHeader />
+      <SayfaSarici>
 
       <div className="orders-govde">
         <h1 className="orders-baslik">Siparişlerim</h1>
@@ -165,6 +166,7 @@ export default function Orders() {
           </>
         )}
       </div>
+      </SayfaSarici>
     </div>
   );
 }
