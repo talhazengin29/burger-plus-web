@@ -1,0 +1,109 @@
+/* Masa seçici modal */
+.masa-sec-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 16px;
+}
+.masa-sec-modal {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+}
+.masa-sec-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--on-surface);
+}
+.masa-sec-aciklama {
+  text-align: center;
+  font-size: 14px;
+  color: var(--charcoal-soft);
+  margin-bottom: 20px;
+}
+/* Masa numarası grid'i */
+.masa-sec-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.masa-sec-hucre {
+  aspect-ratio: 1;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  border: 2px solid transparent;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--on-surface);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s;
+}
+.masa-sec-hucre:active { transform: scale(0.93); }
+.masa-sec-hucre--aktif {
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  border-color: var(--primary);
+}
+.masa-sec-kapat {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  color: var(--charcoal-soft);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+/* Onay ekranı */
+.masa-sec-onay {
+  text-align: center;
+  padding: 12px 0;
+}
+.masa-sec-onay-ikon { font-size: 48px; margin-bottom: 16px; }
+.masa-sec-onay-yazi {
+  font-size: 16px;
+  color: var(--on-surface);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.masa-sec-onay-btn-grup {
+  display: flex;
+  gap: 12px;
+}
+.masa-sec-btn-iptal {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--r-md);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+}
+.masa-sec-btn-onayla {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+}

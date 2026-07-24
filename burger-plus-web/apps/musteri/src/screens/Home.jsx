@@ -8,7 +8,7 @@ import "./Home.css";
 
 export default function Home() {
   const [aktifKategori, setAktifKategori] = useState("Burgerler");
-  const { sepeteEkle, sepetAdet, kullanici, burgerDamga, burgerDamgaHedef } = useApp();
+  const { sepeteEkle, sepetAdet, kullanici, burgerDamga, burgerDamgaHedef, misafir } = useApp();
   const git = useNavigate();
   const chipRef = useSuruklenebilir();
 
@@ -49,15 +49,23 @@ export default function Home() {
             <br />
             <span className="vurgu">1 Burger HEDİYE!</span>
           </h2>
-          <div className="damga-alt">
-            <span className="damga-durum t-body-sm">
-              {burgerDamga}/{burgerDamgaHedef} Burger Tamamlandı
-            </span>
-            <span className="damga-ikon">🍔</span>
-          </div>
-          <div className="ilerleme-ray">
-            <div className="ilerleme-dolgu" style={{ width: `${damgaYuzde}%` }} />
-          </div>
+          {misafir ? (
+            <p className="damga-misafir-not">
+              🔑 Giriş yap veya üye ol, bu kampanyaya dahil ol!
+            </p>
+          ) : (
+            <>
+              <div className="damga-alt">
+                <span className="damga-durum t-body-sm">
+                  {burgerDamga}/{burgerDamgaHedef} Burger Tamamlandı
+                </span>
+                <span className="damga-ikon">🍔</span>
+              </div>
+              <div className="ilerleme-ray">
+                <div className="ilerleme-dolgu" style={{ width: `${damgaYuzde}%` }} />
+              </div>
+            </>
+          )}
         </section>
 
         {/* Kategori chip'leri */}

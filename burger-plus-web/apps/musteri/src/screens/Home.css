@@ -218,3 +218,15 @@
 }
 .ekle-btn:active { transform: scale(0.92); }
 .ekle-ikon { width: 20px; height: 20px; }
+
+/* Ye Kazan misafir notu */
+.damga-misafir-not {
+  font-size: 14px;
+  color: var(--charcoal-soft);
+  text-align: center;
+  margin-top: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 107, 0, 0.08);
+  border-radius: var(--r-md);
+  line-height: 1.5;
+}
