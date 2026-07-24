@@ -233,19 +233,21 @@ export function AppProvider({ children }) {
   // Siparişlerim'e kalıcı ekler, sepeti boşaltır.
   // tutar: bu ödemede gerçekten ödenen miktar (bölüşmede kişi payı olabilir).
   // yontem: "tam" | "esit" | "urun". masaNo: masaya servis ise masa no; al götürde null.
-  const odemeyiTamamla = (tutar, yontem = "tam", masaNo = null) => {
+  // odenenUrunlerParam: ürüne göre ödemede sadece seçilen ürünler gelir.
+  // Tamamını öde/eşit böl'de tüm sepet gelir.
+  const odemeyiTamamla = (tutar, yontem = "tam", masaNo = null, odenenUrunlerParam = null) => {
     const kazanilan = misafir ? 0 : puanHesapla(tutar);
     if (kazanilan > 0) {
       const yeniPuan = puan + kazanilan;
       setPuan(yeniPuan);
-      // Giriş yapmış kullanıcının puanını sunucuda da güncelle (kalıcı)
       if (kullanici) puaniGuncelle(yeniPuan);
     }
 
-    // Ödenen ürünlerin bir kopyası (sepet birazdan boşalacak)
-    const odenenUrunler = sepet.map((u) => ({
+    // Ödenen ürünler: parametre geldiyse onu kullan, yoksa tüm sepeti al
+    const kaynakUrunler = odenenUrunlerParam || sepet;
+    const odenenUrunler = kaynakUrunler.map((u) => ({
       id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
-      kategori: u.kategori,   // damga sayacı için (Burgerler sayılır)
+      kategori: u.kategori,
     }));
 
     const ozet = {

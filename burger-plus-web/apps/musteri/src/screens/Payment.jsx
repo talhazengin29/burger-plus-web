@@ -14,15 +14,17 @@ const YONTEMLER = [
 export default function Payment() {
   const git = useNavigate();
   const [params] = useSearchParams();
-  const masaNo = params.get("masa"); // varsa masaya servis, yoksa al götür
+  const masaNo = params.get("masa");
   const masaModu = !!masaNo;
   const { sepet, sepetToplam, odemeyiTamamla, misafir } = useApp();
 
   const [yontem, setYontem] = useState("tam");
   const [kisiSayisi, setKisiSayisi] = useState(2);
-  const [seciliUrunler, setSeciliUrunler] = useState([]); // ürüne göre: satır id listesi
 
-  // Sepet boşsa ödeme ekranı anlamsız
+  // Ürüne göre ödeme: her ürün için kaç adet ödeneceğini tutan obje
+  // { urunId: adet }  (0 = seçilmemiş, 1+ = o kadar adet ödeniyor)
+  const [seciliAdetler, setSeciliAdetler] = useState({});
+
   if (sepet.length === 0) {
     return (
       <div className="ekran payment">
@@ -39,25 +41,59 @@ export default function Payment() {
     );
   }
 
+  // Ürün seçiminde adet artır/azalt
+  const adetArtir = (id, maxAdet) => {
+    setSeciliAdetler((o) => {
+      const mevcut = o[id] || 0;
+      if (mevcut >= maxAdet) return o;
+      return { ...o, [id]: mevcut + 1 };
+    });
+  };
+  const adetAzalt = (id) => {
+    setSeciliAdetler((o) => {
+      const mevcut = o[id] || 0;
+      if (mevcut <= 0) return o;
+      const yeni = { ...o };
+      if (mevcut - 1 === 0) delete yeni[id];
+      else yeni[id] = mevcut - 1;
+      return yeni;
+    });
+  };
+  // Tümünü seç / kaldır toggle
+  const tumunuSec = (id, maxAdet) => {
+    setSeciliAdetler((o) => {
+      if ((o[id] || 0) > 0) {
+        const yeni = { ...o };
+        delete yeni[id];
+        return yeni;
+      }
+      return { ...o, [id]: maxAdet };
+    });
+  };
+
+  // Ödenen ürünleri hesapla (ürüne göre modda)
+  const seciliUrunListesi = sepet
+    .filter((u) => (seciliAdetler[u.id] || 0) > 0)
+    .map((u) => ({ ...u, adet: seciliAdetler[u.id] }));
+
   // Ödenecek tutarı yönteme göre hesapla
   let odenecek = sepetToplam;
+  let odenenUrunler = sepet; // tamamını öde → tüm sepet
   if (yontem === "esit") {
     odenecek = sepetToplam / kisiSayisi;
+    // Eşit bölmede de tüm ürünler mutfağa gider
   } else if (yontem === "urun") {
-    odenecek = sepet
-      .filter((s) => seciliUrunler.includes(s.id))
-      .reduce((t, s) => t + s.fiyat * s.adet, 0);
+    odenecek = seciliUrunListesi.reduce((t, u) => t + u.fiyat * u.adet, 0);
+    odenenUrunler = seciliUrunListesi;
   }
 
   const kazanilacakPuan = puanHesapla(odenecek);
-  const odemeAktif = yontem !== "urun" || seciliUrunler.length > 0;
-
-  const urunSec = (id) =>
-    setSeciliUrunler((o) => (o.includes(id) ? o.filter((x) => x !== id) : [...o, id]));
+  const odemeAktif = yontem !== "urun" || seciliUrunListesi.length > 0;
 
   const odeyVeBitir = () => {
     if (!odemeAktif) return;
-    odemeyiTamamla(odenecek, yontem, masaNo);
+    // Sadece ödenen ürünleri gönder — mutfağa yalnızca bunlar gidecek
+    odemeyiTamamla(odenecek, yontem, masaNo, odenenUrunler);
     git("/odeme-basarili");
   };
 
@@ -70,21 +106,15 @@ export default function Payment() {
       </header>
 
       <div className="payment-govde">
-        {/* Masaya servis ise masa bilgisi */}
         {masaModu && (
-          <div className="odeme-masa-rozet">
-            🍽️ Masa {masaNo} — Masaya Servis
-          </div>
+          <div className="odeme-masa-rozet">🍽️ Masa {masaNo} — Masaya Servis</div>
         )}
 
-        {/* Misafir bilgi şeridi */}
         {misafir && (
-          <div className="misafir-rozet">
-            👤 Misafir olarak devam ediyorsun
-          </div>
+          <div className="misafir-rozet">👤 Misafir olarak devam ediyorsun</div>
         )}
 
-        {/* Yöntem seçimi — misafir sadece tamamını öder, seçenek gösterilmez */}
+        {/* Yöntem seçimi — misafir sadece tamamını öder */}
         {!misafir && (
           <>
             <h2 className="odeme-bolum-baslik">Nasıl ödemek istersin?</h2>
@@ -104,7 +134,7 @@ export default function Payment() {
           </>
         )}
 
-        {/* Eşit böl: kişi sayısı (misafirde yok) */}
+        {/* Eşit böl: kişi sayısı */}
         {!misafir && yontem === "esit" && (
           <section className="secim-kutu">
             <h3 className="secim-baslik">Kaç kişi paylaşıyor?</h3>
@@ -117,32 +147,63 @@ export default function Payment() {
           </section>
         )}
 
-        {/* Ürüne göre: hangi ürünleri ödüyorsun (misafirde yok) */}
+        {/* Ürüne göre: adet bazlı seçim */}
         {!misafir && yontem === "urun" && (
           <section className="secim-kutu">
             <h3 className="secim-baslik">Ödeyeceğin ürünleri seç</h3>
             <div className="urun-sec-liste">
               {sepet.map((u) => {
-                const secili = seciliUrunler.includes(u.id);
+                const seciliAdet = seciliAdetler[u.id] || 0;
+                const secili = seciliAdet > 0;
                 return (
-                  <button
+                  <div
                     key={u.id}
                     className={"urun-sec-satir" + (secili ? " urun-sec-satir--secili" : "")}
-                    onClick={() => urunSec(u.id)}
                   >
-                    <span className={"sec-kutu" + (secili ? " sec-kutu--dolu" : "")}>
-                      {secili && <IconCheck />}
-                    </span>
-                    <span className="urun-sec-ad">{u.ad} {u.adet > 1 && `x${u.adet}`}</span>
-                    <span className="urun-sec-fiyat">₺{(u.fiyat * u.adet).toFixed(2)}</span>
-                  </button>
+                    {/* Sol: ürün bilgisi + tıklayınca tümünü seç/kaldır */}
+                    <button
+                      className="urun-sec-sol"
+                      onClick={() => tumunuSec(u.id, u.adet)}
+                    >
+                      <span className={"sec-kutu" + (secili ? " sec-kutu--dolu" : "")}>
+                        {secili && <IconCheck />}
+                      </span>
+                      <span className="urun-sec-ad">{u.ad}</span>
+                    </button>
+
+                    {/* Sağ: adet seçici (birden fazla ise) */}
+                    <div className="urun-sec-sag">
+                      {u.adet > 1 ? (
+                        <div className="urun-adet-secici">
+                          <button
+                            className="urun-adet-btn"
+                            onClick={() => adetAzalt(u.id)}
+                            disabled={seciliAdet === 0}
+                          >
+                            <IconMinus />
+                          </button>
+                          <span className="urun-adet-sayi">{seciliAdet}/{u.adet}</span>
+                          <button
+                            className="urun-adet-btn"
+                            onClick={() => adetArtir(u.id, u.adet)}
+                            disabled={seciliAdet === u.adet}
+                          >
+                            <IconPlus />
+                          </button>
+                        </div>
+                      ) : null}
+                      <span className="urun-sec-fiyat">
+                        ₺{(u.fiyat * (secili ? seciliAdet : u.adet)).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </section>
         )}
 
-        {/* Puan bilgisi — sadece daimi kullanıcıya */}
+        {/* Puan bilgisi */}
         {!misafir && (
           <div className="puan-bilgi">
             <span className="puan-bilgi-ikon">⭐</span>

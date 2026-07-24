@@ -208,3 +208,52 @@
   color: #fff;
   font-weight: 700;
 }
+
+/* Ürüne göre ödeme: satır düzeni */
+.urun-sec-sol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+.urun-sec-sag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+/* Adet seçici (+/- butonları) */
+.urun-adet-secici {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.urun-adet-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.urun-adet-btn:disabled { opacity: 0.3; cursor: default; }
+.urun-adet-btn svg { width: 14px; height: 14px; }
+.urun-adet-sayi {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
+  color: var(--on-surface);
+}
