@@ -15,7 +15,7 @@ const menuSatirlari = [
 ];
 
 export default function Profile() {
-  const { puan, karanlik, temaDegistir, misafir, adminMi, kullanici, cikisYap } = useApp();
+  const { karanlik, temaDegistir, misafir, adminMi, kullanici, cikisYap } = useApp();
   const git = useNavigate();
 
   // Misafir profil bölümüne giremez — üyeliğe davet ekranı göster
@@ -27,11 +27,6 @@ export default function Profile() {
       />
     );
   }
-
-  // Profil ekranı tasarımda 1000'lik ara hedef gösteriyor
-  const araHedef = 1000;
-  const gosterilenPuan = Math.min(puan, araHedef);
-  const yuzde = (gosterilenPuan / araHedef) * 100;
 
   return (
     <div className="ekran profile">
@@ -54,18 +49,6 @@ export default function Profile() {
             {kullanici ? kullanici.email : "Giriş yapmadınız"}
           </p>
         </div>
-
-        {/* Puan çubuğu */}
-        <section className="profil-puan-kart">
-          <div className="profil-puan-ust">
-            <span className="profil-puan-etiket">Burger Puanı</span>
-            <span className="profil-puan-deger">{gosterilenPuan} / {araHedef} Puan</span>
-          </div>
-          <div className="ilerleme-ray">
-            <div className="ilerleme-dolgu" style={{ width: `${yuzde}%` }} />
-          </div>
-          <p className="profil-puan-not">Bir sonraki ücretsiz menüye çok yakınsın!</p>
-        </section>
 
         {/* İşletme bölümü — SADECE ADMIN görür */}
         {adminMi && (

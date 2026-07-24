@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { girisYap, tokeniKaydet } from "../lib/authApi";
 import logoFull from "../assets/logo-full.png";
@@ -41,12 +42,25 @@ export default function Login() {
 
   return (
     <div className="ekran login">
-      <div className="login-ust">
+      {/* Logo — yukarıdan fade */}
+      <motion.div
+        className="login-ust"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <img className="login-logo" src={logoFull} alt="Burger Plus" />
         <p className="login-slogan">Lezzet ve puanlar seni bekliyor</p>
-      </div>
+      </motion.div>
 
-      <form className="login-form" onSubmit={gonder}>
+      {/* Form — aşağıdan yukarı kayarak gelir */}
+      <motion.form
+        className="login-form"
+        onSubmit={gonder}
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+      >
         <h2 className="login-baslik">Giriş Yap</h2>
 
         <label className="login-etiket">E-posta</label>
@@ -84,21 +98,30 @@ export default function Login() {
         <button type="submit" className="login-giris-btn" disabled={yukleniyor || !email || !sifre}>
           {yukleniyor ? "Giriş yapılıyor..." : "Giriş Yap"}
         </button>
-      </form>
+      </motion.form>
 
-      <p className="login-kayit-yonlendir">
+      {/* Alt linkler — gecikmeli fade */}
+      <motion.p
+        className="login-kayit-yonlendir"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
         Hesabın yok mu?{" "}
         <button className="login-kayit-link" onClick={() => git("/kayit")}>
           Kayıt Ol
         </button>
-      </p>
+      </motion.p>
 
-      <button className="login-misafir-link" onClick={() => {
-        setMisafir(true);
-        git("/anasayfa");
-      }}>
+      <motion.button
+        className="login-misafir-link"
+        onClick={() => { setMisafir(true); git("/anasayfa"); }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
         Misafir olarak devam et
-      </button>
+      </motion.button>
     </div>
   );
 }

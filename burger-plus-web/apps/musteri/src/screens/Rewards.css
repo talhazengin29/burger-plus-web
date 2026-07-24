@@ -58,10 +58,24 @@
   line-height: 1;
   margin-bottom: 18px;
 }
+.puan-sayi { display: inline; }
+.puan-etiket {
+  font-size: 18px;
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--primary-container);
+}
 .puan-birim {
   font-size: 16px;
   margin-left: 6px;
   font-weight: 700;
+}
+.puan-ilerleme-bilgi {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--charcoal-soft);
+  margin-bottom: 8px;
 }
 .puan-etiket-satir {
   display: flex;
@@ -71,6 +85,17 @@
   margin-bottom: 8px;
 }
 .puan-hedef { color: var(--primary-container); font-weight: 600; }
+.puan-ilerleme-ray {
+  height: 8px;
+  background: var(--surface-container-high);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.puan-ilerleme-dolgu {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-grad-start), var(--primary-grad-end));
+  border-radius: var(--r-full);
+}
 .puan-kalan {
   font-size: 14px;
   color: var(--charcoal-soft);
