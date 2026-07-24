@@ -15,6 +15,7 @@ import TableWelcome from "./screens/TableWelcome";
 import QrGenerator from "./screens/QrGenerator";
 import Kayit from "./screens/Kayit";
 import ProfilDuzenle from "./screens/ProfilDuzenle";
+import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { Navigate } from "react-router-dom";
 import "./App.css";
@@ -25,7 +26,7 @@ const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlar
 // Sadece admin girebilir; değilse ana sayfaya yönlendir.
 function AdminKorumali({ children }) {
   const { adminMi, authYuklendi } = useApp();
-  if (!authYuklendi) return null; // token kontrolü bitene kadar bekle
+  if (!authYuklendi) return null;
   return adminMi ? children : <Navigate to="/anasayfa" replace />;
 }
 
@@ -37,23 +38,21 @@ function Icerik() {
     <div className="telefon">
       <div className="telefon-ekran">
         <Routes>
-          {/* Açılış: Giriş ekranı */}
+          {/* Açık rotalar: giriş, kayıt, QR ile masa */}
           <Route path="/" element={<Login />} />
           <Route path="/kayit" element={<Kayit />} />
-          <Route path="/anasayfa" element={<Home />} />
-          <Route path="/kampanyalar" element={<Campaigns />} />
-          <Route path="/puanlarim" element={<Rewards />} />
-          <Route path="/profil" element={<Profile />} />
-          <Route path="/profil-duzenle" element={<ProfilDuzenle />} />
-          {/* Sipariş/menü akışı */}
-          <Route path="/sepet" element={<Cart />} />
-          <Route path="/qr" element={<QrScan />} />
-          <Route path="/odeme" element={<Payment />} />
-          <Route path="/odeme-basarili" element={<PaymentSuccess />} />
-          {/* Siparişlerim sekmesi */}
-          <Route path="/siparislerim" element={<Orders />} />
-          {/* QR ile masa karşılama (müşteri buraya QR'dan gelir) */}
           <Route path="/masa" element={<TableWelcome />} />
+          {/* Korumalı rotalar: giriş yapmış veya misafir olmalı */}
+          <Route path="/anasayfa" element={<Korumali><Home /></Korumali>} />
+          <Route path="/kampanyalar" element={<Korumali><Campaigns /></Korumali>} />
+          <Route path="/puanlarim" element={<Korumali><Rewards /></Korumali>} />
+          <Route path="/profil" element={<Korumali><Profile /></Korumali>} />
+          <Route path="/profil-duzenle" element={<Korumali><ProfilDuzenle /></Korumali>} />
+          <Route path="/sepet" element={<Korumali><Cart /></Korumali>} />
+          <Route path="/qr" element={<Korumali><QrScan /></Korumali>} />
+          <Route path="/odeme" element={<Korumali><Payment /></Korumali>} />
+          <Route path="/odeme-basarili" element={<Korumali><PaymentSuccess /></Korumali>} />
+          <Route path="/siparislerim" element={<Korumali><Orders /></Korumali>} />
           {/* İşletme: masa QR'ları üret — SADECE ADMIN */}
           <Route path="/qr-uret" element={<AdminKorumali><QrGenerator /></AdminKorumali>} />
         </Routes>

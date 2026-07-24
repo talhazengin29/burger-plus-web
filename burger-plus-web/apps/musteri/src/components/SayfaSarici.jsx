@@ -12,7 +12,7 @@ export default function SayfaSarici({ children }) {
       initial={sayfaGecisi.initial}
       animate={sayfaGecisi.animate}
       transition={sayfaGecisi.transition}
-      style={{ height: "100%", display: "flex", flexDirection: "column" }}
+      style={{ flex: 1, minHeight: 0 }}
     >
       {children}
     </motion.div>
