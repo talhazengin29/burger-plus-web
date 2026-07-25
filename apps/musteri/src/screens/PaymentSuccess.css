@@ -1,0 +1,208 @@
+.success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px var(--margin);
+}
+.success-icerik {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Onay dairesi */
+.success-daire {
+  width: 96px; height: 96px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 28px rgba(255, 107, 0, 0.45), var(--glow-lg);
+  animation: pop 0.35s ease;
+}
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-check { width: 48px; height: 48px; color: #fff; }
+
+.success-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--on-surface);
+  margin-bottom: 6px;
+}
+.success-alt {
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* --- Sipariş durum kartı (al götür) — cam --- */
+.siparis-durum-kart {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--glass-shadow-sm);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.siparis-durum-kart--hazir {
+  background: var(--primary-fixed);
+  border-color: rgba(255, 107, 0, 0.4);
+  box-shadow: var(--glass-shadow-sm), var(--glow);
+}
+.durum-ikon { font-size: 30px; flex-shrink: 0; }
+.durum-metin {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+.durum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--on-surface);
+}
+.durum-alt { font-size: 13px; color: var(--on-surface-variant); }
+
+/* Dönen bekleme göstergesi */
+.durum-spinner {
+  width: 22px; height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--primary-container);
+  border-radius: var(--r-full);
+  animation: don 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes don {
+  to { transform: rotate(360deg); }
+}
+
+/* Ödenen tutar — cam */
+.success-tutar-kart {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 16px;
+}
+.success-tutar-etiket { font-weight: 600; font-size: 15px; color: var(--on-surface-variant); }
+.success-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--on-surface);
+}
+
+/* Kazanılan puan kartı — turuncu tonlu cam, vurgulu */
+.success-puan-kart {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background:
+    linear-gradient(135deg, rgba(255, 107, 0, 0.16), rgba(255, 145, 77, 0.05)),
+    var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: var(--glass-shadow);
+}
+.success-puan-ust {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+.success-puan-buyuk {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 52px;
+  color: var(--primary-container);
+  text-shadow: 0 0 32px rgba(255, 107, 0, 0.5);
+  line-height: 1;
+}
+.success-puan-toplam {
+  font-size: 14px;
+  color: var(--outline);
+  margin-top: 6px;
+}
+
+.success-misafir-not {
+  width: 100%;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  margin-bottom: 32px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+/* Butonlar */
+.success-butonlar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.success-btn-ana {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  transition: box-shadow 0.2s;
+}
+.success-btn-ana:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+/* İkincil — cam efektli */
+.success-btn-puan {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-strong);
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 16px;
+  transition: background 0.15s;
+}
+.success-btn-puan:hover { background: rgba(255, 255, 255, 0.12); }
+.success-btn-ana:active, .success-btn-puan:active { transform: scale(0.99); }

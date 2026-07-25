@@ -1,0 +1,173 @@
+.mutfak {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Üst bar --- */
+.mutfak-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.mutfak-header-sol { display: flex; align-items: center; gap: 12px; }
+.mutfak-brand {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.mutfak-etiket {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: var(--panel-3);
+  color: var(--metin-soluk);
+  padding: 4px 10px;
+  border-radius: var(--r-md);
+}
+.mutfak-header-sag { display: flex; align-items: center; gap: 18px; }
+.baglanti { font-size: 13px; font-weight: 600; }
+.baglanti--acik { color: var(--basari); }
+.baglanti--kapali { color: var(--tehlike); }
+.mutfak-sayi { color: var(--metin-soluk); font-size: 14px; }
+.cikis-btn {
+  padding: 8px 16px;
+  border-radius: var(--r-md);
+  background: var(--panel-3);
+  color: var(--metin);
+  font-size: 13px;
+  font-weight: 600;
+}
+.cikis-btn:hover { background: var(--border); }
+
+/* --- Boş durum --- */
+.bos-durum {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--metin-soluk);
+  padding: 40px;
+  text-align: center;
+}
+.bos-emoji { font-size: 64px; margin-bottom: 8px; }
+.bos-durum h2 { font-size: 22px; color: var(--metin); font-weight: 700; }
+
+/* --- Masa listesi (kart ızgarası) --- */
+.masa-liste {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.masa-kart {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s;
+}
+/* Durum renkleri (sol kenar + rozet) */
+.masa-kart.durum-info { border-left: 4px solid var(--info); }
+.masa-kart.durum-uyari { border-left: 4px solid var(--uyari); }
+.masa-kart.durum-basari { border-left: 4px solid var(--basari); opacity: 0.7; }
+
+.masa-kart-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.masa-baslik { display: flex; flex-direction: column; gap: 3px; }
+.masa-no {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--metin);
+}
+.masa-sure {
+  font-size: 12px;
+  color: var(--metin-soluk);
+}
+.durum-rozet {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.durum-rozet.durum-info { background: rgba(59,130,246,0.15); color: var(--info); }
+.durum-rozet.durum-uyari { background: rgba(245,158,11,0.15); color: var(--uyari); }
+.durum-rozet.durum-basari { background: rgba(16,185,129,0.15); color: var(--basari); }
+
+/* --- Kalem listesi --- */
+.kalem-liste {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kalem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--panel-2);
+  border-radius: var(--r-md);
+  font-size: 14px;
+}
+.kalem-adet {
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 28px;
+}
+.kalem-ad { flex: 1; font-weight: 500; }
+.kalem-kisi {
+  font-size: 11px;
+  color: var(--metin-soluk);
+  background: var(--panel-3);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* --- Alt satır (toplam + butonlar) --- */
+.masa-alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.masa-toplam {
+  font-weight: 700;
+  color: var(--metin);
+  font-size: 15px;
+}
+.btn {
+  padding: 10px 18px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 700;
+  transition: filter 0.15s;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn:active { transform: scale(0.98); }
+.btn-uyari { background: var(--uyari); color: #1a1108; }
+.btn-basari { background: var(--basari); color: #06231a; }
+.hazir-not {
+  color: var(--basari);
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,0 +1,274 @@
+/* --- Basit üst bar (Puan & Profil ekranlarında ortak stil) --- */
+.basit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px var(--margin);
+  position: sticky;
+  top: 0;
+  background: rgba(13, 13, 13, 0.55);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 5;
+}
+.basit-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+}
+.ikon-btn.koyu { color: #fff; }
+.daire-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  color: var(--on-surface-variant);
+  display: grid; place-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+.daire-btn:hover { background: var(--glass-bg-strong); color: #fff; }
+.daire-btn svg { width: 20px; height: 20px; }
+
+.rewards-govde { padding: 8px var(--margin) 0; }
+
+/* --- Toplam puan kartı — cam --- */
+.puan-kart {
+  position: relative;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  padding: 26px 22px 22px;
+  text-align: center;
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.puan-ust-cizgi {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-grad-start), var(--primary-grad-end));
+  box-shadow: var(--glow);
+}
+.puan-kart-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--on-surface);
+  margin-bottom: 4px;
+}
+.puan-buyuk {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 48px;
+  color: var(--primary-container);
+  text-shadow: 0 0 32px rgba(255, 107, 0, 0.45);
+  line-height: 1;
+  margin-bottom: 18px;
+}
+.puan-sayi { display: inline; }
+.puan-etiket {
+  font-size: 18px;
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--primary-container);
+}
+.puan-birim {
+  font-size: 16px;
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+.puan-ilerleme-bilgi {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+.puan-etiket-satir {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+.puan-hedef { color: var(--primary-container); font-weight: 600; }
+/* Turuncu ilerleme barı */
+.puan-ilerleme-ray {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.puan-ilerleme-dolgu {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-grad-start), var(--primary-grad-end));
+  border-radius: var(--r-full);
+  box-shadow: var(--glow-sm);
+}
+.puan-kalan {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  margin-top: 12px;
+}
+.puan-kalan strong { color: var(--on-surface); }
+
+/* --- QR CTA --- */
+.qr-cta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  margin-bottom: 28px;
+  transition: box-shadow 0.2s;
+}
+.qr-cta:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.qr-cta-ikon { width: 26px; height: 26px; }
+.qr-cta:active { transform: scale(0.99); }
+
+/* --- Bölüm başlığı + ikon --- */
+.bolum-basrivi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;      /* QR butonu kaldırıldı, boşluğu burada dengeliyoruz */
+  margin-bottom: 16px;
+}
+.bolum-ikon { color: var(--primary-container); width: 24px; height: 24px; }
+
+/* --- Ödül grid — cam kartlar --- */
+.odul-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.odul-kart {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.odul-kart:hover {
+  border-color: rgba(255, 107, 0, 0.28);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
+}
+.odul-gorsel-wrap { aspect-ratio: 4 / 3; overflow: hidden; }
+.odul-gorsel { width: 100%; height: 100%; object-fit: cover; }
+/* Görseli olmayan ödül — cam ikon kutusu (orijinalde stilsizdi) */
+.odul-ikon-kutu,
+.odul-gorsel-yer {
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  display: grid; place-items: center;
+}
+.odul-gorsel-yer svg {
+  width: 48px; height: 48px;
+  color: var(--primary-container);
+  filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+}
+.odul-buyuk-ikon {
+  width: 48px; height: 48px;
+  color: var(--primary-container);
+  filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+}
+.odul-alt { padding: 12px 14px 14px; }
+.odul-ad { font-weight: 600; font-size: 15px; color: var(--on-surface); margin-bottom: 8px; }
+.odul-fiyat-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.odul-puan { color: var(--primary-container); font-weight: 600; font-size: 14px; }
+.odul-ekle {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: var(--on-surface-variant);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.odul-ekle:hover { background: var(--primary-fixed); color: var(--primary-bright); }
+.odul-ekle svg {
+  display: block;   /* satır-içi boşluk kalmasın → tam ortada */
+}
+.odul-ekle:active { transform: scale(0.9); }
+
+/* --- Puan geçmişi — cam liste --- */
+.gecmis-baslik { margin-bottom: 14px; }
+.gecmis-liste {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 4px 16px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 14px;
+}
+.gecmis-satir {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.gecmis-satir:last-child { border-bottom: none; }
+.gecmis-ikon-daire {
+  width: 42px; height: 42px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.gecmis-ikon { width: 20px; height: 20px; color: var(--primary); }
+.gecmis-orta,
+.gecmis-sol { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.gecmis-sol .gecmis-baslik {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--on-surface);
+  margin-bottom: 0;
+}
+.gecmis-ad { font-weight: 600; font-size: 15px; color: var(--on-surface); }
+.gecmis-tarih { font-size: 13px; color: var(--outline); }
+.gecmis-puan { font-family: 'Montserrat'; font-weight: 700; font-size: 20px; }
+.gecmis-puan.arti { color: var(--primary-container); }
+.gecmis-puan.eksi { color: var(--on-surface-variant); }
+
+.tumunu-gor {
+  display: block;
+  margin: 0 auto;
+  color: var(--primary-container);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px;
+}

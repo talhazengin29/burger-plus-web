@@ -1,0 +1,54 @@
+# ============================================
+# Burger Plus Web — Kod Kontrolü
+# Her push ve PR'da otomatik çalışır.
+# Build bozuksa veya lint hatası varsa uyarır.
+# ============================================
+
+name: Kod Kontrolü
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  kontrol:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodu indir
+        uses: actions/checkout@v4
+
+      # --- Müşteri uygulaması ---
+      - name: Müşteri — bağımlılıkları kur
+        working-directory: apps/musteri
+        run: npm install
+
+      - name: Müşteri — lint (kod hatası kontrolü)
+        working-directory: apps/musteri
+        run: npx oxlint src/ --deny-warnings || true
+
+      - name: Müşteri — build kontrolü
+        working-directory: apps/musteri
+        run: npm run build
+
+      # --- Personel uygulaması ---
+      - name: Personel — bağımlılıkları kur
+        working-directory: apps/personel
+        run: npm install
+
+      - name: Personel — lint
+        working-directory: apps/personel
+        run: npx oxlint src/ --deny-warnings || true
+
+      - name: Personel — build kontrolü
+        working-directory: apps/personel
+        env:
+          VITE_BASE: /personel/
+        run: npm run build
+
+      # --- Birleştirme ---
+      - name: Birleştirme kontrolü
+        run: node birlestir.js

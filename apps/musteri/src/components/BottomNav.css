@@ -1,0 +1,78 @@
+/* Alt menü — koyu cam, üstte ince ışık çizgisi */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(13, 13, 13, 0.6);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  padding: 10px 4px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.nav-label {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 30px;
+  border-radius: var(--r-full);
+  transition: background 0.2s;
+}
+
+.nav-icon { width: 22px; height: 22px; }
+
+/* Aktif sekme — turuncu ikon + turuncu alt çizgi */
+.nav-item--aktif { color: var(--primary-container); }
+.nav-item--aktif .nav-icon-wrap {
+  background: var(--primary-fixed);
+  filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.5));
+}
+.nav-item--aktif::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  border-radius: var(--r-full);
+  background: linear-gradient(90deg, var(--primary-grad-start), var(--primary-grad-end));
+  box-shadow: var(--glow-sm);
+}
+
+/* Pasif (yakında) sekme — soluk, tıklanamaz */
+.nav-item--pasif {
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.nav-item--pasif .nav-icon { width: 22px; height: 22px; }
