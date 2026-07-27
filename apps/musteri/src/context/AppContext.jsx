@@ -377,7 +377,6 @@ export function AppProvider({ children }) {
 
     sepetiBosalt();
     setAktifMasa(null);
-    setMisafir(false);
     return ozet;
   };
 
