@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { sadakatVarsayilan, oduller, puanGecmisi } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { IconShop, IconTicket, IconCutlery, IconGift } from "../components/Icons";
@@ -11,7 +12,14 @@ import "./Rewards.css";
 const ODUL_IKONLARI = { IconTicket, IconCutlery, IconGift };
 
 export default function Rewards() {
-  const { puan, misafir } = useApp();
+  const { puan, misafir, odulSatinAl } = useApp();
+  const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
+
+  useEffect(() => {
+    if (!mesaj) return;
+    const t = setTimeout(() => setMesaj(null), 2500);
+    return () => clearTimeout(t);
+  }, [mesaj]);
 
   if (misafir) {
     return (
@@ -26,11 +34,33 @@ export default function Rewards() {
   const yuzde = Math.min((puan / hedef) * 100, 100);
   const kalan = Math.max(hedef - puan, 0);
 
+  const odulAlTiklandi = (o) => {
+    const sonuc = odulSatinAl(o);
+    setMesaj(
+      sonuc.basarili
+        ? { tip: "basari", metin: `${o.ad} hediyelerine eklendi!` }
+        : { tip: "hata", metin: "Yeterli puanın yok" }
+    );
+  };
+
   return (
     <div className="ekran rewards">
       <OrtakHeader />
       <SayfaSarici>
         <div className="rewards-govde">
+          <AnimatePresence>
+            {mesaj && (
+              <motion.div
+                className={"rewards-toast rewards-toast--" + mesaj.tip}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                {mesaj.metin}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Toplam puan kartı */}
           <motion.section
             className="puan-kart"
@@ -76,6 +106,7 @@ export default function Rewards() {
                       <motion.button
                         className="odul-ekle"
                         aria-label={`${o.ad} al`}
+                        onClick={() => odulAlTiklandi(o)}
                         whileTap={{ scale: 0.85 }}
                       >
                         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">

@@ -1,0 +1,98 @@
+.hediyelerim-govde { padding: 8px var(--margin) 24px; }
+.hediyelerim-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--on-surface);
+  margin-bottom: 20px;
+}
+.hediyelerim-bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--on-surface);
+  margin: 24px 0 14px;
+}
+.hediyelerim-bos {
+  color: var(--outline);
+  font-size: 14px;
+  padding: 8px 2px 4px;
+}
+
+.hediye-liste { display: flex; flex-direction: column; gap: 14px; }
+
+/* --- Hediye kartı — cam --- */
+.hediye-kart {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  box-shadow: var(--glass-shadow);
+}
+.hediye-gorsel-wrap {
+  width: 64px; height: 64px;
+  flex-shrink: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.hediye-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.hediye-gorsel-yer {
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  display: grid; place-items: center;
+  color: var(--primary-container);
+}
+.hediye-gorsel-yer svg { width: 28px; height: 28px; }
+
+.hediye-icerik {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.hediye-ad {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--on-surface);
+}
+.hediye-kaynak { font-size: 13px; color: var(--primary-container); font-weight: 600; }
+.hediye-tarih { font-size: 12px; color: var(--outline); margin-bottom: 4px; }
+
+.hediye-sepet-btn {
+  align-self: flex-start;
+  padding: 9px 16px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+  transition: box-shadow 0.2s;
+}
+.hediye-sepet-btn:hover { box-shadow: 0 4px 14px rgba(255, 107, 0, 0.4), var(--glow-sm); }
+.hediye-sepet-btn:active { transform: scale(0.97); }
+
+.hediye-kullanildi-rozet {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--basari);
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+}
+
+/* Kullanılmış hediyeler soluk görünür */
+.hediye-kart--kullanilmis {
+  opacity: 0.6;
+  background: var(--glass-bg-soft);
+  border: 1px solid var(--glass-border-soft);
+}

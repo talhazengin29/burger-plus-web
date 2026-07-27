@@ -16,13 +16,14 @@ import QrGenerator from "./screens/QrGenerator";
 import Kayit from "./screens/Kayit";
 import ProfilDuzenle from "./screens/ProfilDuzenle";
 import UrunDetay from "./screens/UrunDetay";
+import Hediyelerim from "./screens/Hediyelerim";
 import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { Navigate } from "react-router-dom";
 import "./App.css";
 
 // Alt menünün gösterileceği ekranlar. Giriş, sepet, ödeme akışında alt menü olmaz.
-const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil"];
+const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil", "/hediyelerim"];
 
 // Sadece admin girebilir; değilse ana sayfaya yönlendir.
 function AdminKorumali({ children }) {
@@ -49,6 +50,7 @@ function Icerik() {
           <Route path="/puanlarim" element={<Korumali><Rewards /></Korumali>} />
           <Route path="/profil" element={<Korumali><Profile /></Korumali>} />
           <Route path="/profil-duzenle" element={<Korumali><ProfilDuzenle /></Korumali>} />
+          <Route path="/hediyelerim" element={<Korumali><Hediyelerim /></Korumali>} />
           <Route path="/sepet" element={<Korumali><Cart /></Korumali>} />
           <Route path="/qr" element={<Korumali><QrScan /></Korumali>} />
           <Route path="/odeme" element={<Korumali><Payment /></Korumali>} />

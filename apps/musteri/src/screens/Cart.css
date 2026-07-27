@@ -83,6 +83,16 @@
 .cart-orta { flex: 1; min-width: 0; }
 .cart-ad { font-weight: 600; font-size: 16px; color: var(--on-surface); margin-bottom: 4px; }
 .cart-birim { color: var(--primary-container); font-weight: 700; font-size: 15px; }
+.cart-hediye-etiket {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--basari);
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+}
 .cart-sag {
   display: flex;
   flex-direction: column;

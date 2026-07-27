@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
-  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift,
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
@@ -10,6 +10,7 @@ import "./Profile.css";
 
 const menuSatirlari = [
   { ad: "Kişisel Bilgiler", Ikon: IconUser, yol: "/profil-duzenle" },
+  { ad: "Hediyelerim", Ikon: IconGift, yol: "/hediyelerim" },
   { ad: "Sipariş Geçmişi", Ikon: IconReceipt, yol: "/siparislerim" },
   { ad: "Yardım & Destek", Ikon: IconHelp, yol: null },
 ];

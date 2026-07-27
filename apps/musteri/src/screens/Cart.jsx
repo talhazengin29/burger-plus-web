@@ -5,7 +5,14 @@ import "./Cart.css";
 
 export default function Cart() {
   const git = useNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, odemeyiTamamla } = useApp();
+
+  // Sepette sadece hediye ürünler varsa (toplam 0₺) ödeme ekranına gerek yok.
+  const bedava = sepet.length > 0 && sepetToplam === 0;
+  const siparisiTamamla = () => {
+    odemeyiTamamla(0, "tam", aktifMasa || null, sepet);
+    git("/odeme-basarili");
+  };
 
   return (
     <div className="ekran cart">
@@ -34,7 +41,11 @@ export default function Cart() {
                   <img className="cart-gorsel" src={u.gorsel} alt={u.ad} />
                   <div className="cart-orta">
                     <h3 className="cart-ad">{u.ad}</h3>
-                    <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
+                    {u.hediyeMi ? (
+                      <span className="cart-hediye-etiket">HEDİYE 🎁</span>
+                    ) : (
+                      <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
+                    )}
                   </div>
                   <div className="cart-sag">
                     <button className="cart-sil" onClick={() => sepettenCikar(u.id)} aria-label="Kaldır">
@@ -59,14 +70,14 @@ export default function Cart() {
             </div>
 
             {aktifMasa ? (
-              /* QR ile masa seçili — doğrudan o masaya ödeme */
+              /* QR ile masa seçili — doğrudan o masaya ödeme (bedavaysa direkt tamamla) */
               <>
                 <div className="cart-masa-bilgi">🍽️ Masa {aktifMasa}'desin</div>
                 <button
                   className="odeme-gec-btn"
-                  onClick={() => git(`/odeme?masa=${aktifMasa}`)}
+                  onClick={bedava ? siparisiTamamla : () => git(`/odeme?masa=${aktifMasa}`)}
                 >
-                  Ödemeye Geç
+                  {bedava ? "Siparişi Tamamla" : "Ödemeye Geç"}
                 </button>
               </>
             ) : (
@@ -74,9 +85,12 @@ export default function Cart() {
               <>
                 <p className="cart-secim-baslik">Nasıl sipariş vermek istersin?</p>
                 <div className="cart-secim-butonlar">
-                  <button className="siparis-tip-btn siparis-tip-btn--algotur" onClick={() => git("/odeme")}>
+                  <button
+                    className="siparis-tip-btn siparis-tip-btn--algotur"
+                    onClick={bedava ? siparisiTamamla : () => git("/odeme")}
+                  >
                     <span className="siparis-tip-emoji">🥡</span>
-                    Al Götür
+                    {bedava ? "Siparişi Tamamla" : "Al Götür"}
                   </button>
                   <button className="siparis-tip-btn siparis-tip-btn--masa" onClick={() => git("/qr?mod=masa")}>
                     <span className="siparis-tip-emoji">🍽️</span>

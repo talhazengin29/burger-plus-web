@@ -3,7 +3,7 @@
    Ödeme yapıldığında puan burada artar. Puan oranı mockData'da (PUAN_ORANI_TL).
    ========================================================================== */
 
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
 import { puanHesapla, kampanyalar, kampanyaAktifMi } from "../data/mockData";
 import { socket } from "../lib/socket";
 import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle } from "../lib/authApi";
@@ -41,9 +41,11 @@ export function AppProvider({ children }) {
     tokeniSil();
     setKullanici(null);
     setPuan(0);
-    // Siparişler/damga kişiye özel — çıkışta temizle ki hesaplar karışmasın
+    // Siparişler/damga/hediyeler kişiye özel — çıkışta temizle ki hesaplar karışmasın
     localStorage.removeItem("bp_siparislerim");
     setSiparislerim([]);
+    localStorage.removeItem("bp_hediyeler");
+    setHediyeler([]);
   };
 
   // Profil güncelle (email + telefon). Başarılıysa kullanıcı state'ini tazeler.
@@ -229,11 +231,77 @@ export function AppProvider({ children }) {
   const toplamBurger = siparislerim.reduce((toplam, s) => {
     const burgerAdet = (s.urunler || [])
       .filter((u) => u.kategori === "Burgerler")
-      .reduce((t, u) => t + (u.adet || 0), 0);
+      .reduce((t, u) => t + (u.adet || 1), 0); // adet alanı yoksa bile en az 1 say
     return toplam + burgerAdet;
   }, 0);
   const burgerDamga = toplamBurger % DAMGA_HEDEF;
   const kazanilanHediye = Math.floor(toplamBurger / DAMGA_HEDEF);
+
+  // --- Hediye envanteri (Ye Kazan + puanla alınan ödüller) ---
+  // localStorage'da kalıcı — tarayıcı kapansa bile korunur.
+  const [hediyeler, setHediyeler] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("bp_hediyeler") || "[]"); }
+    catch { return []; }
+  });
+  const hediyeEkle = (hediye) => {
+    setHediyeler((o) => {
+      const yeni = [hediye, ...o];
+      localStorage.setItem("bp_hediyeler", JSON.stringify(yeni));
+      return yeni;
+    });
+  };
+  const hediyeKullan = (id) => {
+    setHediyeler((o) => {
+      const yeni = o.map((h) => (h.id === id ? { ...h, kullanildi: true } : h));
+      localStorage.setItem("bp_hediyeler", JSON.stringify(yeni));
+      return yeni;
+    });
+  };
+
+  // kazanilanHediye arttıkça (her 5 burgerde bir) otomatik hediye ekle.
+  // useRef: yalnızca artışta tetiklensin, her render'da değil.
+  const oncekiKazanilanHediye = useRef(kazanilanHediye);
+  useEffect(() => {
+    const fark = kazanilanHediye - oncekiKazanilanHediye.current;
+    for (let i = 0; i < fark; i++) {
+      hediyeEkle({
+        id: Date.now() + i,
+        ad: "Bedava Burger (Ye Kazan)",
+        tip: "ye-kazan",
+        tarih: new Date().toISOString(),
+        kullanildi: false,
+      });
+    }
+    oncekiKazanilanHediye.current = kazanilanHediye;
+  }, [kazanilanHediye]);
+
+  // Puanla ödül satın alma (Rewards ekranındaki "+" butonu çağırır).
+  const odulSatinAl = (odul) => {
+    if (puan < odul.puan) return { basarili: false };
+    const yeniPuan = puan - odul.puan;
+    setPuan(yeniPuan);
+    if (kullanici) puaniGuncelle(yeniPuan);
+    hediyeEkle({
+      id: Date.now(),
+      ad: odul.ad,
+      tip: "puan",
+      puan: odul.puan,
+      gorsel: odul.gorsel || null,
+      tarih: new Date().toISOString(),
+      kullanildi: false,
+    });
+    return { basarili: true };
+  };
+
+  // Hediyeyi sepete 0₺ olarak ekler — indirim/birleştirme mantığından muaf,
+  // kendi bağımsız satırı olarak girer.
+  const hediyeSepeteEkle = (hediye) => {
+    setSepet((onceki) => [...onceki, {
+      id: hediye.id, ad: hediye.ad, fiyat: 0, adet: 1,
+      gorsel: hediye.gorsel || null, kategori: hediye.kategori || null, hediyeMi: true,
+    }]);
+    hediyeKullan(hediye.id);
+  };
 
   // Masa kapatıldı bildirimini dinle (salon personeli kapatınca gelir).
   // O masanın siparişleri "tamamlandı" olur, masa bağlantısı temizlenir.
@@ -342,6 +410,10 @@ export function AppProvider({ children }) {
     burgerDamgaHedef: DAMGA_HEDEF,
     toplamBurger,
     kazanilanHediye,
+    // hediye envanteri (Ye Kazan + puanla alınan ödüller)
+    hediyeler,
+    hediyeSepeteEkle,
+    odulSatinAl,
     // masa özeti (canlı, masadaki herkesin siparişi)
     masaOzeti,
     ozetMasaNo,
