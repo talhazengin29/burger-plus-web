@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { kategoriler, kategoriGorseller, urunler, kampanyalar } from "../data/mockData";
+import { kategoriler, kategoriGorseller, urunler } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
-import { IconPlus, IconSearch, IconFilter, IconArrowRight, IconFlame } from "../components/Icons";
+import { IconPlus, IconSearch, IconFilter, IconArrowRight } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, barDolumu, asagiAcilma } from "../lib/animasyonlar";
 import "./Home.css";
@@ -39,7 +39,6 @@ export default function Home() {
   }, [aktifKategori, arama, siralama]);
 
   const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
-  const promosyon = kampanyalar[0];
 
   // "Tümünü Gör" — kategori/arama filtrelerini kaldırıp tüm menüyü gösterir
   const tumunuGoster = () => {
@@ -64,12 +63,73 @@ export default function Home() {
           <span className="vurgu">Harika Deneyim!</span>
         </motion.h1>
 
+        {/* Ye Kazan damga kartı */}
+        <motion.section
+          className="damga-kart"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05, ease: "easeOut" }}
+        >
+          <div className="damga-ust">
+            <div>
+              <span className="damga-rozet">YE KAZAN</span>
+              <h2 className="damga-baslik">
+                {burgerDamgaHedef} Burger Ye, <span className="vurgu">1 Burger HEDİYE!</span>
+              </h2>
+            </div>
+            {!misafir && (
+              <span className="damga-sayac">
+                {burgerDamga}
+                <span className="damga-sayac-hedef">/{burgerDamgaHedef}</span>
+              </span>
+            )}
+          </div>
+
+          {misafir ? (
+            <p className="damga-misafir-not">
+              Giriş yap veya üye ol, bu kampanyaya dahil ol!
+            </p>
+          ) : (
+            <>
+              <div className="ilerleme-ray">
+                {/* Bar dolumu animasyonu — açılışta 0'dan yüzdeye kadar dolar */}
+                <motion.div className="ilerleme-dolgu" {...barDolumu(damgaYuzde)} />
+              </div>
+              <span className="damga-durum">
+                {burgerDamgaHedef - burgerDamga} burger sonra hediyen hazır
+              </span>
+            </>
+          )}
+        </motion.section>
+
+        {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
+        <div className="kategori-satir" ref={chipRef}>
+          {kategoriler.map((k) => (
+            <motion.button
+              key={k}
+              type="button"
+              className={"kategori" + (k === aktifKategori ? " kategori--aktif" : "")}
+              onClick={() => setAktifKategori(k)}
+              aria-pressed={k === aktifKategori}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <span className="kategori-daire">
+                {kategoriGorseller[k] && (
+                  <img className="kategori-gorsel" src={kategoriGorseller[k]} alt="" loading="lazy" />
+                )}
+              </span>
+              <span className="kategori-ad">{k}</span>
+            </motion.button>
+          ))}
+        </div>
+
         {/* Arama çubuğu — cam, solda arama ikonu, sağda sıralama filtresi */}
         <motion.div
           className="arama-sarici"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.05, ease: "easeOut" }}
+          transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
         >
           <div className="arama-kutu">
             <IconSearch className="arama-ikon" aria-hidden="true" />
@@ -124,97 +184,6 @@ export default function Home() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
-        <div className="kategori-satir" ref={chipRef}>
-          {kategoriler.map((k) => (
-            <motion.button
-              key={k}
-              type="button"
-              className={"kategori" + (k === aktifKategori ? " kategori--aktif" : "")}
-              onClick={() => setAktifKategori(k)}
-              aria-pressed={k === aktifKategori}
-              whileTap={{ scale: 0.94 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              <span className="kategori-daire">
-                {kategoriGorseller[k] && (
-                  <img className="kategori-gorsel" src={kategoriGorseller[k]} alt="" loading="lazy" />
-                )}
-              </span>
-              <span className="kategori-ad">{k}</span>
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Promosyon banner'ı — kampanyalar sayfasının ilk kaydı */}
-        <motion.section
-          className="promo-kart"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-        >
-          <div className="promo-metin">
-            <span className="promo-etiket">
-              <IconFlame className="promo-etiket-ikon" aria-hidden="true" />
-              {promosyon.etiket}
-            </span>
-            <h2 className="promo-baslik">{promosyon.baslik}</h2>
-            {promosyon.fiyat && <span className="promo-fiyat">₺{promosyon.fiyat}</span>}
-            <motion.button
-              type="button"
-              className="promo-btn"
-              onClick={() => git("/kampanyalar")}
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              Sipariş Ver
-            </motion.button>
-          </div>
-          <div className="promo-gorsel-wrap">
-            <img className="promo-gorsel" src={promosyon.gorsel} alt="" loading="lazy" />
-          </div>
-        </motion.section>
-
-        {/* Ye Kazan damga kartı */}
-        <motion.section
-          className="damga-kart"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15, ease: "easeOut" }}
-        >
-          <div className="damga-ust">
-            <div>
-              <span className="damga-rozet">YE KAZAN</span>
-              <h2 className="damga-baslik">
-                {burgerDamgaHedef} Burger Ye, <span className="vurgu">1 Burger HEDİYE!</span>
-              </h2>
-            </div>
-            {!misafir && (
-              <span className="damga-sayac">
-                {burgerDamga}
-                <span className="damga-sayac-hedef">/{burgerDamgaHedef}</span>
-              </span>
-            )}
-          </div>
-
-          {misafir ? (
-            <p className="damga-misafir-not">
-              Giriş yap veya üye ol, bu kampanyaya dahil ol!
-            </p>
-          ) : (
-            <>
-              <div className="ilerleme-ray">
-                {/* Bar dolumu animasyonu — açılışta 0'dan yüzdeye kadar dolar */}
-                <motion.div className="ilerleme-dolgu" {...barDolumu(damgaYuzde)} />
-              </div>
-              <span className="damga-durum">
-                {burgerDamgaHedef - burgerDamga} burger sonra hediyen hazır
-              </span>
-            </>
-          )}
-        </motion.section>
-
         {/* Bölüm başlığı + tümünü gör */}
         <div className="bolum-satir">
           <h3 className="bolum-baslik">Popüler Ürünler</h3>
@@ -234,7 +203,17 @@ export default function Home() {
             animate="animate"
           >
             {gosterilen.map((u) => (
-              <motion.article key={u.id} className="urun-kart" variants={siraliOge}>
+              <motion.article
+                key={u.id}
+                className="urun-kart"
+                variants={siraliOge}
+                onClick={() => git(`/urun/${u.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") git(`/urun/${u.id}`);
+                }}
+              >
                 <div className="urun-gorsel-wrap">
                   <img className="urun-gorsel" src={u.gorsel} alt={u.ad} loading="lazy" />
                 </div>
@@ -244,7 +223,10 @@ export default function Home() {
                     <span className="urun-fiyat">₺{u.fiyat.toFixed(2)}</span>
                     <motion.button
                       className="ekle-btn"
-                      onClick={() => sepeteEkle(u)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sepeteEkle(u);
+                      }}
                       aria-label={`${u.ad} sepete ekle`}
                       whileTap={{ scale: 0.85 }}
                       whileHover={{ scale: 1.1 }}

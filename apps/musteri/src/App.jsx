@@ -15,6 +15,7 @@ import TableWelcome from "./screens/TableWelcome";
 import QrGenerator from "./screens/QrGenerator";
 import Kayit from "./screens/Kayit";
 import ProfilDuzenle from "./screens/ProfilDuzenle";
+import UrunDetay from "./screens/UrunDetay";
 import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { Navigate } from "react-router-dom";
@@ -53,6 +54,7 @@ function Icerik() {
           <Route path="/odeme" element={<Korumali><Payment /></Korumali>} />
           <Route path="/odeme-basarili" element={<Korumali><PaymentSuccess /></Korumali>} />
           <Route path="/siparislerim" element={<Korumali><Orders /></Korumali>} />
+          <Route path="/urun/:id" element={<Korumali><UrunDetay /></Korumali>} />
           {/* İşletme: masa QR'ları üret — SADECE ADMIN */}
           <Route path="/qr-uret" element={<AdminKorumali><QrGenerator /></AdminKorumali>} />
         </Routes>

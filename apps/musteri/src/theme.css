@@ -15,15 +15,16 @@
      Tema buradan başlar. Aşağıdaki tüm token'lar bu altı değere dayanır;
      markanın rengini değiştirmek için tek yer burasıdır. */
   --bg-primary: #0d0d0d;
-  --bg-card: rgba(255, 255, 255, 0.06);
-  --bg-card-hover: rgba(255, 255, 255, 0.1);
+  /* Hafif mavimsi ton — buzlu cam hissi (nötr beyaz yerine) */
+  --bg-card: rgba(200, 220, 255, 0.08);
+  --bg-card-hover: rgba(200, 220, 255, 0.12);
   --bg-input: rgba(255, 255, 255, 0.05);
   --accent: #ff6b00;
   --accent-glow: rgba(255, 107, 0, 0.4);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
-  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass: rgba(255, 255, 255, 0.15);
   /* Zeminin arkasındaki sıcak turuncu parlama (dekoratif bloblar) */
   --warm-glow: radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.15), transparent 50%);
 
@@ -40,13 +41,13 @@
   --glass-border: var(--border-glass);
   --glass-border-soft: rgba(255, 255, 255, 0.06);
   --glass-border-strong: rgba(255, 255, 255, 0.16);
-  --glass-blur: blur(20px);
+  --glass-blur: blur(32px);
   --glass-blur-sm: blur(12px);
-  --glass-blur-lg: blur(28px);
+  --glass-blur-lg: blur(40px);
   /* Cam kartın imzası: dış gölge + üstte ince ışık çizgisi (inset) */
-  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), var(--glass-inset);
-  --glass-shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.35), var(--glass-inset);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), var(--glass-inset);
+  --glass-shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.3), var(--glass-inset);
 
   /* --- Eski yüzey adları → cam karşılıkları --- */
   --surface-container-lowest: var(--glass-bg);
@@ -76,10 +77,11 @@
   /* Buton gradyanı (tasarımdaki "tıklanabilir" his) */
   --primary-grad-start: var(--accent);
   --primary-grad-end: #ff914d;
-  /* Turuncu parlama — buton hover / aktif eleman */
-  --glow: 0 0 20px var(--accent-glow);
-  --glow-sm: 0 0 12px rgba(255, 107, 0, 0.35);
-  --glow-lg: 0 0 32px rgba(255, 107, 0, 0.45);
+  /* Turuncu parlama — buton hover / aktif eleman.
+     Spread eklenmesi + blur artışı köşeli/keskin görünen glow'u yumuşatır. */
+  --glow: 0 0 28px 3px var(--accent-glow);
+  --glow-sm: 0 0 18px 2px rgba(255, 107, 0, 0.35);
+  --glow-lg: 0 0 40px 4px rgba(255, 107, 0, 0.45);
   --shadow-primary: 0 4px 16px rgba(255, 107, 0, 0.3);
 
   /* Charcoal — ikincil cam yüzey (üstünde beyaz yazı taşır) */
@@ -117,10 +119,10 @@
   --bg-primary: #000000;
   --bg-deep: #000000;
 
-  --bg-card: rgba(255, 255, 255, 0.05);
-  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-card: rgba(200, 220, 255, 0.07);
+  --bg-card-hover: rgba(200, 220, 255, 0.1);
   --bg-input: rgba(255, 255, 255, 0.04);
-  --border-glass: rgba(255, 255, 255, 0.07);
+  --border-glass: rgba(255, 255, 255, 0.13);
   --glass-bg-soft: rgba(255, 255, 255, 0.025);
 
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), var(--glass-inset);
@@ -130,7 +132,7 @@
 /* Tema geçişini yumuşat */
 body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
 .puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,
-.bottom-nav, .promo-kart, .kategori-daire, .arama-kutu {
+.bottom-nav, .kategori-daire, .arama-kutu {
   transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 
