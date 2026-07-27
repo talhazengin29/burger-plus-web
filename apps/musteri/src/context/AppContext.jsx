@@ -138,7 +138,10 @@ export function AppProvider({ children }) {
     [kampanyaSaati]
   );
   // Ürünün kategorisine uygulanan aktif kampanya varsa indirimli fiyatı döner.
+  // Kampanya indirimleri sadece giriş yapmış (üye) kullanıcılar içindir — misafir
+  // kampanyayı görebilir ama fiyat indirimi/otomatik uygulama misafire yapılmaz.
   const indirimliFiyat = (urun) => {
+    if (!kullanici) return null;
     const k = aktifKampanyalar.find((kk) => kk.gecerliKategoriler?.includes(urun.kategori));
     if (!k) return null;
     return {
@@ -337,7 +340,7 @@ export function AppProvider({ children }) {
     const kaynakUrunler = odenenUrunlerParam || sepet;
     const odenenUrunler = kaynakUrunler.map((u) => ({
       id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
-      kategori: u.kategori,
+      kategori: u.kategori, haricMalzemeler: u.haricMalzemeler || [],
     }));
 
     const ozet = {
@@ -354,7 +357,7 @@ export function AppProvider({ children }) {
     odenenUrunler.forEach((u) => {
       socket.emit("urun-ekle", {
         masaNo: masaNo || "algotur",
-        urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet },
+        urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, haricMalzemeler: u.haricMalzemeler || [] },
         kisiAdi: gonderenAd,
       });
     });

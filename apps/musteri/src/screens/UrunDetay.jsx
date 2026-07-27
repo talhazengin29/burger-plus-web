@@ -18,17 +18,28 @@ const besinEtiketleri = [
 export default function UrunDetay() {
   const { id } = useParams();
   const git = useNavigate();
-  const { sepeteEkle, indirimliFiyat } = useApp();
+  const { sepeteEkle, indirimliFiyat, misafir, aktifKampanyalar } = useApp();
   const [adet, setAdet] = useState(1);
+  const [haricMalzemeler, setHaricMalzemeler] = useState([]);
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to="/anasayfa" replace />;
 
   const indirim = indirimliFiyat(urun);
   const birimFiyat = indirim ? indirim.fiyat : urun.fiyat;
+  const misafirIcinFirsatVar =
+    !indirim && misafir && aktifKampanyalar.some((k) => k.gecerliKategoriler?.includes(urun.kategori));
+
+  const malzemeToggle = (malzeme) => {
+    setHaricMalzemeler((onceki) =>
+      onceki.includes(malzeme)
+        ? onceki.filter((m) => m !== malzeme) // tekrar tıkla → geri ekle
+        : [...onceki, malzeme]                 // tıkla → çıkar
+    );
+  };
 
   const sepeteEkleyeBas = () => {
-    for (let i = 0; i < adet; i++) sepeteEkle(urun);
+    for (let i = 0; i < adet; i++) sepeteEkle({ ...urun, haricMalzemeler });
     git(-1);
   };
 
@@ -64,6 +75,9 @@ export default function UrunDetay() {
               </span>
             ) : (
               <span className="urun-detay-fiyat">₺{urun.fiyat.toFixed(2)}</span>
+            )}
+            {misafirIcinFirsatVar && (
+              <p className="urun-detay-uye-not">Üyelere özel fiyat — üye ol, indirimden faydalan</p>
             )}
             {urun.aciklama && <p className="urun-detay-aciklama">{urun.aciklama}</p>}
           </section>
@@ -103,14 +117,27 @@ export default function UrunDetay() {
             </section>
           )}
 
-          {/* İçindekiler */}
+          {/* İçindekiler — tıklayınca çıkarılabilir malzeme özelleştirmesi */}
           {urun.malzemeler && urun.malzemeler.length > 0 && (
             <section className="urun-detay-kart">
               <h2 className="urun-detay-baslik">İçindekiler</h2>
+              <p className="urun-detay-malzeme-not">İstemediğin malzemeye dokun</p>
               <div className="malzeme-liste">
-                {urun.malzemeler.map((m) => (
-                  <span key={m} className="malzeme-etiket">{m}</span>
-                ))}
+                {urun.malzemeler.map((m) => {
+                  const haric = haricMalzemeler.includes(m);
+                  return (
+                    <motion.button
+                      key={m}
+                      type="button"
+                      className={"malzeme-etiket " + (haric ? "malzeme--haric" : "malzeme--dahil")}
+                      onClick={() => malzemeToggle(m)}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="malzeme-ikon">{haric ? "✕" : "✓"}</span>
+                      {m}
+                    </motion.button>
+                  );
+                })}
               </div>
             </section>
           )}

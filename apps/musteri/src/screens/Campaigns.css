@@ -138,6 +138,62 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* Misafire görünen "üyelere özel" rozeti — butonun üstünde */
+.camp-uye-rozet {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--outline);
+  margin-bottom: 10px;
+}
+
+/* --- Üyelik gerektiren kampanya modalı --- */
+.uye-modal-perde {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.uye-modal {
+  /* Not: framer-motion bu elemanın transform'unu (scale/y girişi) kendi
+     yönetir — konumlandırma için transform/translate KULLANMA, üst
+     kapsayıcı (.uye-modal-perde) flex ile ortalar. */
+  width: 100%;
+  max-width: 360px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-modal);
+  padding: 24px 20px;
+  text-align: center;
+}
+.uye-modal-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--on-surface);
+  margin-bottom: 8px;
+}
+.uye-modal-metin {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.uye-modal-butonlar {
+  display: flex;
+  gap: 10px;
+}
+.uye-modal-butonlar .camp-btn { width: auto; flex: 1; }
 .camp-btn--primary {
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;

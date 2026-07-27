@@ -93,6 +93,12 @@
   padding: 4px 10px;
   border-radius: var(--r-full);
 }
+.cart-haric-malzeme {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--error);
+}
 .cart-sag {
   display: flex;
   flex-direction: column;

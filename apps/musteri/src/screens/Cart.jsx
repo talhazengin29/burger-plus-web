@@ -46,6 +46,9 @@ export default function Cart() {
                     ) : (
                       <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
                     )}
+                    {u.haricMalzemeler?.length > 0 && (
+                      <span className="cart-haric-malzeme">Çıkarılan: {u.haricMalzemeler.join(", ")}</span>
+                    )}
                   </div>
                   <div className="cart-sag">
                     <button className="cart-sil" onClick={() => sepettenCikar(u.id)} aria-label="Kaldır">

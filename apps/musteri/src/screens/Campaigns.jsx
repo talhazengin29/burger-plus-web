@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { kampanyalar, kampanyaDurumu } from "../data/mockData";
+import { useApp } from "../context/AppContext";
 import { IconClock, IconInvite } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
-import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
+import { siraliKonteyner, siraliOge, fadeIn, asagiAcilma } from "../lib/animasyonlar";
 import "./Campaigns.css";
 
 // Etikete göre küçük ikon seçimi (saat / davet / öğrenci)
@@ -20,6 +21,7 @@ const durumMetni = { aktif: "AKTİF", baslamadi: "BAŞLAMADI", sonaerdi: "SONA E
 
 export default function Campaigns() {
   const git = useNavigate();
+  const { misafir } = useApp();
 
   // Saatli kampanyaların (Happy Hour) durumu canlı kalsın diye dakikada bir tazelenir.
   const [simdi, setSimdi] = useState(() => new Date());
@@ -28,9 +30,17 @@ export default function Campaigns() {
     return () => clearInterval(id);
   }, []);
 
+  // Misafir kampanyayı görebilir ama faydalanamaz — "Sipariş Ver"e basınca üyelik modalı çıkar.
+  const [modalAcik, setModalAcik] = useState(false);
+
   const siparisVer = (k) => {
     const kategori = k.gecerliKategoriler?.[0];
     git("/anasayfa", kategori ? { state: { kategori } } : undefined);
+  };
+
+  const siparisVerTiklandi = (k) => {
+    if (misafir) { setModalAcik(true); return; }
+    siparisVer(k);
   };
 
   return (
@@ -66,11 +76,14 @@ export default function Campaigns() {
                       {k.indirimYuzde > 0 && <span className="camp-fiyat">%{k.indirimYuzde}</span>}
                     </div>
                     <p className="camp-aciklama">{k.aciklama}</p>
+                    {siparisVerilebilir && misafir && (
+                      <span className="camp-uye-rozet">🔒 Üyelere Özel</span>
+                    )}
                     <motion.button
                       className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
                       whileTap={{ scale: 0.95 }}
                       disabled={pasif}
-                      onClick={siparisVerilebilir ? () => siparisVer(k) : undefined}
+                      onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : undefined}
                     >
                       {k.buton}
                     </motion.button>
@@ -81,6 +94,21 @@ export default function Campaigns() {
           </motion.div>
         </div>
       </SayfaSarici>
+
+      <AnimatePresence>
+        {modalAcik && (
+          <motion.div className="uye-modal-perde" {...fadeIn} onClick={() => setModalAcik(false)}>
+            <motion.div className="uye-modal" {...asagiAcilma} onClick={(e) => e.stopPropagation()}>
+              <h3 className="uye-modal-baslik">Üyelere Özel Kampanya</h3>
+              <p className="uye-modal-metin">Bu kampanyadan faydalanmak için üye olmalısın.</p>
+              <div className="uye-modal-butonlar">
+                <button className="camp-btn camp-btn--charcoal" onClick={() => setModalAcik(false)}>Kapat</button>
+                <button className="camp-btn camp-btn--primary" onClick={() => git("/kayit")}>Üye Ol</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

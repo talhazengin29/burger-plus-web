@@ -108,13 +108,22 @@ export default function Kitchen() {
                 </div>
 
                 <ul className="kalem-liste">
-                  {masa.kalemler.map((k) => (
-                    <li key={k.id} className="kalem">
-                      <span className="kalem-adet">{k.adet}×</span>
-                      <span className="kalem-ad">{k.urun_ad}</span>
-                      {k.kisi_adi && <span className="kalem-kisi">{k.kisi_adi}</span>}
-                    </li>
-                  ))}
+                  {masa.kalemler.map((k) => {
+                    // Backend alanı henüz snake_case'e taşımamış olabilir — ikisini de destekle.
+                    const haric = k.haricMalzemeler || k.haric_malzemeler;
+                    return (
+                      <li key={k.id} className="kalem">
+                        <span className="kalem-adet">{k.adet}×</span>
+                        <div className="kalem-bilgi">
+                          <span className="kalem-ad">{k.urun_ad}</span>
+                          {haric?.length > 0 && (
+                            <span className="kalem-haric">⛔ {haric.join(", ")}</span>
+                          )}
+                        </div>
+                        {k.kisi_adi && <span className="kalem-kisi">{k.kisi_adi}</span>}
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 <div className="masa-alt">

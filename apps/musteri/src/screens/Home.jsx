@@ -23,7 +23,7 @@ export default function Home() {
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat } = useApp();
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, aktifKampanyalar } = useApp();
   const git = useNavigate();
   const chipRef = useSuruklenebilir();
 
@@ -206,6 +206,8 @@ export default function Home() {
           >
             {gosterilen.map((u) => {
               const indirim = indirimliFiyat(u);
+              const misafirIcinFirsatVar =
+                !indirim && misafir && aktifKampanyalar.some((k) => k.gecerliKategoriler?.includes(u.kategori));
               return (
               <motion.article
                 key={u.id}
@@ -246,6 +248,9 @@ export default function Home() {
                       <IconPlus className="ekle-ikon" />
                     </motion.button>
                   </div>
+                  {misafirIcinFirsatVar && (
+                    <span className="urun-uye-not">Üyelere özel fiyat</span>
+                  )}
                 </div>
               </motion.article>
               );
