@@ -165,22 +165,33 @@ export const urunler = [
 export const kampanyalar = [
   {
     id: 1,
-    etiket: "Öğrenciye Özel",
-    baslik: "Öğrenci Menüsü",
-    fiyat: 150,
-    aciklama: "Seçili burger, çıtır patates ve soğuk içecek ile doyurucu bir öğün. Öğrenci kimliğini göstermeyi unutma!",
-    buton: "Hemen Al",
+    etiket: "14:00 - 17:00",
+    baslik: "Happy Hour",
+    aciklama: "14:00-17:00 arası tüm içeceklerde %30 indirim!",
+    buton: "Sipariş Ver",
     butonTipi: "primary",
-    gorsel: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&h=400&fit=crop",
+    gorsel: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&h=400&fit=crop",
+    aktif: true,
+    baslangicSaat: 14,
+    bitisSaat: 17,
+    indirimYuzde: 30,
+    gecerliKategoriler: ["İçecekler"],
+    kampanyaTipi: "saatli",
   },
   {
     id: 2,
-    etiket: "14:00 - 17:00",
-    baslik: "%20 İndirim Fırsatı",
-    aciklama: "Hafta içi saat 14:00 ile 17:00 arasında vereceğin tüm siparişlerde anında %20 indirim kazan. Ara öğünleri şölene çevir!",
-    buton: "Kampanyaya Katıl",
-    butonTipi: "charcoal",
-    gorsel: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&h=400&fit=crop",
+    etiket: "Öğrenciye Özel",
+    baslik: "Öğrenci Menüsü",
+    aciklama: "Tüm burgerlerde her zaman %15 indirim. Öğrenci kimliğini göstermeyi unutma!",
+    buton: "Sipariş Ver",
+    butonTipi: "primary",
+    gorsel: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&h=400&fit=crop",
+    aktif: true,
+    baslangicSaat: null,
+    bitisSaat: null,
+    indirimYuzde: 15,
+    gecerliKategoriler: ["Burgerler"],
+    kampanyaTipi: "surekli",
   },
   {
     id: 3,
@@ -190,8 +201,37 @@ export const kampanyalar = [
     buton: "Davet Kodu Oluştur",
     butonTipi: "charcoal",
     gorsel: "https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=600&h=400&fit=crop",
+    aktif: true,
+    baslangicSaat: null,
+    bitisSaat: null,
+    indirimYuzde: 0,
+    gecerliKategoriler: [],
+    kampanyaTipi: "surekli",
   },
 ];
+
+// Kampanya şu anda (verilen saatte) geçerli mi? Saatli kampanyalar için
+// başlangıç/bitiş saatine, sürekli kampanyalar için sadece aktif bayrağına bakar.
+export function kampanyaAktifMi(kampanya, simdi = new Date()) {
+  if (!kampanya.aktif) return false;
+  if (kampanya.kampanyaTipi === "surekli") return true;
+  if (kampanya.kampanyaTipi === "saatli") {
+    const saat = simdi.getHours();
+    return saat >= kampanya.baslangicSaat && saat < kampanya.bitisSaat;
+  }
+  return false;
+}
+
+// Kampanya kartında gösterilecek canlı durum rozeti.
+export function kampanyaDurumu(kampanya, simdi = new Date()) {
+  if (kampanya.kampanyaTipi !== "saatli") {
+    return kampanyaAktifMi(kampanya, simdi) ? "aktif" : "pasif";
+  }
+  const saat = simdi.getHours();
+  if (saat < kampanya.baslangicSaat) return "baslamadi";
+  if (saat >= kampanya.bitisSaat) return "sonaerdi";
+  return "aktif";
+}
 
 export const oduller = [
   {

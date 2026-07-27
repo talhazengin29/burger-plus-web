@@ -71,11 +71,18 @@ export default function Orders() {
 
   // Yedek: socket kopmuş olabilir. Masaların durumunu sunucudan da sorguluyoruz.
   const [masaDurumlari, setMasaDurumlari] = useState({});
+  // İlk poll sonucu gelene kadar aktif/geçmiş bölümlerini göstermeyip bekleriz —
+  // aksi halde masaDurumlari boşken sipariş bir an "Hazırlanıyor" görünüp poll
+  // sonucu "kapali" gelince aniden Geçmiş'e düşüyordu (görsel flaş).
+  const [ilkSorguTamam, setIlkSorguTamam] = useState(false);
   useEffect(() => {
+    // Zaten tamamlandı işaretli siparişler için sorgulamaya gerek yok.
     const masalar = [...new Set(
-      siparislerim.filter((s) => s.tip === "masa" && s.masaNo).map((s) => String(s.masaNo))
+      siparislerim
+        .filter((s) => s.tip === "masa" && s.masaNo && !s.tamamlandi)
+        .map((s) => String(s.masaNo))
     )];
-    if (masalar.length === 0) return;
+    if (masalar.length === 0) { setIlkSorguTamam(true); return; }
 
     let iptal = false;
     const sorgula = async () => {
@@ -93,7 +100,10 @@ export default function Orders() {
           else yeni[no] = "yeni";
         } catch { /* sunucu yok, sessizce geç */ }
       }
-      if (!iptal) setMasaDurumlari(yeni);
+      if (!iptal) {
+        setMasaDurumlari(yeni);
+        setIlkSorguTamam(true);
+      }
     };
     sorgula();
     const zamanlayici = setInterval(sorgula, 5000);
@@ -121,6 +131,12 @@ export default function Orders() {
   const aktifler = siparislerim.filter((s) => !tamamlandiMi(s));
   const gecmisler = siparislerim.filter((s) => tamamlandiMi(s));
 
+  // Durumu henüz bilinmeyen (poll edilmemiş) masa siparişi varsa bölümleri
+  // gösterme — aksi halde sipariş yanlış bölümde görünüp sonra sıçrar.
+  const bekleniyor = siparislerim.some(
+    (s) => s.tip === "masa" && s.masaNo && !s.tamamlandi && !ilkSorguTamam
+  );
+
   return (
     <div className="ekran orders">
       <OrtakHeader />
@@ -137,6 +153,10 @@ export default function Orders() {
             <button className="orders-bos-btn" onClick={() => git("/anasayfa")}>
               Menüye Git
             </button>
+          </div>
+        ) : bekleniyor ? (
+          <div className="orders-yukleniyor">
+            <p className="orders-bos-alt">Siparişler yükleniyor…</p>
           </div>
         ) : (
           <>

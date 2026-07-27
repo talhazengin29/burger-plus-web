@@ -72,6 +72,31 @@
 .rozet-ikon { width: 14px; height: 14px; }
 .rozet-emoji { font-size: 13px; }
 
+/* Canlı kampanya durumu — AKTİF (yeşil) / BAŞLAMADI / SONA ERDİ (gri) */
+.camp-durum-rozet {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 6px 11px;
+  border-radius: var(--r-full);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+}
+.camp-durum-rozet--aktif {
+  background: rgba(74, 222, 128, 0.16);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  color: var(--basari);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.25);
+}
+.camp-durum-rozet--baslamadi,
+.camp-durum-rozet--sonaerdi {
+  background: rgba(13, 13, 13, 0.55);
+  border: 1px solid var(--glass-border-strong);
+  color: var(--on-surface-variant);
+}
+
 .camp-icerik { padding: 18px; }
 .camp-baslik-satir {
   display: flex;
@@ -108,6 +133,11 @@
   transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
 }
 .camp-btn:active { transform: scale(0.99); }
+.camp-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 .camp-btn--primary {
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;

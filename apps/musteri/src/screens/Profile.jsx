@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
-  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconMoon, IconQr,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr,
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
@@ -15,7 +15,7 @@ const menuSatirlari = [
 ];
 
 export default function Profile() {
-  const { karanlik, temaDegistir, misafir, adminMi, kullanici, cikisYap } = useApp();
+  const { misafir, adminMi, kullanici, cikisYap } = useApp();
   const git = useNavigate();
 
   // Misafir profil bölümüne giremez — üyeliğe davet ekranı göster
@@ -67,21 +67,6 @@ export default function Profile() {
 
         {/* Menü satırları */}
         <div className="profil-menu">
-          {/* Karanlık tema — anahtarlı satır */}
-          <div className="profil-menu-satir">
-            <span className="profil-menu-ikon-daire"><IconMoon /></span>
-            <span className="profil-menu-ad">Karanlık Tema</span>
-            <button
-              className={"tema-anahtar" + (karanlik ? " tema-anahtar--acik" : "")}
-              onClick={temaDegistir}
-              role="switch"
-              aria-checked={karanlik}
-              aria-label="Karanlık tema"
-            >
-              <span className="tema-anahtar-top" />
-            </button>
-          </div>
-
           {menuSatirlari.map(({ ad, Ikon, yol }) => (
             <button
               key={ad}

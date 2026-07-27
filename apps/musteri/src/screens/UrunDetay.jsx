@@ -18,11 +18,14 @@ const besinEtiketleri = [
 export default function UrunDetay() {
   const { id } = useParams();
   const git = useNavigate();
-  const { sepeteEkle } = useApp();
+  const { sepeteEkle, indirimliFiyat } = useApp();
   const [adet, setAdet] = useState(1);
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to="/anasayfa" replace />;
+
+  const indirim = indirimliFiyat(urun);
+  const birimFiyat = indirim ? indirim.fiyat : urun.fiyat;
 
   const sepeteEkleyeBas = () => {
     for (let i = 0; i < adet; i++) sepeteEkle(urun);
@@ -54,7 +57,14 @@ export default function UrunDetay() {
           {/* Ad + fiyat + açıklama */}
           <section className="urun-detay-kart urun-detay-ozet">
             <h1 className="urun-detay-ad">{urun.ad}</h1>
-            <span className="urun-detay-fiyat">₺{urun.fiyat.toFixed(2)}</span>
+            {indirim ? (
+              <span className="urun-detay-fiyat-grup">
+                <span className="urun-detay-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span>
+                <span className="urun-detay-fiyat urun-detay-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span>
+              </span>
+            ) : (
+              <span className="urun-detay-fiyat">₺{urun.fiyat.toFixed(2)}</span>
+            )}
             {urun.aciklama && <p className="urun-detay-aciklama">{urun.aciklama}</p>}
           </section>
 
@@ -125,7 +135,7 @@ export default function UrunDetay() {
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          Sepete Ekle — ₺{(urun.fiyat * adet).toFixed(2)}
+          Sepete Ekle — ₺{(birimFiyat * adet).toFixed(2)}
         </motion.button>
       </div>
     </div>

@@ -15,16 +15,18 @@
      Tema buradan başlar. Aşağıdaki tüm token'lar bu altı değere dayanır;
      markanın rengini değiştirmek için tek yer burasıdır. */
   --bg-primary: #0d0d0d;
-  /* Hafif mavimsi ton — buzlu cam hissi (nötr beyaz yerine) */
-  --bg-card: rgba(200, 220, 255, 0.08);
-  --bg-card-hover: rgba(200, 220, 255, 0.12);
+  /* Kartların kendi arka plan rengi yok — sadece backdrop-filter blur ile
+     buzlu cam hissi verilir. Böylece kartlar üst üste/kesişince görünen
+     kare zemin çizgileri oluşmaz. */
+  --bg-card: rgba(0, 0, 0, 0);
+  --bg-card-hover: rgba(0, 0, 0, 0);
   --bg-input: rgba(255, 255, 255, 0.05);
   --accent: #ff6b00;
   --accent-glow: rgba(255, 107, 0, 0.4);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
-  --border-glass: rgba(255, 255, 255, 0.15);
+  --border-glass: rgba(255, 255, 255, 0.05);
   /* Zeminin arkasındaki sıcak turuncu parlama (dekoratif bloblar) */
   --warm-glow: radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.15), transparent 50%);
 
@@ -35,12 +37,12 @@
 
   /* --- Cam (glassmorphism) yüzey tokenları --- */
   --glass-bg: var(--bg-card);                    /* standart kart */
-  --glass-bg-soft: rgba(255, 255, 255, 0.03);    /* input, iç kutu */
+  --glass-bg-soft: rgba(255, 255, 255, 0.02);    /* input, iç kutu */
   --glass-bg-strong: var(--bg-card-hover);       /* vurgulu kart / hover */
-  --glass-bg-solid: rgba(255, 255, 255, 0.12);   /* rozet, ikon dairesi */
+  --glass-bg-solid: rgba(255, 255, 255, 0.1);    /* rozet, ikon dairesi */
   --glass-border: var(--border-glass);
-  --glass-border-soft: rgba(255, 255, 255, 0.06);
-  --glass-border-strong: rgba(255, 255, 255, 0.16);
+  --glass-border-soft: rgba(255, 255, 255, 0.03);
+  --glass-border-strong: rgba(255, 255, 255, 0.08);
   --glass-blur: blur(32px);
   --glass-blur-sm: blur(12px);
   --glass-blur-lg: blur(40px);
@@ -110,26 +112,7 @@
   --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.6), var(--glass-inset);
 }
 
-/* ==========================================================================
-   EKSTRA KOYU TEMA
-   Profildeki tema anahtarı bu modu açar. Aynı cam sistemi, daha derin
-   siyah zemin ve biraz daha sönük cam — JS mantığına dokunmadan çalışır.
-   ========================================================================== */
-[data-tema="karanlik"] {
-  --bg-primary: #000000;
-  --bg-deep: #000000;
-
-  --bg-card: rgba(200, 220, 255, 0.07);
-  --bg-card-hover: rgba(200, 220, 255, 0.1);
-  --bg-input: rgba(255, 255, 255, 0.04);
-  --border-glass: rgba(255, 255, 255, 0.13);
-  --glass-bg-soft: rgba(255, 255, 255, 0.025);
-
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), var(--glass-inset);
-  --glass-shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.6), var(--glass-inset);
-}
-
-/* Tema geçişini yumuşat */
+/* Durum/hover geçişlerini yumuşat */
 body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
 .puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,
 .bottom-nav, .kategori-daire, .arama-kutu {

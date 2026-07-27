@@ -74,6 +74,23 @@
   font-size: 20px;
   color: var(--primary-container);
 }
+/* Kampanya indirimi uygulanmış fiyat */
+.urun-detay-fiyat-grup {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.urun-detay-fiyat-eski {
+  font-family: 'Montserrat';
+  font-size: 15px;
+  color: var(--on-surface-variant);
+  text-decoration: line-through;
+}
+.urun-detay-fiyat--indirim {
+  color: var(--primary-bright);
+  text-shadow: 0 0 14px rgba(255, 107, 0, 0.35);
+}
 .urun-detay-aciklama {
   font-size: 14px;
   line-height: 1.55;

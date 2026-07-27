@@ -3,8 +3,8 @@
    Ödeme yapıldığında puan burada artar. Puan oranı mockData'da (PUAN_ORANI_TL).
    ========================================================================== */
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { puanHesapla } from "../data/mockData";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { puanHesapla, kampanyalar, kampanyaAktifMi } from "../data/mockData";
 import { socket } from "../lib/socket";
 import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle } from "../lib/authApi";
 
@@ -52,13 +52,6 @@ export function AppProvider({ children }) {
     if (sonuc.kullanici) setKullanici(sonuc.kullanici);
     return sonuc; // {kullanici} veya {hata}
   };
-
-  // Karanlık tema — tüm ekranlara <html data-tema="karanlik"> ile yansır
-  const [karanlik, setKaranlik] = useState(false);
-  useEffect(() => {
-    document.documentElement.setAttribute("data-tema", karanlik ? "karanlik" : "aydinlik");
-  }, [karanlik]);
-  const temaDegistir = () => setKaranlik((v) => !v);
 
   // --- Sepet ---
   // Al götür (masasız) için YEREL sepet.
@@ -130,10 +123,39 @@ export function AppProvider({ children }) {
     return () => socket.off("masa-guncellendi", dinleyici);
   }, [ozetMasaNo]);
 
+  // --- Kampanyalar (saatli/sürekli indirimler) ---
+  // Dakikada bir tazelenen saat — saatli kampanyaların (örn. 14:00-17:00
+  // Happy Hour) aktiflik durumu otomatik güncellensin diye.
+  const [kampanyaSaati, setKampanyaSaati] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setKampanyaSaati(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
+  const aktifKampanyalar = useMemo(
+    () => kampanyalar.filter((k) => kampanyaAktifMi(k, kampanyaSaati)),
+    [kampanyaSaati]
+  );
+  // Ürünün kategorisine uygulanan aktif kampanya varsa indirimli fiyatı döner.
+  const indirimliFiyat = (urun) => {
+    const k = aktifKampanyalar.find((kk) => kk.gecerliKategoriler?.includes(urun.kategori));
+    if (!k) return null;
+    return {
+      kampanya: k,
+      orijinalFiyat: urun.fiyat,
+      fiyat: Math.round(urun.fiyat * (1 - k.indirimYuzde / 100) * 100) / 100,
+    };
+  };
+
   // --- Sepet (tamamen yerel/kişisel) ---
   // Ortak masa sepeti YOK. Herkes kendi sepetini oluşturur, kendi öder.
   // Backend'e gönderim ödeme anında olur (aşağıda odemeyiTamamla).
   const sepeteEkle = (urun) => {
+    // Aktif kampanya varsa ürün sepete indirimli fiyatla girer — ödeme akışı
+    // (sepetToplam, odemeyiTamamla) hiç değişmeden bu fiyatı kullanır.
+    const indirim = indirimliFiyat(urun);
+    const eklenecek = indirim
+      ? { ...urun, fiyat: indirim.fiyat, orijinalFiyat: indirim.orijinalFiyat }
+      : urun;
     setSepet((onceki) => {
       const mevcut = onceki.find((s) => s.id === urun.id);
       if (mevcut) {
@@ -141,7 +163,7 @@ export function AppProvider({ children }) {
           s.id === urun.id ? { ...s, adet: s.adet + 1 } : s
         );
       }
-      return [...onceki, { ...urun, adet: 1 }];
+      return [...onceki, { ...eklenecek, adet: 1 }];
     });
   };
 
@@ -291,8 +313,6 @@ export function AppProvider({ children }) {
   const deger = {
     puan,
     setPuan,
-    karanlik,
-    temaDegistir,
     // auth
     kullanici,
     adminMi,
@@ -300,6 +320,9 @@ export function AppProvider({ children }) {
     girisiTamamla,
     cikisYap,
     profiliGuncelle,
+    // kampanyalar (saatli/sürekli indirimler)
+    aktifKampanyalar,
+    indirimliFiyat,
     // sepet (yerel/kişisel)
     sepet: aktifSepet,
     sepeteEkle,

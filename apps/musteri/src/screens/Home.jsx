@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { kategoriler, kategoriGorseller, urunler } from "../data/mockData";
 import { useApp } from "../context/AppContext";
@@ -17,11 +17,13 @@ const siralamalar = [
 ];
 
 export default function Home() {
-  const [aktifKategori, setAktifKategori] = useState("Burgerler");
+  const location = useLocation();
+  // Kampanyalar'dan "Sipariş Ver" ile gelinirse ilgili kategori otomatik seçili açılır.
+  const [aktifKategori, setAktifKategori] = useState(location.state?.kategori || "Burgerler");
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir } = useApp();
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat } = useApp();
   const git = useNavigate();
   const chipRef = useSuruklenebilir();
 
@@ -202,7 +204,9 @@ export default function Home() {
             initial="initial"
             animate="animate"
           >
-            {gosterilen.map((u) => (
+            {gosterilen.map((u) => {
+              const indirim = indirimliFiyat(u);
+              return (
               <motion.article
                 key={u.id}
                 className="urun-kart"
@@ -220,7 +224,14 @@ export default function Home() {
                 <div className="urun-alt">
                   <h4 className="urun-ad">{u.ad}</h4>
                   <div className="urun-fiyat-satir">
-                    <span className="urun-fiyat">₺{u.fiyat.toFixed(2)}</span>
+                    {indirim ? (
+                      <span className="urun-fiyat-grup">
+                        <span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span>
+                        <span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span>
+                      </span>
+                    ) : (
+                      <span className="urun-fiyat">₺{u.fiyat.toFixed(2)}</span>
+                    )}
                     <motion.button
                       className="ekle-btn"
                       onClick={(e) => {
@@ -237,7 +248,8 @@ export default function Home() {
                   </div>
                 </div>
               </motion.article>
-            ))}
+              );
+            })}
           </motion.div>
         </AnimatePresence>
 

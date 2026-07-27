@@ -171,6 +171,13 @@
 .orders-bos-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
 .orders-bos-btn:active { transform: scale(0.98); }
 
+/* --- Durum sorgulanırken (ilk poll bekleniyor) --- */
+.orders-yukleniyor {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
 /* --- Bölümler (Senin Siparişlerin / Masanın Tamamı) --- */
 .orders-bolum { margin-bottom: 28px; }
 .orders-bolum-baslik {

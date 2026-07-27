@@ -147,35 +147,6 @@
 .isletme-metin { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .isletme-alt { font-size: 13px; color: var(--outline); }
 
-/* --- Tema aç/kapa anahtarı --- */
-.tema-anahtar {
-  width: 52px;
-  height: 30px;
-  border-radius: var(--r-full);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-border);
-  position: relative;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-  flex-shrink: 0;
-}
-.tema-anahtar-top {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  border-radius: var(--r-full);
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease;
-}
-.tema-anahtar--acik {
-  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
-  border-color: transparent;
-  box-shadow: var(--glow-sm);
-}
-.tema-anahtar--acik .tema-anahtar-top { transform: translateX(22px); }
-
 /* --- Çıkış — ikincil cam buton --- */
 .cikis-btn {
   width: 100%;
