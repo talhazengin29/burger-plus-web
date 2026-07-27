@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(grep -rnE \"background:[^;]*\\(#[Ff]{3,6}|white|#[Ff][0-9A-Fa-f]{5}\\)|color: *#\\(0|1|2|3\\)[0-9A-Fa-f]{2}\" --include=\"*.css\" .)",
+      "Bash(python \".claude/ui-ux-pro-max/scripts/search.py\" \"food delivery ordering app dark glassmorphism warm amber mobile\" --design-system -p \"Burger Plus\")",
+      "Bash(python \".claude/ui-ux-pro-max/scripts/search.py\" \"glassmorphism dark blur\" --domain style -n 2)",
+      "Bash(python \".claude/ui-ux-pro-max/scripts/search.py\" \"dark mode contrast touch target bottom navigation\" --domain ux -n 6)",
+      "Bash(npx oxlint *)",
+      "Bash(npx vite *)",
+      "Bash(npm install *)"
+    ]
+  }
+}

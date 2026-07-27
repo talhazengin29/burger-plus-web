@@ -1,0 +1,174 @@
+.profil-brand {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+}
+
+.profile-govde { padding: 8px var(--margin) 0; }
+
+/* --- Avatar bloğu --- */
+.profil-avatar-blok { text-align: center; padding: 12px 0 24px; }
+.profil-avatar-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 14px;
+}
+.profil-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-full);
+  object-fit: cover;
+  border: 2px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+}
+/* Baş harfli büyük profil avatarı — koyu cam zemin, turuncu harf */
+.profil-avatar-harf {
+  display: grid;
+  place-items: center;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 2px solid rgba(255, 107, 0, 0.35);
+  color: var(--primary-bright);
+  text-shadow: 0 0 24px rgba(255, 107, 0, 0.5);
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 42px;
+}
+.profil-duzenle {
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 38px; height: 38px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  display: grid; place-items: center;
+  border: 3px solid var(--bg-page);
+  box-shadow: var(--glow-sm);
+}
+.profil-duzenle svg { width: 18px; height: 18px; }
+.profil-ad {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--on-surface);
+  margin-bottom: 4px;
+}
+.profil-uyelik { color: var(--on-surface-variant); font-size: 15px; }
+
+/* --- Puan kartı — cam --- */
+.profil-puan-kart {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 22px;
+}
+.profil-puan-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.profil-puan-etiket { font-weight: 700; font-size: 16px; color: var(--on-surface); }
+.profil-puan-deger { color: var(--primary-container); font-weight: 700; font-size: 15px; }
+.profil-puan-not {
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+/* --- Menü satırları — cam kart --- */
+.profil-menu {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.profil-menu-satir {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 18px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+  transition: background 0.15s;
+}
+.profil-menu-satir:hover { background: rgba(255, 255, 255, 0.04); }
+.profil-menu-satir:last-child { border-bottom: none; }
+.profil-menu-ikon-daire {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.profil-menu-ikon-daire svg { width: 22px; height: 22px; color: var(--primary-container); }
+.profil-menu-ad { flex: 1; font-weight: 600; font-size: 17px; color: var(--on-surface); }
+.profil-menu-ok { width: 20px; height: 20px; color: var(--outline); }
+
+/* --- İşletme bölümü --- */
+.profil-isletme-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+.isletme-satir {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+.isletme-ikon {
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end)) !important;
+  border-color: transparent !important;
+  box-shadow: var(--glow-sm);
+}
+.isletme-ikon svg { color: #fff !important; }
+.isletme-metin { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.isletme-alt { font-size: 13px; color: var(--outline); }
+
+/* --- Çıkış — ikincil cam buton --- */
+.cikis-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-strong);
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  transition: background 0.15s, border-color 0.15s;
+}
+.cikis-btn:hover {
+  background: rgba(255, 90, 82, 0.12);
+  border-color: rgba(255, 90, 82, 0.3);
+}
+.cikis-ikon { width: 22px; height: 22px; }
+.cikis-btn:active { transform: scale(0.99); }

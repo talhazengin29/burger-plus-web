@@ -1,0 +1,299 @@
+.payment { display: flex; flex-direction: column; }
+.payment-govde { flex: 1; padding: 16px var(--margin); padding-bottom: 170px; }
+
+.odeme-masa-rozet {
+  background: var(--primary-fixed);
+  border: 1px solid rgba(255, 107, 0, 0.35);
+  color: var(--on-surface);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.12);
+}
+.misafir-rozet {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.odeme-bolum-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--on-surface);
+  margin-bottom: 16px;
+}
+
+/* --- Yöntem kartları — cam --- */
+.yontem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.yontem-kart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow-sm);
+  border: 1px solid var(--glass-border);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.1s;
+}
+.yontem-kart:hover { background: var(--glass-bg-strong); }
+.yontem-kart:active { transform: scale(0.97); }
+.yontem-kart--aktif {
+  border-color: var(--primary-container);
+  background: var(--primary-fixed);
+  box-shadow: var(--glass-shadow-sm), var(--glow-sm);
+}
+.yontem-ikon {
+  width: 28px; height: 28px;
+  color: var(--primary-container);
+  filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.35));
+}
+.yontem-ad { font-weight: 700; font-size: 13px; color: var(--on-surface); }
+.yontem-aciklama { font-size: 10px; color: var(--outline); line-height: 1.3; }
+
+/* --- Seçim kutuları (eşit böl / ürüne göre) — cam --- */
+.secim-kutu {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 20px;
+}
+.secim-baslik {
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--on-surface);
+  margin-bottom: 16px;
+}
+
+/* Kişi seçici */
+.kisi-secici {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.kisi-secici button {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  display: grid; place-items: center;
+  transition: background 0.15s;
+}
+.kisi-secici button:hover { background: var(--primary-fixed-strong); }
+.kisi-secici button svg { width: 20px; height: 20px; }
+.kisi-secici button:active { transform: scale(0.9); }
+.kisi-sayi {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--on-surface);
+  min-width: 50px;
+  text-align: center;
+}
+.kisi-not {
+  text-align: center;
+  margin-top: 14px;
+  color: var(--primary-container);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Ürün seçme listesi */
+.urun-sec-liste { display: flex; flex-direction: column; gap: 10px; }
+.urun-sec-satir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-soft);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+.urun-sec-satir--secili {
+  background: var(--primary-fixed);
+  border-color: rgba(255, 107, 0, 0.3);
+}
+.sec-kutu {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.sec-kutu--dolu {
+  background: var(--primary-container);
+  border-color: var(--primary-container);
+  color: #fff;
+  box-shadow: var(--glow-sm);
+}
+.sec-kutu svg { width: 16px; height: 16px; }
+.urun-sec-ad { flex: 1; font-weight: 600; font-size: 15px; color: var(--on-surface); }
+.urun-sec-fiyat { font-weight: 700; color: var(--primary-container); font-size: 15px; }
+
+/* --- Puan bilgi şeridi --- */
+.puan-bilgi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+.puan-bilgi strong { color: var(--primary-container); }
+.puan-bilgi-ikon { font-size: 18px; }
+
+/* --- Alt sabit ödeme bar — koyu cam --- */
+.payment-alt-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(13, 13, 13, 0.7);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  border-top: 1px solid var(--glass-border);
+  padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-top-left-radius: var(--r-xl);
+  border-top-right-radius: var(--r-xl);
+}
+.odenecek-satir {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.odenecek-tutar {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--primary-container);
+}
+.ode-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  transition: box-shadow 0.2s;
+}
+.ode-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.ode-btn:active { transform: scale(0.99); }
+.ode-btn--pasif {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--glass-border);
+  color: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.ode-btn--pasif:hover { box-shadow: none; }
+
+.odeme-bos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  color: var(--on-surface-variant);
+}
+.odeme-bos button {
+  padding: 14px 28px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+}
+
+/* Ürüne göre ödeme: satır düzeni */
+.urun-sec-sol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+.urun-sec-sag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+/* Adet seçici (+/- butonları) */
+.urun-adet-secici {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.urun-adet-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s;
+}
+.urun-adet-btn:hover:not(:disabled) { background: var(--primary-fixed-strong); }
+.urun-adet-btn:disabled { opacity: 0.3; cursor: default; }
+.urun-adet-btn svg { width: 14px; height: 14px; }
+.urun-adet-sayi {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
+  color: var(--on-surface);
+}

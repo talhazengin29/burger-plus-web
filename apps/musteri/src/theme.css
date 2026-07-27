@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Flame & Frame — Burger+ tasarım sistemi (Koyu Glassmorphism)
+   Renkler, tipografi ve ortak değerler tek yerde. Bir ekranı değiştirmek
+   burayı etkilemez; burayı değiştirmek tüm ekranlara yansır.
+
+   TEMA: Koyu antrasit zemin + buzlu cam (frosted glass) yüzeyler + turuncu aksan.
+   Ekran dosyaları eski değişken adlarını (--surface-container-*) kullanmaya
+   devam eder; o adlar burada cam karşılıklarına bağlanmıştır.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* --- Tasarım referansının çekirdek tokenları ---
+     Tema buradan başlar. Aşağıdaki tüm token'lar bu altı değere dayanır;
+     markanın rengini değiştirmek için tek yer burasıdır. */
+  --bg-primary: #0d0d0d;
+  --bg-card: rgba(255, 255, 255, 0.10);
+  --bg-card-hover: rgba(255, 255, 255, 0.14);
+  --bg-input: rgba(255, 255, 255, 0.05);
+  --accent: #ff6b00;
+  --accent-glow: rgba(255, 107, 0, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --border-glass: rgba(255, 255, 255, 0.12);
+
+  /* --- Sayfa zeminleri --- */
+  --bg-page: var(--bg-primary);  /* uygulama zemini */
+  --bg-deep: #070707;            /* telefon dışı / en koyu kat */
+  --surface: var(--bg-page);
+
+  /* --- Cam (glassmorphism) yüzey tokenları --- */
+  --glass-bg: var(--bg-card);                    /* standart kart */
+  --glass-bg-soft: rgba(255, 255, 255, 0.03);    /* input, iç kutu */
+  --glass-bg-strong: var(--bg-card-hover);       /* vurgulu kart / hover */
+  --glass-bg-solid: rgba(255, 255, 255, 0.12);   /* rozet, ikon dairesi */
+  --glass-border: var(--border-glass);
+  --glass-border-soft: rgba(255, 255, 255, 0.06);
+  --glass-border-strong: rgba(255, 255, 255, 0.16);
+  --glass-blur: blur(32px);
+  --glass-blur-sm: blur(24px);
+  --glass-blur-lg: blur(40px);
+  /* Cam kartın imzası: dış gölge + üstte ince ışık çizgisi (inset) */
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), var(--glass-inset);
+  --glass-shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.35), var(--glass-inset);
+
+  /* --- Eski yüzey adları → cam karşılıkları --- */
+  --surface-container-lowest: var(--glass-bg);
+  --surface-container-low: rgba(255, 255, 255, 0.04);
+  --surface-container: rgba(255, 255, 255, 0.05);
+  --surface-container-high: rgba(255, 255, 255, 0.08);
+  --surface-container-highest: rgba(255, 255, 255, 0.11);
+
+  /* --- Metin --- */
+  --on-surface: var(--text-primary);            /* başlıklar */
+  --on-surface-variant: var(--text-secondary);  /* açıklamalar */
+  --outline: var(--text-muted);                 /* ipuçları */
+  --outline-variant: rgba(255, 255, 255, 0.12); /* ince çizgiler */
+  --hairline: rgba(255, 255, 255, 0.08);        /* liste ayraçları */
+  --placeholder: rgba(255, 255, 255, 0.3);
+
+  /* --- Marka rengi — turuncu --- */
+  --primary: var(--accent);
+  --primary-container: var(--accent);
+  --primary-bright: #ff8534;
+  --on-primary: #ffffff;
+  --on-primary-container: #ffd6b8;
+  /* Turuncu cam: üstünde turuncu yazı taşıyan rozet/hap zeminleri */
+  --primary-fixed: rgba(255, 107, 0, 0.16);
+  --primary-fixed-strong: rgba(255, 107, 0, 0.28);
+
+  /* Buton gradyanı (tasarımdaki "tıklanabilir" his) */
+  --primary-grad-start: var(--accent);
+  --primary-grad-end: #ff914d;
+  /* Turuncu parlama — buton hover / aktif eleman */
+  --glow: 0 0 20px var(--accent-glow);
+  --glow-sm: 0 0 12px rgba(255, 107, 0, 0.35);
+  --glow-lg: 0 0 32px rgba(255, 107, 0, 0.45);
+  --shadow-primary: 0 4px 16px rgba(255, 107, 0, 0.3);
+
+  /* Charcoal — ikincil cam yüzey (üstünde beyaz yazı taşır) */
+  --charcoal: rgba(255, 255, 255, 0.08);
+  --charcoal-soft: rgba(255, 255, 255, 0.45);
+
+  /* Durum renkleri (koyu zeminde okunur tonlar) */
+  --error: #ff5a52;
+  --basari: #4ade80;
+  --bilgi: #60a5fa;
+
+  /* Köşe yuvarlaklıkları */
+  --r-sm: 0.25rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;      /* 16px — cam kart standardı */
+  --r-xl: 1.5rem;
+  --r-full: 9999px;
+
+  /* Boşluklar */
+  --margin: 20px;
+  --gutter: 16px;
+  --gap-section: 32px;
+
+  /* Gölge */
+  --shadow-card: var(--glass-shadow);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.6), var(--glass-inset);
+}
+
+/* Hover/durum geçişlerini yumuşat */
+body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
+.puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,
+.bottom-nav, .kategori-daire, .arama-kutu {
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hareket azaltma tercihi — animasyonlar kapanır, düzen aynı kalır */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tipografi yardımcıları */
+.t-headline-xl { font-family: 'Montserrat'; font-size: 40px; font-weight: 800; line-height: 48px; letter-spacing: -0.02em; }
+.t-headline-lg { font-family: 'Montserrat'; font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -0.01em; }
+.t-headline-mobile { font-family: 'Montserrat'; font-size: 24px; font-weight: 700; line-height: 30px; }
+.t-title-md { font-family: 'Montserrat'; font-size: 20px; font-weight: 600; line-height: 26px; }
+.t-body-lg { font-family: 'Plus Jakarta Sans'; font-size: 16px; font-weight: 500; line-height: 24px; }
+.t-body-sm { font-family: 'Plus Jakarta Sans'; font-size: 14px; font-weight: 400; line-height: 20px; }
+.t-label-bold { font-family: 'Plus Jakarta Sans'; font-size: 12px; font-weight: 700; line-height: 16px; }
+
+button { font-family: inherit; color: inherit; cursor: pointer; border: none; background: none; }
+img { display: block; max-width: 100%; }
+
+/* Klavye ile gezinme görünür kalsın (fare tıklamasında görünmez) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Koyu zeminde form elemanları ve seçim rengi */
+input, textarea, select { color-scheme: dark; }
+::selection { background: rgba(255, 107, 0, 0.35); color: #fff; }

@@ -1,0 +1,60 @@
+.personel {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sekme barı */
+.sekme-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.sekme {
+  padding: 10px 22px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--metin-soluk);
+  transition: all 0.15s;
+}
+.sekme:hover { color: var(--metin); background: var(--panel-2); }
+.sekme--aktif {
+  background: var(--primary);
+  color: #fff;
+}
+.sekme--aktif:hover { background: var(--primary); color: #fff; }
+.sekme-cikis {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: var(--r-md);
+  background: var(--panel-3);
+  color: var(--metin);
+  font-size: 13px;
+  font-weight: 600;
+}
+.sekme-cikis:hover { background: var(--border); }
+
+.sekme-icerik { flex: 1; }
+
+/* Tema değiştirme butonu */
+.sekme-tema {
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  background: var(--panel-3);
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s;
+}
+.sekme-tema:hover { background: var(--border); }
+/* Tema butonu geldiği için çıkış artık margin-left:auto olmasın */
+.sekme-cikis { margin-left: 8px; }

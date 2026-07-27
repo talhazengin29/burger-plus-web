@@ -1,0 +1,91 @@
+.uyeol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px var(--margin) 100px;
+}
+.uyeol-icerik {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.uyeol-daire {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 28px rgba(255, 107, 0, 0.4), var(--glow-lg);
+}
+.uyeol-ikon { width: 44px; height: 44px; color: #fff; }
+
+.uyeol-baslik {
+  font-family: 'Montserrat';
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--on-surface);
+  margin-bottom: 10px;
+}
+.uyeol-alt {
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+/* Avantaj listesi — cam kart */
+.uyeol-avantaj {
+  list-style: none;
+  width: 100%;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: 8px 20px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 28px;
+}
+.uyeol-avantaj li {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--on-surface-variant);
+}
+.uyeol-avantaj li:last-child { border-bottom: none; }
+
+.uyeol-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-family: 'Montserrat';
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
+}
+.uyeol-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.uyeol-btn:active { transform: scale(0.99); }
+.uyeol-btn-ikincil {
+  width: 100%;
+  padding: 15px;
+  border-radius: var(--r-lg);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-family: 'Montserrat';
+  font-weight: 600;
+  font-size: 15px;
+  transition: color 0.15s;
+}
+.uyeol-btn-ikincil:hover { color: #fff; }

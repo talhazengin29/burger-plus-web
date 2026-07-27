@@ -1,0 +1,51 @@
+/* Kilitli (salt-okunur) hesap bilgileri bloğu — cam */
+.pd-kilitli-blok {
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.pd-kilitli-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+}
+.pd-kilit {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--outline);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+}
+.pd-kilitli-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+.pd-kilitli-satir + .pd-kilitli-satir {
+  border-top: 1px solid var(--hairline);
+}
+.pd-etiket { font-size: 14px; color: var(--outline); }
+.pd-deger { font-size: 15px; font-weight: 600; color: var(--on-surface); }
+
+.pd-basari {
+  color: var(--basari);
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  text-align: center;
+}
