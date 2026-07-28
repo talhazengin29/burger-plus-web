@@ -412,7 +412,6 @@
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
 .urun-gorsel-wrap { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
-.urun-tukendi { position: absolute; inset: auto 8px 8px; padding: 4px 8px; border-radius: var(--r-full); background: rgba(15,15,15,.82); color: #fff; font-size: 10px; font-weight: 800; }
 .urun-gorsel { width: 100%; height: 100%; object-fit: cover; }
 .urun-alt { padding: 14px; }
 .urun-ad {

@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { socket } from "../lib/socket";
 import "./Kitchen.css";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-
 /*
   Mutfak ekrani. Backend'e mutfaga-katil ile baglanir, tum acik masalari
   canli gosterir. Her masa karti icin "Hazirlaniyor" ve "Hazir" butonlari,
@@ -32,7 +30,7 @@ function gecenSure(tarih) {
 export default function Kitchen() {
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
-  const [stoklar, setStoklar] = useState([]);
+  const [islemdeMasalar, setIslemdeMasalar] = useState(new Set());
 
   useEffect(() => {
     const acildi = () => setBagli(true);
@@ -42,7 +40,6 @@ export default function Kitchen() {
     socket.on("connect", acildi);
     socket.on("disconnect", kapandi);
     socket.on("mutfak-guncellendi", guncelle);
-    socket.on("stok-guncellendi", setStoklar);
 
     // Mutfak odasına katıl (backend mevcut masaları gönderir)
     socket.emit("mutfaga-katil");
@@ -51,24 +48,20 @@ export default function Kitchen() {
       socket.off("connect", acildi);
       socket.off("disconnect", kapandi);
       socket.off("mutfak-guncellendi", guncelle);
-      socket.off("stok-guncellendi", setStoklar);
     };
-  }, []);
-
-  useEffect(() => {
-    let iptal = false;
-    const stokGetir = () => fetch(`${BACKEND_URL}/api/mutfak/stok`)
-      .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((d) => { if (!iptal) setStoklar(d.stoklar || []); })
-      .catch(() => {});
-    stokGetir();
-    const timer = setInterval(stokGetir, 30000);
-    return () => { iptal = true; clearInterval(timer); };
   }, []);
 
   // Bir masanin tum kalemlerinin durumunu degistir
   const durumDegistir = (masaNo, durum) => {
-    socket.emit("masa-durum-degistir", { masaNo, durum });
+    if (islemdeMasalar.has(masaNo)) return;
+    setIslemdeMasalar((onceki) => new Set(onceki).add(masaNo));
+    socket.timeout(8000).emit("masa-durum-degistir", { masaNo, durum }, () => {
+      setIslemdeMasalar((onceki) => {
+        const sonraki = new Set(onceki);
+        sonraki.delete(masaNo);
+        return sonraki;
+      });
+    });
   };
 
   // Masaları öncelik sırasına diz: yeni siparişler önce, sonra hazırlanıyor, sonra hazır
@@ -96,15 +89,6 @@ export default function Kitchen() {
           </span>
         </div>
       </header>
-
-      {stoklar.length > 0 && (
-        <section className="mutfak-stok-serit">
-          <div className="mutfak-stok-baslik"><b>Mutfak stokları</b><span>{stoklar.filter((s) => s.kritik).length} kritik</span></div>
-          <div className="mutfak-stoklar">
-            {stoklar.map((s) => <div key={s.id} className={s.kritik ? "kritik" : ""}><span>{s.ad}</span><strong>{s.mevcut} {s.birim}</strong></div>)}
-          </div>
-        </section>
-      )}
 
       {siraliMasalar.length === 0 ? (
         <div className="bos-durum">
@@ -168,6 +152,7 @@ export default function Kitchen() {
                     {durum === "yeni" && (
                       <button
                         className="btn btn-uyari"
+                        disabled={islemdeMasalar.has(masa.masaNo)}
                         onClick={() => durumDegistir(masa.masaNo, "hazirlaniyor")}
                       >
                         Hazırlamaya Başla
@@ -176,6 +161,7 @@ export default function Kitchen() {
                     {durum === "hazirlaniyor" && (
                       <button
                         className="btn btn-basari"
+                        disabled={islemdeMasalar.has(masa.masaNo)}
                         onClick={() => durumDegistir(masa.masaNo, "hazir")}
                       >
                         Hazır ✓

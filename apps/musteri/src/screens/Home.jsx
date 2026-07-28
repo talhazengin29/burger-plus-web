@@ -206,7 +206,6 @@ export default function Home() {
           >
             {gosterilen.map((u) => {
               const indirim = indirimliFiyat(u);
-              const tukendi = u.satilabilirAdet === 0;
               return (
               <motion.article
                 key={u.id}
@@ -221,7 +220,6 @@ export default function Home() {
               >
                 <div className="urun-gorsel-wrap">
                   <img className="urun-gorsel" src={u.gorsel} alt={u.ad} loading="lazy" />
-                  {tukendi && <span className="urun-tukendi">Tükendi</span>}
                 </div>
                 <div className="urun-alt">
                   <h4 className="urun-ad">{u.ad}</h4>
@@ -243,9 +241,8 @@ export default function Home() {
                       className="ekle-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!tukendi) sepeteEkle(u);
+                        sepeteEkle(u);
                       }}
-                      disabled={tukendi}
                       aria-label={`${u.ad} sepete ekle`}
                       whileTap={{ scale: 0.85 }}
                       whileHover={{ scale: 1.1 }}

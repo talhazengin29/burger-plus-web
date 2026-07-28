@@ -27,7 +27,6 @@ export default function UrunDetay() {
 
   const indirim = indirimliFiyat(urun);
   const gramajOpsiyonu = urun.gramajOpsiyonu?.aktif ? urun.gramajOpsiyonu : null;
-  const tukendi = urun.satilabilirAdet === 0;
   const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
   const toplamGramaj = Number(urun.temelMiktar || 0) + ekstraGramaj;
   const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
@@ -206,11 +205,10 @@ export default function UrunDetay() {
           type="button"
           className="urun-detay-sepet-btn"
           onClick={sepeteEkleyeBas}
-          disabled={tukendi}
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          {tukendi ? "Ürün tükendi" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
+          {`Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
         </motion.button>
       </div>
     </div>

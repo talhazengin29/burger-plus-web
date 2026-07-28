@@ -28,6 +28,7 @@ export default function Salon() {
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
   const [onayMasa, setOnayMasa] = useState(null); // kapatma onayı beklenen masa
+  const [kapatilanMasalar, setKapatilanMasalar] = useState(new Set());
 
   useEffect(() => {
     const acildi = () => setBagli(true);
@@ -48,7 +49,15 @@ export default function Salon() {
   }, []);
 
   const masayiKapat = (masaNo) => {
-    socket.emit("masa-kapat", masaNo);
+    if (kapatilanMasalar.has(masaNo)) return;
+    setKapatilanMasalar((onceki) => new Set(onceki).add(masaNo));
+    socket.timeout(8000).emit("masa-kapat", masaNo, () => {
+      setKapatilanMasalar((onceki) => {
+        const sonraki = new Set(onceki);
+        sonraki.delete(masaNo);
+        return sonraki;
+      });
+    });
     setOnayMasa(null);
   };
 
@@ -122,8 +131,8 @@ export default function Salon() {
                       <button className="salon-btn-iptal" onClick={() => setOnayMasa(null)}>
                         Vazgeç
                       </button>
-                      <button className="salon-btn-kapat" onClick={() => masayiKapat(masa.masaNo)}>
-                        Evet, Kapat
+                      <button disabled={kapatilanMasalar.has(masa.masaNo)} className="salon-btn-kapat" onClick={() => masayiKapat(masa.masaNo)}>
+                        {kapatilanMasalar.has(masa.masaNo) ? "Kapatılıyor…" : "Evet, Kapat"}
                       </button>
                     </div>
                   </div>
