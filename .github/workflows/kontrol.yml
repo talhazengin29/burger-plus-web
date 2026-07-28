@@ -7,28 +7,46 @@
 name: Kod Kontrolü
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: web-kontrol-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   kontrol:
     name: Build & Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Kodu indir
         uses: actions/checkout@v4
 
+      - name: Node.js hazırla
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            apps/musteri/package-lock.json
+            apps/personel/package-lock.json
+
       # --- Müşteri uygulaması ---
       - name: Müşteri — bağımlılıkları kur
         working-directory: apps/musteri
-        run: npm install
+        run: npm ci
 
       - name: Müşteri — lint (kod hatası kontrolü)
         working-directory: apps/musteri
-        run: npx oxlint src/ --deny-warnings || true
+        run: npm run lint
 
       - name: Müşteri — build kontrolü
         working-directory: apps/musteri
@@ -37,11 +55,11 @@ jobs:
       # --- Personel uygulaması ---
       - name: Personel — bağımlılıkları kur
         working-directory: apps/personel
-        run: npm install
+        run: npm ci
 
       - name: Personel — lint
         working-directory: apps/personel
-        run: npx oxlint src/ --deny-warnings || true
+        run: npm run lint
 
       - name: Personel — build kontrolü
         working-directory: apps/personel

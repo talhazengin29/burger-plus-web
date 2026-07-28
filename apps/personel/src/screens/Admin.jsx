@@ -88,7 +88,6 @@ export default function Admin({ onCikis }) {
     if (await islem(() => adminIstek("/personeller", jsonGonder("POST", personelForm)), "Personel kaydı güncellendi.")) setPersonelForm(null);
   };
 
-  const enYuksekCiro = Math.max(1, ...rapor.gunluk.map((g) => Number(g.ciro)));
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
 
   return (
@@ -120,7 +119,7 @@ export default function Admin({ onCikis }) {
               </section>
               <section className="admin-grid-2">
                 <Panel baslik="Son 30 gün satış hareketi" alt={para(toplamCiro)}>
-                  <MiniGrafik veriler={rapor.gunluk} max={enYuksekCiro} />
+                  <SatisCizgiGrafigi veriler={rapor.gunluk} />
                 </Panel>
                 <Panel baslik="En çok satanlar" alt="Son 30 gün">
                   <div className="admin-siralama">{dashboard.populer?.length ? dashboard.populer.map((u, i) => (
@@ -151,7 +150,7 @@ export default function Admin({ onCikis }) {
             {bolum === "raporlar" && <>
               <BolumBaslik baslik="Satış analizi" aciklama="Son 30 günün ürün, adet ve ciro performansı." />
               <section className="admin-metrikler rapor-metrik"><Metrik ad="30 günlük ciro" deger={para(toplamCiro)} alt={`${rapor.gunluk.reduce((t, g) => t + g.adet, 0)} ürün`} renk="turuncu" /><Metrik ad="Günlük ortalama" deger={para(toplamCiro / Math.max(1, rapor.gunluk.length))} alt={`${rapor.gunluk.length} aktif satış günü`} renk="mavi" /></section>
-              <Panel baslik="Günlük ciro" alt="30 gün"><MiniGrafik veriler={rapor.gunluk} max={enYuksekCiro} /></Panel>
+              <Panel baslik="Ciro ve sipariş trendi" alt="Son 30 gün"><SatisCizgiGrafigi veriler={rapor.gunluk} /></Panel>
               <Panel baslik="Ürün performansı" alt={`${rapor.urunler.length} ürün`}><div className="admin-tablo-sarici"><table className="admin-tablo"><thead><tr><th>Ürün</th><th>Satılan</th><th>Ciro</th><th>Pay</th></tr></thead><tbody>{rapor.urunler.map((u) => <tr key={u.urun_ad}><td><b>{u.urun_ad}</b></td><td>{u.adet}</td><td><strong>{para(u.ciro)}</strong></td><td>%{toplamCiro ? ((u.ciro / toplamCiro) * 100).toFixed(1) : 0}</td></tr>)}</tbody></table></div></Panel>
             </>}
           </div>
@@ -168,7 +167,67 @@ function Metrik({ ad, deger, alt, renk }) { return <article className={`admin-me
 function Panel({ baslik, alt, children }) { return <section className="admin-panel"><header><h2>{baslik}</h2><span>{alt}</span></header>{children}</section>; }
 function Bos({ yazi }) { return <div className="admin-bos">{yazi}</div>; }
 function BolumBaslik({ baslik, aciklama, buton, onClick }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div>{buton && <button onClick={onClick}>{buton}</button>}</div>; }
-function MiniGrafik({ veriler, max }) { return <div className="mini-grafik">{veriler.length ? veriler.slice(-14).map((g) => <div key={g.gun} title={`${g.gun}: ${para(g.ciro)}`}><i style={{ height: `${Math.max(5, (g.ciro / max) * 100)}%` }} /><small>{new Date(g.gun).getDate()}</small></div>) : <Bos yazi="Grafik için satış verisi bekleniyor." />}</div>; }
+function SatisCizgiGrafigi({ veriler }) {
+  const [secili, setSecili] = useState(null);
+  const gunler = sonOtuzGunuDoldur(veriler);
+  const ciroMax = Math.max(1, ...gunler.map((g) => g.ciro));
+  const adetMax = Math.max(1, ...gunler.map((g) => g.adet));
+  const w = 680;
+  const h = 236;
+  const pad = { sol: 12, sag: 12, ust: 18, alt: 31 };
+  const x = (i) => pad.sol + (i / Math.max(1, gunler.length - 1)) * (w - pad.sol - pad.sag);
+  const y = (deger, max) => pad.ust + (1 - deger / max) * (h - pad.ust - pad.alt);
+  const noktalar = (alan, max) => gunler.map((g, i) => `${x(i)},${y(g[alan], max)}`).join(" ");
+  const alan = `M ${x(0)} ${h - pad.alt} L ${gunler.map((g, i) => `${x(i)} ${y(g.ciro, ciroMax)}`).join(" L ")} L ${x(gunler.length - 1)} ${h - pad.alt} Z`;
+  const seciliGun = secili == null ? gunler[gunler.length - 1] : gunler[secili];
+  const enYuksek = gunler.reduce((en, g) => g.ciro > en.ciro ? g : en, gunler[0]);
+  const sonYedi = gunler.slice(-7).reduce((t, g) => t + g.ciro, 0);
+  const oncekiYedi = gunler.slice(-14, -7).reduce((t, g) => t + g.ciro, 0);
+  const degisim = oncekiYedi ? ((sonYedi - oncekiYedi) / oncekiYedi) * 100 : null;
+
+  if (!veriler.length) return <Bos yazi="Grafik için satış verisi bekleniyor." />;
+
+  return <div className="cizgi-grafik">
+    <div className="cizgi-grafik-ust">
+      <div className="cizgi-lejant"><span><i className="ciro" />Ciro</span><span><i className="adet" />Ürün adedi</span></div>
+      <div className="cizgi-secili"><b>{gunEtiketi(seciliGun.gun)}</b><span>{para(seciliGun.ciro)} · {seciliGun.adet} ürün</span></div>
+    </div>
+    <div className="cizgi-cizim">
+      <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Son 30 gün ciro ve ürün adedi çizgi grafiği">
+        <defs>
+          <linearGradient id="ciro-alani" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#ff6b00" stopOpacity=".32" /><stop offset="1" stopColor="#ff6b00" stopOpacity="0" /></linearGradient>
+        </defs>
+        {[0.2, 0.4, 0.6, 0.8].map((oran) => <line key={oran} className="cizgi-grid" x1={pad.sol} x2={w - pad.sag} y1={pad.ust + oran * (h - pad.ust - pad.alt)} y2={pad.ust + oran * (h - pad.ust - pad.alt)} />)}
+        <path d={alan} fill="url(#ciro-alani)" />
+        <polyline className="cizgi ciro" points={noktalar("ciro", ciroMax)} />
+        <polyline className="cizgi adet" points={noktalar("adet", adetMax)} />
+        {gunler.map((g, i) => <g key={g.gun} onMouseEnter={() => setSecili(i)} onFocus={() => setSecili(i)} tabIndex={0} role="button" aria-label={`${gunEtiketi(g.gun)}: ${para(g.ciro)}, ${g.adet} ürün`}>
+          <line className="cizgi-hedef" x1={x(i) - 8} x2={x(i) + 8} y1={pad.ust} y2={h - pad.alt} />
+          <circle className={`cizgi-nokta ${secili === i ? "aktif" : ""}`} cx={x(i)} cy={y(g.ciro, ciroMax)} r={secili === i ? "4.5" : "2.5"} />
+        </g>)}
+        {gunler.filter((_, i) => i === 0 || i === gunler.length - 1 || i % 7 === 0).map((g, i) => <text className="cizgi-etiket" key={g.gun} x={x(gunler.indexOf(g))} y={h - 8} textAnchor={i === 0 ? "start" : i === 4 ? "end" : "middle"}>{new Date(g.gun).getDate()}</text>)}
+      </svg>
+    </div>
+    <div className="cizgi-ozet">
+      <div><span>En yüksek gün</span><b>{para(enYuksek.ciro)}</b><small>{gunEtiketi(enYuksek.gun)}</small></div>
+      <div><span>Günlük ortalama</span><b>{para(gunler.reduce((t, g) => t + g.ciro, 0) / gunler.length)}</b><small>30 günlük görünüm</small></div>
+      <div><span>Son 7 gün</span><b className={degisim != null && degisim < 0 ? "eksi" : "arti"}>{degisim == null ? "Yeni veri" : `${degisim >= 0 ? "+" : ""}%${degisim.toFixed(1)}`}</b><small>Önceki 7 güne göre</small></div>
+    </div>
+  </div>;
+}
+
+function sonOtuzGunuDoldur(veriler) {
+  const kayitlar = new Map(veriler.map((g) => [String(g.gun).slice(0, 10), { ciro: Number(g.ciro || 0), adet: Number(g.adet || 0) }]));
+  return Array.from({ length: 30 }, (_, i) => {
+    const tarih = new Date();
+    tarih.setHours(12, 0, 0, 0);
+    tarih.setDate(tarih.getDate() - (29 - i));
+    const gun = tarih.toISOString().slice(0, 10);
+    return { gun, ...(kayitlar.get(gun) || { ciro: 0, adet: 0 }) };
+  });
+}
+
+function gunEtiketi(gun) { return new Date(`${gun}T12:00:00`).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }); }
 function Modal({ baslik, kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className="admin-modal"><header><h2>{baslik}</h2><button onClick={kapat}>×</button></header>{children}</section></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }
