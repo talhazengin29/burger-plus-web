@@ -255,7 +255,7 @@
   place-items: center;
   overflow: hidden;
   border-radius: var(--r-full);
-  background: #17120f;
+  background: var(--bg-page);
   border: 2px solid var(--glass-border);
   box-shadow: var(--glass-shadow-sm);
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
