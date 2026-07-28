@@ -89,15 +89,19 @@ export default function Salon() {
                 {masa.kalemler.map((k) => {
                   const secimler = k.secimler || {};
                   const haric = k.haricMalzemeler || k.haric_malzemeler || secimler.haricMalzemeler;
-                  const gramaj = Number(secimler.ekstraGramaj) > 0
-                    ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
-                    : null;
+                  const dahil = secimler.dahilMalzemeler || [];
+                  const gramaj = Number(secimler.toplamGramaj) > 0
+                    ? `${secimler.toplamGramaj} ${secimler.gramajBirim || "gr"}${Number(secimler.ekstraGramaj) > 0 ? ` (+${secimler.ekstraGramaj})` : " (Standart)"}`
+                    : Number(secimler.ekstraGramaj) > 0
+                      ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"}`
+                      : null;
                   return (
                     <div key={k.id} className="salon-kalem">
                       <span className="salon-kalem-adet">{k.adet}×</span>
                       <span className="salon-kalem-ad">
                         {k.urun_ad}
                         {gramaj && <small className="salon-kalem-gramaj">{gramaj}</small>}
+                        {dahil.length > 0 && <small className="salon-kalem-dahil">Dahil: {dahil.join(", ")}</small>}
                         {haric?.length > 0 && <small className="salon-kalem-haric">Haric: {haric.join(", ")}</small>}
                       </span>
                       <span className={"salon-kalem-durum durum-" + k.durum}>

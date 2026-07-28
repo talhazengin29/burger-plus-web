@@ -153,6 +153,7 @@
   font-weight: 700;
   color: var(--primary);
 }
+.kalem-dahil { font-size: 11px; color: var(--metin-soluk); line-height: 1.4; }
 .kalem-kisi {
   align-self: flex-start;
   font-size: 11px;

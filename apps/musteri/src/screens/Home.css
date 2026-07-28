@@ -429,6 +429,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.urun-standart-miktar { display: block; margin: -3px 0 8px; color: var(--outline); font-size: 10px; font-weight: 600; }
 .urun-fiyat-satir {
   display: flex;
   align-items: center;

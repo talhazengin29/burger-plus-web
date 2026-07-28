@@ -3,6 +3,10 @@ export function haricMalzemeleriGetir(urun) {
 }
 
 export function gramajMetni(secimler) {
+  if (Number(secimler?.toplamGramaj) > 0) {
+    const ek = Number(secimler.ekstraGramaj) > 0 ? ` (+${secimler.ekstraGramaj})` : " (Standart)";
+    return `${secimler.toplamGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Gramaj"}${ek}`;
+  }
   if (!secimler?.ekstraGramaj) return null;
   return `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`;
 }

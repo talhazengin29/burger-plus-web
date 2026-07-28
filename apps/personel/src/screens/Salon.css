@@ -76,6 +76,7 @@
 .salon-kalem-ad { flex: 1; font-weight: 500; }
 .salon-kalem-ad small { display: block; font-size: 11px; font-weight: 600; }
 .salon-kalem-gramaj { color: var(--primary); }
+.salon-kalem-dahil { color: var(--metin-soluk); }
 .salon-kalem-haric { color: var(--tehlike); }
 .salon-kalem-durum {
   font-size: 11px;

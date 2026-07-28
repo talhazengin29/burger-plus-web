@@ -101,6 +101,7 @@
 .gramaj-bilgi { display: flex; flex-direction: column; gap: 4px; }
 .gramaj-bilgi .urun-detay-baslik { margin-bottom: 0; }
 .gramaj-deger { color: var(--primary-container); font-weight: 700; font-size: 14px; }
+.gramaj-standart { color: var(--on-surface-variant); font-size: 11px; }
 .gramaj-fiyat { color: var(--outline); font-size: 11px; }
 .gramaj-kontrol { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .gramaj-kontrol button {

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { adminGiris } from "../lib/adminApi";
+import { useEffect, useState } from "react";
+import { adminGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import "./Login.css";
 
 // Rol şifreleri. Gerçek üründe backend'de doğrulanmalı; şimdilik istemcide.
@@ -14,6 +14,12 @@ export default function Login({ onGirisBasarili }) {
   const [email, setEmail] = useState("");
   const [hata, setHata] = useState("");
   const [yukleniyor, setYukleniyor] = useState(false);
+  const [adminKurulumGoster, setAdminKurulumGoster] = useState(false);
+
+  useEffect(() => {
+    if (rol !== "admin") return;
+    yerelAdminDurumu().then(setAdminKurulumGoster).catch(() => {});
+  }, [rol]);
 
   const gonder = async (e) => {
     e.preventDefault();
@@ -24,6 +30,7 @@ export default function Login({ onGirisBasarili }) {
         onGirisBasarili("admin");
       } catch (err) {
         setHata(err.message);
+        setAdminKurulumGoster(true);
       } finally {
         setYukleniyor(false);
       }
@@ -34,6 +41,20 @@ export default function Login({ onGirisBasarili }) {
     } else {
       setHata("Şifre yanlış");
       setSifre("");
+    }
+  };
+
+  const ilkAdminiKur = async () => {
+    setYukleniyor(true);
+    setHata("");
+    try {
+      await ilkYerelAdminOlustur(email, sifre);
+      await adminGiris(email, sifre);
+      onGirisBasarili("admin");
+    } catch (err) {
+      setHata(err.message);
+    } finally {
+      setYukleniyor(false);
     }
   };
 
@@ -98,6 +119,11 @@ export default function Login({ onGirisBasarili }) {
         <button type="submit" className="login-btn" disabled={!sifre || (rol === "admin" && !email) || yukleniyor}>
           {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}
         </button>
+        {rol === "admin" && adminKurulumGoster && (
+          <button type="button" className="login-kurulum-btn" onClick={ilkAdminiKur} disabled={!email || sifre.length < 8 || yukleniyor}>
+            İlk yerel yöneticiyi oluştur
+          </button>
+        )}
       </form>
     </div>
   );

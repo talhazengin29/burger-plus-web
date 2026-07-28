@@ -137,15 +137,21 @@ export default function Kitchen() {
                     // Backend alanı henüz snake_case'e taşımamış olabilir — ikisini de destekle.
                     const secimler = k.secimler || {};
                     const haric = k.haricMalzemeler || k.haric_malzemeler || secimler.haricMalzemeler;
-                    const gramaj = Number(secimler.ekstraGramaj) > 0
-                      ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
-                      : null;
+                    const dahil = secimler.dahilMalzemeler || [];
+                    const gramaj = Number(secimler.toplamGramaj) > 0
+                      ? `${secimler.toplamGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Gramaj"}${Number(secimler.ekstraGramaj) > 0 ? ` (+${secimler.ekstraGramaj})` : " (Standart)"}`
+                      : Number(secimler.ekstraGramaj) > 0
+                        ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
+                        : null;
                     return (
                       <li key={k.id} className="kalem">
                         <span className="kalem-adet">{k.adet}×</span>
                         <div className="kalem-bilgi">
                           <span className="kalem-ad">{k.urun_ad}</span>
                           {gramaj && <span className="kalem-gramaj">{gramaj}</span>}
+                          {dahil.length > 0 && (
+                            <span className="kalem-dahil">Dahil: {dahil.join(", ")}</span>
+                          )}
                           {haric?.length > 0 && (
                             <span className="kalem-haric">Haric: {haric.join(", ")}</span>
                           )}

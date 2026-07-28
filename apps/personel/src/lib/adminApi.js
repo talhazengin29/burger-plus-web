@@ -20,6 +20,24 @@ export async function adminGiris(email, sifre) {
   return veri.kullanici;
 }
 
+export async function ilkYerelAdminOlustur(email, sifre) {
+  const r = await fetch(`${BACKEND_URL}/api/yerel-admin-kurulum`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, sifre }),
+  });
+  const veri = await r.json();
+  if (!r.ok) throw new Error(veri.hata || "İlk yönetici oluşturulamadı.");
+  return veri;
+}
+
+export async function yerelAdminDurumu() {
+  const r = await fetch(`${BACKEND_URL}/api/yerel-admin-durum`);
+  if (!r.ok) return false;
+  const veri = await r.json();
+  return veri.kurulumGerekli === true;
+}
+
 export async function adminIstek(yol, secenekler = {}) {
   const r = await fetch(`${BACKEND_URL}/api/admin${yol}`, {
     ...secenekler,

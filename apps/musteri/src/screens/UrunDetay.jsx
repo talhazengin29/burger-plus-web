@@ -29,6 +29,7 @@ export default function UrunDetay() {
   const gramajOpsiyonu = urun.gramajOpsiyonu?.aktif ? urun.gramajOpsiyonu : null;
   const tukendi = urun.satilabilirAdet === 0;
   const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
+  const toplamGramaj = Number(urun.temelMiktar || 0) + ekstraGramaj;
   const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
   const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + gramajFiyatArtisi;
 
@@ -41,13 +42,17 @@ export default function UrunDetay() {
   };
 
   const sepeteEkleyeBas = () => {
-    const secimler = ekstraGramaj > 0
-      ? {
-          ekstraGramaj,
-          gramajEtiketi: gramajOpsiyonu.etiket,
-          gramajBirim: gramajOpsiyonu.birim,
-        }
-      : {};
+    const dahilMalzemeler = (urun.malzemeler || []).filter((m) => !haricMalzemeler.includes(m));
+    const secimler = {
+      dahilMalzemeler,
+      ...(gramajOpsiyonu ? {
+        ekstraGramaj,
+        standartGramaj: Number(urun.temelMiktar || 0),
+        toplamGramaj,
+        gramajEtiketi: gramajOpsiyonu.etiket,
+        gramajBirim: gramajOpsiyonu.birim,
+      } : {}),
+    };
     for (let i = 0; i < adet; i++) {
       sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi });
     }
@@ -95,8 +100,9 @@ export default function UrunDetay() {
               <div className="gramaj-bilgi">
                 <h2 className="urun-detay-baslik">{gramajOpsiyonu.etiket}</h2>
                 <span className="gramaj-deger">
-                  {ekstraGramaj > 0 ? `+${ekstraGramaj} ${gramajOpsiyonu.birim}` : "Standart"}
+                  {toplamGramaj} {gramajOpsiyonu.birim}
                 </span>
+                <span className="gramaj-standart">Standart: {urun.temelMiktar} {gramajOpsiyonu.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${gramajOpsiyonu.birim}` : ""}</span>
                 <span className="gramaj-fiyat">
                   Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}
                 </span>

@@ -225,6 +225,11 @@ export default function Home() {
                 </div>
                 <div className="urun-alt">
                   <h4 className="urun-ad">{u.ad}</h4>
+                  {u.temelMiktar > 0 && (
+                    <span className="urun-standart-miktar">
+                      Standart {u.temelMiktar} {u.gramajOpsiyonu?.birim || (u.kategori === "İçecekler" ? "ml" : "gr")}
+                    </span>
+                  )}
                   <div className="urun-fiyat-satir">
                     {indirim ? (
                       <span className="urun-fiyat-grup">
