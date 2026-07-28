@@ -11,6 +11,7 @@ const SIFRELER = {
 export default function Login({ onGirisBasarili }) {
   const [rol, setRol] = useState("mutfak");
   const [sifre, setSifre] = useState("");
+  const [sifreGorunur, setSifreGorunur] = useState(false);
   const [email, setEmail] = useState("");
   const [hata, setHata] = useState("");
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -106,14 +107,19 @@ export default function Login({ onGirisBasarili }) {
         <label className="login-etiket">
           {rol === "mutfak" ? "Mutfak Şifresi" : rol === "salon" ? "Salon Şifresi" : "Yönetici Şifresi"}
         </label>
-        <input
-          type="password"
-          className="login-input"
-          value={sifre}
-          onChange={(e) => { setSifre(e.target.value); setHata(""); }}
-          autoFocus={rol !== "admin"}
-          placeholder="••••"
-        />
+        <div className="sifre-alani">
+          <input
+            type={sifreGorunur ? "text" : "password"}
+            className="login-input"
+            value={sifre}
+            onChange={(e) => { setSifre(e.target.value); setHata(""); }}
+            autoFocus={rol !== "admin"}
+            placeholder="••••"
+          />
+          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
+            <GozIkonu kapali={sifreGorunur} />
+          </button>
+        </div>
         {hata && <p className="login-hata">{hata}</p>}
 
         <button type="submit" className="login-btn" disabled={!sifre || (rol === "admin" && !email) || yukleniyor}>
@@ -126,5 +132,13 @@ export default function Login({ onGirisBasarili }) {
         )}
       </form>
     </div>
+  );
+}
+
+function GozIkonu({ kapali }) {
+  return kapali ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.3A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3.1 3.7M6.2 6.5A17.2 17.2 0 0 0 2.5 12S6 18 12 18c1.4 0 2.7-.3 3.8-.8" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></svg>
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" /><circle cx="12" cy="12" r="2.8" /></svg>
   );
 }

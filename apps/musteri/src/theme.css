@@ -15,11 +15,10 @@
      Tema buradan başlar. Aşağıdaki tüm token'lar bu altı değere dayanır;
      markanın rengini değiştirmek için tek yer burasıdır. */
   --bg-primary: #0d0d0d;
-  /* Kartların kendi arka plan rengi yok — sadece backdrop-filter blur ile
-     buzlu cam hissi verilir. Böylece kartlar üst üste/kesişince görünen
-     kare zemin çizgileri oluşmaz. */
-  --bg-card: rgba(0, 0, 0, 0);
-  --bg-card-hover: rgba(0, 0, 0, 0);
+  /* Kart yüzeyleri opak tutulur. Dekoratif arka plan veya başka kartlar
+     kartın içinden görünmez; ekran katmanları her cihazda net kalır. */
+  --bg-card: #17120f;
+  --bg-card-hover: #211813;
   --bg-input: rgba(255, 255, 255, 0.05);
   --accent: #ff6b00;
   --accent-glow: rgba(255, 107, 0, 0.4);
@@ -37,9 +36,9 @@
 
   /* --- Cam (glassmorphism) yüzey tokenları --- */
   --glass-bg: var(--bg-card);                    /* standart kart */
-  --glass-bg-soft: rgba(255, 255, 255, 0.02);    /* input, iç kutu */
+  --glass-bg-soft: #1b1512;                       /* input, iç kutu */
   --glass-bg-strong: var(--bg-card-hover);       /* vurgulu kart / hover */
-  --glass-bg-solid: rgba(255, 255, 255, 0.1);    /* rozet, ikon dairesi */
+  --glass-bg-solid: #2a201b;                      /* rozet, ikon dairesi */
   --glass-border: var(--border-glass);
   --glass-border-soft: rgba(255, 255, 255, 0.03);
   --glass-border-strong: rgba(255, 255, 255, 0.08);

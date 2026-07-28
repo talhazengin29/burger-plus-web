@@ -50,6 +50,11 @@
   outline: none;
   border-color: var(--primary);
 }
+.sifre-alani { position: relative; }
+.sifre-alani .login-input { padding-right: 52px; }
+.sifre-goster-btn { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: var(--metin-soluk); }
+.sifre-goster-btn:hover, .sifre-goster-btn:focus-visible { color: var(--metin); background: var(--panel-3); outline: none; }
+.sifre-goster-btn svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .login-hata {
   color: var(--tehlike);
   font-size: 13px;

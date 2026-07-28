@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { girisYap, tokeniKaydet } from "../lib/authApi";
+import { IconEye, IconEyeOff } from "../components/Icons";
 import logoFull from "../assets/logo-full.png";
 import "./Login.css";
 
@@ -11,6 +12,7 @@ export default function Login() {
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
   const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
+  const [sifreGorunur, setSifreGorunur] = useState(false);
   const [beniHatirla, setBeniHatirla] = useState(true);
   const [hata, setHata] = useState("");
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -74,14 +76,19 @@ export default function Login() {
         />
 
         <label className="login-etiket">Şifre</label>
-        <input
-          type="password"
-          className="login-input"
-          value={sifre}
-          onChange={(e) => { setSifre(e.target.value); setHata(""); }}
-          placeholder="••••••"
-          autoComplete="current-password"
-        />
+        <div className="sifre-alani">
+          <input
+            type={sifreGorunur ? "text" : "password"}
+            className="login-input"
+            value={sifre}
+            onChange={(e) => { setSifre(e.target.value); setHata(""); }}
+            placeholder="••••••"
+            autoComplete="current-password"
+          />
+          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
+            {sifreGorunur ? <IconEyeOff /> : <IconEye />}
+          </button>
+        </div>
 
         {/* Beni hatırla */}
         <label className="beni-hatirla">

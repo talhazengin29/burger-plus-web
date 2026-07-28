@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { kayitOl, tokeniKaydet } from "../lib/authApi";
-import { IconBack } from "../components/Icons";
+import { IconBack, IconEye, IconEyeOff } from "../components/Icons";
 import "./Login.css";
 
 export default function Kayit() {
@@ -12,6 +12,7 @@ export default function Kayit() {
     ad: "", soyad: "", cinsiyet: "", email: "", telefon: "", sifre: "",
   });
   const [hata, setHata] = useState("");
+  const [sifreGorunur, setSifreGorunur] = useState(false);
   const [yukleniyor, setYukleniyor] = useState(false);
 
   const guncelle = (alan, deger) => {
@@ -83,9 +84,14 @@ export default function Kayit() {
           placeholder="05XX XXX XX XX" autoComplete="tel" />
 
         <label className="login-etiket">Şifre</label>
-        <input type="password" className="login-input" value={form.sifre}
-          onChange={(e) => guncelle("sifre", e.target.value)}
-          placeholder="En az 6 karakter" autoComplete="new-password" />
+        <div className="sifre-alani">
+          <input type={sifreGorunur ? "text" : "password"} className="login-input" value={form.sifre}
+            onChange={(e) => guncelle("sifre", e.target.value)}
+            placeholder="En az 6 karakter" autoComplete="new-password" />
+          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
+            {sifreGorunur ? <IconEyeOff /> : <IconEye />}
+          </button>
+        </div>
 
         {hata && <p className="login-hata">{hata}</p>}
 

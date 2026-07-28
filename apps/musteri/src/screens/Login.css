@@ -89,6 +89,11 @@
   box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
 }
 .login-input::placeholder { color: rgba(255, 255, 255, 0.3); opacity: 1; }
+.sifre-alani { position: relative; margin-bottom: 16px; }
+.sifre-alani .login-input { margin-bottom: 0; padding-right: 50px; }
+.sifre-goster-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; display: grid; place-items: center; border-radius: var(--r-full); color: var(--on-surface-variant); }
+.sifre-goster-btn:hover, .sifre-goster-btn:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.1); outline: none; }
+.sifre-goster-btn svg { width: 20px; height: 20px; }
 
 /* Kayıt: ad-soyad yan yana */
 .kayit-ikili { display: flex; gap: 12px; }
