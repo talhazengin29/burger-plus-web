@@ -242,6 +242,8 @@
 
 .kategori {
   flex-shrink: 0;
+  position: relative;
+  z-index: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -251,17 +253,32 @@
 }
 .kategori-daire {
   width: 64px; height: 64px;
+  position: relative;
   display: grid;
   place-items: center;
-  overflow: hidden;
   border-radius: var(--r-full);
-  background: var(--bg-page);
-  border: 2px solid var(--glass-border);
-  box-shadow: var(--glass-shadow-sm);
+  isolation: isolate;
+  overflow: visible;
+  background: #15110f;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
-.kategori-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.kategori-daire::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.32) 0%, rgba(255, 107, 0, 0.15) 48%, transparent 72%);
+  filter: blur(5px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.kategori-gorsel { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .kategori-ad {
+  position: relative;
+  z-index: 1;
   font-size: 12px;
   font-weight: 600;
   color: var(--on-surface-variant);
@@ -269,12 +286,16 @@
   line-height: 1.25;
   transition: color 0.2s;
 }
-.kategori:hover .kategori-daire { border-color: var(--glass-border-strong); }
+.kategori:hover { z-index: 2; }
+.kategori:hover .kategori-daire { border-color: rgba(255, 255, 255, 0.22); }
 /* Aktif kategori — turuncu kenarlık + parlama */
+.kategori--aktif { z-index: 3; }
 .kategori--aktif .kategori-daire {
   border-color: var(--primary-container);
-  box-shadow: var(--glow);
+  box-shadow: 0 0 0 1px rgba(255, 107, 0, 0.45), 0 0 18px rgba(255, 107, 0, 0.58), 0 7px 16px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
 }
+.kategori--aktif .kategori-daire::before { opacity: 1; transform: scale(1.04); }
 .kategori--aktif .kategori-ad { color: var(--primary-container); font-weight: 700; }
 
 /* --- Ye Kazan damga kartı --- */
