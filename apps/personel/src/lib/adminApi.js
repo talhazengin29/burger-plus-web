@@ -48,7 +48,17 @@ export async function adminIstek(yol, secenekler = {}) {
     },
   });
   const veri = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(veri.hata || "İşlem tamamlanamadı.");
+  if (!r.ok) {
+    const hata = new Error(
+      veri.hata || (r.status === 401 || r.status === 403
+        ? "Yönetici oturumunuz geçersiz veya süresi dolmuş. Lütfen yeniden giriş yapın."
+        : `${yol} verisi alınamadı (HTTP ${r.status}).`)
+    );
+    hata.status = r.status;
+    hata.yol = yol;
+    if (r.status === 401 || r.status === 403) adminToken.sil();
+    throw hata;
+  }
   return veri;
 }
 

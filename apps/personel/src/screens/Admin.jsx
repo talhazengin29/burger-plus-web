@@ -38,19 +38,37 @@ export default function Admin({ onCikis }) {
   const verileriYukle = useCallback(async () => {
     setYukleniyor(true);
     setHata("");
-    try {
-      const [d, u, s, sh, p, r] = await Promise.all([
-        adminIstek("/dashboard"), adminIstek("/urunler"), adminIstek("/stok"),
-        adminIstek("/stok/hareketler"), adminIstek("/personeller"), adminIstek("/raporlar/satis?gun=30"),
-      ]);
-      setDashboard(d); setUrunler(u.urunler || []); setStoklar(s.stoklar || []);
-      setStokHareketleri(sh.hareketler || []); setPersoneller(p.personeller || []); setRapor(r);
-    } catch (err) {
-      setHata(err.message);
-    } finally {
+    const istekler = [
+      ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Stok", "/stok"],
+      ["Stok hareketleri", "/stok/hareketler"], ["Personel", "/personeller"],
+      ["Satış raporları", "/raporlar/satis?gun=30"],
+    ];
+    const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
+    const yetkiHatasi = sonuclar.find((sonuc) =>
+      sonuc.status === "rejected" && [401, 403].includes(sonuc.reason?.status)
+    );
+    if (yetkiHatasi) {
       setYukleniyor(false);
+      onCikis();
+      return;
     }
-  }, []);
+
+    const [d, u, s, sh, p, r] = sonuclar.map((sonuc) =>
+      sonuc.status === "fulfilled" ? sonuc.value : null
+    );
+    if (d) setDashboard(d);
+    if (u) setUrunler(u.urunler || []);
+    if (s) setStoklar(s.stoklar || []);
+    if (sh) setStokHareketleri(sh.hareketler || []);
+    if (p) setPersoneller(p.personeller || []);
+    if (r) setRapor(r);
+
+    const hatalar = sonuclar.flatMap((sonuc, index) =>
+      sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
+    );
+    setHata(hatalar.join(" • "));
+    setYukleniyor(false);
+  }, [onCikis]);
 
   useEffect(() => { verileriYukle(); }, [verileriYukle]);
   useEffect(() => {

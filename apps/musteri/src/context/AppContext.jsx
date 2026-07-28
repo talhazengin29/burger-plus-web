@@ -380,11 +380,24 @@ export function AppProvider({ children }) {
 
     // Ödenen ürünler: parametre geldiyse onu kullan, yoksa tüm sepeti al
     const kaynakUrunler = odenenUrunlerParam || sepet;
-    const odenenUrunler = kaynakUrunler.map((u) => ({
-      id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
-      kategori: u.kategori, haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {},
-      sepetAnahtari: u.sepetAnahtari,
-    }));
+    const odenenUrunler = kaynakUrunler.map((u) => {
+      const secimler = {
+        dahilMalzemeler: u.secimler?.dahilMalzemeler || u.malzemeler || [],
+        standartGramaj: u.secimler?.standartGramaj ?? u.temelMiktar ?? 0,
+        ekstraGramaj: u.secimler?.ekstraGramaj ?? 0,
+        toplamGramaj: u.secimler?.toplamGramaj ?? u.temelMiktar ?? 0,
+        gramajEtiketi: u.secimler?.gramajEtiketi || u.gramajOpsiyonu?.etiket || "Ürün gramajı",
+        gramajBirim: u.secimler?.gramajBirim || u.gramajOpsiyonu?.birim || "gr",
+        ...(u.secimler || {}),
+      };
+      return {
+        id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
+        kategori: u.kategori, temelMiktar: u.temelMiktar, malzemeler: u.malzemeler || [],
+        gramajOpsiyonu: u.gramajOpsiyonu || null,
+        haricMalzemeler: u.haricMalzemeler || [], secimler,
+        sepetAnahtari: u.sepetAnahtari,
+      };
+    });
 
     const ozet = {
       tutar, yontem, masaNo, misafir,
@@ -401,7 +414,12 @@ export function AppProvider({ children }) {
     odenenUrunler.forEach((u) => {
       socket.emit("urun-ekle", {
         masaNo: masaNo || "algotur",
-        urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {} },
+        urun: {
+          id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, kategori: u.kategori,
+          temelMiktar: u.temelMiktar, malzemeler: u.malzemeler || [],
+          gramajOpsiyonu: u.gramajOpsiyonu,
+          haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {},
+        },
         secimler: u.secimler || {},
         haricMalzemeler: u.haricMalzemeler || [],
         siparisNo,
