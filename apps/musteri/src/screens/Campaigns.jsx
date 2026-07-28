@@ -32,6 +32,8 @@ export default function Campaigns() {
 
   // Misafir kampanyayı görebilir ama faydalanamaz — "Sipariş Ver"e basınca üyelik modalı çıkar.
   const [modalAcik, setModalAcik] = useState(false);
+  const [davetKodu, setDavetKodu] = useState("");
+  const [kopyalandi, setKopyalandi] = useState(false);
 
   const siparisVer = (k) => {
     const kategori = k.gecerliKategoriler?.[0];
@@ -41,6 +43,22 @@ export default function Campaigns() {
   const siparisVerTiklandi = (k) => {
     if (misafir) { setModalAcik(true); return; }
     siparisVer(k);
+  };
+
+  const davetKoduOlustur = () => {
+    if (misafir) { setModalAcik(true); return; }
+    setKopyalandi(false);
+    setDavetKodu(rastgeleDavetKodu());
+  };
+
+  const koduKopyala = async () => {
+    if (!davetKodu) return;
+    try {
+      await navigator.clipboard.writeText(davetKodu);
+      setKopyalandi(true);
+    } catch {
+      setKopyalandi(false);
+    }
   };
 
   return (
@@ -55,6 +73,7 @@ export default function Campaigns() {
             {kampanyalar.map((k) => {
               const durum = kampanyaDurumu(k, simdi);
               const siparisVerilebilir = k.buton === "Sipariş Ver";
+              const davetKampanyasi = k.etiket === "Davet Et";
               const pasif = siparisVerilebilir && durum !== "aktif";
               return (
                 <motion.article key={k.id} className="camp-kart" variants={siraliOge}>
@@ -79,14 +98,23 @@ export default function Campaigns() {
                     {siparisVerilebilir && misafir && (
                       <span className="camp-uye-rozet">🔒 Üyelere Özel</span>
                     )}
-                    <motion.button
-                      className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={pasif}
-                      onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : undefined}
-                    >
-                      {k.buton}
-                    </motion.button>
+                    {davetKampanyasi && davetKodu ? (
+                      <div className="davet-kodu-kutu">
+                        <span>Davet kodun</span>
+                        <strong>{davetKodu}</strong>
+                        <button type="button" onClick={koduKopyala}>{kopyalandi ? "Kopyalandı" : "Kopyala"}</button>
+                        <button type="button" className="davet-yenile" onClick={davetKoduOlustur}>Yeni kod üret</button>
+                      </div>
+                    ) : (
+                      <motion.button
+                        className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={pasif}
+                        onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKoduOlustur : undefined}
+                      >
+                        {k.buton}
+                      </motion.button>
+                    )}
                   </div>
                 </motion.article>
               );
@@ -111,4 +139,11 @@ export default function Campaigns() {
       </AnimatePresence>
     </div>
   );
+}
+
+function rastgeleDavetKodu() {
+  const karakterler = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const rastgele = new Uint32Array(8);
+  crypto.getRandomValues(rastgele);
+  return Array.from(rastgele, (sayi) => karakterler[sayi % karakterler.length]).join("");
 }
