@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
 import { IconBack, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
+import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./Payment.css";
 
 const YONTEMLER = [
@@ -73,8 +74,8 @@ export default function Payment() {
 
   // Ödenen ürünleri hesapla (ürüne göre modda)
   const seciliUrunListesi = sepet
-    .filter((u) => (seciliAdetler[u.id] || 0) > 0)
-    .map((u) => ({ ...u, adet: seciliAdetler[u.id] }));
+    .filter((u) => (seciliAdetler[u.sepetAnahtari] || 0) > 0)
+    .map((u) => ({ ...u, adet: seciliAdetler[u.sepetAnahtari] }));
 
   // Ödenecek tutarı yönteme göre hesapla
   let odenecek = sepetToplam;
@@ -113,6 +114,20 @@ export default function Payment() {
         {misafir && (
           <div className="misafir-rozet">👤 Misafir olarak devam ediyorsun</div>
         )}
+
+        <section className="secim-kutu odeme-urun-ozeti">
+          <h3 className="secim-baslik">Sipariş özeti</h3>
+          {sepet.map((u) => (
+            <div key={u.sepetAnahtari || u.id} className="odeme-ozet-satir">
+              <span className="odeme-ozet-ad">
+                {u.ad} ×{u.adet}
+                {gramajMetni(u.secimler) && <small>{gramajMetni(u.secimler)}</small>}
+                {haricMalzemeleriGetir(u).length > 0 && <small>Haric: {haricMalzemeleriGetir(u).join(", ")}</small>}
+              </span>
+              <strong>₺{(u.fiyat * u.adet).toFixed(2)}</strong>
+            </div>
+          ))}
+        </section>
 
         {/* Yöntem seçimi — misafir sadece tamamını öder */}
         {!misafir && (
@@ -153,22 +168,27 @@ export default function Payment() {
             <h3 className="secim-baslik">Ödeyeceğin ürünleri seç</h3>
             <div className="urun-sec-liste">
               {sepet.map((u) => {
-                const seciliAdet = seciliAdetler[u.id] || 0;
+                const anahtar = u.sepetAnahtari;
+                const seciliAdet = seciliAdetler[anahtar] || 0;
                 const secili = seciliAdet > 0;
                 return (
                   <div
-                    key={u.id}
+                    key={anahtar}
                     className={"urun-sec-satir" + (secili ? " urun-sec-satir--secili" : "")}
                   >
                     {/* Sol: ürün bilgisi + tıklayınca tümünü seç/kaldır */}
                     <button
                       className="urun-sec-sol"
-                      onClick={() => tumunuSec(u.id, u.adet)}
+                      onClick={() => tumunuSec(anahtar, u.adet)}
                     >
                       <span className={"sec-kutu" + (secili ? " sec-kutu--dolu" : "")}>
                         {secili && <IconCheck />}
                       </span>
-                      <span className="urun-sec-ad">{u.ad}</span>
+                      <span className="urun-sec-ad">
+                        {u.ad}
+                        {gramajMetni(u.secimler) && <small>{gramajMetni(u.secimler)}</small>}
+                        {haricMalzemeleriGetir(u).length > 0 && <small>Haric: {haricMalzemeleriGetir(u).join(", ")}</small>}
+                      </span>
                     </button>
 
                     {/* Sağ: adet seçici (birden fazla ise) */}
@@ -177,7 +197,7 @@ export default function Payment() {
                         <div className="urun-adet-secici">
                           <button
                             className="urun-adet-btn"
-                            onClick={() => adetAzalt(u.id)}
+                            onClick={() => adetAzalt(anahtar)}
                             disabled={seciliAdet === 0}
                           >
                             <IconMinus />
@@ -185,7 +205,7 @@ export default function Payment() {
                           <span className="urun-adet-sayi">{seciliAdet}/{u.adet}</span>
                           <button
                             className="urun-adet-btn"
-                            onClick={() => adetArtir(u.id, u.adet)}
+                            onClick={() => adetArtir(anahtar, u.adet)}
                             disabled={seciliAdet === u.adet}
                           >
                             <IconPlus />

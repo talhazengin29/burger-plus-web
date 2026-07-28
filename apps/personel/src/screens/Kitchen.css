@@ -140,7 +140,13 @@
   font-weight: 600;
   color: var(--tehlike);
 }
+.kalem-gramaj {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+}
 .kalem-kisi {
+  align-self: flex-start;
   font-size: 11px;
   color: var(--metin-soluk);
   background: var(--panel-3);

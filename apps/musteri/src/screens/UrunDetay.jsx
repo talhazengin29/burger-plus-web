@@ -18,17 +18,19 @@ const besinEtiketleri = [
 export default function UrunDetay() {
   const { id } = useParams();
   const git = useNavigate();
-  const { sepeteEkle, indirimliFiyat, misafir, aktifKampanyalar } = useApp();
+  const { sepeteEkle, indirimliFiyat } = useApp();
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
+  const [gramajAdimi, setGramajAdimi] = useState(0);
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to="/anasayfa" replace />;
 
   const indirim = indirimliFiyat(urun);
-  const birimFiyat = indirim ? indirim.fiyat : urun.fiyat;
-  const misafirIcinFirsatVar =
-    !indirim && misafir && aktifKampanyalar.some((k) => k.gecerliKategoriler?.includes(urun.kategori));
+  const gramajOpsiyonu = urun.gramajOpsiyonu?.aktif ? urun.gramajOpsiyonu : null;
+  const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
+  const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
+  const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + gramajFiyatArtisi;
 
   const malzemeToggle = (malzeme) => {
     setHaricMalzemeler((onceki) =>
@@ -39,7 +41,16 @@ export default function UrunDetay() {
   };
 
   const sepeteEkleyeBas = () => {
-    for (let i = 0; i < adet; i++) sepeteEkle({ ...urun, haricMalzemeler });
+    const secimler = ekstraGramaj > 0
+      ? {
+          ekstraGramaj,
+          gramajEtiketi: gramajOpsiyonu.etiket,
+          gramajBirim: gramajOpsiyonu.birim,
+        }
+      : {};
+    for (let i = 0; i < adet; i++) {
+      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi });
+    }
     git(-1);
   };
 
@@ -76,11 +87,41 @@ export default function UrunDetay() {
             ) : (
               <span className="urun-detay-fiyat">₺{urun.fiyat.toFixed(2)}</span>
             )}
-            {misafirIcinFirsatVar && (
-              <p className="urun-detay-uye-not">Üyelere özel fiyat — üye ol, indirimden faydalan</p>
-            )}
             {urun.aciklama && <p className="urun-detay-aciklama">{urun.aciklama}</p>}
           </section>
+
+          {gramajOpsiyonu && (
+            <section className="urun-detay-kart gramaj-kart">
+              <div className="gramaj-bilgi">
+                <h2 className="urun-detay-baslik">{gramajOpsiyonu.etiket}</h2>
+                <span className="gramaj-deger">
+                  {ekstraGramaj > 0 ? `+${ekstraGramaj} ${gramajOpsiyonu.birim}` : "Standart"}
+                </span>
+                <span className="gramaj-fiyat">
+                  Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}
+                </span>
+              </div>
+              <div className="gramaj-kontrol" aria-label={`${gramajOpsiyonu.etiket} seçimi`}>
+                <button
+                  type="button"
+                  onClick={() => setGramajAdimi((a) => Math.max(0, a - 1))}
+                  disabled={gramajAdimi === 0}
+                  aria-label="Gramajı azalt"
+                >
+                  <IconMinus />
+                </button>
+                <span>{gramajAdimi}</span>
+                <button
+                  type="button"
+                  onClick={() => setGramajAdimi((a) => Math.min(gramajOpsiyonu.maxAdim, a + 1))}
+                  disabled={gramajAdimi === gramajOpsiyonu.maxAdim}
+                  aria-label="Gramajı artır"
+                >
+                  <IconPlus />
+                </button>
+              </div>
+            </section>
+          )}
 
           {/* Besin değerleri — sıralı animasyonla gelir */}
           {urun.besinDegerleri && (

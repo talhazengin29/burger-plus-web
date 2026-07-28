@@ -110,17 +110,22 @@ export default function Kitchen() {
                 <ul className="kalem-liste">
                   {masa.kalemler.map((k) => {
                     // Backend alanı henüz snake_case'e taşımamış olabilir — ikisini de destekle.
-                    const haric = k.haricMalzemeler || k.haric_malzemeler;
+                    const secimler = k.secimler || {};
+                    const haric = k.haricMalzemeler || k.haric_malzemeler || secimler.haricMalzemeler;
+                    const gramaj = Number(secimler.ekstraGramaj) > 0
+                      ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
+                      : null;
                     return (
                       <li key={k.id} className="kalem">
                         <span className="kalem-adet">{k.adet}×</span>
                         <div className="kalem-bilgi">
                           <span className="kalem-ad">{k.urun_ad}</span>
+                          {gramaj && <span className="kalem-gramaj">{gramaj}</span>}
                           {haric?.length > 0 && (
-                            <span className="kalem-haric">⛔ {haric.join(", ")}</span>
+                            <span className="kalem-haric">Haric: {haric.join(", ")}</span>
                           )}
+                          {k.kisi_adi && <span className="kalem-kisi">Kişi: {k.kisi_adi}</span>}
                         </div>
-                        {k.kisi_adi && <span className="kalem-kisi">{k.kisi_adi}</span>}
                       </li>
                     );
                   })}

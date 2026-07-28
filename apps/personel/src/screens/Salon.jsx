@@ -86,16 +86,27 @@ export default function Salon() {
 
               {/* Kim ne aldı */}
               <div className="salon-kalemler">
-                {masa.kalemler.map((k) => (
-                  <div key={k.id} className="salon-kalem">
-                    <span className="salon-kalem-adet">{k.adet}×</span>
-                    <span className="salon-kalem-ad">{k.urun_ad}</span>
-                    <span className={"salon-kalem-durum durum-" + k.durum}>
-                      {DURUM_ETIKET[k.durum] || k.durum}
-                    </span>
-                    <span className="salon-kalem-kisi">{k.kisi_adi}</span>
-                  </div>
-                ))}
+                {masa.kalemler.map((k) => {
+                  const secimler = k.secimler || {};
+                  const haric = k.haricMalzemeler || k.haric_malzemeler || secimler.haricMalzemeler;
+                  const gramaj = Number(secimler.ekstraGramaj) > 0
+                    ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
+                    : null;
+                  return (
+                    <div key={k.id} className="salon-kalem">
+                      <span className="salon-kalem-adet">{k.adet}×</span>
+                      <span className="salon-kalem-ad">
+                        {k.urun_ad}
+                        {gramaj && <small className="salon-kalem-gramaj">{gramaj}</small>}
+                        {haric?.length > 0 && <small className="salon-kalem-haric">Haric: {haric.join(", ")}</small>}
+                      </span>
+                      <span className={"salon-kalem-durum durum-" + k.durum}>
+                        {DURUM_ETIKET[k.durum] || k.durum}
+                      </span>
+                      <span className="salon-kalem-kisi">{k.kisi_adi}</span>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Kapat butonu / onay */}

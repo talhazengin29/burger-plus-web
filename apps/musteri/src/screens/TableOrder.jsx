@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { IconBack } from "../components/Icons";
+import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./TableOrder.css";
 
 /*
@@ -37,9 +38,13 @@ export default function TableOrder() {
         <h2 className="table-bolum-baslik">Siparişin</h2>
         <div className="table-liste">
           {sepet.map((u) => (
-            <div key={u.id} className="table-satir">
+            <div key={u.sepetAnahtari || u.id} className="table-satir">
               <span className="table-adet">{u.adet}×</span>
-              <span className="table-ad">{u.ad}</span>
+              <span className="table-ad">
+                {u.ad}
+                {gramajMetni(u.secimler) && <small>{gramajMetni(u.secimler)}</small>}
+                {haricMalzemeleriGetir(u).length > 0 && <small>Haric: {haricMalzemeleriGetir(u).join(", ")}</small>}
+              </span>
               <span className="table-fiyat">₺{(u.fiyat * u.adet).toFixed(2)}</span>
             </div>
           ))}

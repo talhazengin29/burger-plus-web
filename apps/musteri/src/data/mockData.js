@@ -38,6 +38,14 @@ export const urunler = [
     malzemeler: ["Dana köfte", "Cheddar", "Marul", "Domates", "Soğan", "Turşu", "Özel sos"],
     besinDegerleri: { kalori: "520 kcal", protein: "32g", karbonhidrat: "38g", yag: "26g" },
     alerjenler: ["Gluten", "Süt Ürünleri"],
+    gramajOpsiyonu: {
+      aktif: true,
+      etiket: "Köfte gramajı",
+      birim: "gr",
+      artisMiktari: 50,
+      maxAdim: 3,
+      fiyatArtisi: 35,
+    },
   },
   {
     id: 2,
@@ -49,6 +57,14 @@ export const urunler = [
     malzemeler: ["Dana köfte", "Cheddar", "Çıtır soğan", "BBQ sos", "Marul", "Turşu"],
     besinDegerleri: { kalori: "610 kcal", protein: "35g", karbonhidrat: "42g", yag: "32g" },
     alerjenler: ["Gluten", "Süt Ürünleri", "Hardal"],
+    gramajOpsiyonu: {
+      aktif: true,
+      etiket: "Köfte gramajı",
+      birim: "gr",
+      artisMiktari: 75,
+      maxAdim: 2,
+      fiyatArtisi: 50,
+    },
   },
   {
     id: 3,
@@ -82,6 +98,14 @@ export const urunler = [
     malzemeler: ["Patates", "Ayçiçek yağı", "Tuz"],
     besinDegerleri: { kalori: "340 kcal", protein: "5g", karbonhidrat: "42g", yag: "17g" },
     alerjenler: [],
+    gramajOpsiyonu: {
+      aktif: true,
+      etiket: "Patates porsiyonu",
+      birim: "gr",
+      artisMiktari: 100,
+      maxAdim: 2,
+      fiyatArtisi: 30,
+    },
   },
   {
     id: 6,

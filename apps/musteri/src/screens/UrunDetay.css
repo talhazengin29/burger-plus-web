@@ -97,10 +97,19 @@
   color: var(--on-surface-variant);
   margin-top: 4px;
 }
-.urun-detay-uye-not {
-  font-size: 12px;
-  color: var(--outline);
+.gramaj-kart { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.gramaj-bilgi { display: flex; flex-direction: column; gap: 4px; }
+.gramaj-bilgi .urun-detay-baslik { margin-bottom: 0; }
+.gramaj-deger { color: var(--primary-container); font-weight: 700; font-size: 14px; }
+.gramaj-fiyat { color: var(--outline); font-size: 11px; }
+.gramaj-kontrol { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gramaj-kontrol button {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: var(--r-full); background: var(--primary-fixed); color: var(--primary-container);
 }
+.gramaj-kontrol button:disabled { opacity: 0.35; }
+.gramaj-kontrol button svg { width: 16px; height: 16px; }
+.gramaj-kontrol span { min-width: 18px; text-align: center; font-weight: 700; }
 
 /* Besin değerleri */
 .besin-grid {

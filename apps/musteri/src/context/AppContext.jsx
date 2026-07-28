@@ -6,6 +6,7 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
 import { puanHesapla, kampanyalar, kampanyaAktifMi } from "../data/mockData";
 import { socket } from "../lib/socket";
+import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
 import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle } from "../lib/authApi";
 
 const AppContext = createContext(null);
@@ -158,31 +159,33 @@ export function AppProvider({ children }) {
     // Aktif kampanya varsa ürün sepete indirimli fiyatla girer — ödeme akışı
     // (sepetToplam, odemeyiTamamla) hiç değişmeden bu fiyatı kullanır.
     const indirim = indirimliFiyat(urun);
+    const ekstraFiyat = Number(urun.gramajFiyatArtisi) || 0;
     const eklenecek = indirim
-      ? { ...urun, fiyat: indirim.fiyat, orijinalFiyat: indirim.orijinalFiyat }
-      : urun;
+      ? { ...urun, fiyat: indirim.fiyat + ekstraFiyat, orijinalFiyat: indirim.orijinalFiyat + ekstraFiyat }
+      : { ...urun, fiyat: urun.fiyat + ekstraFiyat };
+    const sepetAnahtari = sepetAnahtariOlustur(urun);
     setSepet((onceki) => {
-      const mevcut = onceki.find((s) => s.id === urun.id);
+      const mevcut = onceki.find((s) => s.sepetAnahtari === sepetAnahtari);
       if (mevcut) {
         return onceki.map((s) =>
-          s.id === urun.id ? { ...s, adet: s.adet + 1 } : s
+          s.sepetAnahtari === sepetAnahtari ? { ...s, adet: s.adet + 1 } : s
         );
       }
-      return [...onceki, { ...eklenecek, adet: 1 }];
+      return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1 }];
     });
   };
 
-  const adetArtir = (id) =>
-    setSepet((o) => o.map((s) => (s.id === id ? { ...s, adet: s.adet + 1 } : s)));
+  const adetArtir = (anahtar) =>
+    setSepet((o) => o.map((s) => (s.sepetAnahtari === anahtar ? { ...s, adet: s.adet + 1 } : s)));
 
-  const adetAzalt = (id) =>
+  const adetAzalt = (anahtar) =>
     setSepet((o) =>
       o
-        .map((s) => (s.id === id ? { ...s, adet: s.adet - 1 } : s))
+        .map((s) => (s.sepetAnahtari === anahtar ? { ...s, adet: s.adet - 1 } : s))
         .filter((s) => s.adet > 0)
     );
 
-  const sepettenCikar = (id) => setSepet((o) => o.filter((s) => s.id !== id));
+  const sepettenCikar = (anahtar) => setSepet((o) => o.filter((s) => s.sepetAnahtari !== anahtar));
 
   const sepetiBosalt = () => setSepet([]);
 
@@ -299,9 +302,11 @@ export function AppProvider({ children }) {
   // Hediyeyi sepete 0₺ olarak ekler — indirim/birleştirme mantığından muaf,
   // kendi bağımsız satırı olarak girer.
   const hediyeSepeteEkle = (hediye) => {
+    const sepetAnahtari = `hediye-${hediye.id}-${Date.now()}`;
     setSepet((onceki) => [...onceki, {
       id: hediye.id, ad: hediye.ad, fiyat: 0, adet: 1,
       gorsel: hediye.gorsel || null, kategori: hediye.kategori || null, hediyeMi: true,
+      sepetAnahtari,
     }]);
     hediyeKullan(hediye.id);
   };
@@ -340,7 +345,8 @@ export function AppProvider({ children }) {
     const kaynakUrunler = odenenUrunlerParam || sepet;
     const odenenUrunler = kaynakUrunler.map((u) => ({
       id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
-      kategori: u.kategori, haricMalzemeler: u.haricMalzemeler || [],
+      kategori: u.kategori, haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {},
+      sepetAnahtari: u.sepetAnahtari,
     }));
 
     const ozet = {
@@ -357,7 +363,9 @@ export function AppProvider({ children }) {
     odenenUrunler.forEach((u) => {
       socket.emit("urun-ekle", {
         masaNo: masaNo || "algotur",
-        urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, haricMalzemeler: u.haricMalzemeler || [] },
+        urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {} },
+        secimler: u.secimler || {},
+        haricMalzemeler: u.haricMalzemeler || [],
         kisiAdi: gonderenAd,
       });
     });

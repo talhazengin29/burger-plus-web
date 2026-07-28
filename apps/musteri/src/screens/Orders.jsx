@@ -4,6 +4,7 @@ import { useApp } from "../context/AppContext";
 import { IconBag } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
+import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./Orders.css";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
@@ -40,11 +41,15 @@ function SiparisKart({ s, durum, gecmis }) {
 
       <div className="siparis-urunler">
         {s.urunler.map((u) => (
-          <div key={u.id} className="siparis-urun-satir">
+          <div key={u.sepetAnahtari || u.id} className="siparis-urun-satir">
             <img className="siparis-urun-gorsel" src={u.gorsel} alt={u.ad} />
             <div className="siparis-urun-orta">
               <span className="siparis-urun-ad">{u.ad}</span>
               <span className="siparis-urun-birim">₺{u.fiyat.toFixed(2)}</span>
+              {gramajMetni(u.secimler) && <span className="siparis-urun-secim">{gramajMetni(u.secimler)}</span>}
+              {haricMalzemeleriGetir(u).length > 0 && (
+                <span className="siparis-urun-haric">Haric: {haricMalzemeleriGetir(u).join(", ")}</span>
+              )}
             </div>
             <span className="siparis-urun-adet">{u.adet}×</span>
           </div>

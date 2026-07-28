@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
+import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./Cart.css";
 
 export default function Cart() {
@@ -37,7 +38,7 @@ export default function Cart() {
           <div className="cart-govde">
             <div className="cart-liste">
               {sepet.map((u) => (
-                <article key={u.id} className="cart-satir">
+                <article key={u.sepetAnahtari || u.id} className="cart-satir">
                   <img className="cart-gorsel" src={u.gorsel} alt={u.ad} />
                   <div className="cart-orta">
                     <h3 className="cart-ad">{u.ad}</h3>
@@ -46,18 +47,21 @@ export default function Cart() {
                     ) : (
                       <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
                     )}
-                    {u.haricMalzemeler?.length > 0 && (
-                      <span className="cart-haric-malzeme">Çıkarılan: {u.haricMalzemeler.join(", ")}</span>
+                    {gramajMetni(u.secimler) && (
+                      <span className="cart-gramaj">{gramajMetni(u.secimler)}</span>
+                    )}
+                    {haricMalzemeleriGetir(u).length > 0 && (
+                      <span className="cart-haric-malzeme">Haric: {haricMalzemeleriGetir(u).join(", ")}</span>
                     )}
                   </div>
                   <div className="cart-sag">
-                    <button className="cart-sil" onClick={() => sepettenCikar(u.id)} aria-label="Kaldır">
+                    <button className="cart-sil" onClick={() => sepettenCikar(u.sepetAnahtari)} aria-label="Kaldır">
                       <IconTrash />
                     </button>
                     <div className="adet-kontrol">
-                      <button onClick={() => adetAzalt(u.id)} aria-label="Azalt"><IconMinus /></button>
+                      <button onClick={() => adetAzalt(u.sepetAnahtari)} aria-label="Azalt"><IconMinus /></button>
                       <span className="adet-sayi">{u.adet}</span>
-                      <button onClick={() => adetArtir(u.id)} aria-label="Artır"><IconPlus /></button>
+                      <button onClick={() => adetArtir(u.sepetAnahtari)} aria-label="Artır"><IconPlus /></button>
                     </div>
                   </div>
                 </article>
