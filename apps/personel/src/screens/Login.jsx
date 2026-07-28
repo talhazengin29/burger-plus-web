@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { adminGiris } from "../lib/adminApi";
 import "./Login.css";
 
 // Rol şifreleri. Gerçek üründe backend'de doğrulanmalı; şimdilik istemcide.
@@ -10,10 +11,24 @@ const SIFRELER = {
 export default function Login({ onGirisBasarili }) {
   const [rol, setRol] = useState("mutfak");
   const [sifre, setSifre] = useState("");
+  const [email, setEmail] = useState("");
   const [hata, setHata] = useState("");
+  const [yukleniyor, setYukleniyor] = useState(false);
 
-  const gonder = (e) => {
+  const gonder = async (e) => {
     e.preventDefault();
+    if (rol === "admin") {
+      setYukleniyor(true);
+      try {
+        await adminGiris(email, sifre);
+        onGirisBasarili("admin");
+      } catch (err) {
+        setHata(err.message);
+      } finally {
+        setYukleniyor(false);
+      }
+      return;
+    }
     if (sifre === SIFRELER[rol]) {
       onGirisBasarili(rol);
     } else {
@@ -45,23 +60,43 @@ export default function Login({ onGirisBasarili }) {
           >
             🍽️ Salon
           </button>
+          <button
+            type="button"
+            className={"rol-btn " + (rol === "admin" ? "rol-btn--aktif" : "")}
+            onClick={() => { setRol("admin"); setHata(""); }}
+          >
+            Yönetim
+          </button>
         </div>
 
+        {rol === "admin" && (
+          <>
+            <label className="login-etiket">Yönetici E-postası</label>
+            <input
+              type="email"
+              className="login-input login-input--email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setHata(""); }}
+              autoFocus
+              placeholder="admin@burgerplus.com"
+            />
+          </>
+        )}
         <label className="login-etiket">
-          {rol === "mutfak" ? "Mutfak Şifresi" : "Salon Şifresi"}
+          {rol === "mutfak" ? "Mutfak Şifresi" : rol === "salon" ? "Salon Şifresi" : "Yönetici Şifresi"}
         </label>
         <input
           type="password"
           className="login-input"
           value={sifre}
           onChange={(e) => { setSifre(e.target.value); setHata(""); }}
-          autoFocus
+          autoFocus={rol !== "admin"}
           placeholder="••••"
         />
         {hata && <p className="login-hata">{hata}</p>}
 
-        <button type="submit" className="login-btn" disabled={!sifre}>
-          Giriş Yap
+        <button type="submit" className="login-btn" disabled={!sifre || (rol === "admin" && !email) || yukleniyor}>
+          {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}
         </button>
       </form>
     </div>

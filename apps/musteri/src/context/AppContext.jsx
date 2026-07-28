@@ -4,15 +4,52 @@
    ========================================================================== */
 
 import { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
-import { puanHesapla, kampanyalar, kampanyaAktifMi } from "../data/mockData";
+import {
+  puanHesapla,
+  kampanyalar,
+  kampanyaAktifMi,
+  urunler as varsayilanUrunler,
+  urunKurallariniUygula,
+} from "../data/mockData";
 import { socket } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
 import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle } from "../lib/authApi";
 
 const AppContext = createContext(null);
 
+function kataloguBirlestir(uzakUrunler) {
+  return uzakUrunler.map((uzak) => {
+    const yerel = varsayilanUrunler.find((u) => String(u.id) === String(uzak.id)) || {};
+    const doluUzakAlanlar = Object.fromEntries(
+      Object.entries(uzak).filter(([, deger]) => deger !== null && deger !== undefined)
+    );
+    return urunKurallariniUygula({ ...yerel, ...doluUzakAlanlar });
+  });
+}
+
 export function AppProvider({ children }) {
   const [puan, setPuan] = useState(0);
+  const [urunler, setUrunler] = useState(varsayilanUrunler);
+
+  // Backend kataloğu varsa onu kullan; sunucu kapalıyken mevcut menü çalışmaya devam eder.
+  useEffect(() => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+    fetch(`${backendUrl}/api/urunler`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then(({ urunler: uzakUrunler }) => {
+        if (!Array.isArray(uzakUrunler) || uzakUrunler.length === 0) return;
+        setUrunler(kataloguBirlestir(uzakUrunler));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const katalogGuncelle = (uzakUrunler) => {
+      if (Array.isArray(uzakUrunler)) setUrunler(kataloguBirlestir(uzakUrunler));
+    };
+    socket.on("urunler-guncellendi", katalogGuncelle);
+    return () => socket.off("urunler-guncellendi", katalogGuncelle);
+  }, []);
 
   // --- Giriş yapmış kullanıcı (auth) ---
   // null ise misafir/giriş yapılmamış. Doluysa gerçek hesap.
@@ -360,12 +397,14 @@ export function AppProvider({ children }) {
     // Mutfağa gönder (masaya servis ise masa no ile, al götür ise "algotur" etiketiyle)
     // İsim: giriş yapmışsa gerçek adı, misafirse "Misafir".
     const gonderenAd = kullanici ? `${kullanici.ad} ${kullanici.soyad}` : "Misafir";
+    const siparisNo = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     odenenUrunler.forEach((u) => {
       socket.emit("urun-ekle", {
         masaNo: masaNo || "algotur",
         urun: { id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {} },
         secimler: u.secimler || {},
         haricMalzemeler: u.haricMalzemeler || [],
+        siparisNo,
         kisiAdi: gonderenAd,
       });
     });
@@ -401,6 +440,8 @@ export function AppProvider({ children }) {
     // kampanyalar (saatli/sürekli indirimler)
     aktifKampanyalar,
     indirimliFiyat,
+    // Backend tarafından yönetilen dinamik ürün kataloğu
+    urunler,
     // sepet (yerel/kişisel)
     sepet: aktifSepet,
     sepeteEkle,

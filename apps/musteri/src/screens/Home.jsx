@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { kategoriler, kategoriGorseller, urunler } from "../data/mockData";
+import { kategoriler, kategoriGorseller } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
 import { IconPlus, IconSearch, IconFilter, IconArrowRight } from "../components/Icons";
@@ -23,7 +23,7 @@ export default function Home() {
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat } = useApp();
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, urunler } = useApp();
   const git = useNavigate();
   const chipRef = useSuruklenebilir();
 
@@ -38,7 +38,7 @@ export default function Home() {
     if (siralama === "artan") return [...liste].sort((a, b) => a.fiyat - b.fiyat);
     if (siralama === "azalan") return [...liste].sort((a, b) => b.fiyat - a.fiyat);
     return liste;
-  }, [aktifKategori, arama, siralama]);
+  }, [aktifKategori, arama, siralama, urunler]);
 
   const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
 
@@ -206,6 +206,7 @@ export default function Home() {
           >
             {gosterilen.map((u) => {
               const indirim = indirimliFiyat(u);
+              const tukendi = u.satilabilirAdet === 0;
               return (
               <motion.article
                 key={u.id}
@@ -220,6 +221,7 @@ export default function Home() {
               >
                 <div className="urun-gorsel-wrap">
                   <img className="urun-gorsel" src={u.gorsel} alt={u.ad} loading="lazy" />
+                  {tukendi && <span className="urun-tukendi">Tükendi</span>}
                 </div>
                 <div className="urun-alt">
                   <h4 className="urun-ad">{u.ad}</h4>
@@ -236,8 +238,9 @@ export default function Home() {
                       className="ekle-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        sepeteEkle(u);
+                        if (!tukendi) sepeteEkle(u);
                       }}
+                      disabled={tukendi}
                       aria-label={`${u.ad} sepete ekle`}
                       whileTap={{ scale: 0.85 }}
                       whileHover={{ scale: 1.1 }}

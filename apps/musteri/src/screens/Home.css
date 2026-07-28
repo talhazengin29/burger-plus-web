@@ -411,7 +411,8 @@
   border-color: rgba(255, 107, 0, 0.28);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
-.urun-gorsel-wrap { aspect-ratio: 1 / 1; overflow: hidden; }
+.urun-gorsel-wrap { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
+.urun-tukendi { position: absolute; inset: auto 8px 8px; padding: 4px 8px; border-radius: var(--r-full); background: rgba(15,15,15,.82); color: #fff; font-size: 10px; font-weight: 800; }
 .urun-gorsel { width: 100%; height: 100%; object-fit: cover; }
 .urun-alt { padding: 14px; }
 .urun-ad {
@@ -475,6 +476,7 @@
   transition: box-shadow 0.2s;
 }
 .ekle-btn:hover { box-shadow: 0 2px 10px rgba(255, 107, 0, 0.5), var(--glow-lg); }
+.ekle-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
 .ekle-ikon { width: 20px; height: 20px; }
 
 /* Arama sonuç vermediğinde */

@@ -36,6 +36,14 @@
 .baglanti--acik { color: var(--basari); }
 .baglanti--kapali { color: var(--tehlike); }
 .mutfak-sayi { color: var(--metin-soluk); font-size: 14px; }
+.mutfak-stok-serit { padding: 14px 24px 0; }
+.mutfak-stok-baslik { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+.mutfak-stok-baslik span { color: var(--tehlike); }
+.mutfak-stoklar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+.mutfak-stoklar > div { min-width: 125px; padding: 9px 11px; border-radius: var(--r-md); background: var(--panel); border: 1px solid var(--border); display: flex; flex-direction: column; }
+.mutfak-stoklar > div.kritik { border-color: color-mix(in srgb, var(--tehlike) 55%, var(--border)); background: color-mix(in srgb, var(--tehlike) 9%, var(--panel)); }
+.mutfak-stoklar span { font-size: 10px; color: var(--metin-soluk); }
+.mutfak-stoklar strong { font-size: 12px; }
 .cikis-btn {
   padding: 8px 16px;
   border-radius: var(--r-md);

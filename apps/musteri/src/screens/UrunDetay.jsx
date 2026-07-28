@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { urunler } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconMinus, IconPlus, IconWarning } from "../components/Icons";
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
@@ -18,7 +17,7 @@ const besinEtiketleri = [
 export default function UrunDetay() {
   const { id } = useParams();
   const git = useNavigate();
-  const { sepeteEkle, indirimliFiyat } = useApp();
+  const { sepeteEkle, indirimliFiyat, urunler } = useApp();
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
   const [gramajAdimi, setGramajAdimi] = useState(0);
@@ -28,6 +27,7 @@ export default function UrunDetay() {
 
   const indirim = indirimliFiyat(urun);
   const gramajOpsiyonu = urun.gramajOpsiyonu?.aktif ? urun.gramajOpsiyonu : null;
+  const tukendi = urun.satilabilirAdet === 0;
   const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
   const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
   const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + gramajFiyatArtisi;
@@ -200,10 +200,11 @@ export default function UrunDetay() {
           type="button"
           className="urun-detay-sepet-btn"
           onClick={sepeteEkleyeBas}
+          disabled={tukendi}
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          Sepete Ekle — ₺{(birimFiyat * adet).toFixed(2)}
+          {tukendi ? "Ürün tükendi" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
         </motion.button>
       </div>
     </div>

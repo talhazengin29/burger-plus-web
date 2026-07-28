@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Login from "./screens/Login";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
+import Admin from "./screens/Admin";
+import { adminToken } from "./lib/adminApi";
 import "./App.css";
 
 /*
@@ -22,7 +24,7 @@ export default function App() {
 
   useEffect(() => {
     const kayitli = sessionStorage.getItem(OTURUM);
-    if (kayitli) {
+    if (kayitli && (kayitli !== "admin" || adminToken.al())) {
       setRol(kayitli);
       setAktifSekme(kayitli);
     }
@@ -46,10 +48,12 @@ export default function App() {
 
   const cikis = () => {
     sessionStorage.removeItem(OTURUM);
+    adminToken.sil();
     setRol(null);
   };
 
   if (!rol) return <Login onGirisBasarili={girisBasarili} />;
+  if (rol === "admin") return <Admin onCikis={cikis} />;
 
   return (
     <div className="personel">
