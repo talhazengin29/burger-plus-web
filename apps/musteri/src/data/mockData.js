@@ -27,50 +27,105 @@ export const kategoriGorseller = {
   "İçecekler": "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=160&h=160&fit=crop",
 };
 
-export const urunler = [
+// Kategori + ürünün temel miktarı + fiyatından otomatik artış üretir.
+// Üründe gramajOpsiyonu tanımlanırsa hesaplanan değerleri ezer;
+// gramajOpsiyonu: null verilirse yalnızca o üründe özellik kapatılır.
+export const kategoriUrunKurallari = {
+  "Burgerler": {
+    etiket: "Köfte gramajı",
+    birim: "gr",
+    artisOrani: 0.25,
+    miktarYuvarlama: 25,
+    fiyatArtisOrani: 0.20,
+    fiyatYuvarlama: 5,
+    maxAdim: 3,
+  },
+  "Yan Lezzetler": {
+    etiket: "Porsiyon gramajı",
+    birim: "gr",
+    artisOrani: 0.25,
+    miktarYuvarlama: 25,
+    fiyatArtisOrani: 0.40,
+    fiyatYuvarlama: 5,
+    maxAdim: 3,
+  },
+  "İçecekler": {
+    etiket: "İçecek hacmi",
+    birim: "ml",
+    artisOrani: 0.25,
+    miktarYuvarlama: 25,
+    fiyatArtisOrani: 0.25,
+    fiyatYuvarlama: 5,
+    maxAdim: 3,
+  },
+};
+
+function enYakinaYuvarla(deger, adim) {
+  return Math.max(adim, Math.round(deger / adim) * adim);
+}
+
+export function urunKurallariniUygula(urun) {
+  const kategoriKurali = kategoriUrunKurallari[urun.kategori];
+  const uruneOzelMi = Object.prototype.hasOwnProperty.call(urun, "gramajOpsiyonu");
+
+  if (!kategoriKurali || !Number.isFinite(urun.temelMiktar) || urun.temelMiktar <= 0) return urun;
+  if (uruneOzelMi && !urun.gramajOpsiyonu) return urun;
+
+  const hesaplananGramaj = {
+    aktif: true,
+    etiket: kategoriKurali.etiket,
+    birim: kategoriKurali.birim,
+    artisMiktari: enYakinaYuvarla(
+      urun.temelMiktar * kategoriKurali.artisOrani,
+      kategoriKurali.miktarYuvarlama
+    ),
+    maxAdim: kategoriKurali.maxAdim,
+    fiyatArtisi: enYakinaYuvarla(
+      urun.fiyat * kategoriKurali.fiyatArtisOrani,
+      kategoriKurali.fiyatYuvarlama
+    ),
+  };
+
+  return {
+    ...urun,
+    gramajOpsiyonu: {
+      ...hesaplananGramaj,
+      ...(urun.gramajOpsiyonu || {}),
+    },
+  };
+}
+
+const urunListesi = [
   {
     id: 1,
     ad: "Classic Burger",
     fiyat: 180,
     kategori: "Burgerler",
+    temelMiktar: 200,
     gorsel: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop",
     aciklama: "Özel soslu, taze malzemelerle hazırlanan klasik lezzet.",
     malzemeler: ["Dana köfte", "Cheddar", "Marul", "Domates", "Soğan", "Turşu", "Özel sos"],
     besinDegerleri: { kalori: "520 kcal", protein: "32g", karbonhidrat: "38g", yag: "26g" },
     alerjenler: ["Gluten", "Süt Ürünleri"],
-    gramajOpsiyonu: {
-      aktif: true,
-      etiket: "Köfte gramajı",
-      birim: "gr",
-      artisMiktari: 50,
-      maxAdim: 3,
-      fiyatArtisi: 35,
-    },
   },
   {
     id: 2,
     ad: "BBQ Smoke Burger",
     fiyat: 220,
     kategori: "Burgerler",
+    temelMiktar: 300,
     gorsel: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=400&fit=crop",
     aciklama: "Dumanlı BBQ sosu ve çıtır soğanla zenginleştirilmiş, dolgun bir burger.",
     malzemeler: ["Dana köfte", "Cheddar", "Çıtır soğan", "BBQ sos", "Marul", "Turşu"],
     besinDegerleri: { kalori: "610 kcal", protein: "35g", karbonhidrat: "42g", yag: "32g" },
     alerjenler: ["Gluten", "Süt Ürünleri", "Hardal"],
-    gramajOpsiyonu: {
-      aktif: true,
-      etiket: "Köfte gramajı",
-      birim: "gr",
-      artisMiktari: 75,
-      maxAdim: 2,
-      fiyatArtisi: 50,
-    },
   },
   {
     id: 3,
     ad: "Vegan Burger",
     fiyat: 195,
     kategori: "Burgerler",
+    temelMiktar: 180,
     gorsel: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop",
     aciklama: "Bitkisel köfte ve taze sebzelerle hazırlanan hafif, doyurucu seçenek.",
     malzemeler: ["Bitkisel köfte", "Marul", "Domates", "Soğan", "Vegan sos"],
@@ -82,6 +137,7 @@ export const urunler = [
     ad: "Double Cheese",
     fiyat: 250,
     kategori: "Burgerler",
+    temelMiktar: 400,
     gorsel: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop",
     aciklama: "İki kat köfte, iki kat cheddar — peynir severler için doyurucu klasik.",
     malzemeler: ["Dana köfte x2", "Cheddar x2", "Marul", "Domates", "Özel sos"],
@@ -93,25 +149,19 @@ export const urunler = [
     ad: "Çıtır Patates",
     fiyat: 75,
     kategori: "Yan Lezzetler",
+    temelMiktar: 400,
     gorsel: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop",
     aciklama: "Dışı çıtır, içi yumuşacık, taze kızartılmış patates.",
     malzemeler: ["Patates", "Ayçiçek yağı", "Tuz"],
     besinDegerleri: { kalori: "340 kcal", protein: "5g", karbonhidrat: "42g", yag: "17g" },
     alerjenler: [],
-    gramajOpsiyonu: {
-      aktif: true,
-      etiket: "Patates porsiyonu",
-      birim: "gr",
-      artisMiktari: 100,
-      maxAdim: 2,
-      fiyatArtisi: 30,
-    },
   },
   {
     id: 6,
     ad: "Soğan Halkası",
     fiyat: 85,
     kategori: "Yan Lezzetler",
+    temelMiktar: 200,
     gorsel: "https://images.unsplash.com/photo-1639024471283-03518883512d?w=400&h=400&fit=crop",
     aciklama: "Çıtır galeta kaplamalı, altın sarısı kızarmış soğan halkaları.",
     malzemeler: ["Soğan", "Galeta unu", "Un", "Baharatlar"],
@@ -123,6 +173,7 @@ export const urunler = [
     ad: "Kola",
     fiyat: 40,
     kategori: "İçecekler",
+    temelMiktar: 330,
     gorsel: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&h=400&fit=crop",
     aciklama: "Soğuk ve gazlı, klasik kola.",
     malzemeler: ["Karbonatlı su", "Şeker", "Kola aroması"],
@@ -134,6 +185,7 @@ export const urunler = [
     ad: "Limonata",
     fiyat: 55,
     kategori: "İçecekler",
+    temelMiktar: 400,
     gorsel: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=400&fit=crop",
     aciklama: "Taze sıkılmış limon ve naneyle serinletici ev yapımı limonata.",
     malzemeler: ["Limon", "Şeker", "Nane", "Su"],
@@ -145,6 +197,7 @@ export const urunler = [
     ad: "Ayran",
     fiyat: 35,
     kategori: "İçecekler",
+    temelMiktar: 300,
     gorsel: "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&h=400&fit=crop",
     aciklama: "Geleneksel usul, köpüklü ve serinletici ayran.",
     malzemeler: ["Yoğurt", "Su", "Tuz"],
@@ -156,6 +209,7 @@ export const urunler = [
     ad: "Su",
     fiyat: 15,
     kategori: "İçecekler",
+    temelMiktar: 500,
     gorsel: "https://images.unsplash.com/photo-1616118132534-381148898bb4?w=400&h=400&fit=crop",
     aciklama: "Doğal kaynak suyu, 500 ml.",
     malzemeler: ["Doğal kaynak suyu"],
@@ -167,6 +221,7 @@ export const urunler = [
     ad: "Soda",
     fiyat: 30,
     kategori: "İçecekler",
+    temelMiktar: 200,
     gorsel: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&h=400&fit=crop",
     aciklama: "Buz gibi, gazlı maden sodası.",
     malzemeler: ["Karbonatlı maden suyu"],
@@ -178,6 +233,7 @@ export const urunler = [
     ad: "Çay",
     fiyat: 20,
     kategori: "İçecekler",
+    temelMiktar: 200,
     gorsel: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=400&h=400&fit=crop",
     aciklama: "Demli, sıcak servis edilen açık çay.",
     malzemeler: ["Çay yaprağı", "Su"],
@@ -185,6 +241,8 @@ export const urunler = [
     alerjenler: [],
   },
 ];
+
+export const urunler = urunListesi.map(urunKurallariniUygula);
 
 export const kampanyalar = [
   {
