@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBell, IconBag } from "./Icons";
 import { badgePop } from "../lib/animasyonlar";
 import { duyurulariGetir } from "../lib/authApi";
+import { socket } from "../lib/socket";
 
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
@@ -16,9 +17,23 @@ export default function OrtakHeader({ selamlama = false }) {
 
   const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
 
-  useEffect(() => {
-    duyurulariGetir().then(setDuyurular).catch(() => setDuyurular([]));
+  const duyurulariYukle = useCallback(() => {
+    return duyurulariGetir().then(setDuyurular).catch(() => setDuyurular([]));
   }, []);
+
+  useEffect(() => {
+    duyurulariYukle();
+    socket.on("duyurular-guncellendi", duyurulariYukle);
+    return () => socket.off("duyurular-guncellendi", duyurulariYukle);
+  }, [duyurulariYukle]);
+
+  const bildirimleriAcKapat = () => {
+    setBildirimlerAcik((acik) => {
+      const sonrakiDurum = !acik;
+      if (sonrakiDurum) duyurulariYukle();
+      return sonrakiDurum;
+    });
+  };
 
   const duyuruyaGit = (hedef) => {
     setBildirimlerAcik(false);
@@ -45,7 +60,7 @@ export default function OrtakHeader({ selamlama = false }) {
             className="ikon-btn bildirim-btn"
             aria-label="Bildirimler"
             aria-expanded={bildirimlerAcik}
-            onClick={() => setBildirimlerAcik((acik) => !acik)}
+            onClick={bildirimleriAcKapat}
             whileTap={{ scale: 0.88 }}
           >
             <IconBell />
