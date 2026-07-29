@@ -4,10 +4,12 @@ import "./Admin.css";
 
 const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "" };
+const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 
 const BOLUMLER = [
   ["genel", "Genel Bakış", "▦"],
   ["urunler", "Ürünler", "◆"],
+  ["duyurular", "Duyurular", "●"],
   ["personel", "Personel", "♟"],
   ["raporlar", "Satış Raporları", "↗"],
 ];
@@ -20,19 +22,21 @@ export default function Admin({ onCikis }) {
   const [dashboard, setDashboard] = useState(null);
   const [urunler, setUrunler] = useState([]);
   const [personeller, setPersoneller] = useState([]);
+  const [duyurular, setDuyurular] = useState([]);
   const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
   const [bildirim, setBildirim] = useState("");
   const [urunForm, setUrunForm] = useState(null);
   const [personelForm, setPersonelForm] = useState(null);
+  const [duyuruForm, setDuyuruForm] = useState(null);
 
   const verileriYukle = useCallback(async () => {
     setYukleniyor(true);
     setHata("");
     const istekler = [
       ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
-      ["Satış raporları", "/raporlar/satis?gun=30"],
+      ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"],
     ];
     const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
     const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -44,13 +48,14 @@ export default function Admin({ onCikis }) {
       return;
     }
 
-    const [d, u, p, r] = sonuclar.map((sonuc) =>
+    const [d, u, p, r, duy] = sonuclar.map((sonuc) =>
       sonuc.status === "fulfilled" ? sonuc.value : null
     );
     if (d) setDashboard(d);
     if (u) setUrunler(u.urunler || []);
     if (p) setPersoneller(p.personeller || []);
     if (r) setRapor(r);
+    if (duy) setDuyurular(duy.duyurular || []);
 
     const hatalar = sonuclar.flatMap((sonuc, index) =>
       sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -86,6 +91,11 @@ export default function Admin({ onCikis }) {
   const personelKaydet = async (e) => {
     e.preventDefault();
     if (await islem(() => adminIstek("/personeller", jsonGonder("POST", personelForm)), "Personel kaydı güncellendi.")) setPersonelForm(null);
+  };
+
+  const duyuruKaydet = async (e) => {
+    e.preventDefault();
+    if (await islem(() => adminIstek("/duyurular", jsonGonder("POST", duyuruForm)), "Duyuru yayınlandı.")) setDuyuruForm(null);
   };
 
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
@@ -147,6 +157,11 @@ export default function Admin({ onCikis }) {
               ))}</div>
             </>}
 
+            {bolum === "duyurular" && <>
+              <BolumBaslik baslik="Müşteri duyuruları" aciklama="Yayınlanan duyurular müşterilerin bildirim panelinde görünür." buton="+ Duyuru yayınla" onClick={() => setDuyuruForm({ ...BOS_DUYURU })} />
+              <div className="duyuru-liste">{duyurular.length ? duyurular.map((duyuru) => <article key={duyuru.id} className={!duyuru.aktif ? "pasif" : ""}><span>DUYURU</span><h3>{duyuru.baslik}</h3><p>{duyuru.mesaj}</p><footer><small>{tarihSaat(duyuru.olusturma)}</small><b>{duyuru.hedef}</b></footer></article>) : <Bos yazi="Henüz yayınlanmış duyuru yok." />}</div>
+            </>}
+
             {bolum === "personel" && <>
               <BolumBaslik baslik="Ekip ve vardiyalar" aciklama="Giriş–çıkış saatleri, çalışma süresi ve tahmini ücret takibi." buton="+ Personel ekle" onClick={() => setPersonelForm({ ...BOS_PERSONEL })} />
               <div className="admin-personel-grid">{personeller.map((p) => (
@@ -174,6 +189,7 @@ export default function Admin({ onCikis }) {
 
       {urunForm && <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} kapat={() => setUrunForm(null)}><form className="admin-form" onSubmit={urunKaydet}><Ikili><Alan etiket="Ürün adı"><input required value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan><Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => setUrunForm({ ...urunForm, kategori: e.target.value })}><option>Burgerler</option><option>Yan Lezzetler</option><option>İçecekler</option></select></Alan></Ikili><Ikili><Alan etiket="Fiyat (₺)"><input required type="number" min="0" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan><Alan etiket="Temel miktar (gr/ml)"><input required type="number" min="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan></Ikili><Alan etiket="Görsel URL"><input value={urunForm.gorsel || ""} onChange={(e) => setUrunForm({ ...urunForm, gorsel: e.target.value })} /></Alan><Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan><Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan><Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan><FormAlt kapat={() => setUrunForm(null)} /></form></Modal>}
       {personelForm && <Modal baslik={personelForm.id ? "Personeli düzenle" : "Personel ekle"} kapat={() => setPersonelForm(null)}><form className="admin-form" onSubmit={personelKaydet}><Ikili><Alan etiket="Ad"><input required value={personelForm.ad} onChange={(e) => setPersonelForm({ ...personelForm, ad: e.target.value })} /></Alan><Alan etiket="Soyad"><input required value={personelForm.soyad} onChange={(e) => setPersonelForm({ ...personelForm, soyad: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="Rol"><select value={personelForm.rol} onChange={(e) => setPersonelForm({ ...personelForm, rol: e.target.value })}><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></Alan><Alan etiket="Saatlik ücret"><input type="number" value={personelForm.saatlikUcret} onChange={(e) => setPersonelForm({ ...personelForm, saatlikUcret: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="E-posta"><input type="email" value={personelForm.email} onChange={(e) => setPersonelForm({ ...personelForm, email: e.target.value })} /></Alan><Alan etiket="Telefon"><input value={personelForm.telefon} onChange={(e) => setPersonelForm({ ...personelForm, telefon: e.target.value })} /></Alan></Ikili><FormAlt kapat={() => setPersonelForm(null)} /></form></Modal>}
+      {duyuruForm && <Modal baslik="Yeni duyuru" kapat={() => setDuyuruForm(null)}><form className="admin-form" onSubmit={duyuruKaydet}><Alan etiket="Duyuru başlığı"><input required maxLength="100" value={duyuruForm.baslik} onChange={(e) => setDuyuruForm({ ...duyuruForm, baslik: e.target.value })} placeholder="Örn. Yeni menümüz yayında" /></Alan><Alan etiket="Mesaj"><textarea required maxLength="600" value={duyuruForm.mesaj} onChange={(e) => setDuyuruForm({ ...duyuruForm, mesaj: e.target.value })} placeholder="Müşterilerin bildirim panelinde göreceği açıklama" /></Alan><Alan etiket="Tıklandığında açılacak sayfa"><select value={duyuruForm.hedef} onChange={(e) => setDuyuruForm({ ...duyuruForm, hedef: e.target.value })}><option value="/anasayfa">Ana sayfa</option><option value="/kampanyalar">Kampanyalar</option><option value="/hediyelerim">Hediyelerim</option></select></Alan><FormAlt kapat={() => setDuyuruForm(null)} /></form></Modal>}
     </div>
   );
 }

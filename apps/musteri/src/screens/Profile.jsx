@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
@@ -16,8 +17,9 @@ const menuSatirlari = [
 ];
 
 export default function Profile() {
-  const { misafir, adminMi, kullanici, cikisYap } = useApp();
+  const { misafir, adminMi, kullanici, cikisYap, avatar } = useApp();
   const git = useNavigate();
+  const [yardimAcik, setYardimAcik] = useState(false);
 
   // Misafir profil bölümüne giremez — üyeliğe davet ekranı göster
   if (misafir) {
@@ -38,9 +40,7 @@ export default function Profile() {
         {/* Avatar bloğu */}
         <div className="profil-avatar-blok">
           <div className="profil-avatar-wrap">
-            <div className="profil-avatar profil-avatar-harf">
-              {kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
-            </div>
+            {avatar ? <img className="profil-avatar" src={avatar} alt="Profil" /> : <div className="profil-avatar profil-avatar-harf">{kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}</div>}
             <button className="profil-duzenle" aria-label="Düzenle" onClick={() => git("/profil-duzenle")}><IconEdit /></button>
           </div>
           <h2 className="profil-ad">
@@ -72,7 +72,7 @@ export default function Profile() {
             <button
               key={ad}
               className="profil-menu-satir"
-              onClick={() => yol && git(yol)}
+              onClick={() => yol ? git(yol) : setYardimAcik(true)}
             >
               <span className="profil-menu-ikon-daire"><Ikon /></span>
               <span className="profil-menu-ad">{ad}</span>
@@ -86,6 +86,7 @@ export default function Profile() {
           <IconLogout className="cikis-ikon" />
           Çıkış Yap
         </button>
+        {yardimAcik && <div className="destek-perde" onClick={() => setYardimAcik(false)}><section className="destek-modal" onClick={(e) => e.stopPropagation()}><span>BURGER PLUS DESTEK</span><h3>Nasıl yardımcı olabiliriz?</h3><p>Siparişin, kampanyalar veya hesabınla ilgili desteğe ihtiyaç duyarsan ekibimize ulaşabilirsin. Sipariş numaranı ve masa bilgini paylaşman çözümü hızlandırır.</p><p className="destek-not">Destek saatleri: Her gün 10:00 – 23:00</p><a href="mailto:destek@burgerplus.com">destek@burgerplus.com</a><button onClick={() => setYardimAcik(false)}>Kapat</button></section></div>}
       </div>
       </SayfaSarici>
     </div>

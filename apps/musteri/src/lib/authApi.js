@@ -87,3 +87,34 @@ export async function profilGuncelle(email, telefon) {
   });
   return r.json();
 }
+
+export async function duyurulariGetir() {
+  const r = await fetch(`${BACKEND_URL}/api/duyurular`);
+  if (!r.ok) return [];
+  const veri = await r.json();
+  return veri.duyurular || [];
+}
+
+export async function siparisGecmisiniGetir() {
+  const token = tokeniAl();
+  if (!token) return [];
+  const r = await fetch(`${BACKEND_URL}/api/siparislerim`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) throw new Error("Sipariş geçmişi alınamadı.");
+  const veri = await r.json();
+  return veri.siparisler || [];
+}
+
+export async function siparisiHesabaKaydet(siparis) {
+  const token = tokeniAl();
+  if (!token) return null;
+  const r = await fetch(`${BACKEND_URL}/api/siparislerim`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(siparis),
+  });
+  if (!r.ok) throw new Error("Sipariş hesaba kaydedilemedi.");
+  const veri = await r.json();
+  return veri.siparis || null;
+}

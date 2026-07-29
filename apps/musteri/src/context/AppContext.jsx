@@ -3,7 +3,7 @@
    Ödeme yapıldığında puan burada artar. Puan oranı mockData'da (PUAN_ORANI_TL).
    ========================================================================== */
 
-import { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   puanHesapla,
   kampanyalar,
@@ -13,7 +13,7 @@ import {
 } from "../data/mockData";
 import { socket } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
-import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle } from "../lib/authApi";
+import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle, siparisGecmisiniGetir, siparisiHesabaKaydet } from "../lib/authApi";
 
 const AppContext = createContext(null);
 
@@ -54,8 +54,13 @@ export function AppProvider({ children }) {
   // --- Giriş yapmış kullanıcı (auth) ---
   // null ise misafir/giriş yapılmamış. Doluysa gerçek hesap.
   const [kullanici, setKullanici] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [authYuklendi, setAuthYuklendi] = useState(false);
   const adminMi = kullanici?.rol === "admin";
+
+  useEffect(() => {
+    setAvatar(kullanici?.id ? localStorage.getItem(`bp_avatar_${kullanici.id}`) : null);
+  }, [kullanici?.id]);
 
   // Açılışta token varsa kullanıcıyı geri getir (oturum korunur)
   useEffect(() => {
@@ -79,8 +84,8 @@ export function AppProvider({ children }) {
     tokeniSil();
     setKullanici(null);
     setPuan(0);
-    // Siparişler/damga/hediyeler kişiye özel — çıkışta temizle ki hesaplar karışmasın
-    localStorage.removeItem("bp_siparislerim");
+    setAvatar(null);
+    // Ekrandaki kişisel veriyi temizle; hesaba ait geçmiş kendi anahtarında ve backend'de korunur.
     setSiparislerim([]);
     localStorage.removeItem("bp_hediyeler");
     setHediyeler([]);
@@ -212,6 +217,13 @@ export function AppProvider({ children }) {
     });
   };
 
+  const avatarGuncelle = (gorsel) => {
+    if (!kullanici?.id) return;
+    if (gorsel) localStorage.setItem(`bp_avatar_${kullanici.id}`, gorsel);
+    else localStorage.removeItem(`bp_avatar_${kullanici.id}`);
+    setAvatar(gorsel || null);
+  };
+
   const adetArtir = (anahtar) =>
     setSepet((o) => o.map((s) => (s.sepetAnahtari === anahtar ? { ...s, adet: s.adet + 1 } : s)));
 
@@ -234,38 +246,51 @@ export function AppProvider({ children }) {
   // Son ödemenin özeti (onay ekranı bunu gösterir)
   const [sonOdeme, setSonOdeme] = useState(null);
 
-  // --- Siparişlerim (kalıcı liste) ---
-  // Her ödeme buraya bir sipariş ekler. sessionStorage'da tutulur (kapanınca gitmez).
-  // --- Siparişlerim (kalıcı liste) ---
-  // localStorage'da tutulur → tarayıcı kapansa bile korunur (sadakat damgası için önemli).
-  const [siparislerim, setSiparislerim] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("bp_siparislerim") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  // --- Siparişlerim (hesaba bağlı kalıcı liste) ---
+  // Giriş yapan kullanıcıda backend esas kaynaktır; hesap başına ayrı local kopya ağ kesintisine karşı tutulur.
+  const siparisDepoAnahtari = kullanici?.id ? `bp_siparislerim_hesap_${kullanici.id}` : "bp_siparislerim_misafir";
+  const [siparislerim, setSiparislerim] = useState([]);
+
+  useEffect(() => {
+    if (!authYuklendi) return;
+    let iptal = false;
+    let yerel = [];
+    try { yerel = JSON.parse(localStorage.getItem(siparisDepoAnahtari) || "[]"); }
+    catch { yerel = []; }
+    setSiparislerim(yerel);
+    if (!kullanici?.id) return () => { iptal = true; };
+    siparisGecmisiniGetir()
+      .then((siparisler) => {
+        if (iptal) return;
+        setSiparislerim(siparisler);
+        localStorage.setItem(siparisDepoAnahtari, JSON.stringify(siparisler));
+      })
+      .catch(() => {});
+    return () => { iptal = true; };
+  }, [authYuklendi, kullanici?.id, siparisDepoAnahtari]);
+
   const siparisEkle = (siparis) => {
     setSiparislerim((o) => {
       const yeni = [siparis, ...o];
-      localStorage.setItem("bp_siparislerim", JSON.stringify(yeni));
+      localStorage.setItem(siparisDepoAnahtari, JSON.stringify(yeni));
       return yeni;
     });
+    if (kullanici?.id) siparisiHesabaKaydet(siparis).catch(() => {});
   };
 
   // Masa kapatıldığında o masanın siparişlerini "tamamlandı" işaretle.
   // Böylece aktif sipariş ekranından düşer, geçmişte "ödeme tamamlandı" kalır.
-  const masaSiparisleriniTamamla = (masaNo) => {
+  const masaSiparisleriniTamamla = useCallback((masaNo) => {
     setSiparislerim((o) => {
       const yeni = o.map((s) =>
         s.tip === "masa" && String(s.masaNo) === String(masaNo)
           ? { ...s, tamamlandi: true, kapanmaTarihi: new Date().toISOString() }
           : s
       );
-      localStorage.setItem("bp_siparislerim", JSON.stringify(yeni));
+      localStorage.setItem(siparisDepoAnahtari, JSON.stringify(yeni));
       return yeni;
     });
-  };
+  }, [siparisDepoAnahtari]);
 
   // --- Burger damga sayacı (5 al 1 bedava) ---
   // Siparişlerden toplam burger adedini sayar. Her 5'te bir hediye kazanılır,
@@ -362,7 +387,7 @@ export function AppProvider({ children }) {
     };
     socket.on("masa-kapandi", kapandi);
     return () => socket.off("masa-kapandi", kapandi);
-  }, [ozetMasaNo]);
+  }, [ozetMasaNo, masaSiparisleriniTamamla]);
 
   // Ödemeyi tamamlar: (misafir değilse) puanı artırır, siparişi mutfağa gönderir,
   // Siparişlerim'e kalıcı ekler, sepeti boşaltır.
@@ -430,6 +455,7 @@ export function AppProvider({ children }) {
     // Siparişlerim'e kalıcı ekle
     siparisEkle({
       id: Date.now(),
+      siparisNo,
       masaNo: masaNo || null,
       tip: masaNo ? "masa" : "algotur",
       urunler: odenenUrunler,
@@ -450,6 +476,8 @@ export function AppProvider({ children }) {
     setPuan,
     // auth
     kullanici,
+    avatar,
+    avatarGuncelle,
     adminMi,
     authYuklendi,
     girisiTamamla,

@@ -1,16 +1,29 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBell, IconBag } from "./Icons";
 import { badgePop } from "../lib/animasyonlar";
+import { duyurulariGetir } from "../lib/authApi";
 
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
   const git = useNavigate();
-  const { sepetAdet, kullanici, misafir } = useApp();
+  const { sepetAdet, kullanici, misafir, avatar } = useApp();
+  const [bildirimlerAcik, setBildirimlerAcik] = useState(false);
+  const [duyurular, setDuyurular] = useState([]);
 
   const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
+
+  useEffect(() => {
+    duyurulariGetir().then(setDuyurular).catch(() => setDuyurular([]));
+  }, []);
+
+  const duyuruyaGit = (hedef) => {
+    setBildirimlerAcik(false);
+    git(hedef || "/anasayfa");
+  };
 
   return (
     <header className="home-header">
@@ -27,13 +40,24 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       )}
       <div className="home-header-sag">
-        <motion.button
-          className="ikon-btn"
-          aria-label="Bildirimler"
-          whileTap={{ scale: 0.88 }}
-        >
-          <IconBell />
-        </motion.button>
+        <div className="bildirim-sarici">
+          <motion.button
+            className="ikon-btn bildirim-btn"
+            aria-label="Bildirimler"
+            aria-expanded={bildirimlerAcik}
+            onClick={() => setBildirimlerAcik((acik) => !acik)}
+            whileTap={{ scale: 0.88 }}
+          >
+            <IconBell />
+            {duyurular.length > 0 && <span className="bildirim-badge">{Math.min(duyurular.length, 9)}</span>}
+          </motion.button>
+          <AnimatePresence>
+            {bildirimlerAcik && <motion.div className="bildirim-panel" initial={{ opacity: 0, y: -8, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .98 }}>
+              <header><b>Bildirimler</b><span>{duyurular.length ? `${duyurular.length} yeni` : "Güncelsin"}</span></header>
+              {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => <button key={duyuru.id} onClick={() => duyuruyaGit(duyuru.hedef)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>)}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
+            </motion.div>}
+          </AnimatePresence>
+        </div>
         <motion.button
           className="ikon-btn sepet-btn"
           aria-label="Sepet"
@@ -59,7 +83,7 @@ export default function OrtakHeader({ selamlama = false }) {
           aria-label="Profil"
           whileTap={{ scale: 0.9 }}
         >
-          {kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
+          {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
         </motion.button>
       </div>
     </header>

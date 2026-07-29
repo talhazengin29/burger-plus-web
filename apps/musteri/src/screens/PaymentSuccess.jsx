@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
@@ -7,14 +6,6 @@ import "./PaymentSuccess.css";
 export default function PaymentSuccess() {
   const git = useNavigate();
   const { sonOdeme, puan } = useApp();
-
-  // Sipariş durumu: al götür siparişi önce hazırlanır, sonra hazır olur.
-  // Şimdilik zamanlayıcı ile simüle (gerçekte mutfak onayı ile değişecek).
-  const [hazir, setHazir] = useState(false);
-  useEffect(() => {
-    const zamanlayici = setTimeout(() => setHazir(true), 5000);
-    return () => clearTimeout(zamanlayici);
-  }, []);
 
   // Doğrudan bu adrese gelinirse (ödeme yapılmadıysa) ana sayfaya yönlendir
   if (!sonOdeme) {
@@ -46,21 +37,13 @@ export default function PaymentSuccess() {
         </p>
 
         {/* Sipariş durumu */}
-        <div className={"siparis-durum-kart" + (hazir ? " siparis-durum-kart--hazir" : "")}>
-          <span className="durum-ikon">{hazir ? "🎉" : "👨‍🍳"}</span>
+        <div className="siparis-durum-kart">
+          <span className="durum-ikon">👨‍🍳</span>
           <div className="durum-metin">
-            <span className="durum-baslik">
-              {sonOdeme.masaNo
-                ? (hazir ? "Siparişin Masana Getiriliyor!" : "Siparişin Hazırlanıyor")
-                : (hazir ? "Siparişin Hazır!" : "Siparişin Hazırlanıyor")}
-            </span>
-            <span className="durum-alt">
-              {sonOdeme.masaNo
-                ? (hazir ? `Masa ${sonOdeme.masaNo}'ye getiriliyor, afiyet olsun!` : "Mutfağa iletildi, birazdan...")
-                : (hazir ? "Alabilirsin, afiyet olsun!" : "Birazdan hazır olacak...")}
-            </span>
+            <span className="durum-baslik">Siparişin Hazırlanıyor</span>
+            <span className="durum-alt">Mutfağa iletildi, hazırlanıyor.</span>
           </div>
-          {!hazir && <span className="durum-spinner" />}
+          <span className="durum-spinner" />
         </div>
 
         <div className="success-tutar-kart">

@@ -11,10 +11,11 @@ import "./ProfilDuzenle.css";
 */
 export default function ProfilDuzenle() {
   const git = useNavigate();
-  const { kullanici, profiliGuncelle } = useApp();
+  const { kullanici, profiliGuncelle, avatar, avatarGuncelle } = useApp();
 
   const [email, setEmail] = useState(kullanici?.email || "");
   const [telefon, setTelefon] = useState(kullanici?.telefon || "");
+  const [avatarTaslak, setAvatarTaslak] = useState(avatar);
   const [hata, setHata] = useState("");
   const [basari, setBasari] = useState(false);
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -33,6 +34,7 @@ export default function ProfilDuzenle() {
       if (sonuc.hata) {
         setHata(sonuc.hata);
       } else {
+        avatarGuncelle(avatarTaslak);
         setBasari(true);
         setTimeout(() => git("/profil"), 900);
       }
@@ -41,6 +43,18 @@ export default function ProfilDuzenle() {
     } finally {
       setYukleniyor(false);
     }
+  };
+
+  const avatarSecildi = (e) => {
+    const dosya = e.target.files?.[0];
+    if (!dosya) return;
+    if (!dosya.type.startsWith("image/") || dosya.size > 1_500_000) {
+      setHata("Lütfen 1,5 MB'tan küçük bir görsel seç.");
+      return;
+    }
+    const okuyucu = new FileReader();
+    okuyucu.onload = () => { setAvatarTaslak(String(okuyucu.result)); setHata(""); };
+    okuyucu.readAsDataURL(dosya);
   };
 
   return (
@@ -66,6 +80,11 @@ export default function ProfilDuzenle() {
             <span className="pd-etiket">Cinsiyet</span>
             <span className="pd-deger">{kullanici.cinsiyet || "—"}</span>
           </div>
+        </div>
+
+        <div className="avatar-duzenle-alani">
+          {avatarTaslak ? <img src={avatarTaslak} alt="Profil önizleme" /> : <span>{kullanici.ad.charAt(0).toUpperCase()}</span>}
+          <div><b>Profil görseli</b><small>JPG, PNG veya WebP · en fazla 1,5 MB</small><label><input type="file" accept="image/*" onChange={avatarSecildi} />Görsel seç</label>{avatarTaslak && <button type="button" onClick={() => setAvatarTaslak(null)}>Görseli kaldır</button>}</div>
         </div>
 
         {/* Düzenlenebilir */}

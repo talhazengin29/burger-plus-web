@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import logoFull from "../../../musteri/src/assets/logo-full.png";
 import "./Login.css";
 
 // Rol şifreleri. Gerçek üründe backend'de doğrulanmalı; şimdilik istemcide.
@@ -62,7 +63,7 @@ export default function Login({ onGirisBasarili }) {
   return (
     <div className="login">
       <form className="login-kart" onSubmit={gonder}>
-        <div className="login-logo">🍔</div>
+        <div className="personel-login-ust"><img className="login-logo" src={logoFull} alt="Burger Plus" /><span>EKİP PORTALI</span></div>
         <h1 className="login-baslik">Burger Plus</h1>
         <p className="login-alt">Personel Girişi</p>
 
@@ -73,14 +74,14 @@ export default function Login({ onGirisBasarili }) {
             className={"rol-btn " + (rol === "mutfak" ? "rol-btn--aktif" : "")}
             onClick={() => { setRol("mutfak"); setHata(""); }}
           >
-            🍳 Mutfak
+            Mutfak
           </button>
           <button
             type="button"
             className={"rol-btn " + (rol === "salon" ? "rol-btn--aktif" : "")}
             onClick={() => { setRol("salon"); setHata(""); }}
           >
-            🍽️ Salon
+            Salon
           </button>
           <button
             type="button"

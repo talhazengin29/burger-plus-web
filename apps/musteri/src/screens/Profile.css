@@ -172,3 +172,5 @@
 }
 .cikis-ikon { width: 22px; height: 22px; }
 .cikis-btn:active { transform: scale(0.99); }
+
+.destek-perde{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.68);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.destek-modal{width:min(390px,100%);padding:24px;border:1px solid var(--glass-border-strong);border-radius:var(--r-xl);background:rgba(25,25,25,.98);box-shadow:var(--shadow-modal)}.destek-modal>span{color:var(--primary-container);font-size:10px;font-weight:800;letter-spacing:.08em}.destek-modal h3{margin:8px 0;color:var(--on-surface);font-family:'Montserrat';font-size:20px}.destek-modal p{color:var(--on-surface-variant);font-size:14px;line-height:1.55}.destek-modal .destek-not{margin-top:12px;font-size:12px}.destek-modal a{display:block;margin:16px 0;color:var(--primary-container);font-weight:700;font-size:14px}.destek-modal button{width:100%;padding:13px;border-radius:var(--r-md);background:rgba(255,255,255,.1);border:1px solid var(--glass-border-strong);color:#fff;font-weight:700}
