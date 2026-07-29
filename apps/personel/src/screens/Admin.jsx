@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { adminIstek, jsonGonder } from "../lib/adminApi";
 import "./Admin.css";
 
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true };
+const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
+const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, gramajOpsiyonu: BOS_GRAMAJ };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 
@@ -16,6 +17,36 @@ const BOLUMLER = [
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const tarihSaat = (d) => d ? new Date(d).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+
+const GRAMAJ_KURALLARI = {
+  "Burgerler": { etiket: "Köfte gramajı", birim: "gr", artisOrani: .25, miktarYuvarlama: 25, fiyatArtisOrani: .20, fiyatYuvarlama: 5 },
+  "Yan Lezzetler": { etiket: "Porsiyon gramajı", birim: "gr", artisOrani: .25, miktarYuvarlama: 25, fiyatArtisOrani: .40, fiyatYuvarlama: 5 },
+  "İçecekler": { etiket: "İçecek hacmi", birim: "ml", artisOrani: .25, miktarYuvarlama: 25, fiyatArtisOrani: .25, fiyatYuvarlama: 5 },
+};
+
+const enYakinaYuvarla = (deger, adim) => Math.max(adim, Math.round(deger / adim) * adim);
+const gramajVarsayilani = (urun) => {
+  const kural = GRAMAJ_KURALLARI[urun.kategori];
+  const temel = Number(urun.temelMiktar);
+  const fiyat = Number(urun.fiyat);
+  if (!kural || !Number.isFinite(temel) || temel <= 0) return { ...BOS_GRAMAJ, etiket: kural?.etiket || BOS_GRAMAJ.etiket, birim: kural?.birim || "gr" };
+  return {
+    aktif: true,
+    etiket: kural.etiket,
+    birim: kural.birim,
+    artisMiktari: enYakinaYuvarla(temel * kural.artisOrani, kural.miktarYuvarlama),
+    maxAdim: 3,
+    fiyatArtisi: enYakinaYuvarla((Number.isFinite(fiyat) ? fiyat : 0) * kural.fiyatArtisOrani, kural.fiyatYuvarlama),
+  };
+};
+
+const yeniUrunFormu = () => ({ ...BOS_URUN, gramajOpsiyonu: { ...BOS_GRAMAJ } });
+const urunuFormaCevir = (urun) => ({
+  ...urun,
+  malzemeler: (urun.malzemeler || []).join(", "),
+  alerjenler: (urun.alerjenler || []).join(", "),
+  gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
+});
 
 export default function Admin({ onCikis }) {
   const [bolum, setBolum] = useState("genel");
@@ -82,11 +113,33 @@ export default function Admin({ onCikis }) {
     const veri = {
       ...urunForm,
       fiyat: Number(urunForm.fiyat), temelMiktar: Number(urunForm.temelMiktar),
+      gramajOpsiyonu: {
+        aktif: urunForm.gramajOpsiyonu?.aktif === true,
+        etiket: String(urunForm.gramajOpsiyonu?.etiket || "").trim(),
+        birim: String(urunForm.gramajOpsiyonu?.birim || "gr").trim().toLowerCase(),
+        artisMiktari: Number(urunForm.gramajOpsiyonu?.artisMiktari),
+        maxAdim: Number(urunForm.gramajOpsiyonu?.maxAdim),
+        fiyatArtisi: Number(urunForm.gramajOpsiyonu?.fiyatArtisi),
+      },
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
     if (await islem(() => adminIstek("/urunler", jsonGonder("POST", veri)), "Ürün kataloğu güncellendi.")) setUrunForm(null);
   };
+
+  const gramajGuncelle = (alan, deger) => setUrunForm((onceki) => ({
+    ...onceki,
+    gramajOpsiyonu: { ...onceki.gramajOpsiyonu, [alan]: deger },
+  }));
+
+  const urunKategorisiDegistir = (kategori) => setUrunForm((onceki) => {
+    const varsayilan = gramajVarsayilani({ ...onceki, kategori });
+    return {
+      ...onceki,
+      kategori,
+      gramajOpsiyonu: { ...onceki.gramajOpsiyonu, etiket: varsayilan.etiket, birim: varsayilan.birim },
+    };
+  });
 
   const personelKaydet = async (e) => {
     e.preventDefault();
@@ -147,12 +200,12 @@ export default function Admin({ onCikis }) {
             </>}
 
             {bolum === "urunler" && <>
-              <BolumBaslik baslik="Menü kataloğu" aciklama="Müşteri uygulamasında yayınlanan ürünleri yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm({ ...BOS_URUN })} />
+              <BolumBaslik baslik="Menü kataloğu" aciklama="Müşteri uygulamasında yayınlanan ürünleri ve gramaj artışlarını yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu())} />
               <div className="admin-kart-grid">{urunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
                   <img src={u.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300"} alt="" />
-                  <div><span className="admin-rozet">{u.kategori}</span><h3>{u.ad}</h3><p>{u.temelMiktar || "—"} {u.kategori === "İçecekler" ? "ml" : "gr"}</p><strong>{para(u.fiyat)}</strong></div>
-                  <footer><button onClick={() => setUrunForm({ ...u, malzemeler: (u.malzemeler || []).join(", "), alerjenler: (u.alerjenler || []).join(", ") })}>Düzenle</button><button className="tehlike" onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button></footer>
+                  <div><span className="admin-rozet">{u.kategori}</span><h3>{u.ad}</h3><p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || (u.kategori === "İçecekler" ? "ml" : "gr")}</p>{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}<strong>{para(u.fiyat)}</strong></div>
+                  <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button className="tehlike" onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button></footer>
                 </article>
               ))}</div>
             </>}
@@ -187,7 +240,48 @@ export default function Admin({ onCikis }) {
         )}
       </main>
 
-      {urunForm && <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} kapat={() => setUrunForm(null)}><form className="admin-form" onSubmit={urunKaydet}><Ikili><Alan etiket="Ürün adı"><input required value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan><Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => setUrunForm({ ...urunForm, kategori: e.target.value })}><option>Burgerler</option><option>Yan Lezzetler</option><option>İçecekler</option></select></Alan></Ikili><Ikili><Alan etiket="Fiyat (₺)"><input required type="number" min="0" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan><Alan etiket="Temel miktar (gr/ml)"><input required type="number" min="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan></Ikili><Alan etiket="Görsel URL"><input value={urunForm.gorsel || ""} onChange={(e) => setUrunForm({ ...urunForm, gorsel: e.target.value })} /></Alan><Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan><Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan><Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan><FormAlt kapat={() => setUrunForm(null)} /></form></Modal>}
+      {urunForm && (
+        <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} kapat={() => setUrunForm(null)}>
+          <form className="admin-form" onSubmit={urunKaydet}>
+            <Ikili>
+              <Alan etiket="Ürün adı"><input required maxLength="120" value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan>
+              <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}><option>Burgerler</option><option>Yan Lezzetler</option><option>İçecekler</option></select></Alan>
+            </Ikili>
+            <Ikili>
+              <Alan etiket="Fiyat (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
+              <Alan etiket="Standart miktar (gr/ml)"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>
+            </Ikili>
+
+            <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.aktif ? "aktif" : ""}`}>
+              <header>
+                <div><b>Dinamik gramaj artırımı</b><small>Müşteri ürün detayında miktarı adım adım artırabilir.</small></div>
+                <label className="admin-switch"><input type="checkbox" checked={urunForm.gramajOpsiyonu?.aktif === true} onChange={(e) => gramajGuncelle("aktif", e.target.checked)} /><span /></label>
+              </header>
+              {urunForm.gramajOpsiyonu?.aktif && (
+                <div className="gramaj-kural-alanlari">
+                  <Ikili>
+                    <Alan etiket="Müşteriye görünen etiket"><input required maxLength="80" value={urunForm.gramajOpsiyonu.etiket} onChange={(e) => gramajGuncelle("etiket", e.target.value)} placeholder="Köfte gramajı" /></Alan>
+                    <Alan etiket="Birim"><select value={urunForm.gramajOpsiyonu.birim} onChange={(e) => gramajGuncelle("birim", e.target.value)}><option value="gr">gr</option><option value="ml">ml</option><option value="adet">adet</option></select></Alan>
+                  </Ikili>
+                  <div className="gramaj-uc-alan">
+                    <Alan etiket="Her adımda artış"><input required type="number" min="1" max="10000" step="1" value={urunForm.gramajOpsiyonu.artisMiktari} onChange={(e) => gramajGuncelle("artisMiktari", e.target.value)} /></Alan>
+                    <Alan etiket="Maksimum adım"><input required type="number" min="1" max="20" step="1" value={urunForm.gramajOpsiyonu.maxAdim} onChange={(e) => gramajGuncelle("maxAdim", e.target.value)} /></Alan>
+                    <Alan etiket="Adım fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.gramajOpsiyonu.fiyatArtisi} onChange={(e) => gramajGuncelle("fiyatArtisi", e.target.value)} /></Alan>
+                  </div>
+                  <button type="button" className="gramaj-oneri-btn" onClick={() => setUrunForm((onceki) => ({ ...onceki, gramajOpsiyonu: gramajVarsayilani(onceki) }))}>Kategori önerisini yeniden hesapla</button>
+                  <p className="gramaj-onizleme">Örnek: Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu.birim} → ilk artış +{urunForm.gramajOpsiyonu.artisMiktari || "—"} {urunForm.gramajOpsiyonu.birim}, fiyat +{para(urunForm.gramajOpsiyonu.fiyatArtisi)}</p>
+                </div>
+              )}
+            </section>
+
+            <Alan etiket="Görsel URL"><input value={urunForm.gorsel || ""} onChange={(e) => setUrunForm({ ...urunForm, gorsel: e.target.value })} /></Alan>
+            <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
+            <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan>
+            <Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan>
+            <FormAlt kapat={() => setUrunForm(null)} />
+          </form>
+        </Modal>
+      )}
       {personelForm && <Modal baslik={personelForm.id ? "Personeli düzenle" : "Personel ekle"} kapat={() => setPersonelForm(null)}><form className="admin-form" onSubmit={personelKaydet}><Ikili><Alan etiket="Ad"><input required value={personelForm.ad} onChange={(e) => setPersonelForm({ ...personelForm, ad: e.target.value })} /></Alan><Alan etiket="Soyad"><input required value={personelForm.soyad} onChange={(e) => setPersonelForm({ ...personelForm, soyad: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="Rol"><select value={personelForm.rol} onChange={(e) => setPersonelForm({ ...personelForm, rol: e.target.value })}><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></Alan><Alan etiket="Saatlik ücret"><input type="number" value={personelForm.saatlikUcret} onChange={(e) => setPersonelForm({ ...personelForm, saatlikUcret: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="E-posta"><input type="email" value={personelForm.email} onChange={(e) => setPersonelForm({ ...personelForm, email: e.target.value })} /></Alan><Alan etiket="Telefon"><input value={personelForm.telefon} onChange={(e) => setPersonelForm({ ...personelForm, telefon: e.target.value })} /></Alan></Ikili><FormAlt kapat={() => setPersonelForm(null)} /></form></Modal>}
       {duyuruForm && <Modal baslik="Yeni duyuru" kapat={() => setDuyuruForm(null)}><form className="admin-form" onSubmit={duyuruKaydet}><Alan etiket="Duyuru başlığı"><input required maxLength="100" value={duyuruForm.baslik} onChange={(e) => setDuyuruForm({ ...duyuruForm, baslik: e.target.value })} placeholder="Örn. Yeni menümüz yayında" /></Alan><Alan etiket="Mesaj"><textarea required maxLength="600" value={duyuruForm.mesaj} onChange={(e) => setDuyuruForm({ ...duyuruForm, mesaj: e.target.value })} placeholder="Müşterilerin bildirim panelinde göreceği açıklama" /></Alan><Alan etiket="Tıklandığında açılacak sayfa"><select value={duyuruForm.hedef} onChange={(e) => setDuyuruForm({ ...duyuruForm, hedef: e.target.value })}><option value="/anasayfa">Ana sayfa</option><option value="/kampanyalar">Kampanyalar</option><option value="/hediyelerim">Hediyelerim</option></select></Alan><FormAlt kapat={() => setDuyuruForm(null)} /></form></Modal>}
     </div>
