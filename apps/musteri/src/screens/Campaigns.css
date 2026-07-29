@@ -216,4 +216,8 @@
 .davet-kodu-kutu span { grid-column: 1 / -1; color: var(--on-surface-variant); font-size: 11px; font-weight: 700; }
 .davet-kodu-kutu strong { align-self: center; color: var(--primary-container); font-family: 'Montserrat'; font-size: 20px; letter-spacing: .12em; }
 .davet-kodu-kutu button { padding: 8px 10px; border-radius: var(--r-md); background: var(--primary); color: #fff; font-size: 12px; font-weight: 800; }
-.davet-kodu-kutu .davet-yenile { grid-column: 1 / -1; padding: 4px; background: transparent; color: var(--on-surface-variant); font-size: 11px; }
+.davet-kodu-kutu button:disabled { opacity: .45; cursor: wait; }
+.davet-istatistikler { grid-column: 1 / -1; display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08) }
+.davet-istatistikler span { grid-column:auto;text-align:center;color:var(--on-surface-variant);font-size:10px;font-weight:600 }
+.davet-istatistikler b { display:block;color:var(--on-surface);font-family:'Montserrat';font-size:15px }
+.davet-hata { grid-column:1 / -1;color:var(--error);font-size:11px }

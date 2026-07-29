@@ -59,6 +59,17 @@ export async function beniGetir() {
   return d.kullanici;
 }
 
+export async function davetOzetiniGetir() {
+  const token = tokeniAl();
+  if (!token) return null;
+  const r = await fetch(`${BACKEND_URL}/api/davetim`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const veri = await r.json();
+  if (!r.ok) throw new Error(veri.hata || "Davet bilgileri alınamadı.");
+  return veri.davet;
+}
+
 // Puani sunucuda guncelle (giris yapmis kullanici icin)
 export async function puaniGuncelle(puan) {
   const token = tokeniAl();

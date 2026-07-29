@@ -5,6 +5,7 @@ import { puanHesapla } from "../data/mockData";
 import { IconBack, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { iyzicoOdemesiniBaslat, odemeTaslagiOlustur } from "../lib/authApi";
+import { emailTemizle, formuDogrula, guvenliMetin, ilkHata, kurallar, telefonTemizle, temizMetin } from "../lib/dogrulama";
 import "./Payment.css";
 
 const YONTEMLER = [
@@ -12,6 +13,17 @@ const YONTEMLER = [
   { id: "esit", ad: "Eşit Böl", Ikon: IconUsers, aciklama: "Çoklu ödeme oturumu ile yakında", devreDisi: true },
   { id: "urun", ad: "Ürüne Göre", Ikon: IconBag, aciklama: "Sadece kendi ürünlerini öde" },
 ];
+
+const ODEME_SEMASI = {
+  ad: (deger) => kurallar.ad(deger, "Ad"),
+  soyad: (deger) => kurallar.ad(deger, "Soyad"),
+  email: kurallar.email,
+  telefon: (deger) => kurallar.telefon(deger, true),
+  kimlikNo: kurallar.tcKimlik,
+  adres: kurallar.adres,
+  il: kurallar.il,
+  postaKodu: kurallar.postaKodu,
+};
 
 export default function Payment() {
   const git = useNavigate();
@@ -24,12 +36,21 @@ export default function Payment() {
   const [kisiSayisi, setKisiSayisi] = useState(2);
   const [islemde, setIslemde] = useState(false);
   const [odemeHatasi, setOdemeHatasi] = useState("");
+  const [alanHatalari, setAlanHatalari] = useState({});
   const [alici, setAlici] = useState(() => ({
     ad: kullanici?.ad || "", soyad: kullanici?.soyad || "", email: kullanici?.email || "",
     telefon: kullanici?.telefon || "+905", kimlikNo: "", adres: "", il: "", postaKodu: "",
   }));
 
-  const aliciDegistir = (alan, deger) => setAlici((onceki) => ({ ...onceki, [alan]: deger }));
+  const aliciDegistir = (alan, deger) => {
+    setAlici((onceki) => ({ ...onceki, [alan]: deger }));
+    setAlanHatalari((onceki) => ({ ...onceki, [alan]: "" }));
+    setOdemeHatasi("");
+  };
+
+  const alaniDogrula = (alan) => {
+    setAlanHatalari((onceki) => ({ ...onceki, [alan]: ODEME_SEMASI[alan](alici[alan]) }));
+  };
 
   // Ürüne göre ödeme: her ürün için kaç adet ödeneceğini tutan obje
   // { urunId: adet }  (0 = seçilmemiş, 1+ = o kadar adet ödeniyor)
@@ -102,8 +123,24 @@ export default function Payment() {
 
   const odeyVeBitir = async () => {
     if (!odemeAktif || islemde) return;
-    setIslemde(true);
     setOdemeHatasi("");
+    const hatalar = formuDogrula(alici, ODEME_SEMASI);
+    setAlanHatalari(hatalar);
+    if (ilkHata(hatalar)) {
+      setOdemeHatasi("Ödeme için işaretli fatura bilgilerini kontrol et.");
+      return;
+    }
+    const dogrulanmisAlici = {
+      ad: temizMetin(alici.ad, 60),
+      soyad: temizMetin(alici.soyad, 60),
+      email: emailTemizle(alici.email),
+      telefon: telefonTemizle(alici.telefon),
+      kimlikNo: String(alici.kimlikNo),
+      adres: temizMetin(alici.adres, 300),
+      il: temizMetin(alici.il, 80),
+      postaKodu: String(alici.postaKodu || "").trim(),
+    };
+    setIslemde(true);
     try {
       const taslak = await odemeTaslagiOlustur({
         masaNo: masaNo || null,
@@ -116,7 +153,7 @@ export default function Payment() {
         })),
       });
 
-      const paymentPageUrl = await iyzicoOdemesiniBaslat(taslak.id, alici);
+      const paymentPageUrl = await iyzicoOdemesiniBaslat(taslak.id, dogrulanmisAlici);
       window.location.assign(paymentPageUrl);
     } catch (e) {
       setOdemeHatasi(e.message || "Ödeme başlatılamadı. Lütfen tekrar dene.");
@@ -160,14 +197,14 @@ export default function Payment() {
           <h3 className="secim-baslik">Fatura bilgileri</h3>
           <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir.</p>
           <div className="odeme-bilgi-grid">
-            <label>Ad<input value={alici.ad} onChange={(e) => aliciDegistir("ad", e.target.value)} autoComplete="given-name" /></label>
-            <label>Soyad<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", e.target.value)} autoComplete="family-name" /></label>
-            <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value)} autoComplete="email" /></label>
-            <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value)} autoComplete="tel" /></label>
-            <label className="tam-genislik">T.C. kimlik no<input inputMode="numeric" maxLength="11" value={alici.kimlikNo} onChange={(e) => aliciDegistir("kimlikNo", e.target.value.replace(/\D/g, ""))} /></label>
-            <label className="tam-genislik">Adres<textarea rows="2" value={alici.adres} onChange={(e) => aliciDegistir("adres", e.target.value)} autoComplete="street-address" /></label>
-            <label>İl<input value={alici.il} onChange={(e) => aliciDegistir("il", e.target.value)} autoComplete="address-level1" /></label>
-            <label>Posta kodu<input value={alici.postaKodu} onChange={(e) => aliciDegistir("postaKodu", e.target.value)} autoComplete="postal-code" /></label>
+            <label>Ad<input value={alici.ad} onChange={(e) => aliciDegistir("ad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("ad")} autoComplete="given-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.ad)} />{alanHatalari.ad && <small className="alan-hata">{alanHatalari.ad}</small>}</label>
+            <label>Soyad<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("soyad")} autoComplete="family-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.soyad)} />{alanHatalari.soyad && <small className="alan-hata">{alanHatalari.soyad}</small>}</label>
+            <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value.slice(0, 254))} onBlur={() => alaniDogrula("email")} autoComplete="email" maxLength="254" required aria-invalid={Boolean(alanHatalari.email)} />{alanHatalari.email && <small className="alan-hata">{alanHatalari.email}</small>}</label>
+            <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value.slice(0, 20))} onBlur={() => alaniDogrula("telefon")} autoComplete="tel" maxLength="20" required aria-invalid={Boolean(alanHatalari.telefon)} />{alanHatalari.telefon && <small className="alan-hata">{alanHatalari.telefon}</small>}</label>
+            <label className="tam-genislik">T.C. kimlik no<input inputMode="numeric" maxLength="11" value={alici.kimlikNo} onChange={(e) => aliciDegistir("kimlikNo", e.target.value.replace(/\D/g, "").slice(0, 11))} onBlur={() => alaniDogrula("kimlikNo")} required aria-invalid={Boolean(alanHatalari.kimlikNo)} />{alanHatalari.kimlikNo && <small className="alan-hata">{alanHatalari.kimlikNo}</small>}</label>
+            <label className="tam-genislik">Adres<textarea rows="2" value={alici.adres} onChange={(e) => aliciDegistir("adres", guvenliMetin(e.target.value, 300))} onBlur={() => alaniDogrula("adres")} autoComplete="street-address" maxLength="300" required aria-invalid={Boolean(alanHatalari.adres)} />{alanHatalari.adres && <small className="alan-hata">{alanHatalari.adres}</small>}</label>
+            <label>İl<input value={alici.il} onChange={(e) => aliciDegistir("il", guvenliMetin(e.target.value, 80))} onBlur={() => alaniDogrula("il")} autoComplete="address-level1" maxLength="80" required aria-invalid={Boolean(alanHatalari.il)} />{alanHatalari.il && <small className="alan-hata">{alanHatalari.il}</small>}</label>
+            <label>Posta kodu<input inputMode="numeric" value={alici.postaKodu} onChange={(e) => aliciDegistir("postaKodu", e.target.value.replace(/\D/g, "").slice(0, 5))} onBlur={() => alaniDogrula("postaKodu")} autoComplete="postal-code" maxLength="5" aria-invalid={Boolean(alanHatalari.postaKodu)} />{alanHatalari.postaKodu && <small className="alan-hata">{alanHatalari.postaKodu}</small>}</label>
           </div>
         </section>
 

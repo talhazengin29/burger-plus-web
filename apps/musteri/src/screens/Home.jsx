@@ -7,6 +7,7 @@ import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
 import { IconPlus, IconSearch, IconFilter, IconArrowRight } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, barDolumu, asagiAcilma } from "../lib/animasyonlar";
+import { guvenliMetin } from "../lib/dogrulama";
 import "./Home.css";
 
 // Arama çubuğundaki filtre düğmesinin sıralama seçenekleri
@@ -139,9 +140,10 @@ export default function Home() {
               className="arama-input"
               type="search"
               value={arama}
-              onChange={(e) => setArama(e.target.value)}
+              onChange={(e) => setArama(guvenliMetin(e.target.value, 80))}
               placeholder="Menüde ara..."
               aria-label="Menüde ara"
+              maxLength="80"
             />
             <motion.button
               type="button"

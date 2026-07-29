@@ -58,6 +58,18 @@
 }
 .profil-uyelik { color: var(--on-surface-variant); font-size: 15px; }
 
+.profil-davet-kart { margin:0 0 22px;padding:17px;border:1px solid rgba(255,107,0,.3);border-radius:var(--r-lg);background:rgba(255,107,0,.08);box-shadow:var(--glass-shadow-sm) }
+.profil-davet-ust { display:flex;align-items:center;justify-content:space-between;gap:12px }
+.profil-davet-ust>div { display:flex;flex-direction:column;gap:3px }
+.profil-davet-ust span { color:var(--on-surface-variant);font-size:11px;font-weight:700 }
+.profil-davet-ust strong { color:var(--primary-container);font-family:'Montserrat';font-size:21px;letter-spacing:.12em }
+.profil-davet-ust button { padding:9px 11px;border-radius:var(--r-md);background:var(--primary);color:#fff;font-size:11px;font-weight:800 }
+.profil-davet-ust button:disabled { opacity:.45 }
+.profil-davet-kart>p { margin:11px 0 13px;color:var(--on-surface-variant);font-size:11px;line-height:1.45 }
+.profil-davet-ozet { display:grid;grid-template-columns:repeat(3,1fr);gap:7px }
+.profil-davet-ozet span { padding:8px 4px;border-radius:var(--r-sm);background:rgba(0,0,0,.18);text-align:center;color:var(--outline);font-size:9px;line-height:1.3 }
+.profil-davet-ozet b { display:block;margin-bottom:2px;color:var(--on-surface);font-family:'Montserrat';font-size:15px }
+
 /* --- Puan kartı — cam --- */
 .profil-puan-kart {
   background: var(--glass-bg);

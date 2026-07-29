@@ -7,6 +7,7 @@ import { IconClock, IconInvite } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { siraliKonteyner, siraliOge, fadeIn, asagiAcilma } from "../lib/animasyonlar";
+import { davetOzetiniGetir } from "../lib/authApi";
 import "./Campaigns.css";
 
 // Etikete göre küçük ikon seçimi (saat / davet / öğrenci)
@@ -21,7 +22,7 @@ const durumMetni = { aktif: "AKTİF", baslamadi: "BAŞLAMADI", sonaerdi: "SONA E
 
 export default function Campaigns() {
   const git = useNavigate();
-  const { misafir } = useApp();
+  const { misafir, kullanici } = useApp();
 
   // Saatli kampanyaların (Happy Hour) durumu canlı kalsın diye dakikada bir tazelenir.
   const [simdi, setSimdi] = useState(() => new Date());
@@ -32,8 +33,22 @@ export default function Campaigns() {
 
   // Misafir kampanyayı görebilir ama faydalanamaz — "Sipariş Ver"e basınca üyelik modalı çıkar.
   const [modalAcik, setModalAcik] = useState(false);
-  const [davetKodu, setDavetKodu] = useState("");
+  const [davetAcik, setDavetAcik] = useState(false);
+  const [davetOzeti, setDavetOzeti] = useState(null);
+  const [davetHatasi, setDavetHatasi] = useState("");
   const [kopyalandi, setKopyalandi] = useState(false);
+
+  useEffect(() => {
+    if (!kullanici?.id) {
+      setDavetOzeti(null);
+      return;
+    }
+    let iptal = false;
+    davetOzetiniGetir()
+      .then((ozet) => { if (!iptal) setDavetOzeti(ozet); })
+      .catch((e) => { if (!iptal) setDavetHatasi(e.message); });
+    return () => { iptal = true; };
+  }, [kullanici?.id]);
 
   const siparisVer = (k) => {
     const kategori = k.gecerliKategoriler?.[0];
@@ -45,13 +60,14 @@ export default function Campaigns() {
     siparisVer(k);
   };
 
-  const davetKoduOlustur = () => {
-    if (misafir) { setModalAcik(true); return; }
+  const davetKodunuGoster = () => {
+    if (misafir || !kullanici) { setModalAcik(true); return; }
     setKopyalandi(false);
-    setDavetKodu(rastgeleDavetKodu());
+    setDavetAcik(true);
   };
 
   const koduKopyala = async () => {
+    const davetKodu = davetOzeti?.davetKodu || kullanici?.davetKodu;
     if (!davetKodu) return;
     try {
       await navigator.clipboard.writeText(davetKodu);
@@ -98,19 +114,23 @@ export default function Campaigns() {
                     {siparisVerilebilir && misafir && (
                       <span className="camp-uye-rozet">🔒 Üyelere Özel</span>
                     )}
-                    {davetKampanyasi && davetKodu ? (
+                    {davetKampanyasi && davetAcik ? (
                       <div className="davet-kodu-kutu">
                         <span>Davet kodun</span>
-                        <strong>{davetKodu}</strong>
-                        <button type="button" onClick={koduKopyala}>{kopyalandi ? "Kopyalandı" : "Kopyala"}</button>
-                        <button type="button" className="davet-yenile" onClick={davetKoduOlustur}>Yeni kod üret</button>
+                        <strong>{davetOzeti?.davetKodu || kullanici?.davetKodu || "Yükleniyor…"}</strong>
+                        <button type="button" onClick={koduKopyala} disabled={!davetOzeti?.davetKodu && !kullanici?.davetKodu}>{kopyalandi ? "Kopyalandı" : "Kopyala"}</button>
+                        {davetHatasi && <small className="davet-hata">{davetHatasi}</small>}
+                        <div className="davet-istatistikler">
+                          <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b> davet</span>
+                          <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b> puan kazanç</span>
+                        </div>
                       </div>
                     ) : (
                       <motion.button
                         className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
                         whileTap={{ scale: 0.95 }}
                         disabled={pasif}
-                        onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKoduOlustur : undefined}
+                        onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKodunuGoster : undefined}
                       >
                         {k.buton}
                       </motion.button>
@@ -139,11 +159,4 @@ export default function Campaigns() {
       </AnimatePresence>
     </div>
   );
-}
-
-function rastgeleDavetKodu() {
-  const karakterler = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const rastgele = new Uint32Array(8);
-  crypto.getRandomValues(rastgele);
-  return Array.from(rastgele, (sayi) => karakterler[sayi % karakterler.length]).join("");
 }

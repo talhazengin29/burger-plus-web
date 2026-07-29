@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
@@ -7,6 +7,7 @@ import {
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
+import { davetOzetiniGetir } from "../lib/authApi";
 import "./Profile.css";
 
 const menuSatirlari = [
@@ -20,6 +21,27 @@ export default function Profile() {
   const { misafir, adminMi, kullanici, cikisYap, avatar } = useApp();
   const git = useNavigate();
   const [yardimAcik, setYardimAcik] = useState(false);
+  const [davetOzeti, setDavetOzeti] = useState(null);
+  const [davetKopyalandi, setDavetKopyalandi] = useState(false);
+
+  useEffect(() => {
+    if (!kullanici?.id) return;
+    let iptal = false;
+    davetOzetiniGetir().then((ozet) => { if (!iptal) setDavetOzeti(ozet); }).catch(() => {});
+    return () => { iptal = true; };
+  }, [kullanici?.id]);
+
+  const davetKodunuKopyala = async () => {
+    const kod = davetOzeti?.davetKodu || kullanici?.davetKodu;
+    if (!kod) return;
+    try {
+      await navigator.clipboard.writeText(kod);
+      setDavetKopyalandi(true);
+      setTimeout(() => setDavetKopyalandi(false), 1800);
+    } catch {
+      setDavetKopyalandi(false);
+    }
+  };
 
   // Misafir profil bölümüne giremez — üyeliğe davet ekranı göster
   if (misafir) {
@@ -50,6 +72,21 @@ export default function Profile() {
             {kullanici ? kullanici.email : "Giriş yapmadınız"}
           </p>
         </div>
+
+        {kullanici && (
+          <section className="profil-davet-kart">
+            <div className="profil-davet-ust">
+              <div><span>Davet kodun</span><strong>{davetOzeti?.davetKodu || kullanici.davetKodu || "—"}</strong></div>
+              <button type="button" onClick={davetKodunuKopyala} disabled={!davetOzeti?.davetKodu && !kullanici.davetKodu}>{davetKopyalandi ? "Kopyalandı" : "Kopyala"}</button>
+            </div>
+            <p>Kodunla kayıt olan arkadaşlarının her alışverişinden %5 puan kazanırsın.</p>
+            <div className="profil-davet-ozet">
+              <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b>Davet edilen</span>
+              <span><b>{davetOzeti?.odulluSiparisSayisi ?? 0}</b>Ödüllü sipariş</span>
+              <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b>Kazanılan puan</span>
+            </div>
+          </section>
+        )}
 
         {/* İşletme bölümü — SADECE ADMIN görür */}
         {adminMi && (

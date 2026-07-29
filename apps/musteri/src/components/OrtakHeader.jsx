@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -26,6 +27,15 @@ export default function OrtakHeader({ selamlama = false }) {
     socket.on("duyurular-guncellendi", duyurulariYukle);
     return () => socket.off("duyurular-guncellendi", duyurulariYukle);
   }, [duyurulariYukle]);
+
+  useEffect(() => {
+    if (!bildirimlerAcik) return undefined;
+    const escIleKapat = (olay) => {
+      if (olay.key === "Escape") setBildirimlerAcik(false);
+    };
+    window.addEventListener("keydown", escIleKapat);
+    return () => window.removeEventListener("keydown", escIleKapat);
+  }, [bildirimlerAcik]);
 
   const bildirimleriAcKapat = () => {
     setBildirimlerAcik((acik) => {
@@ -66,12 +76,6 @@ export default function OrtakHeader({ selamlama = false }) {
             <IconBell />
             {duyurular.length > 0 && <span className="bildirim-badge">{Math.min(duyurular.length, 9)}</span>}
           </motion.button>
-          <AnimatePresence>
-            {bildirimlerAcik && <motion.div className="bildirim-panel" initial={{ opacity: 0, y: -8, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .98 }}>
-              <header><b>Bildirimler</b><span>{duyurular.length ? `${duyurular.length} yeni` : "Güncelsin"}</span></header>
-              {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => <button key={duyuru.id} onClick={() => duyuruyaGit(duyuru.hedef)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>)}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
-            </motion.div>}
-          </AnimatePresence>
         </div>
         <motion.button
           className="ikon-btn sepet-btn"
@@ -101,6 +105,36 @@ export default function OrtakHeader({ selamlama = false }) {
           {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
         </motion.button>
       </div>
+      {createPortal(
+        <AnimatePresence>
+          {bildirimlerAcik && (
+            <div className="bildirim-katman">
+              <motion.button
+                type="button"
+                className="bildirim-perde"
+                aria-label="Bildirimleri kapat"
+                onClick={() => setBildirimlerAcik(false)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+              <motion.section
+                className="bildirim-panel"
+                role="dialog"
+                aria-modal="false"
+                aria-label="Bildirimler"
+                initial={{ opacity: 0, y: -10, scale: .98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: .98 }}
+              >
+                <header><b>Bildirimler</b><span>{duyurular.length ? `${duyurular.length} yeni` : "Güncelsin"}</span></header>
+                {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => <button key={duyuru.id} onClick={() => duyuruyaGit(duyuru.hedef)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>)}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
+              </motion.section>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </header>
   );
 }

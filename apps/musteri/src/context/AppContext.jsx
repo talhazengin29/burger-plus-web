@@ -57,20 +57,44 @@ export function AppProvider({ children }) {
   const [authYuklendi, setAuthYuklendi] = useState(false);
   const adminMi = kullanici?.rol === "admin";
 
+  const kullaniciyiYenile = useCallback(async () => {
+    const guncel = await beniGetir();
+    if (guncel) {
+      setKullanici(guncel);
+      setPuan(guncel.puan || 0);
+    }
+    return guncel;
+  }, []);
+
   useEffect(() => {
     setAvatar(kullanici?.id ? localStorage.getItem(`bp_avatar_${kullanici.id}`) : null);
   }, [kullanici?.id]);
 
   // Açılışta token varsa kullanıcıyı geri getir (oturum korunur)
   useEffect(() => {
-    beniGetir().then((k) => {
+    kullaniciyiYenile().then((k) => {
       if (k) {
         setKullanici(k);
         setPuan(k.puan || 0);
       }
       setAuthYuklendi(true);
     });
-  }, []);
+  }, [kullaniciyiYenile]);
+
+  // Davet edilen kişinin ödemesi başka bir cihazda tamamlanabilir. Kullanıcı
+  // uygulamaya geri döndüğünde güncel puanı ve davet bilgileri otomatik alınır.
+  useEffect(() => {
+    const odaklaninca = () => kullaniciyiYenile().catch(() => {});
+    const gorunurlukDegisince = () => {
+      if (document.visibilityState === "visible") odaklaninca();
+    };
+    window.addEventListener("focus", odaklaninca);
+    document.addEventListener("visibilitychange", gorunurlukDegisince);
+    return () => {
+      window.removeEventListener("focus", odaklaninca);
+      document.removeEventListener("visibilitychange", gorunurlukDegisince);
+    };
+  }, [kullaniciyiYenile]);
 
   // Giriş/kayıt başarılı olunca çağrılır
   const girisiTamamla = (k) => {
@@ -428,6 +452,7 @@ export function AppProvider({ children }) {
     girisiTamamla,
     cikisYap,
     profiliGuncelle,
+    kullaniciyiYenile,
     // kampanyalar (saatli/sürekli indirimler)
     aktifKampanyalar,
     indirimliFiyat,

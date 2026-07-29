@@ -168,3 +168,16 @@ img { display: block; max-width: 100%; }
 /* Koyu zeminde form elemanları ve seçim rengi */
 input, textarea, select { color-scheme: dark; }
 ::selection { background: rgba(255, 107, 0, 0.35); color: #fff; }
+/* Ortak form doğrulama durumları */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 3px rgba(255, 90, 82, 0.12) !important;
+}
+.alan-hata {
+  display: block;
+  color: #ffaaa5;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}

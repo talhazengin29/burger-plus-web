@@ -260,6 +260,7 @@
 .odeme-bilgi-grid .tam-genislik { grid-column: 1 / -1; }
 .odeme-bilgi-grid input, .odeme-bilgi-grid textarea { width: 100%; border: 1px solid var(--glass-border); border-radius: var(--r-sm); background: rgba(0,0,0,.2); color: var(--on-surface); padding: 11px 12px; font: inherit; font-size: 14px; outline: none; resize: vertical; }
 .odeme-bilgi-grid input:focus, .odeme-bilgi-grid textarea:focus { border-color: var(--primary-container); box-shadow: 0 0 0 3px rgba(255,107,0,.12); }
+.odeme-bilgi-grid .alan-hata { margin-top: -2px; }
 
 /* Ürüne göre ödeme: satır düzeni */
 .urun-sec-sol {
