@@ -4,11 +4,12 @@ import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
 import { IconBack, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
+import { iyzicoOdemesiniBaslat, odemeTaslagiOlustur } from "../lib/authApi";
 import "./Payment.css";
 
 const YONTEMLER = [
   { id: "tam", ad: "Tamamını Öde", Ikon: IconWallet, aciklama: "Hesabın tamamını sen öde" },
-  { id: "esit", ad: "Eşit Böl", Ikon: IconUsers, aciklama: "Alman usulü — herkes eşit" },
+  { id: "esit", ad: "Eşit Böl", Ikon: IconUsers, aciklama: "Çoklu ödeme oturumu ile yakında", devreDisi: true },
   { id: "urun", ad: "Ürüne Göre", Ikon: IconBag, aciklama: "Sadece kendi ürünlerini öde" },
 ];
 
@@ -17,10 +18,18 @@ export default function Payment() {
   const [params] = useSearchParams();
   const masaNo = params.get("masa");
   const masaModu = !!masaNo;
-  const { sepet, sepetToplam, odemeyiTamamla, misafir } = useApp();
+  const { sepet, sepetToplam, kullanici, misafir } = useApp();
 
   const [yontem, setYontem] = useState("tam");
   const [kisiSayisi, setKisiSayisi] = useState(2);
+  const [islemde, setIslemde] = useState(false);
+  const [odemeHatasi, setOdemeHatasi] = useState("");
+  const [alici, setAlici] = useState(() => ({
+    ad: kullanici?.ad || "", soyad: kullanici?.soyad || "", email: kullanici?.email || "",
+    telefon: kullanici?.telefon || "+905", kimlikNo: "", adres: "", il: "", postaKodu: "",
+  }));
+
+  const aliciDegistir = (alan, deger) => setAlici((onceki) => ({ ...onceki, [alan]: deger }));
 
   // Ürüne göre ödeme: her ürün için kaç adet ödeneceğini tutan obje
   // { urunId: adet }  (0 = seçilmemiş, 1+ = o kadar adet ödeniyor)
@@ -91,11 +100,29 @@ export default function Payment() {
   const kazanilacakPuan = puanHesapla(odenecek);
   const odemeAktif = yontem !== "urun" || seciliUrunListesi.length > 0;
 
-  const odeyVeBitir = () => {
-    if (!odemeAktif) return;
-    // Sadece ödenen ürünleri gönder — mutfağa yalnızca bunlar gidecek
-    odemeyiTamamla(odenecek, yontem, masaNo, odenenUrunler);
-    git("/odeme-basarili");
+  const odeyVeBitir = async () => {
+    if (!odemeAktif || islemde) return;
+    setIslemde(true);
+    setOdemeHatasi("");
+    try {
+      const taslak = await odemeTaslagiOlustur({
+        masaNo: masaNo || null,
+        yontem,
+        urunler: odenenUrunler.map((u) => ({
+          id: u.id,
+          adet: u.adet,
+          secimler: u.secimler || {},
+          haricMalzemeler: u.haricMalzemeler || [],
+        })),
+      });
+
+      const paymentPageUrl = await iyzicoOdemesiniBaslat(taslak.id, alici);
+      window.location.assign(paymentPageUrl);
+    } catch (e) {
+      setOdemeHatasi(e.message || "Ödeme başlatılamadı. Lütfen tekrar dene.");
+    } finally {
+      setIslemde(false);
+    }
   };
 
   return (
@@ -129,16 +156,32 @@ export default function Payment() {
           ))}
         </section>
 
+        <section className="secim-kutu odeme-bilgi-kutu">
+          <h3 className="secim-baslik">Fatura bilgileri</h3>
+          <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir.</p>
+          <div className="odeme-bilgi-grid">
+            <label>Ad<input value={alici.ad} onChange={(e) => aliciDegistir("ad", e.target.value)} autoComplete="given-name" /></label>
+            <label>Soyad<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", e.target.value)} autoComplete="family-name" /></label>
+            <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value)} autoComplete="email" /></label>
+            <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value)} autoComplete="tel" /></label>
+            <label className="tam-genislik">T.C. kimlik no<input inputMode="numeric" maxLength="11" value={alici.kimlikNo} onChange={(e) => aliciDegistir("kimlikNo", e.target.value.replace(/\D/g, ""))} /></label>
+            <label className="tam-genislik">Adres<textarea rows="2" value={alici.adres} onChange={(e) => aliciDegistir("adres", e.target.value)} autoComplete="street-address" /></label>
+            <label>İl<input value={alici.il} onChange={(e) => aliciDegistir("il", e.target.value)} autoComplete="address-level1" /></label>
+            <label>Posta kodu<input value={alici.postaKodu} onChange={(e) => aliciDegistir("postaKodu", e.target.value)} autoComplete="postal-code" /></label>
+          </div>
+        </section>
+
         {/* Yöntem seçimi — misafir sadece tamamını öder */}
         {!misafir && (
           <>
             <h2 className="odeme-bolum-baslik">Nasıl ödemek istersin?</h2>
             <div className="yontem-grid">
-              {YONTEMLER.map(({ id, ad, Ikon, aciklama }) => (
+              {YONTEMLER.map(({ id, ad, Ikon, aciklama, devreDisi }) => (
                 <button
                   key={id}
-                  className={"yontem-kart" + (yontem === id ? " yontem-kart--aktif" : "")}
-                  onClick={() => setYontem(id)}
+                  className={"yontem-kart" + (yontem === id ? " yontem-kart--aktif" : "") + (devreDisi ? " yontem-kart--pasif" : "")}
+                  onClick={() => !devreDisi && setYontem(id)}
+                  disabled={devreDisi}
                 >
                   <Ikon className="yontem-ikon" />
                   <span className="yontem-ad">{ad}</span>
@@ -230,6 +273,7 @@ export default function Payment() {
             <span>Bu ödemeden <strong>{kazanilacakPuan} puan</strong> kazanacaksın</span>
           </div>
         )}
+        {odemeHatasi && <p className="odeme-hata" role="alert">{odemeHatasi}</p>}
       </div>
 
       {/* Alt sabit ödeme bar */}
@@ -241,9 +285,9 @@ export default function Payment() {
         <button
           className={"ode-btn" + (!odemeAktif ? " ode-btn--pasif" : "")}
           onClick={odeyVeBitir}
-          disabled={!odemeAktif}
+          disabled={!odemeAktif || islemde}
         >
-          Ödeme Yap
+          {islemde ? "Güvenli ödeme hazırlanıyor…" : "Ödeme Yap"}
         </button>
       </div>
     </div>

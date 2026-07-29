@@ -64,6 +64,7 @@
   background: var(--primary-fixed);
   box-shadow: var(--glass-shadow-sm), var(--glow-sm);
 }
+.yontem-kart--pasif { opacity: .48; cursor: not-allowed; }
 .yontem-ikon {
   width: 28px; height: 28px;
   color: var(--primary-container);
@@ -252,6 +253,13 @@
   font-weight: 700;
   box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
 }
+.odeme-hata { margin: 16px 0 0; padding: 12px 14px; border: 1px solid rgba(255, 102, 102, .45); border-radius: var(--r-md); background: rgba(180, 28, 28, .16); color: #ffd1d1; font-size: 13px; line-height: 1.45; }
+.odeme-bilgi-not { margin: -5px 0 14px; color: var(--on-surface-variant); font-size: 12px; line-height: 1.4; }
+.odeme-bilgi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.odeme-bilgi-grid label { display: flex; flex-direction: column; gap: 6px; color: var(--on-surface-variant); font-size: 12px; font-weight: 600; }
+.odeme-bilgi-grid .tam-genislik { grid-column: 1 / -1; }
+.odeme-bilgi-grid input, .odeme-bilgi-grid textarea { width: 100%; border: 1px solid var(--glass-border); border-radius: var(--r-sm); background: rgba(0,0,0,.2); color: var(--on-surface); padding: 11px 12px; font: inherit; font-size: 14px; outline: none; resize: vertical; }
+.odeme-bilgi-grid input:focus, .odeme-bilgi-grid textarea:focus { border-color: var(--primary-container); box-shadow: 0 0 0 3px rgba(255,107,0,.12); }
 
 /* Ürüne göre ödeme: satır düzeni */
 .urun-sec-sol {

@@ -5,7 +5,6 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
-  puanHesapla,
   kampanyalar,
   kampanyaAktifMi,
   urunler as varsayilanUrunler,
@@ -271,7 +270,7 @@ export function AppProvider({ children }) {
 
   const siparisEkle = (siparis) => {
     setSiparislerim((o) => {
-      const yeni = [siparis, ...o];
+      const yeni = [siparis, ...o.filter((mevcut) => mevcut.siparisNo !== siparis.siparisNo)];
       localStorage.setItem(siparisDepoAnahtari, JSON.stringify(yeni));
       return yeni;
     });
@@ -389,83 +388,29 @@ export function AppProvider({ children }) {
     return () => socket.off("masa-kapandi", kapandi);
   }, [ozetMasaNo, masaSiparisleriniTamamla]);
 
-  // Ödemeyi tamamlar: (misafir değilse) puanı artırır, siparişi mutfağa gönderir,
-  // Siparişlerim'e kalıcı ekler, sepeti boşaltır.
-  // tutar: bu ödemede gerçekten ödenen miktar (bölüşmede kişi payı olabilir).
-  // yontem: "tam" | "esit" | "urun". masaNo: masaya servis ise masa no; al götürde null.
-  // odenenUrunlerParam: ürüne göre ödemede sadece seçilen ürünler gelir.
-  // Tamamını öde/eşit böl'de tüm sepet gelir.
-  const odemeyiTamamla = (tutar, yontem = "tam", masaNo = null, odenenUrunlerParam = null) => {
-    const kazanilan = misafir ? 0 : puanHesapla(tutar);
-    if (kazanilan > 0) {
-      const yeniPuan = puan + kazanilan;
-      setPuan(yeniPuan);
-      if (kullanici) puaniGuncelle(yeniPuan);
-    }
-
-    // Ödenen ürünler: parametre geldiyse onu kullan, yoksa tüm sepeti al
-    const kaynakUrunler = odenenUrunlerParam || sepet;
-    const odenenUrunler = kaynakUrunler.map((u) => {
-      const secimler = {
-        dahilMalzemeler: u.secimler?.dahilMalzemeler || u.malzemeler || [],
-        standartGramaj: u.secimler?.standartGramaj ?? u.temelMiktar ?? 0,
-        ekstraGramaj: u.secimler?.ekstraGramaj ?? 0,
-        toplamGramaj: u.secimler?.toplamGramaj ?? u.temelMiktar ?? 0,
-        gramajEtiketi: u.secimler?.gramajEtiketi || u.gramajOpsiyonu?.etiket || "Ürün gramajı",
-        gramajBirim: u.secimler?.gramajBirim || u.gramajOpsiyonu?.birim || "gr",
-        ...(u.secimler || {}),
-      };
-      return {
-        id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, gorsel: u.gorsel,
-        kategori: u.kategori, temelMiktar: u.temelMiktar, malzemeler: u.malzemeler || [],
-        gramajOpsiyonu: u.gramajOpsiyonu || null,
-        haricMalzemeler: u.haricMalzemeler || [], secimler,
-        sepetAnahtari: u.sepetAnahtari,
-      };
-    });
-
+  // Başarı yalnızca backend'in onayladığı ödeme nesnesiyle işlenir. Böylece
+  // tarayıcı tutarı/puanı değiştiremez ve mutfak aktarımı backend'de kalır.
+  const odemeyiTamamla = (onayliOdeme) => {
     const ozet = {
-      tutar, yontem, masaNo, misafir,
-      kazanilanPuan: kazanilan,
-      urunler: odenenUrunler,
-      tarih: new Date().toISOString(),
+      ...onayliOdeme,
+      misafir,
+      tarih: onayliOdeme.tarih || new Date().toISOString(),
     };
     setSonOdeme(ozet);
+    if (Number.isFinite(onayliOdeme.guncelPuan)) setPuan(onayliOdeme.guncelPuan);
 
-    // Mutfağa gönder (masaya servis ise masa no ile, al götür ise "algotur" etiketiyle)
-    // İsim: giriş yapmışsa gerçek adı, misafirse "Misafir".
-    const gonderenAd = kullanici ? `${kullanici.ad} ${kullanici.soyad}` : "Misafir";
-    const siparisNo = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    odenenUrunler.forEach((u) => {
-      socket.emit("urun-ekle", {
-        masaNo: masaNo || "algotur",
-        urun: {
-          id: u.id, ad: u.ad, fiyat: u.fiyat, adet: u.adet, kategori: u.kategori,
-          temelMiktar: u.temelMiktar, malzemeler: u.malzemeler || [],
-          gramajOpsiyonu: u.gramajOpsiyonu,
-          haricMalzemeler: u.haricMalzemeler || [], secimler: u.secimler || {},
-        },
-        secimler: u.secimler || {},
-        haricMalzemeler: u.haricMalzemeler || [],
-        siparisNo,
-        kisiAdi: gonderenAd,
-      });
-    });
-
-    // Siparişlerim'e kalıcı ekle
     siparisEkle({
-      id: Date.now(),
-      siparisNo,
-      masaNo: masaNo || null,
-      tip: masaNo ? "masa" : "algotur",
-      urunler: odenenUrunler,
-      tutar,
-      kazanilanPuan: kazanilan,
+      id: onayliOdeme.siparisNo,
+      siparisNo: onayliOdeme.siparisNo,
+      masaNo: onayliOdeme.masaNo || null,
+      tip: onayliOdeme.tip,
+      urunler: onayliOdeme.urunler,
+      tutar: onayliOdeme.tutar,
+      kazanilanPuan: onayliOdeme.kazanilanPuan,
       misafir,
       durum: "hazirlaniyor",
-      tarih: new Date().toISOString(),
+      tarih: ozet.tarih,
     });
-
     sepetiBosalt();
     setAktifMasa(null);
     return ozet;

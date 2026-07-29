@@ -118,3 +118,49 @@ export async function siparisiHesabaKaydet(siparis) {
   const veri = await r.json();
   return veri.siparis || null;
 }
+
+function yetkiBasligi() {
+  const token = tokeniAl();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function odemeTaslagiOlustur(veri) {
+  const r = await fetch(`${BACKEND_URL}/api/odeme/taslak`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
+    body: JSON.stringify(veri),
+  });
+  const yanit = await r.json();
+  if (!r.ok) throw new Error(yanit.hata || "Ödeme taslağı oluşturulamadı.");
+  return yanit.odeme;
+}
+
+export async function testOdemesiniOnayla(odemeId) {
+  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/simulasyon-onay`, {
+    method: "POST",
+    headers: yetkiBasligi(),
+  });
+  const yanit = await r.json();
+  if (!r.ok) throw new Error(yanit.hata || "Test ödemesi onaylanamadı.");
+  return yanit.odeme;
+}
+
+export async function iyzicoOdemesiniBaslat(odemeId, alici) {
+  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
+    body: JSON.stringify({ alici }),
+  });
+  const yanit = await r.json();
+  if (!r.ok) throw new Error(yanit.hata || "İyzico ödeme formu başlatılamadı.");
+  return yanit.paymentPageUrl;
+}
+
+export async function odemeSonucunuGetir(odemeId) {
+  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/sonuc`, {
+    headers: yetkiBasligi(),
+  });
+  const yanit = await r.json();
+  if (!r.ok) throw new Error(yanit.hata || "Ödeme sonucu alınamadı.");
+  return yanit.odeme;
+}

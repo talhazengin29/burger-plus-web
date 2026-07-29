@@ -1,11 +1,41 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
+import { odemeSonucunuGetir } from "../lib/authApi";
 import "./PaymentSuccess.css";
 
 export default function PaymentSuccess() {
   const git = useNavigate();
-  const { sonOdeme, puan } = useApp();
+  const [params] = useSearchParams();
+  const odemeId = params.get("odeme");
+  const { sonOdeme, puan, odemeyiTamamla } = useApp();
+  const [yukleniyor, setYukleniyor] = useState(!!odemeId);
+  const [hata, setHata] = useState(params.get("odemeHatasi") || "");
+
+  useEffect(() => {
+    if (!odemeId) return;
+    let iptal = false;
+    odemeSonucunuGetir(odemeId)
+      .then((odeme) => {
+        if (iptal) return;
+        if (odeme.durum !== "basarili") throw new Error("Ödeme henüz onaylanmadı.");
+        odemeyiTamamla(odeme);
+      })
+      .catch((e) => { if (!iptal) setHata(e.message || "Ödeme sonucu alınamadı."); })
+      .finally(() => { if (!iptal) setYukleniyor(false); });
+    return () => { iptal = true; };
+    // odemeId URL'den sabittir; callback sonrası tek defa işlenmelidir.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [odemeId]);
+
+  if (yukleniyor) {
+    return <div className="ekran success"><div className="success-icerik"><span className="durum-spinner" /><p className="success-alt">Ödeme sonucun doğrulanıyor…</p></div></div>;
+  }
+
+  if (hata) {
+    return <div className="ekran success"><div className="success-icerik"><p className="odeme-hata">{hata}</p><button className="success-btn-ana" onClick={() => git("/odeme")}>Ödemeye Dön</button></div></div>;
+  }
 
   // Doğrudan bu adrese gelinirse (ödeme yapılmadıysa) ana sayfaya yönlendir
   if (!sonOdeme) {
