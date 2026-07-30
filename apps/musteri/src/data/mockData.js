@@ -66,6 +66,7 @@ function enYakinaYuvarla(deger, adim) {
 }
 
 export function urunKurallariniUygula(urun) {
+  if (urun.urunTipi && urun.urunTipi !== "burger") return urun;
   const kategoriKurali = kategoriUrunKurallari[urun.kategori];
   const uruneOzelMi = Object.prototype.hasOwnProperty.call(urun, "gramajOpsiyonu");
 
@@ -286,9 +287,11 @@ const ekUrunListesi = [
   ekUrun(42, "Taze Portakal Suyu", 80, "İçecekler", 300, "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&h=400&fit=crop", ["Portakal"]),
 ];
 
-const urunListesi = [...temelUrunListesi, ...ekUrunListesi];
+const _urunListesi = [...temelUrunListesi, ...ekUrunListesi];
 
-export const urunler = urunListesi.map(urunKurallariniUygula);
+// Katalog artık tamamen yönetim paneli ve backend tarafından oluşturulur.
+// Bilerek boş bırakılır; eski demo ürünler bağlantı gecikmesinde dahi görünmez.
+export const urunler = [];
 
 export const kampanyalar = [
   {

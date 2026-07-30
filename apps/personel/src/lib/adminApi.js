@@ -74,3 +74,13 @@ export async function adminIstek(yol, secenekler = {}) {
 }
 
 export const jsonGonder = (method, body) => ({ method, body: JSON.stringify(body) });
+
+export async function pngGorselYukle(dosya) {
+  if (!dosya || dosya.type !== "image/png") throw new Error("Yalnızca PNG görsel seçebilirsin.");
+  if (dosya.size > 5 * 1024 * 1024) throw new Error("PNG görsel en fazla 5 MB olabilir.");
+  return adminIstek("/gorseller", {
+    method: "POST",
+    headers: { "Content-Type": "image/png" },
+    body: dosya,
+  });
+}

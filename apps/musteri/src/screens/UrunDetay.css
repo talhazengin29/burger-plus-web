@@ -111,6 +111,17 @@
 .gramaj-kontrol button:disabled { opacity: 0.35; }
 .gramaj-kontrol button svg { width: 16px; height: 16px; }
 .gramaj-kontrol span { min-width: 18px; text-align: center; font-weight: 700; }
+.boyut-secenekleri { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.boyut-secenekleri button { min-width: 0; padding: 11px 7px; border: 1px solid var(--glass-border-strong); border-radius: var(--r-md); background: rgba(255,255,255,.045); display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--on-surface-variant); }
+.boyut-secenekleri button.aktif { border-color: var(--primary); background: var(--primary-fixed); color: var(--on-surface); box-shadow: 0 0 16px rgba(255,107,0,.16); }
+.boyut-secenekleri b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.boyut-secenekleri span { font-size: 10px; color: var(--on-surface-variant); }
+.boyut-secenekleri small { font-size: 9px; color: var(--primary-container); font-weight: 700; }
+.menu-icerik-ozeti { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.menu-icerik-ozeti .urun-detay-baslik { grid-column: 1/-1; }
+.menu-icerik-ozeti > span { min-width: 0; padding: 10px 8px; border-radius: var(--r-md); background: rgba(255,255,255,.04); display: flex; flex-direction: column; gap: 3px; }
+.menu-icerik-ozeti b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.menu-icerik-ozeti small { color: var(--outline); font-size: 9px; }
 
 /* Besin değerleri */
 .besin-grid {

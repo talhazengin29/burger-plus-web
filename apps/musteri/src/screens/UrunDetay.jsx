@@ -21,16 +21,39 @@ export default function UrunDetay() {
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
   const [gramajAdimi, setGramajAdimi] = useState(0);
+  const [boyutKodu, setBoyutKodu] = useState("");
+  const [yanBoyutKodu, setYanBoyutKodu] = useState("");
+  const [icecekBoyutKodu, setIcecekBoyutKodu] = useState("");
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to="/anasayfa" replace />;
 
   const indirim = indirimliFiyat(urun);
-  const gramajOpsiyonu = urun.gramajOpsiyonu?.aktif ? urun.gramajOpsiyonu : null;
+  const urunTipi = urun.urunTipi || "burger";
+  const menuYapisi = urunTipi === "menu" ? urun.menuYapisi : null;
+  const menuBurger = menuYapisi ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.burgerUrunId)) : null;
+  const menuYanLezzet = menuYapisi ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.yanLezzetUrunId)) : null;
+  const menuIcecek = menuYapisi ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.icecekUrunId)) : null;
+  const gramajKaynagi = menuBurger || urun;
+  const malzemeListesi = gramajKaynagi.malzemeler || [];
+  const gramajOpsiyonu = gramajKaynagi.gramajOpsiyonu?.aktif ? gramajKaynagi.gramajOpsiyonu : null;
   const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
-  const toplamGramaj = Number(urun.temelMiktar || 0) + ekstraGramaj;
+  const toplamGramaj = Number(gramajKaynagi.temelMiktar || 0) + ekstraGramaj;
   const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
-  const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + gramajFiyatArtisi;
+  const varsayilanBoyut = (boyutlar, kod) => boyutlar?.find((boyut) => boyut.kod === kod) || boyutlar?.find((boyut) => boyut.varsayilan) || boyutlar?.[0] || null;
+  const tekUrunVarsayilanBoyut = varsayilanBoyut(urun.boyutSecenekleri, null);
+  const tekUrunBoyut = varsayilanBoyut(urun.boyutSecenekleri, boyutKodu);
+  const varsayilanYanBoyut = varsayilanBoyut(menuYanLezzet?.boyutSecenekleri, menuYapisi?.varsayilanYanBoyut);
+  const secilenYanBoyut = varsayilanBoyut(menuYanLezzet?.boyutSecenekleri, yanBoyutKodu || menuYapisi?.varsayilanYanBoyut);
+  const varsayilanIcecekBoyut = varsayilanBoyut(menuIcecek?.boyutSecenekleri, menuYapisi?.varsayilanIcecekBoyut);
+  const secilenIcecekBoyut = varsayilanBoyut(menuIcecek?.boyutSecenekleri, icecekBoyutKodu || menuYapisi?.varsayilanIcecekBoyut);
+  const boyutFiyatArtisi = urunTipi === "menu"
+    ? Number(secilenYanBoyut?.fiyatFarki || 0) - Number(varsayilanYanBoyut?.fiyatFarki || 0) + Number(secilenIcecekBoyut?.fiyatFarki || 0) - Number(varsayilanIcecekBoyut?.fiyatFarki || 0)
+    : ["yan_lezzet", "icecek"].includes(urunTipi)
+      ? Number(tekUrunBoyut?.fiyatFarki || 0) - Number(tekUrunVarsayilanBoyut?.fiyatFarki || 0)
+      : 0;
+  const toplamFiyatArtisi = gramajFiyatArtisi + boyutFiyatArtisi;
+  const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + toplamFiyatArtisi;
 
   const malzemeToggle = (malzeme) => {
     setHaricMalzemeler((onceki) =>
@@ -41,19 +64,33 @@ export default function UrunDetay() {
   };
 
   const sepeteEkleyeBas = () => {
-    const dahilMalzemeler = (urun.malzemeler || []).filter((m) => !haricMalzemeler.includes(m));
+    const dahilMalzemeler = malzemeListesi.filter((m) => !haricMalzemeler.includes(m));
     const secimler = {
       dahilMalzemeler,
+      haricMalzemeler,
       ...(gramajOpsiyonu ? {
         ekstraGramaj,
-        standartGramaj: Number(urun.temelMiktar || 0),
+        standartGramaj: Number(gramajKaynagi.temelMiktar || 0),
         toplamGramaj,
         gramajEtiketi: gramajOpsiyonu.etiket,
         gramajBirim: gramajOpsiyonu.birim,
       } : {}),
+      ...(["yan_lezzet", "icecek"].includes(urunTipi) && tekUrunBoyut ? {
+        boyutKodu: tekUrunBoyut.kod, boyutEtiketi: tekUrunBoyut.etiket,
+        boyutMiktar: tekUrunBoyut.miktar, boyutBirim: tekUrunBoyut.birim,
+      } : {}),
+      ...(urunTipi === "menu" ? {
+        menuBurgerId: menuBurger?.id, menuBurgerAd: menuBurger?.ad,
+        yanLezzetId: menuYanLezzet?.id, yanLezzetAd: menuYanLezzet?.ad,
+        yanBoyutKodu: secilenYanBoyut?.kod, yanBoyutEtiketi: secilenYanBoyut?.etiket,
+        yanBoyutMiktar: secilenYanBoyut?.miktar, yanBoyutBirim: secilenYanBoyut?.birim,
+        icecekId: menuIcecek?.id, icecekAd: menuIcecek?.ad,
+        icecekBoyutKodu: secilenIcecekBoyut?.kod, icecekBoyutEtiketi: secilenIcecekBoyut?.etiket,
+        icecekBoyutMiktar: secilenIcecekBoyut?.miktar, icecekBoyutBirim: secilenIcecekBoyut?.birim,
+      } : {}),
     };
     for (let i = 0; i < adet; i++) {
-      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi });
+      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi });
     }
     git(-1);
   };
@@ -101,7 +138,7 @@ export default function UrunDetay() {
                 <span className="gramaj-deger">
                   {toplamGramaj} {gramajOpsiyonu.birim}
                 </span>
-                <span className="gramaj-standart">Standart: {urun.temelMiktar} {gramajOpsiyonu.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${gramajOpsiyonu.birim}` : ""}</span>
+                <span className="gramaj-standart">Standart: {gramajKaynagi.temelMiktar} {gramajOpsiyonu.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${gramajOpsiyonu.birim}` : ""}</span>
                 <span className="gramaj-fiyat">
                   Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}
                 </span>
@@ -126,6 +163,23 @@ export default function UrunDetay() {
                 </button>
               </div>
             </section>
+          )}
+
+          {["yan_lezzet", "icecek"].includes(urunTipi) && urun.boyutSecenekleri?.length > 0 && (
+            <BoyutSecici baslik="Boyut seçimi" urun={urun} seciliKod={tekUrunBoyut?.kod} onSec={setBoyutKodu} />
+          )}
+
+          {urunTipi === "menu" && menuYanLezzet && menuIcecek && (
+            <>
+              <section className="urun-detay-kart menu-icerik-ozeti">
+                <h2 className="urun-detay-baslik">Menü İçeriği</h2>
+                <span><b>{menuBurger?.ad}</b><small>Burger</small></span>
+                <span><b>{menuYanLezzet.ad}</b><small>Yan lezzet</small></span>
+                <span><b>{menuIcecek.ad}</b><small>İçecek</small></span>
+              </section>
+              <BoyutSecici baslik={`${menuYanLezzet.ad} boyutu`} urun={menuYanLezzet} baslangicKodu={menuYapisi.varsayilanYanBoyut} seciliKod={secilenYanBoyut?.kod} onSec={setYanBoyutKodu} />
+              <BoyutSecici baslik={`${menuIcecek.ad} boyutu`} urun={menuIcecek} baslangicKodu={menuYapisi.varsayilanIcecekBoyut} seciliKod={secilenIcecekBoyut?.kod} onSec={setIcecekBoyutKodu} />
+            </>
           )}
 
           {/* Besin değerleri — sıralı animasyonla gelir */}
@@ -164,12 +218,12 @@ export default function UrunDetay() {
           )}
 
           {/* İçindekiler — tıklayınca çıkarılabilir malzeme özelleştirmesi */}
-          {urun.malzemeler && urun.malzemeler.length > 0 && (
+          {malzemeListesi.length > 0 && (
             <section className="urun-detay-kart">
               <h2 className="urun-detay-baslik">İçindekiler</h2>
               <p className="urun-detay-malzeme-not">İstemediğin malzemeye dokun</p>
               <div className="malzeme-liste">
-                {urun.malzemeler.map((m) => {
+                {malzemeListesi.map((m) => {
                   const haric = haricMalzemeler.includes(m);
                   return (
                     <motion.button
@@ -212,5 +266,23 @@ export default function UrunDetay() {
         </motion.button>
       </div>
     </div>
+  );
+}
+
+function BoyutSecici({ baslik, urun, baslangicKodu, seciliKod, onSec }) {
+  const boyutlar = urun.boyutSecenekleri || [];
+  const baslangicIndex = Math.max(0, boyutlar.findIndex((boyut) => boyut.kod === baslangicKodu || (!baslangicKodu && boyut.varsayilan)));
+  const izinliBoyutlar = boyutlar.slice(baslangicIndex);
+  const baslangicFiyati = Number(boyutlar[baslangicIndex]?.fiyatFarki || 0);
+  return (
+    <section className="urun-detay-kart boyut-secici">
+      <h2 className="urun-detay-baslik">{baslik}</h2>
+      <div className="boyut-secenekleri">
+        {izinliBoyutlar.map((boyut) => {
+          const fark = Number(boyut.fiyatFarki || 0) - baslangicFiyati;
+          return <button type="button" key={boyut.kod} className={boyut.kod === seciliKod ? "aktif" : ""} onClick={() => onSec(boyut.kod)}><b>{boyut.etiket}</b><span>{boyut.miktar} {boyut.birim}</span><small>{fark > 0 ? `+₺${fark.toFixed(2)}` : "Dahil"}</small></button>;
+        })}
+      </div>
+    </section>
   );
 }

@@ -77,7 +77,7 @@ export function AppProvider({ children }) {
     fetch(`${backendUrl}/api/urunler`)
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ urunler: uzakUrunler }) => {
-        if (!Array.isArray(uzakUrunler) || uzakUrunler.length === 0) return;
+        if (!Array.isArray(uzakUrunler)) return;
         const katalog = kataloguBirlestir(uzakUrunler);
         setUrunler(katalog);
         setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));

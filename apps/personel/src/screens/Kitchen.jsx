@@ -16,6 +16,14 @@ const DURUM_BILGI = {
   hazir: { etiket: "Hazir", renk: "basari" },
 };
 
+function boyutMetinleri(secimler) {
+  return [
+    secimler.boyutEtiketi && `${secimler.boyutEtiketi}: ${secimler.boyutMiktar} ${secimler.boyutBirim}`,
+    secimler.yanBoyutEtiketi && `${secimler.yanLezzetAd}: ${secimler.yanBoyutEtiketi} (${secimler.yanBoyutMiktar} ${secimler.yanBoyutBirim})`,
+    secimler.icecekBoyutEtiketi && `${secimler.icecekAd}: ${secimler.icecekBoyutEtiketi} (${secimler.icecekBoyutMiktar} ${secimler.icecekBoyutBirim})`,
+  ].filter(Boolean);
+}
+
 // Zamanı okunaklı göster (10 dakika önce vb.)
 function gecenSure(tarih) {
   if (!tarih) return "";
@@ -130,12 +138,14 @@ export default function Kitchen() {
                       : Number(secimler.ekstraGramaj) > 0
                         ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
                         : null;
+                    const boyutlar = boyutMetinleri(secimler);
                     return (
                       <li key={k.id} className="kalem">
                         <span className="kalem-adet">{k.adet}×</span>
                         <div className="kalem-bilgi">
                           <span className="kalem-ad">{k.urun_ad}</span>
                           {gramaj && <span className="kalem-gramaj">{gramaj}</span>}
+                          {boyutlar.map((boyut) => <span className="kalem-gramaj" key={boyut}>{boyut}</span>)}
                           {dahil.length > 0 && (
                             <span className="kalem-dahil">Dahil: {dahil.join(", ")}</span>
                           )}

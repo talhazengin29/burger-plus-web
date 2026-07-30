@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { adminIstek, jsonGonder } from "../lib/adminApi";
+import { adminIstek, jsonGonder, pngGorselYukle } from "../lib/adminApi";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, gramajOpsiyonu: BOS_GRAMAJ };
+const BOS_BOYUTLAR = (birim = "gr") => [
+  { kod: "kucuk", etiket: "Küçük Boy", miktar: "", birim, fiyatFarki: 0, varsayilan: true },
+  { kod: "orta", etiket: "Orta Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
+  { kod: "buyuk", etiket: "Büyük Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
+];
+const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
+const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -22,6 +28,7 @@ const BOLUMLER = [
 ];
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const TIP_ETIKETLERI = { burger: "Burger", yan_lezzet: "Yan Lezzet", icecek: "İçecek", menu: "Menü" };
 const tarihSaat = (d) => d ? new Date(d).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
 
 const GRAMAJ_KURALLARI = {
@@ -46,12 +53,14 @@ const gramajVarsayilani = (urun) => {
   };
 };
 
-const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ } });
+const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], menuYapisi: { ...BOS_MENU } });
 const urunuFormaCevir = (urun) => ({
   ...urun,
   malzemeler: (urun.malzemeler || []).join(", "),
   alerjenler: (urun.alerjenler || []).join(", "),
   gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
+  boyutSecenekleri: (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut })),
+  menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
 });
 
 export default function Admin({ onCikis }) {
@@ -68,6 +77,12 @@ export default function Admin({ onCikis }) {
   const [hata, setHata] = useState("");
   const [bildirim, setBildirim] = useState("");
   const [urunForm, setUrunForm] = useState(null);
+  const [urunArama, setUrunArama] = useState("");
+  const [urunKategoriFiltre, setUrunKategoriFiltre] = useState("tumu");
+  const [urunTipFiltre, setUrunTipFiltre] = useState("tumu");
+  const [urunDurumFiltre, setUrunDurumFiltre] = useState("tumu");
+  const [urunSiralama, setUrunSiralama] = useState("yeni");
+  const [gorselYukleniyor, setGorselYukleniyor] = useState(false);
   const [kategoriForm, setKategoriForm] = useState(null);
   const [personelForm, setPersonelForm] = useState(null);
   const [duyuruForm, setDuyuruForm] = useState(null);
@@ -127,21 +142,65 @@ export default function Admin({ onCikis }) {
 
   const urunKaydet = async (e) => {
     e.preventDefault();
+    if (gorselYukleniyor) return setHata("PNG yüklemesi tamamlanmadan ürünü kaydedemezsin.");
+    if (!urunForm.gorsel) return setHata("Ürün için bir PNG görsel yüklemelisin.");
     const veri = {
       ...urunForm,
       fiyat: Number(urunForm.fiyat), temelMiktar: Number(urunForm.temelMiktar),
-      gramajOpsiyonu: {
+      gramajOpsiyonu: urunForm.urunTipi === "burger" ? {
         aktif: urunForm.gramajOpsiyonu?.aktif === true,
         etiket: String(urunForm.gramajOpsiyonu?.etiket || "").trim(),
         birim: String(urunForm.gramajOpsiyonu?.birim || "gr").trim().toLowerCase(),
         artisMiktari: Number(urunForm.gramajOpsiyonu?.artisMiktari),
         maxAdim: Number(urunForm.gramajOpsiyonu?.maxAdim),
         fiyatArtisi: Number(urunForm.gramajOpsiyonu?.fiyatArtisi),
-      },
+      } : null,
+      boyutSecenekleri: (urunForm.boyutSecenekleri || []).map((boyut) => ({
+        ...boyut, miktar: Number(boyut.miktar), fiyatFarki: Number(boyut.fiyatFarki),
+      })),
+      menuYapisi: urunForm.urunTipi === "menu" ? {
+        ...urunForm.menuYapisi,
+        burgerUrunId: Number(urunForm.menuYapisi.burgerUrunId),
+        yanLezzetUrunId: Number(urunForm.menuYapisi.yanLezzetUrunId),
+        icecekUrunId: Number(urunForm.menuYapisi.icecekUrunId),
+      } : null,
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
     if (await islem(() => adminIstek("/urunler", jsonGonder("POST", veri)), "Ürün kataloğu güncellendi.")) setUrunForm(null);
+  };
+
+  const urunTipiniDegistir = (urunTipi) => setUrunForm((onceki) => ({
+    ...onceki,
+    urunTipi,
+    temelMiktar: urunTipi === "burger" ? onceki.temelMiktar : "",
+    gramajOpsiyonu: urunTipi === "burger" ? { ...BOS_GRAMAJ, ...onceki.gramajOpsiyonu } : null,
+    boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urunTipi)
+      ? (onceki.boyutSecenekleri?.length ? onceki.boyutSecenekleri : BOS_BOYUTLAR(urunTipi === "icecek" ? "ml" : "gr"))
+      : [],
+    menuYapisi: urunTipi === "menu" ? { ...BOS_MENU, ...onceki.menuYapisi } : { ...BOS_MENU },
+  }));
+
+  const boyutGuncelle = (index, alan, deger) => setUrunForm((onceki) => ({
+    ...onceki,
+    boyutSecenekleri: onceki.boyutSecenekleri.map((boyut, sira) => ({
+      ...boyut,
+      ...(alan === "varsayilan" ? { varsayilan: sira === index } : (sira === index ? { [alan]: deger } : {})),
+    })),
+  }));
+
+  const urunGorseliSec = async (dosya) => {
+    if (!dosya) return;
+    setGorselYukleniyor(true);
+    setHata("");
+    try {
+      const { gorsel } = await pngGorselYukle(dosya);
+      setUrunForm((onceki) => onceki ? { ...onceki, gorsel } : onceki);
+    } catch (err) {
+      setHata(err.message);
+    } finally {
+      setGorselYukleniyor(false);
+    }
   };
 
   const gramajGuncelle = (alan, deger) => setUrunForm((onceki) => ({
@@ -201,6 +260,24 @@ export default function Admin({ onCikis }) {
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
   const toplamUrun = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.adet), 0), [rapor]);
   const yogunSaat = useMemo(() => (rapor.saatlik || []).reduce((en, s) => s.adet > en.adet ? s : en, { saat: null, adet: 0 }), [rapor]);
+  const filtreliUrunler = useMemo(() => {
+    const arama = urunArama.trim().toLocaleLowerCase("tr");
+    const liste = urunler.filter((urun) =>
+      (!arama || urun.ad.toLocaleLowerCase("tr").includes(arama)) &&
+      (urunKategoriFiltre === "tumu" || urun.kategori === urunKategoriFiltre) &&
+      (urunTipFiltre === "tumu" || urun.urunTipi === urunTipFiltre) &&
+      (urunDurumFiltre === "tumu" || (urunDurumFiltre === "aktif" ? urun.aktif : !urun.aktif))
+    );
+    return [...liste].sort((a, b) => {
+      if (urunSiralama === "fiyat-artan") return a.fiyat - b.fiyat;
+      if (urunSiralama === "fiyat-azalan") return b.fiyat - a.fiyat;
+      if (urunSiralama === "ad") return a.ad.localeCompare(b.ad, "tr");
+      return Number(b.id) - Number(a.id);
+    });
+  }, [urunler, urunArama, urunKategoriFiltre, urunTipFiltre, urunDurumFiltre, urunSiralama]);
+  const burgerUrunleri = urunler.filter((urun) => urun.urunTipi === "burger" && urun.aktif);
+  const yanLezzetUrunleri = urunler.filter((urun) => urun.urunTipi === "yan_lezzet" && urun.aktif);
+  const icecekUrunleri = urunler.filter((urun) => urun.urunTipi === "icecek" && urun.aktif);
 
   return (
     <div className="admin-shell">
@@ -247,7 +324,7 @@ export default function Admin({ onCikis }) {
             </>}
 
             {bolum === "urunler" && <>
-              <BolumBaslik baslik="Menü kataloğu" aciklama="Müşteri uygulamasında yayınlanan ürünleri, kategorileri ve gramaj artışlarını yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu(kategoriler[0]?.ad))} />
+              <BolumBaslik baslik="Menü kataloğu" aciklama="Burger, boyutlu ürün ve menü yapılarını müşteri uygulamasıyla birlikte yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu(kategoriler[0]?.ad))} />
               <section className="kategori-yonetim-karti">
                 <header><div><span>UYGULAMA MENÜSÜ</span><h3>Kategoriler</h3><p>Buradaki sıralama ve görseller müşteri uygulamasına anında yansır.</p></div><button type="button" onClick={() => setKategoriForm({ ...BOS_KATEGORI, sira: (kategoriler.at(-1)?.sira || 0) + 10 })}>+ Kategori ekle</button></header>
                 <div className="kategori-yonetim-listesi">
@@ -260,13 +337,21 @@ export default function Admin({ onCikis }) {
                   ))}
                 </div>
               </section>
-              <div className="admin-kart-grid">{urunler.map((u) => (
+              <section className="urun-filtreleri">
+                <input type="search" value={urunArama} onChange={(e) => setUrunArama(e.target.value.slice(0, 80))} placeholder="Ürün adına göre ara…" aria-label="Ürün ara" />
+                <select value={urunKategoriFiltre} onChange={(e) => setUrunKategoriFiltre(e.target.value)} aria-label="Kategori filtresi"><option value="tumu">Tüm kategoriler</option>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select>
+                <select value={urunTipFiltre} onChange={(e) => setUrunTipFiltre(e.target.value)} aria-label="Ürün türü filtresi"><option value="tumu">Tüm türler</option>{Object.entries(TIP_ETIKETLERI).map(([tip, etiket]) => <option key={tip} value={tip}>{etiket}</option>)}</select>
+                <select value={urunDurumFiltre} onChange={(e) => setUrunDurumFiltre(e.target.value)} aria-label="Durum filtresi"><option value="tumu">Tüm durumlar</option><option value="aktif">Yayında</option><option value="pasif">Pasif</option></select>
+                <select value={urunSiralama} onChange={(e) => setUrunSiralama(e.target.value)} aria-label="Ürün sıralaması"><option value="yeni">Son eklenen</option><option value="ad">Ada göre</option><option value="fiyat-artan">Fiyat artan</option><option value="fiyat-azalan">Fiyat azalan</option></select>
+                <small>{filtreliUrunler.length} ürün</small>
+              </section>
+              <div className="admin-kart-grid">{filtreliUrunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
-                  <img src={u.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300"} alt="" />
-                  <div><span className="admin-rozet">{u.kategori}</span><h3>{u.ad}</h3><p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || (u.kategori === "İçecekler" ? "ml" : "gr")}</p>{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}<strong>{para(u.fiyat)}</strong></div>
-                  <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button className="tehlike" onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button></footer>
-                </article>
-              ))}</div>
+                  {u.gorsel ? <img src={u.gorsel} alt="" /> : <div className="admin-urun-gorselsiz">PNG</div>}
+                  <div><span className="admin-rozet">{u.kategori} · {TIP_ETIKETLERI[u.urunTipi] || "Ürün"}</span><h3>{u.ad}</h3>{u.urunTipi === "burger" && <p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}<strong>{para(u.fiyat)}</strong></div>
+                  <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button><button className="tehlike" onClick={() => { if (window.confirm(`${u.ad} katalogdan silinsin mi? Geçmiş siparişler korunacak.`)) islem(() => adminIstek(`/urunler/${u.id}`, { method: "DELETE" }), "Ürün katalogdan silindi."); }}>Sil</button></footer>
+              </article>
+              ))}{filtreliUrunler.length === 0 && <Bos yazi={urunler.length ? "Filtreye uygun ürün bulunamadı." : "Katalog boş. İlk ürünü yönetim panelinden ekleyebilirsin."} />}</div>
             </>}
 
             {bolum === "kampanyalar" && <>
@@ -339,7 +424,7 @@ export default function Admin({ onCikis }) {
           <form className="admin-form urun-duzenleme-form" onSubmit={urunKaydet}>
             <div className="urun-form-onizleme">
               <span className="urun-form-gorsel">{urunForm.gorsel ? <img src={urunForm.gorsel} alt="Ürün önizleme" /> : <b>BP</b>}</span>
-              <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)} · Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu?.birim || "gr"}</p></div>
+              <div><small>{urunForm.kategori || "KATEGORİ"} · {TIP_ETIKETLERI[urunForm.urunTipi]}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)}{urunForm.urunTipi === "burger" ? ` · Standart ${urunForm.temelMiktar || "—"} ${urunForm.gramajOpsiyonu?.birim || "gr"}` : ""}</p></div>
               <i>{urunForm.id ? "DÜZENLENİYOR" : "YENİ KAYIT"}</i>
             </div>
             <Ikili>
@@ -347,11 +432,13 @@ export default function Admin({ onCikis }) {
               <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select></Alan>
             </Ikili>
             <Ikili>
-              <Alan etiket="Fiyat (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
-              <Alan etiket="Standart miktar (gr/ml)"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>
+              <Alan etiket="Ürün türü"><select value={urunForm.urunTipi} onChange={(e) => urunTipiniDegistir(e.target.value)}>{Object.entries(TIP_ETIKETLERI).map(([tip, etiket]) => <option key={tip} value={tip}>{etiket}</option>)}</select></Alan>
+              <Alan etiket="Başlangıç fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
             </Ikili>
 
-            <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.aktif ? "aktif" : ""}`}>
+            {urunForm.urunTipi === "burger" && <Alan etiket="Standart burger gramajı"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>}
+
+            {urunForm.urunTipi === "burger" && <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.aktif ? "aktif" : ""}`}>
               <header>
                 <div><b>Dinamik gramaj artırımı</b><small>Müşteri ürün detayında miktarı adım adım artırabilir.</small></div>
                 <label className="admin-switch"><input type="checkbox" checked={urunForm.gramajOpsiyonu?.aktif === true} onChange={(e) => gramajGuncelle("aktif", e.target.checked)} /><span /></label>
@@ -371,11 +458,43 @@ export default function Admin({ onCikis }) {
                   <p className="gramaj-onizleme">Örnek: Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu.birim} → ilk artış +{urunForm.gramajOpsiyonu.artisMiktari || "—"} {urunForm.gramajOpsiyonu.birim}, fiyat +{para(urunForm.gramajOpsiyonu.fiyatArtisi)}</p>
                 </div>
               )}
-            </section>
+            </section>}
 
-            <Alan etiket="Görsel URL"><input value={urunForm.gorsel || ""} onChange={(e) => setUrunForm({ ...urunForm, gorsel: e.target.value })} /></Alan>
+            {["yan_lezzet", "icecek"].includes(urunForm.urunTipi) && (
+              <section className="boyut-editoru">
+                <header><div><b>Boyut seçenekleri</b><small>Miktar ve fiyat farklarını her ürün için ayrı belirle.</small></div></header>
+                <div className="boyut-editor-baslik"><span>Varsayılan</span><span>Boyut</span><span>Miktar</span><span>Birim</span><span>Fiyat farkı</span></div>
+                {urunForm.boyutSecenekleri.map((boyut, index) => (
+                  <div className="boyut-editor-satir" key={boyut.kod}>
+                    <input type="radio" name="varsayilan-boyut" checked={boyut.varsayilan === true} onChange={() => boyutGuncelle(index, "varsayilan", true)} aria-label={`${boyut.etiket} varsayılan`} />
+                    <input required maxLength="40" value={boyut.etiket} onChange={(e) => boyutGuncelle(index, "etiket", e.target.value)} />
+                    <input required type="number" min="1" max="10000" value={boyut.miktar} onChange={(e) => boyutGuncelle(index, "miktar", e.target.value)} />
+                    <select value={boyut.birim} onChange={(e) => boyutGuncelle(index, "birim", e.target.value)}><option value="gr">gr</option><option value="ml">ml</option><option value="adet">adet</option></select>
+                    <input required type="number" min="0" max="100000" step="0.01" value={boyut.fiyatFarki} onChange={(e) => boyutGuncelle(index, "fiyatFarki", e.target.value)} />
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {urunForm.urunTipi === "menu" && (
+              <section className="menu-editoru">
+                <header><b>Menü içeriği</b><small>Önce burger, yan lezzet ve içecek ürünlerini eklemelisin.</small></header>
+                <Alan etiket="Menü burgeri"><select required value={urunForm.menuYapisi.burgerUrunId} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, burgerUrunId: e.target.value } })}><option value="">Burger seç</option>{burgerUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
+                <Ikili>
+                  <Alan etiket="Yan lezzet"><select required value={urunForm.menuYapisi.yanLezzetUrunId} onChange={(e) => { const urun = yanLezzetUrunleri.find((aday) => String(aday.id) === e.target.value); setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, yanLezzetUrunId: e.target.value, varsayilanYanBoyut: urun?.boyutSecenekleri?.find((boyut) => boyut.varsayilan)?.kod || urun?.boyutSecenekleri?.[0]?.kod || "" } }); }}><option value="">Yan lezzet seç</option>{yanLezzetUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
+                  <Alan etiket="Başlangıç boyutu"><select required value={urunForm.menuYapisi.varsayilanYanBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanYanBoyut: e.target.value } })}><option value="">Boyut seç</option>{(yanLezzetUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.yanLezzetUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
+                </Ikili>
+                <Ikili>
+                  <Alan etiket="İçecek"><select required value={urunForm.menuYapisi.icecekUrunId} onChange={(e) => { const urun = icecekUrunleri.find((aday) => String(aday.id) === e.target.value); setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, icecekUrunId: e.target.value, varsayilanIcecekBoyut: urun?.boyutSecenekleri?.find((boyut) => boyut.varsayilan)?.kod || urun?.boyutSecenekleri?.[0]?.kod || "" } }); }}><option value="">İçecek seç</option>{icecekUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
+                  <Alan etiket="Başlangıç boyutu"><select required value={urunForm.menuYapisi.varsayilanIcecekBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanIcecekBoyut: e.target.value } })}><option value="">Boyut seç</option>{(icecekUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.icecekUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
+                </Ikili>
+                <p>Menünün “İçindekiler” alanında seçilen burgerin malzemeleri gösterilir. Boyut büyütmelerinin fiyatı ilgili yan lezzet ve içecekten alınır.</p>
+              </section>
+            )}
+
+            <Alan etiket="Ürün görseli (PNG, en fazla 5 MB)"><label className={`png-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/png,.png" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "PNG yükleniyor…" : urunForm.gorsel ? "PNG’yi değiştir" : "Bilgisayardan PNG seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "URL girmen gerekmiyor."}</small></label></Alan>
             <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
-            <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan>
+            {urunForm.urunTipi !== "menu" ? <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
             <Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan>
             <FormAlt kapat={() => setUrunForm(null)} />
           </form>

@@ -24,6 +24,14 @@ const DURUM_ETIKET = {
   hazir: "Hazır",
 };
 
+function boyutMetinleri(secimler) {
+  return [
+    secimler.boyutEtiketi && `${secimler.boyutEtiketi}: ${secimler.boyutMiktar} ${secimler.boyutBirim}`,
+    secimler.yanBoyutEtiketi && `${secimler.yanLezzetAd}: ${secimler.yanBoyutEtiketi}`,
+    secimler.icecekBoyutEtiketi && `${secimler.icecekAd}: ${secimler.icecekBoyutEtiketi}`,
+  ].filter(Boolean);
+}
+
 export default function Salon() {
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
@@ -107,12 +115,14 @@ export default function Salon() {
                     : Number(secimler.ekstraGramaj) > 0
                       ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"}`
                       : null;
+                  const boyutlar = boyutMetinleri(secimler);
                   return (
                     <div key={k.id} className="salon-kalem">
                       <span className="salon-kalem-adet">{k.adet}×</span>
                       <span className="salon-kalem-ad">
                         {k.urun_ad}
                         {gramaj && <small className="salon-kalem-gramaj">{gramaj}</small>}
+                        {boyutlar.map((boyut) => <small className="salon-kalem-gramaj" key={boyut}>{boyut}</small>)}
                         {dahil.length > 0 && <small className="salon-kalem-dahil">Dahil: {dahil.join(", ")}</small>}
                         {haric?.length > 0 && <small className="salon-kalem-haric">Haric: {haric.join(", ")}</small>}
                       </span>

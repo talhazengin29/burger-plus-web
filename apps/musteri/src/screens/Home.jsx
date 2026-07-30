@@ -201,12 +201,12 @@ export default function Home() {
         </motion.div>
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
-        <div className="bolum-satir">
+        {gosterilen.length > 0 && <div className="bolum-satir">
           <h3 className="bolum-baslik">Popüler {kategoriBasligi}</h3>
-        </div>
+        </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
-        <AnimatePresence mode="wait">
+        {gosterilen.length > 0 && <AnimatePresence mode="wait">
           <motion.div
             className="populer-urun-listesi"
             key={`populer-${aktifKategori}-${siralama}-${arama}`}
@@ -219,7 +219,7 @@ export default function Home() {
               return <UrunKarti key={u.id} urun={u} indirim={indirim} git={git} sepeteEkle={sepeteEkle} />;
             })}
           </motion.div>
-        </AnimatePresence>
+        </AnimatePresence>}
 
         {digerUrunler.length > 0 && (
           <section className="diger-urunler">
@@ -233,7 +233,7 @@ export default function Home() {
         )}
 
         {gosterilen.length === 0 && (
-          <p className="bos-sonuc">"{arama}" için sonuç bulunamadı.</p>
+          <p className="bos-sonuc">{arama ? `“${arama}” için sonuç bulunamadı.` : "Menü ürünleri yönetim panelinden eklenmeyi bekliyor."}</p>
         )}
       </div>
     </div>
@@ -241,8 +241,9 @@ export default function Home() {
 }
 
 function UrunKarti({ urun, indirim, git, sepeteEkle }) {
+  const standartBoyut = urun.boyutSecenekleri?.find((boyut) => boyut.varsayilan) || urun.boyutSecenekleri?.[0];
   return <motion.article className="urun-kart" variants={siraliOge} onClick={() => git(`/urun/${urun.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") git(`/urun/${urun.id}`); }}>
     <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urun.ad} loading="lazy" /></div>
-    <div className="urun-alt"><h4 className="urun-ad">{urun.ad}</h4>{urun.temelMiktar > 0 && <span className="urun-standart-miktar">Standart {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || (urun.kategori === "İçecekler" ? "ml" : "gr")}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span><span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span></span> : <span className="urun-fiyat">₺{urun.fiyat.toFixed(2)}</span>}<motion.button className="ekle-btn" onClick={(e) => { e.stopPropagation(); sepeteEkle(urun); }} aria-label={`${urun.ad} sepete ekle`} whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
+    <div className="urun-alt"><h4 className="urun-ad">{urun.ad}</h4>{urun.temelMiktar > 0 && <span className="urun-standart-miktar">Standart {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || "gr"}</span>}{standartBoyut && <span className="urun-standart-miktar">Standart {standartBoyut.etiket} · {standartBoyut.miktar} {standartBoyut.birim}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span><span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span></span> : <span className="urun-fiyat">₺{urun.fiyat.toFixed(2)}</span>}<motion.button className="ekle-btn" onClick={(e) => { e.stopPropagation(); if (urun.urunTipi === "menu" || standartBoyut) git(`/urun/${urun.id}`); else sepeteEkle(urun); }} aria-label={`${urun.ad} sepete ekle`} whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
   </motion.article>;
 }

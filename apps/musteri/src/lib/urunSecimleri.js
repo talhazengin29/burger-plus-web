@@ -3,12 +3,17 @@ export function haricMalzemeleriGetir(urun) {
 }
 
 export function gramajMetni(secimler) {
+  const parcalar = [];
   if (Number(secimler?.toplamGramaj) > 0) {
     const ek = Number(secimler.ekstraGramaj) > 0 ? ` (+${secimler.ekstraGramaj})` : " (Standart)";
-    return `${secimler.toplamGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Gramaj"}${ek}`;
+    parcalar.push(`${secimler.toplamGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Gramaj"}${ek}`);
+  } else if (secimler?.ekstraGramaj) {
+    parcalar.push(`+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`);
   }
-  if (!secimler?.ekstraGramaj) return null;
-  return `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`;
+  if (secimler?.boyutEtiketi) parcalar.push(`${secimler.boyutEtiketi}: ${secimler.boyutMiktar} ${secimler.boyutBirim}`);
+  if (secimler?.yanBoyutEtiketi) parcalar.push(`${secimler.yanLezzetAd}: ${secimler.yanBoyutEtiketi} (${secimler.yanBoyutMiktar} ${secimler.yanBoyutBirim})`);
+  if (secimler?.icecekBoyutEtiketi) parcalar.push(`${secimler.icecekAd}: ${secimler.icecekBoyutEtiketi} (${secimler.icecekBoyutMiktar} ${secimler.icecekBoyutBirim})`);
+  return parcalar.length ? parcalar.join(" · ") : null;
 }
 
 export function sepetAnahtariOlustur(urun) {
