@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { adminIstek, jsonGonder, pngGorselYukle } from "../lib/adminApi";
+import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Admin.css";
 
@@ -142,8 +142,8 @@ export default function Admin({ onCikis }) {
 
   const urunKaydet = async (e) => {
     e.preventDefault();
-    if (gorselYukleniyor) return setHata("PNG yüklemesi tamamlanmadan ürünü kaydedemezsin.");
-    if (!urunForm.gorsel) return setHata("Ürün için bir PNG görsel yüklemelisin.");
+    if (gorselYukleniyor) return setHata("Görsel yüklemesi tamamlanmadan ürünü kaydedemezsin.");
+    if (!urunForm.gorsel) return setHata("Ürün için bir görsel yüklemelisin.");
     const veri = {
       ...urunForm,
       fiyat: Number(urunForm.fiyat), temelMiktar: Number(urunForm.temelMiktar),
@@ -194,7 +194,7 @@ export default function Admin({ onCikis }) {
     setGorselYukleniyor(true);
     setHata("");
     try {
-      const { gorsel } = await pngGorselYukle(dosya);
+      const { gorsel } = await gorselYukle(dosya);
       setUrunForm((onceki) => onceki ? { ...onceki, gorsel } : onceki);
     } catch (err) {
       setHata(err.message);
@@ -347,7 +347,7 @@ export default function Admin({ onCikis }) {
               </section>
               <div className="admin-kart-grid">{filtreliUrunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
-                  {u.gorsel ? <img src={u.gorsel} alt="" /> : <div className="admin-urun-gorselsiz">PNG</div>}
+                  {u.gorsel ? <img src={u.gorsel} alt="" /> : <div className="admin-urun-gorselsiz">Görsel</div>}
                   <div><span className="admin-rozet">{u.kategori} · {TIP_ETIKETLERI[u.urunTipi] || "Ürün"}</span><h3>{u.ad}</h3>{u.urunTipi === "burger" && <p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}<strong>{para(u.fiyat)}</strong></div>
                   <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button><button className="tehlike" onClick={() => { if (window.confirm(`${u.ad} katalogdan silinsin mi? Geçmiş siparişler korunacak.`)) islem(() => adminIstek(`/urunler/${u.id}`, { method: "DELETE" }), "Ürün katalogdan silindi."); }}>Sil</button></footer>
               </article>
@@ -492,7 +492,7 @@ export default function Admin({ onCikis }) {
               </section>
             )}
 
-            <Alan etiket="Ürün görseli (PNG, en fazla 5 MB)"><label className={`png-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/png,.png" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "PNG yükleniyor…" : urunForm.gorsel ? "PNG’yi değiştir" : "Bilgisayardan PNG seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "URL girmen gerekmiyor."}</small></label></Alan>
+            <Alan etiket="Ürün görseli (en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/*" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : urunForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
             <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
             {urunForm.urunTipi !== "menu" ? <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
             <Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan>
