@@ -70,20 +70,6 @@ export async function davetOzetiniGetir() {
   return veri.davet;
 }
 
-// Puani sunucuda guncelle (giris yapmis kullanici icin)
-export async function puaniGuncelle(puan) {
-  const token = tokeniAl();
-  if (!token) return;
-  await fetch(`${BACKEND_URL}/api/puan`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ puan }),
-  });
-}
-
 // Profil guncelle (email + telefon)
 export async function profilGuncelle(email, telefon) {
   const token = tokeniAl();
@@ -117,17 +103,37 @@ export async function siparisGecmisiniGetir() {
   return veri.siparisler || [];
 }
 
-export async function siparisiHesabaKaydet(siparis) {
+export async function sadakatOzetiniGetir() {
   const token = tokeniAl();
   if (!token) return null;
-  const r = await fetch(`${BACKEND_URL}/api/siparislerim`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(siparis),
+  const r = await fetch(`${BACKEND_URL}/api/sadakat`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!r.ok) throw new Error("Sipariş hesaba kaydedilemedi.");
   const veri = await r.json();
-  return veri.siparis || null;
+  if (!r.ok) throw new Error(veri.hata || "Sadakat bilgileri alınamadı.");
+  return veri.sadakat;
+}
+
+export async function puanlaOdulSatinAl(odulId, istekAnahtari) {
+  const r = await fetch(`${BACKEND_URL}/api/sadakat/oduller/${encodeURIComponent(odulId)}/satin-al`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
+    body: JSON.stringify({ istekAnahtari }),
+  });
+  const veri = await r.json();
+  if (!r.ok) throw new Error(veri.hata || "Ödül alınamadı.");
+  return veri.sadakat;
+}
+
+export async function kullaniciHediyesiniKullan(hediyeId, masaNo) {
+  const r = await fetch(`${BACKEND_URL}/api/sadakat/hediyeler/${encodeURIComponent(hediyeId)}/kullan`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
+    body: JSON.stringify({ masaNo: masaNo || null }),
+  });
+  const veri = await r.json();
+  if (!r.ok) throw new Error(veri.hata || "Hediye kullanılamadı.");
+  return veri;
 }
 
 function yetkiBasligi() {
@@ -143,16 +149,6 @@ export async function odemeTaslagiOlustur(veri) {
   });
   const yanit = await r.json();
   if (!r.ok) throw new Error(yanit.hata || "Ödeme taslağı oluşturulamadı.");
-  return yanit.odeme;
-}
-
-export async function testOdemesiniOnayla(odemeId) {
-  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/simulasyon-onay`, {
-    method: "POST",
-    headers: yetkiBasligi(),
-  });
-  const yanit = await r.json();
-  if (!r.ok) throw new Error(yanit.hata || "Test ödemesi onaylanamadı.");
   return yanit.odeme;
 }
 

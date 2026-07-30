@@ -33,7 +33,10 @@ export default function Kitchen() {
   const [islemdeMasalar, setIslemdeMasalar] = useState(new Set());
 
   useEffect(() => {
-    const acildi = () => setBagli(true);
+    const acildi = () => {
+      setBagli(true);
+      socket.emit("mutfaga-katil");
+    };
     const kapandi = () => setBagli(false);
     const guncelle = (yeniMasalar) => setMasalar(yeniMasalar);
 
@@ -41,8 +44,8 @@ export default function Kitchen() {
     socket.on("disconnect", kapandi);
     socket.on("mutfak-guncellendi", guncelle);
 
-    // Mutfak odasına katıl (backend mevcut masaları gönderir)
-    socket.emit("mutfaga-katil");
+    // Her yeniden bağlantıda odaya tekrar katıl.
+    if (socket.connected) acildi();
 
     return () => {
       socket.off("connect", acildi);

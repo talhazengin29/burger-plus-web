@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconGift } from "../components/Icons";
@@ -15,7 +16,7 @@ function tarihGoster(iso) {
   return new Date(iso).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function HediyeKart({ h, kullanilmis, onSepeteEkle }) {
+function HediyeKart({ h, kullanilmis, onKullan, islemde }) {
   return (
     <motion.article
       className={"hediye-kart" + (kullanilmis ? " hediye-kart--kullanilmis" : "")}
@@ -35,8 +36,8 @@ function HediyeKart({ h, kullanilmis, onSepeteEkle }) {
         {kullanilmis ? (
           <span className="hediye-kullanildi-rozet">Kullanıldı ✓</span>
         ) : (
-          <button className="hediye-sepet-btn" onClick={() => onSepeteEkle(h)}>
-            Sepete Ekle
+          <button className="hediye-sepet-btn" disabled={islemde} onClick={() => onKullan(h)}>
+            {islemde ? "İşleniyor…" : "Hediyeyi Kullan"}
           </button>
         )}
       </div>
@@ -45,8 +46,10 @@ function HediyeKart({ h, kullanilmis, onSepeteEkle }) {
 }
 
 export default function Hediyelerim() {
-  const { misafir, hediyeler, hediyeSepeteEkle } = useApp();
+  const { misafir, hediyeler, hediyeKullan, odemeyiTamamla } = useApp();
   const git = useNavigate();
+  const [islemde, setIslemde] = useState(null);
+  const [hata, setHata] = useState("");
 
   if (misafir) {
     return (
@@ -60,9 +63,19 @@ export default function Hediyelerim() {
   const kullanilabilir = hediyeler.filter((h) => !h.kullanildi);
   const kullanilmis = hediyeler.filter((h) => h.kullanildi);
 
-  const sepeteEkleyeBas = (h) => {
-    hediyeSepeteEkle(h);
-    git("/sepet");
+  const hediyeyiKullan = async (h) => {
+    if (islemde) return;
+    setIslemde(h.id);
+    setHata("");
+    try {
+      const odeme = await hediyeKullan(h);
+      odemeyiTamamla(odeme);
+      git("/odeme-basarili");
+    } catch (e) {
+      setHata(e.message || "Hediye kullanılamadı.");
+    } finally {
+      setIslemde(null);
+    }
   };
 
   return (
@@ -71,6 +84,7 @@ export default function Hediyelerim() {
       <SayfaSarici>
         <div className="hediyelerim-govde">
           <h1 className="hediyelerim-baslik">Hediyelerim</h1>
+          {hata && <p className="hediyelerim-bos" role="alert">{hata}</p>}
 
           <h2 className="hediyelerim-bolum-baslik">Kullanılabilir Hediyeler</h2>
           {kullanilabilir.length === 0 ? (
@@ -78,7 +92,7 @@ export default function Hediyelerim() {
           ) : (
             <motion.div className="hediye-liste" {...siraliKonteyner} initial="initial" animate="animate">
               {kullanilabilir.map((h) => (
-                <HediyeKart key={h.id} h={h} kullanilmis={false} onSepeteEkle={sepeteEkleyeBas} />
+                <HediyeKart key={h.id} h={h} kullanilmis={false} onKullan={hediyeyiKullan} islemde={islemde === h.id} />
               ))}
             </motion.div>
           )}

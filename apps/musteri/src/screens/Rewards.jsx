@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { sadakatVarsayilan, oduller, puanGecmisi } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { IconShop, IconTicket, IconCutlery, IconGift } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
@@ -12,8 +11,9 @@ import "./Rewards.css";
 const ODUL_IKONLARI = { IconTicket, IconCutlery, IconGift };
 
 export default function Rewards() {
-  const { puan, misafir, odulSatinAl } = useApp();
+  const { puan, misafir, odulSatinAl, oduller, puanGecmisi } = useApp();
   const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
+  const [islemde, setIslemde] = useState(null);
 
   useEffect(() => {
     if (!mesaj) return;
@@ -30,17 +30,21 @@ export default function Rewards() {
     );
   }
 
-  const hedef = sadakatVarsayilan.hedefPuan;
+  const hedef = oduller.find((odul) => /burger/i.test(odul.ad))?.puan || oduller.at(-1)?.puan || 1200;
   const yuzde = Math.min((puan / hedef) * 100, 100);
   const kalan = Math.max(hedef - puan, 0);
 
-  const odulAlTiklandi = (o) => {
-    const sonuc = odulSatinAl(o);
-    setMesaj(
-      sonuc.basarili
-        ? { tip: "basari", metin: `${o.ad} hediyelerine eklendi!` }
-        : { tip: "hata", metin: "Yeterli puanın yok" }
-    );
+  const odulAlTiklandi = async (o) => {
+    if (islemde) return;
+    setIslemde(o.id);
+    try {
+      await odulSatinAl(o);
+      setMesaj({ tip: "basari", metin: `${o.ad} hediyelerine eklendi!` });
+    } catch (e) {
+      setMesaj({ tip: "hata", metin: e.message || "Ödül alınamadı." });
+    } finally {
+      setIslemde(null);
+    }
   };
 
   return (
@@ -107,6 +111,7 @@ export default function Rewards() {
                         className="odul-ekle"
                         aria-label={`${o.ad} al`}
                         onClick={() => odulAlTiklandi(o)}
+                        disabled={islemde === o.id}
                         whileTap={{ scale: 0.85 }}
                       >
                         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -129,7 +134,7 @@ export default function Rewards() {
               <div key={g.id} className="gecmis-satir">
                 <div className="gecmis-sol">
                   <span className="gecmis-baslik">{g.baslik}</span>
-                  <span className="gecmis-tarih">{g.tarih}</span>
+                  <span className="gecmis-tarih">{new Date(g.tarih).toLocaleDateString("tr-TR")}</span>
                 </div>
                 <span className={"gecmis-puan " + (g.tip === "kazanc" ? "arti" : "eksi")}>
                   {g.puan > 0 ? `+${g.puan}` : g.puan}

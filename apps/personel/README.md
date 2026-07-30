@@ -3,12 +3,15 @@
 Mutfak + Salon rollerini içeren personel paneli.
 Vite + React + Socket.io. Port 5174.
 
-## İki rol, iki şifre
+## Rol bazlı güvenli giriş
 
-- **Mutfak** (şifre: 1234) — siparişleri görür, "Hazırlamaya Başla" / "Hazır" der
-- **Salon** (şifre: 5678) — masaları/hesabı görür, "Masayı Kapat" ile oturumu kapatır
+- **Mutfak** — siparişleri görür, "Hazırlamaya Başla" / "Hazır" der
+- **Salon/Kasiyer** — masaları ve hesabı görür, "Masayı Kapat" ile oturumu kapatır
+- **Yönetici** — yönetim paneline erişir
 
-Giriş sonrası iki sekme (Mutfak / Salon) arasında geçilebilir.
+Her personel yönetim panelinden e-posta, rol ve en az 8 karakterli şifreyle
+tanımlanır. Giriş backend tarafından doğrulanır; kullanıcı yalnızca yetkili olduğu
+ekrana ve Socket.io olaylarına erişebilir.
 
 ## Masayı Kapat neden önemli?
 
@@ -27,5 +30,4 @@ Backend (burger-plus-backend) çalışıyor olmalı.
 
 ## Şifreleri değiştirme
 
-`src/screens/Login.jsx` içindeki SIFRELER nesnesinden değiştirilir.
-(Gerçek üründe bu backend'de doğrulanmalı; şu an istemci tarafında.)
+Yönetim panelindeki **Personel > Düzenle** formunda yeni şifre belirlenir.

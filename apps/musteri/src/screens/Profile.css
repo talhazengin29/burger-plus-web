@@ -16,10 +16,12 @@
   margin: 0 auto 14px;
 }
 .profil-avatar {
+  display: block;
   width: 100%;
   height: 100%;
   border-radius: var(--r-full);
   object-fit: cover;
+  object-position: center 32%;
   border: 2px solid var(--glass-border-strong);
   box-shadow: var(--glass-shadow);
 }

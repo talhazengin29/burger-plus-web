@@ -10,7 +10,7 @@
 export const sadakatVarsayilan = {
   avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop",
   hedefPuan: 2000,
-  // "5 al 1 bedava" damga sayacı (henüz gerçek sisteme bağlı değil)
+  // İlk ekran çizimi için varsayılan; girişten sonra backend sadakat verisi kullanılır.
   burgerDamga: 0,
   burgerDamgaHedef: 5,
 };

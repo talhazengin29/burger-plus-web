@@ -31,7 +31,10 @@ export default function Salon() {
   const [kapatilanMasalar, setKapatilanMasalar] = useState(new Set());
 
   useEffect(() => {
-    const acildi = () => setBagli(true);
+    const acildi = () => {
+      setBagli(true);
+      socket.emit("salona-katil");
+    };
     const kapandi = () => setBagli(false);
     const guncelle = (yeniMasalar) => setMasalar(yeniMasalar);
 
@@ -39,7 +42,7 @@ export default function Salon() {
     socket.on("disconnect", kapandi);
     socket.on("salon-guncellendi", guncelle);
 
-    socket.emit("salona-katil");
+    if (socket.connected) acildi();
 
     return () => {
       socket.off("connect", acildi);

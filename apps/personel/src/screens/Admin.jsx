@@ -4,7 +4,8 @@ import "./Admin.css";
 
 const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
 const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, gramajOpsiyonu: BOS_GRAMAJ };
-const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "" };
+const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
+const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 
 const BOLUMLER = [
@@ -40,7 +41,7 @@ const gramajVarsayilani = (urun) => {
   };
 };
 
-const yeniUrunFormu = () => ({ ...BOS_URUN, gramajOpsiyonu: { ...BOS_GRAMAJ } });
+const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ } });
 const urunuFormaCevir = (urun) => ({
   ...urun,
   malzemeler: (urun.malzemeler || []).join(", "),
@@ -52,6 +53,7 @@ export default function Admin({ onCikis }) {
   const [bolum, setBolum] = useState("genel");
   const [dashboard, setDashboard] = useState(null);
   const [urunler, setUrunler] = useState([]);
+  const [kategoriler, setKategoriler] = useState([]);
   const [personeller, setPersoneller] = useState([]);
   const [duyurular, setDuyurular] = useState([]);
   const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
@@ -59,6 +61,7 @@ export default function Admin({ onCikis }) {
   const [hata, setHata] = useState("");
   const [bildirim, setBildirim] = useState("");
   const [urunForm, setUrunForm] = useState(null);
+  const [kategoriForm, setKategoriForm] = useState(null);
   const [personelForm, setPersonelForm] = useState(null);
   const [duyuruForm, setDuyuruForm] = useState(null);
 
@@ -67,7 +70,7 @@ export default function Admin({ onCikis }) {
     setHata("");
     const istekler = [
       ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
-      ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"],
+      ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
     ];
     const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
     const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -79,7 +82,7 @@ export default function Admin({ onCikis }) {
       return;
     }
 
-    const [d, u, p, r, duy] = sonuclar.map((sonuc) =>
+    const [d, u, p, r, duy, k] = sonuclar.map((sonuc) =>
       sonuc.status === "fulfilled" ? sonuc.value : null
     );
     if (d) setDashboard(d);
@@ -87,6 +90,8 @@ export default function Admin({ onCikis }) {
     if (p) setPersoneller(p.personeller || []);
     if (r) setRapor(r);
     if (duy) setDuyurular(duy.duyurular || []);
+    if (k) setKategoriler(k.kategoriler || []);
+    else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
 
     const hatalar = sonuclar.flatMap((sonuc, index) =>
       sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -140,6 +145,17 @@ export default function Admin({ onCikis }) {
       gramajOpsiyonu: { ...onceki.gramajOpsiyonu, etiket: varsayilan.etiket, birim: varsayilan.birim },
     };
   });
+
+  const kategoriKaydet = async (e) => {
+    e.preventDefault();
+    const veri = {
+      ...kategoriForm,
+      ad: String(kategoriForm.ad || "").trim(),
+      gorsel: String(kategoriForm.gorsel || "").trim(),
+      sira: Number(kategoriForm.sira),
+    };
+    if (await islem(() => adminIstek("/kategoriler", jsonGonder("POST", veri)), "Kategori uygulama menüsüne kaydedildi.")) setKategoriForm(null);
+  };
 
   const personelKaydet = async (e) => {
     e.preventDefault();
@@ -200,7 +216,19 @@ export default function Admin({ onCikis }) {
             </>}
 
             {bolum === "urunler" && <>
-              <BolumBaslik baslik="Menü kataloğu" aciklama="Müşteri uygulamasında yayınlanan ürünleri ve gramaj artışlarını yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu())} />
+              <BolumBaslik baslik="Menü kataloğu" aciklama="Müşteri uygulamasında yayınlanan ürünleri, kategorileri ve gramaj artışlarını yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu(kategoriler[0]?.ad))} />
+              <section className="kategori-yonetim-karti">
+                <header><div><span>UYGULAMA MENÜSÜ</span><h3>Kategoriler</h3><p>Buradaki sıralama ve görseller müşteri uygulamasına anında yansır.</p></div><button type="button" onClick={() => setKategoriForm({ ...BOS_KATEGORI, sira: (kategoriler.at(-1)?.sira || 0) + 10 })}>+ Kategori ekle</button></header>
+                <div className="kategori-yonetim-listesi">
+                  {kategoriler.map((kategori) => (
+                    <button type="button" className={!kategori.aktif ? "pasif" : ""} key={kategori.id} onClick={() => setKategoriForm({ ...kategori })}>
+                      <span className="kategori-yonetim-gorsel">{kategori.gorsel ? <img src={kategori.gorsel} alt="" /> : <b>{kategori.ad.charAt(0)}</b>}</span>
+                      <span><b>{kategori.ad}</b><small>{urunler.filter((urun) => urun.kategori === kategori.ad).length} ürün · sıra {kategori.sira}</small></span>
+                      <em>Düzenle</em>
+                    </button>
+                  ))}
+                </div>
+              </section>
               <div className="admin-kart-grid">{urunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
                   <img src={u.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300"} alt="" />
@@ -218,7 +246,7 @@ export default function Admin({ onCikis }) {
             {bolum === "personel" && <>
               <BolumBaslik baslik="Ekip ve vardiyalar" aciklama="Giriş–çıkış saatleri, çalışma süresi ve tahmini ücret takibi." buton="+ Personel ekle" onClick={() => setPersonelForm({ ...BOS_PERSONEL })} />
               <div className="admin-personel-grid">{personeller.map((p) => (
-                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div><button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><button className="duzenle-link" onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret })}>Düzenle</button></article>
+                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div><button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><button className="duzenle-link" onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret, sifre: "" })}>Düzenle</button></article>
               ))}</div>
             </>}
 
@@ -241,11 +269,16 @@ export default function Admin({ onCikis }) {
       </main>
 
       {urunForm && (
-        <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} kapat={() => setUrunForm(null)}>
-          <form className="admin-form" onSubmit={urunKaydet}>
+        <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} aciklama="Ürün bilgileri, fiyatlandırma ve porsiyon seçenekleri" sinif="admin-modal--urun" kapat={() => setUrunForm(null)}>
+          <form className="admin-form urun-duzenleme-form" onSubmit={urunKaydet}>
+            <div className="urun-form-onizleme">
+              <span className="urun-form-gorsel">{urunForm.gorsel ? <img src={urunForm.gorsel} alt="Ürün önizleme" /> : <b>BP</b>}</span>
+              <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)} · Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu?.birim || "gr"}</p></div>
+              <i>{urunForm.id ? "DÜZENLENİYOR" : "YENİ KAYIT"}</i>
+            </div>
             <Ikili>
               <Alan etiket="Ürün adı"><input required maxLength="120" value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan>
-              <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}><option>Burgerler</option><option>Yan Lezzetler</option><option>İçecekler</option></select></Alan>
+              <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select></Alan>
             </Ikili>
             <Ikili>
               <Alan etiket="Fiyat (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
@@ -282,7 +315,21 @@ export default function Admin({ onCikis }) {
           </form>
         </Modal>
       )}
-      {personelForm && <Modal baslik={personelForm.id ? "Personeli düzenle" : "Personel ekle"} kapat={() => setPersonelForm(null)}><form className="admin-form" onSubmit={personelKaydet}><Ikili><Alan etiket="Ad"><input required value={personelForm.ad} onChange={(e) => setPersonelForm({ ...personelForm, ad: e.target.value })} /></Alan><Alan etiket="Soyad"><input required value={personelForm.soyad} onChange={(e) => setPersonelForm({ ...personelForm, soyad: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="Rol"><select value={personelForm.rol} onChange={(e) => setPersonelForm({ ...personelForm, rol: e.target.value })}><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></Alan><Alan etiket="Saatlik ücret"><input type="number" value={personelForm.saatlikUcret} onChange={(e) => setPersonelForm({ ...personelForm, saatlikUcret: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="E-posta"><input type="email" value={personelForm.email} onChange={(e) => setPersonelForm({ ...personelForm, email: e.target.value })} /></Alan><Alan etiket="Telefon"><input value={personelForm.telefon} onChange={(e) => setPersonelForm({ ...personelForm, telefon: e.target.value })} /></Alan></Ikili><FormAlt kapat={() => setPersonelForm(null)} /></form></Modal>}
+      {kategoriForm && (
+        <Modal baslik={kategoriForm.id ? "Kategoriyi düzenle" : "Yeni kategori"} aciklama="Kategori adı ve görseli müşteri uygulamasındaki yuvarlak menüde kullanılır." sinif="admin-modal--kategori" kapat={() => setKategoriForm(null)}>
+          <form className="admin-form kategori-form" onSubmit={kategoriKaydet}>
+            <div className="kategori-form-onizleme">
+              <span>{kategoriForm.gorsel ? <img src={kategoriForm.gorsel} alt="Kategori önizleme" /> : <b>{kategoriForm.ad?.charAt(0) || "+"}</b>}</span>
+              <div><small>UYGULAMA ÖNİZLEMESİ</small><strong>{kategoriForm.ad || "Kategori adı"}</strong><p>Ana sayfadaki kategori satırında bu şekilde görünür.</p></div>
+            </div>
+            <Alan etiket="Kategori adı"><input required minLength="2" maxLength="60" value={kategoriForm.ad} onChange={(e) => setKategoriForm({ ...kategoriForm, ad: e.target.value })} placeholder="Örn. Tatlılar" /></Alan>
+            <Alan etiket="Kategori görsel URL"><input required type="url" maxLength="1000" value={kategoriForm.gorsel || ""} onChange={(e) => setKategoriForm({ ...kategoriForm, gorsel: e.target.value })} placeholder="https://..." /></Alan>
+            <Alan etiket="Menü sırası"><input required type="number" min="0" max="999" step="1" value={kategoriForm.sira} onChange={(e) => setKategoriForm({ ...kategoriForm, sira: e.target.value })} /></Alan>
+            <FormAlt kapat={() => setKategoriForm(null)} />
+          </form>
+        </Modal>
+      )}
+      {personelForm && <Modal baslik={personelForm.id ? "Personeli düzenle" : "Personel ekle"} kapat={() => setPersonelForm(null)}><form className="admin-form" onSubmit={personelKaydet}><Ikili><Alan etiket="Ad"><input required value={personelForm.ad} onChange={(e) => setPersonelForm({ ...personelForm, ad: e.target.value })} /></Alan><Alan etiket="Soyad"><input required value={personelForm.soyad} onChange={(e) => setPersonelForm({ ...personelForm, soyad: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="Rol"><select value={personelForm.rol} onChange={(e) => setPersonelForm({ ...personelForm, rol: e.target.value })}><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></Alan><Alan etiket="Saatlik ücret"><input type="number" value={personelForm.saatlikUcret} onChange={(e) => setPersonelForm({ ...personelForm, saatlikUcret: e.target.value })} /></Alan></Ikili><Ikili><Alan etiket="E-posta"><input required type="email" value={personelForm.email} onChange={(e) => setPersonelForm({ ...personelForm, email: e.target.value })} /></Alan><Alan etiket="Telefon"><input value={personelForm.telefon} onChange={(e) => setPersonelForm({ ...personelForm, telefon: e.target.value })} /></Alan></Ikili><Alan etiket={personelForm.id ? "Yeni şifre (değişmeyecekse boş bırak)" : "Giriş şifresi"}><input required={!personelForm.id} minLength="8" maxLength="72" type="password" autoComplete="new-password" value={personelForm.sifre || ""} onChange={(e) => setPersonelForm({ ...personelForm, sifre: e.target.value })} /></Alan><FormAlt kapat={() => setPersonelForm(null)} /></form></Modal>}
       {duyuruForm && <Modal baslik="Yeni duyuru" kapat={() => setDuyuruForm(null)}><form className="admin-form" onSubmit={duyuruKaydet}><Alan etiket="Duyuru başlığı"><input required maxLength="100" value={duyuruForm.baslik} onChange={(e) => setDuyuruForm({ ...duyuruForm, baslik: e.target.value })} placeholder="Örn. Yeni menümüz yayında" /></Alan><Alan etiket="Mesaj"><textarea required maxLength="600" value={duyuruForm.mesaj} onChange={(e) => setDuyuruForm({ ...duyuruForm, mesaj: e.target.value })} placeholder="Müşterilerin bildirim panelinde göreceği açıklama" /></Alan><Alan etiket="Tıklandığında açılacak sayfa"><select value={duyuruForm.hedef} onChange={(e) => setDuyuruForm({ ...duyuruForm, hedef: e.target.value })}><option value="/anasayfa">Ana sayfa</option><option value="/kampanyalar">Kampanyalar</option><option value="/hediyelerim">Hediyelerim</option></select></Alan><FormAlt kapat={() => setDuyuruForm(null)} /></form></Modal>}
     </div>
   );
@@ -413,7 +460,7 @@ function haftayiDoldur(veriler) {
 }
 
 function haftaAdi(gun) { return ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][Number(gun) - 1] || "—"; }
-function Modal({ baslik, kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className="admin-modal"><header><h2>{baslik}</h2><button onClick={kapat}>×</button></header>{children}</section></div>; }
+function Modal({ baslik, aciklama, sinif = "", kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}>×</button></header>{children}</section></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }
 function FormAlt({ kapat }) { return <div className="form-alt"><button type="button" onClick={kapat}>Vazgeç</button><button className="primary" type="submit">Kaydet</button></div>; }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,23 @@ import { badgePop } from "../lib/animasyonlar";
 import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
 
+const okunanlariGetir = (anahtar) => {
+  try {
+    const kayit = JSON.parse(localStorage.getItem(anahtar) || "[]");
+    return Array.isArray(kayit) ? kayit.map(String) : [];
+  } catch {
+    return [];
+  }
+};
+
+const okunanlariKaydet = (anahtar, duyuruIdleri) => {
+  try {
+    localStorage.setItem(anahtar, JSON.stringify(duyuruIdleri));
+  } catch {
+    // Depolama kapalıysa sayaç mevcut oturumda state üzerinden çalışmayı sürdürür.
+  }
+};
+
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
@@ -15,6 +32,12 @@ export default function OrtakHeader({ selamlama = false }) {
   const { sepetAdet, kullanici, misafir, avatar } = useApp();
   const [bildirimlerAcik, setBildirimlerAcik] = useState(false);
   const [duyurular, setDuyurular] = useState([]);
+  const okunanAnahtari = `bp_okunan_duyurular_${kullanici?.id || (misafir ? "misafir" : "anonim")}`;
+  const [okunanDuyurular, setOkunanDuyurular] = useState(() => okunanlariGetir(okunanAnahtari));
+  const okunmamisSayisi = useMemo(
+    () => duyurular.filter((duyuru) => !okunanDuyurular.includes(String(duyuru.id))).length,
+    [duyurular, okunanDuyurular]
+  );
 
   const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
 
@@ -27,6 +50,10 @@ export default function OrtakHeader({ selamlama = false }) {
     socket.on("duyurular-guncellendi", duyurulariYukle);
     return () => socket.off("duyurular-guncellendi", duyurulariYukle);
   }, [duyurulariYukle]);
+
+  useEffect(() => {
+    setOkunanDuyurular(okunanlariGetir(okunanAnahtari));
+  }, [okunanAnahtari]);
 
   useEffect(() => {
     if (!bildirimlerAcik) return undefined;
@@ -45,9 +72,16 @@ export default function OrtakHeader({ selamlama = false }) {
     });
   };
 
-  const duyuruyaGit = (hedef) => {
+  const duyuruyaGit = (duyuru) => {
+    const duyuruId = String(duyuru.id);
+    setOkunanDuyurular((onceki) => {
+      if (onceki.includes(duyuruId)) return onceki;
+      const sonraki = [...onceki, duyuruId].slice(-200);
+      okunanlariKaydet(okunanAnahtari, sonraki);
+      return sonraki;
+    });
     setBildirimlerAcik(false);
-    git(hedef || "/anasayfa");
+    git(duyuru.hedef || "/anasayfa");
   };
 
   return (
@@ -74,7 +108,7 @@ export default function OrtakHeader({ selamlama = false }) {
             whileTap={{ scale: 0.88 }}
           >
             <IconBell />
-            {duyurular.length > 0 && <span className="bildirim-badge">{Math.min(duyurular.length, 9)}</span>}
+            {okunmamisSayisi > 0 && <span className="bildirim-badge">{okunmamisSayisi > 9 ? "9+" : okunmamisSayisi}</span>}
           </motion.button>
         </div>
         <motion.button
@@ -127,8 +161,11 @@ export default function OrtakHeader({ selamlama = false }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: .98 }}
               >
-                <header><b>Bildirimler</b><span>{duyurular.length ? `${duyurular.length} yeni` : "Güncelsin"}</span></header>
-                {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => <button key={duyuru.id} onClick={() => duyuruyaGit(duyuru.hedef)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>)}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
+                <header><b>Bildirimler</b><span>{okunmamisSayisi ? `${okunmamisSayisi} okunmamış` : "Güncelsin"}</span></header>
+                {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => {
+                  const okundu = okunanDuyurular.includes(String(duyuru.id));
+                  return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>;
+                })}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
               </motion.section>
             </div>
           )}

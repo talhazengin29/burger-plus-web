@@ -8,6 +8,10 @@ export const adminToken = {
 };
 
 export async function adminGiris(email, sifre) {
+  return personelGiris(email, sifre, "admin");
+}
+
+export async function personelGiris(email, sifre, ekranRolu) {
   const r = await fetch(`${BACKEND_URL}/api/giris`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,7 +19,14 @@ export async function adminGiris(email, sifre) {
   });
   const veri = await r.json();
   if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
-  if (veri.kullanici?.rol !== "admin") throw new Error("Bu hesabın yönetici yetkisi yok.");
+  const izinler = {
+    admin: ["admin"],
+    mutfak: ["mutfak", "admin"],
+    salon: ["salon", "kasiyer", "admin"],
+  };
+  if (!izinler[ekranRolu]?.includes(veri.kullanici?.rol)) {
+    throw new Error("Bu hesabın seçilen bölüm için yetkisi yok.");
+  }
   adminToken.kaydet(veri.token);
   return veri.kullanici;
 }

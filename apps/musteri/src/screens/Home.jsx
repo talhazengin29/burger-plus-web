@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { kategoriler, kategoriGorseller } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
 import { IconPlus, IconSearch, IconFilter, IconArrowRight } from "../components/Icons";
@@ -24,9 +23,14 @@ export default function Home() {
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, urunler } = useApp();
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, urunler, kategoriler } = useApp();
   const git = useNavigate();
   const chipRef = useSuruklenebilir();
+
+  useEffect(() => {
+    if (kategoriler.some((kategori) => kategori.ad === aktifKategori)) return;
+    setAktifKategori(kategoriler.find((kategori) => kategori.ad === "Burgerler")?.ad || kategoriler[0]?.ad || "Tümü");
+  }, [aktifKategori, kategoriler]);
 
   // Kategori + arama + sıralama; hepsi yalnızca listelemeyi etkiler
   const gosterilen = useMemo(() => {
@@ -107,9 +111,11 @@ export default function Home() {
 
         {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
         <div className="kategori-satir" ref={chipRef}>
-          {kategoriler.map((k) => (
+          {kategoriler.map((kategori) => {
+            const k = kategori.ad;
+            return (
             <motion.button
-              key={k}
+              key={kategori.id || k}
               type="button"
               className={"kategori" + (k === aktifKategori ? " kategori--aktif" : "")}
               onClick={() => setAktifKategori(k)}
@@ -118,13 +124,14 @@ export default function Home() {
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <span className="kategori-daire">
-                {kategoriGorseller[k] && (
-                  <img className="kategori-gorsel" src={kategoriGorseller[k]} alt="" loading="lazy" />
+                {kategori.gorsel && (
+                  <img className="kategori-gorsel" src={kategori.gorsel} alt="" loading="lazy" />
                 )}
               </span>
               <span className="kategori-ad">{k}</span>
             </motion.button>
-          ))}
+            );
+          })}
         </div>
 
         {/* Arama çubuğu — cam, solda arama ikonu, sağda sıralama filtresi */}

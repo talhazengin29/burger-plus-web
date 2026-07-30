@@ -6,14 +6,7 @@ import "./Cart.css";
 
 export default function Cart() {
   const git = useNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, odemeyiTamamla } = useApp();
-
-  // Sepette sadece hediye ürünler varsa (toplam 0₺) ödeme ekranına gerek yok.
-  const bedava = sepet.length > 0 && sepetToplam === 0;
-  const siparisiTamamla = () => {
-    odemeyiTamamla(0, "tam", aktifMasa || null, sepet);
-    git("/odeme-basarili");
-  };
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
 
   return (
     <div className="ekran cart">
@@ -77,14 +70,14 @@ export default function Cart() {
             </div>
 
             {aktifMasa ? (
-              /* QR ile masa seçili — doğrudan o masaya ödeme (bedavaysa direkt tamamla) */
+              /* QR ile masa seçili — doğrudan o masaya ödeme */
               <>
                 <div className="cart-masa-bilgi">🍽️ Masa {aktifMasa}'desin</div>
                 <button
                   className="odeme-gec-btn"
-                  onClick={bedava ? siparisiTamamla : () => git(`/odeme?masa=${aktifMasa}`)}
+                  onClick={() => git(`/odeme?masa=${aktifMasa}`)}
                 >
-                  {bedava ? "Siparişi Tamamla" : "Ödemeye Geç"}
+                  Ödemeye Geç
                 </button>
               </>
             ) : (
@@ -94,10 +87,10 @@ export default function Cart() {
                 <div className="cart-secim-butonlar">
                   <button
                     className="siparis-tip-btn siparis-tip-btn--algotur"
-                    onClick={bedava ? siparisiTamamla : () => git("/odeme")}
+                    onClick={() => git("/odeme")}
                   >
                     <span className="siparis-tip-emoji">🥡</span>
-                    {bedava ? "Siparişi Tamamla" : "Al Götür"}
+                    Al Götür
                   </button>
                   <button className="siparis-tip-btn siparis-tip-btn--masa" onClick={() => git("/qr?mod=masa")}>
                     <span className="siparis-tip-emoji">🍽️</span>

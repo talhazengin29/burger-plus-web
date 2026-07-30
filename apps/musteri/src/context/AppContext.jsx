@@ -3,16 +3,21 @@
    Ödeme yapıldığında puan burada artar. Puan oranı mockData'da (PUAN_ORANI_TL).
    ========================================================================== */
 
-import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import {
   kampanyalar,
   kampanyaAktifMi,
+  kategoriler as varsayilanKategoriAdlari,
+  kategoriGorseller,
   urunler as varsayilanUrunler,
   urunKurallariniUygula,
 } from "../data/mockData";
 import { socket } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
-import { beniGetir, tokeniSil, puaniGuncelle, profilGuncelle, siparisGecmisiniGetir, siparisiHesabaKaydet } from "../lib/authApi";
+import {
+  beniGetir, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
+  sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
+} from "../lib/authApi";
 
 const AppContext = createContext(null);
 
@@ -26,9 +31,44 @@ function kataloguBirlestir(uzakUrunler) {
   });
 }
 
+const varsayilanKategoriler = varsayilanKategoriAdlari.map((ad, sira) => ({
+  id: ad === "Tümü" ? "tumu" : `varsayilan-${sira}`,
+  ad,
+  gorsel: kategoriGorseller[ad] || null,
+  sira,
+}));
+
+function kategorileriBirlestir(uzakKategoriler) {
+  const tumu = varsayilanKategoriler[0];
+  const liste = uzakKategoriler
+    .filter((kategori) => kategori && String(kategori.ad || "").trim() && kategori.aktif !== false)
+    .map((kategori, sira) => ({
+      id: kategori.id ?? `uzak-${sira}`,
+      ad: String(kategori.ad).trim(),
+      gorsel: kategori.gorsel || kategoriGorseller[kategori.ad] || null,
+      sira: Number.isFinite(Number(kategori.sira)) ? Number(kategori.sira) : sira + 1,
+    }));
+  const benzersiz = Array.from(new Map(liste.map((kategori) => [kategori.ad, kategori])).values());
+  return [tumu, ...benzersiz.sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, "tr"))];
+}
+
+function kategorileriUrunlerdenTamamla(mevcut, urunler) {
+  const adlar = new Set(mevcut.map((kategori) => kategori.ad));
+  const eklenenler = [];
+  for (const urun of urunler) {
+    const ad = String(urun.kategori || "").trim();
+    if (!ad || adlar.has(ad)) continue;
+    adlar.add(ad);
+    eklenenler.push({ id: `urun-${ad}`, ad, gorsel: urun.gorsel || null, sira: mevcut.length + eklenenler.length });
+  }
+  return eklenenler.length ? [...mevcut, ...eklenenler] : mevcut;
+}
+
 export function AppProvider({ children }) {
   const [puan, setPuan] = useState(0);
+  const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
   const [urunler, setUrunler] = useState(varsayilanUrunler);
+  const [menuKategorileri, setMenuKategorileri] = useState(varsayilanKategoriler);
 
   // Backend kataloğu varsa onu kullan; sunucu kapalıyken mevcut menü çalışmaya devam eder.
   useEffect(() => {
@@ -37,17 +77,37 @@ export function AppProvider({ children }) {
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ urunler: uzakUrunler }) => {
         if (!Array.isArray(uzakUrunler) || uzakUrunler.length === 0) return;
-        setUrunler(kataloguBirlestir(uzakUrunler));
+        const katalog = kataloguBirlestir(uzakUrunler);
+        setUrunler(katalog);
+        setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
+      })
+      .catch(() => {});
+    fetch(`${backendUrl}/api/kategoriler`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then(({ kategoriler: uzakKategoriler }) => {
+        if (Array.isArray(uzakKategoriler) && uzakKategoriler.length) {
+          setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
+        }
       })
       .catch(() => {});
   }, []);
 
   useEffect(() => {
     const katalogGuncelle = (uzakUrunler) => {
-      if (Array.isArray(uzakUrunler)) setUrunler(kataloguBirlestir(uzakUrunler));
+      if (!Array.isArray(uzakUrunler)) return;
+      const katalog = kataloguBirlestir(uzakUrunler);
+      setUrunler(katalog);
+      setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
+    };
+    const kategorilerGuncelle = (uzakKategoriler) => {
+      if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
     };
     socket.on("urunler-guncellendi", katalogGuncelle);
-    return () => socket.off("urunler-guncellendi", katalogGuncelle);
+    socket.on("kategoriler-guncellendi", kategorilerGuncelle);
+    return () => {
+      socket.off("urunler-guncellendi", katalogGuncelle);
+      socket.off("kategoriler-guncellendi", kategorilerGuncelle);
+    };
   }, []);
 
   // --- Giriş yapmış kullanıcı (auth) ---
@@ -108,10 +168,8 @@ export function AppProvider({ children }) {
     setKullanici(null);
     setPuan(0);
     setAvatar(null);
-    // Ekrandaki kişisel veriyi temizle; hesaba ait geçmiş kendi anahtarında ve backend'de korunur.
     setSiparislerim([]);
-    localStorage.removeItem("bp_hediyeler");
-    setHediyeler([]);
+    setSadakat({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
   };
 
   // Profil güncelle (email + telefon). Başarılıysa kullanıcı state'ini tazeler.
@@ -269,132 +327,60 @@ export function AppProvider({ children }) {
   // Son ödemenin özeti (onay ekranı bunu gösterir)
   const [sonOdeme, setSonOdeme] = useState(null);
 
-  // --- Siparişlerim (hesaba bağlı kalıcı liste) ---
-  // Giriş yapan kullanıcıda backend esas kaynaktır; hesap başına ayrı local kopya ağ kesintisine karşı tutulur.
-  const siparisDepoAnahtari = kullanici?.id ? `bp_siparislerim_hesap_${kullanici.id}` : "bp_siparislerim_misafir";
+  // --- Siparişlerim ve sadakat ---
+  // Bu iki kayıt için tek doğruluk kaynağı backend'dir. Tarayıcı yalnızca gösterir.
   const [siparislerim, setSiparislerim] = useState([]);
 
-  useEffect(() => {
-    if (!authYuklendi) return;
-    let iptal = false;
-    let yerel = [];
-    try { yerel = JSON.parse(localStorage.getItem(siparisDepoAnahtari) || "[]"); }
-    catch { yerel = []; }
-    setSiparislerim(yerel);
-    if (!kullanici?.id) return () => { iptal = true; };
-    siparisGecmisiniGetir()
-      .then((siparisler) => {
-        if (iptal) return;
-        setSiparislerim(siparisler);
-        localStorage.setItem(siparisDepoAnahtari, JSON.stringify(siparisler));
-      })
-      .catch(() => {});
-    return () => { iptal = true; };
-  }, [authYuklendi, kullanici?.id, siparisDepoAnahtari]);
-
-  const siparisEkle = (siparis) => {
-    setSiparislerim((o) => {
-      const yeni = [siparis, ...o.filter((mevcut) => mevcut.siparisNo !== siparis.siparisNo)];
-      localStorage.setItem(siparisDepoAnahtari, JSON.stringify(yeni));
-      return yeni;
-    });
-    if (kullanici?.id) siparisiHesabaKaydet(siparis).catch(() => {});
-  };
-
-  // Masa kapatıldığında o masanın siparişlerini "tamamlandı" işaretle.
-  // Böylece aktif sipariş ekranından düşer, geçmişte "ödeme tamamlandı" kalır.
-  const masaSiparisleriniTamamla = useCallback((masaNo) => {
-    setSiparislerim((o) => {
-      const yeni = o.map((s) =>
-        s.tip === "masa" && String(s.masaNo) === String(masaNo)
-          ? { ...s, tamamlandi: true, kapanmaTarihi: new Date().toISOString() }
-          : s
-      );
-      localStorage.setItem(siparisDepoAnahtari, JSON.stringify(yeni));
-      return yeni;
-    });
-  }, [siparisDepoAnahtari]);
-
-  // --- Burger damga sayacı (5 al 1 bedava) ---
-  // Siparişlerden toplam burger adedini sayar. Her 5'te bir hediye kazanılır,
-  // sayaç 0'dan tekrar başlar (kalan = toplam % 5).
-  const DAMGA_HEDEF = 5;
-  const toplamBurger = siparislerim.reduce((toplam, s) => {
-    const burgerAdet = (s.urunler || [])
-      .filter((u) => u.kategori === "Burgerler")
-      .reduce((t, u) => t + (u.adet || 1), 0); // adet alanı yoksa bile en az 1 say
-    return toplam + burgerAdet;
-  }, 0);
-  const burgerDamga = toplamBurger % DAMGA_HEDEF;
-  const kazanilanHediye = Math.floor(toplamBurger / DAMGA_HEDEF);
-
-  // --- Hediye envanteri (Ye Kazan + puanla alınan ödüller) ---
-  // localStorage'da kalıcı — tarayıcı kapansa bile korunur.
-  const [hediyeler, setHediyeler] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("bp_hediyeler") || "[]"); }
-    catch { return []; }
-  });
-  const hediyeEkle = (hediye) => {
-    setHediyeler((o) => {
-      const yeni = [hediye, ...o];
-      localStorage.setItem("bp_hediyeler", JSON.stringify(yeni));
-      return yeni;
-    });
-  };
-  const hediyeKullan = (id) => {
-    setHediyeler((o) => {
-      const yeni = o.map((h) => (h.id === id ? { ...h, kullanildi: true } : h));
-      localStorage.setItem("bp_hediyeler", JSON.stringify(yeni));
-      return yeni;
-    });
-  };
-
-  // kazanilanHediye arttıkça (her 5 burgerde bir) otomatik hediye ekle.
-  // useRef: yalnızca artışta tetiklensin, her render'da değil.
-  const oncekiKazanilanHediye = useRef(kazanilanHediye);
-  useEffect(() => {
-    const fark = kazanilanHediye - oncekiKazanilanHediye.current;
-    for (let i = 0; i < fark; i++) {
-      hediyeEkle({
-        id: Date.now() + i,
-        ad: "Bedava Burger (Ye Kazan)",
-        tip: "ye-kazan",
-        tarih: new Date().toISOString(),
-        kullanildi: false,
-      });
+  const siparisleriYenile = useCallback(async () => {
+    if (!kullanici?.id) {
+      setSiparislerim([]);
+      return [];
     }
-    oncekiKazanilanHediye.current = kazanilanHediye;
-  }, [kazanilanHediye]);
+    const liste = await siparisGecmisiniGetir();
+    setSiparislerim(liste);
+    return liste;
+  }, [kullanici?.id]);
 
-  // Puanla ödül satın alma (Rewards ekranındaki "+" butonu çağırır).
-  const odulSatinAl = (odul) => {
-    if (puan < odul.puan) return { basarili: false };
-    const yeniPuan = puan - odul.puan;
-    setPuan(yeniPuan);
-    if (kullanici) puaniGuncelle(yeniPuan);
-    hediyeEkle({
-      id: Date.now(),
-      ad: odul.ad,
-      tip: "puan",
-      puan: odul.puan,
-      gorsel: odul.gorsel || null,
-      tarih: new Date().toISOString(),
-      kullanildi: false,
-    });
+  const sadakatiYenile = useCallback(async () => {
+    if (!kullanici?.id) return null;
+    const guncel = await sadakatOzetiniGetir();
+    setSadakat(guncel);
+    setPuan(guncel.puan);
+    return guncel;
+  }, [kullanici?.id]);
+
+  useEffect(() => {
+    if (!authYuklendi || !kullanici?.id) {
+      setSiparislerim([]);
+      return;
+    }
+    siparisleriYenile().catch(() => {});
+    sadakatiYenile().catch(() => {});
+  }, [authYuklendi, kullanici?.id, siparisleriYenile, sadakatiYenile]);
+
+  const masaSiparisleriniTamamla = useCallback(() => {
+    siparisleriYenile().catch(() => {});
+  }, [siparisleriYenile]);
+
+  const odulSatinAl = async (odul) => {
+    const istekAnahtari = crypto.randomUUID();
+    const guncel = await puanlaOdulSatinAl(odul.id, istekAnahtari);
+    setSadakat(guncel);
+    setPuan(guncel.puan);
     return { basarili: true };
   };
 
-  // Hediyeyi sepete 0₺ olarak ekler — indirim/birleştirme mantığından muaf,
-  // kendi bağımsız satırı olarak girer.
-  const hediyeSepeteEkle = (hediye) => {
-    const sepetAnahtari = `hediye-${hediye.id}-${Date.now()}`;
-    setSepet((onceki) => [...onceki, {
-      id: hediye.id, ad: hediye.ad, fiyat: 0, adet: 1,
-      gorsel: hediye.gorsel || null, kategori: hediye.kategori || null, hediyeMi: true,
-      sepetAnahtari,
-    }]);
-    hediyeKullan(hediye.id);
+  const hediyeKullan = async (hediye) => {
+    const sonuc = await kullaniciHediyesiniKullan(hediye.id, aktifMasa);
+    setSadakat(sonuc.sadakat);
+    setPuan(sonuc.sadakat.puan);
+    await siparisleriYenile();
+    return sonuc.odeme;
   };
+
+  const burgerDamga = Number(sadakat.burgerDamga || 0);
+  const DAMGA_HEDEF = Number(sadakat.burgerDamgaHedef || 5);
+  const hediyeler = sadakat.hediyeler || [];
 
   // Masa kapatıldı bildirimini dinle (salon personeli kapatınca gelir).
   // O masanın siparişleri "tamamlandı" olur, masa bağlantısı temizlenir.
@@ -423,18 +409,13 @@ export function AppProvider({ children }) {
     setSonOdeme(ozet);
     if (Number.isFinite(onayliOdeme.guncelPuan)) setPuan(onayliOdeme.guncelPuan);
 
-    siparisEkle({
-      id: onayliOdeme.siparisNo,
-      siparisNo: onayliOdeme.siparisNo,
-      masaNo: onayliOdeme.masaNo || null,
-      tip: onayliOdeme.tip,
-      urunler: onayliOdeme.urunler,
-      tutar: onayliOdeme.tutar,
-      kazanilanPuan: onayliOdeme.kazanilanPuan,
-      misafir,
-      durum: "hazirlaniyor",
-      tarih: ozet.tarih,
-    });
+    if (Number.isFinite(onayliOdeme.burgerDamga)) {
+      setSadakat((onceki) => ({ ...onceki, burgerDamga: onayliOdeme.burgerDamga }));
+    }
+    if (kullanici?.id) {
+      siparisleriYenile().catch(() => {});
+      sadakatiYenile().catch(() => {});
+    }
     sepetiBosalt();
     setAktifMasa(null);
     return ozet;
@@ -442,7 +423,6 @@ export function AppProvider({ children }) {
 
   const deger = {
     puan,
-    setPuan,
     // auth
     kullanici,
     avatar,
@@ -458,6 +438,7 @@ export function AppProvider({ children }) {
     indirimliFiyat,
     // Backend tarafından yönetilen dinamik ürün kataloğu
     urunler,
+    kategoriler: menuKategorileri,
     // sepet (yerel/kişisel)
     sepet: aktifSepet,
     sepeteEkle,
@@ -472,14 +453,15 @@ export function AppProvider({ children }) {
     odemeyiTamamla,
     // siparişlerim (kalıcı liste)
     siparislerim,
+    siparisleriYenile,
     // burger damga sayacı (5 al 1 bedava)
     burgerDamga,
     burgerDamgaHedef: DAMGA_HEDEF,
-    toplamBurger,
-    kazanilanHediye,
     // hediye envanteri (Ye Kazan + puanla alınan ödüller)
     hediyeler,
-    hediyeSepeteEkle,
+    oduller: sadakat.oduller || [],
+    puanGecmisi: sadakat.puanGecmisi || [],
+    hediyeKullan,
     odulSatinAl,
     // masa özeti (canlı, masadaki herkesin siparişi)
     masaOzeti,

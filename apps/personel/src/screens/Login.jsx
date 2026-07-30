@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-import { adminGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import { adminGiris, personelGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import logoFull from "../../../musteri/src/assets/logo-full.png";
 import "./Login.css";
-
-// Rol şifreleri. Gerçek üründe backend'de doğrulanmalı; şimdilik istemcide.
-const SIFRELER = {
-  mutfak: "1234",
-  salon: "5678",
-};
 
 export default function Login({ onGirisBasarili }) {
   const [rol, setRol] = useState("mutfak");
@@ -25,24 +19,18 @@ export default function Login({ onGirisBasarili }) {
 
   const gonder = async (e) => {
     e.preventDefault();
-    if (rol === "admin") {
-      setYukleniyor(true);
-      try {
-        await adminGiris(email, sifre);
-        onGirisBasarili("admin");
-      } catch (err) {
-        setHata(err.message);
-        setAdminKurulumGoster(true);
-      } finally {
-        setYukleniyor(false);
-      }
-      return;
-    }
-    if (sifre === SIFRELER[rol]) {
+    setYukleniyor(true);
+    setHata("");
+    try {
+      if (rol === "admin") await adminGiris(email, sifre);
+      else await personelGiris(email, sifre, rol);
       onGirisBasarili(rol);
-    } else {
-      setHata("Şifre yanlış");
+    } catch (err) {
+      setHata(err.message);
       setSifre("");
+      if (rol === "admin") setAdminKurulumGoster(true);
+    } finally {
+      setYukleniyor(false);
     }
   };
 
@@ -92,19 +80,17 @@ export default function Login({ onGirisBasarili }) {
           </button>
         </div>
 
-        {rol === "admin" && (
-          <>
-            <label className="login-etiket">Yönetici E-postası</label>
+        <>
+            <label className="login-etiket">E-posta</label>
             <input
               type="email"
               className="login-input login-input--email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setHata(""); }}
               autoFocus
-              placeholder="admin@burgerplus.com"
+              placeholder={rol === "admin" ? "admin@burgerplus.com" : "personel@burgerplus.com"}
             />
-          </>
-        )}
+        </>
         <label className="login-etiket">
           {rol === "mutfak" ? "Mutfak Şifresi" : rol === "salon" ? "Salon Şifresi" : "Yönetici Şifresi"}
         </label>
@@ -123,7 +109,7 @@ export default function Login({ onGirisBasarili }) {
         </div>
         {hata && <p className="login-hata">{hata}</p>}
 
-        <button type="submit" className="login-btn" disabled={!sifre || (rol === "admin" && !email) || yukleniyor}>
+        <button type="submit" className="login-btn" disabled={!sifre || !email || yukleniyor}>
           {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}
         </button>
         {rol === "admin" && adminKurulumGoster && (

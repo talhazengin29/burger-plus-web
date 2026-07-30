@@ -72,7 +72,13 @@ function SiparisKart({ s, durum, gecmis }) {
 
 export default function Orders() {
   const git = useNavigate();
-  const { siparislerim, masaDurumu, ozetMasaNo } = useApp();
+  const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo } = useApp();
+
+  useEffect(() => {
+    siparisleriYenile().catch(() => {});
+    const zamanlayici = setInterval(() => siparisleriYenile().catch(() => {}), 5000);
+    return () => clearInterval(zamanlayici);
+  }, [siparisleriYenile]);
 
   // Yedek: socket kopmuş olabilir. Masaların durumunu sunucudan da sorguluyoruz.
   const [masaDurumlari, setMasaDurumlari] = useState({});

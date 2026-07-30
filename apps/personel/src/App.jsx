@@ -4,6 +4,7 @@ import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
 import { adminToken } from "./lib/adminApi";
+import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import "./App.css";
 
 /*
@@ -24,9 +25,10 @@ export default function App() {
 
   useEffect(() => {
     const kayitli = sessionStorage.getItem(OTURUM);
-    if (kayitli && (kayitli !== "admin" || adminToken.al())) {
+    if (kayitli && adminToken.al()) {
       setRol(kayitli);
       setAktifSekme(kayitli);
+      personelSocketiniBagla();
     }
     const kayitliTema = localStorage.getItem(TEMA_ANAHTARI);
     if (kayitliTema) setTema(kayitliTema);
@@ -44,11 +46,13 @@ export default function App() {
     sessionStorage.setItem(OTURUM, girenRol);
     setRol(girenRol);
     setAktifSekme(girenRol);
+    personelSocketiniBagla();
   };
 
   const cikis = () => {
     sessionStorage.removeItem(OTURUM);
     adminToken.sil();
+    personelSocketiniKes();
     setRol(null);
   };
 
@@ -58,18 +62,22 @@ export default function App() {
   return (
     <div className="personel">
       <nav className="sekme-bar">
+        {(rol === "mutfak" || rol === "admin") && (
         <button
           className={"sekme " + (aktifSekme === "mutfak" ? "sekme--aktif" : "")}
           onClick={() => setAktifSekme("mutfak")}
         >
           🍳 Mutfak
         </button>
+        )}
+        {(rol === "salon" || rol === "admin") && (
         <button
           className={"sekme " + (aktifSekme === "salon" ? "sekme--aktif" : "")}
           onClick={() => setAktifSekme("salon")}
         >
           🍽️ Salon
         </button>
+        )}
         <button className="sekme-tema" onClick={temaDegistir} title="Tema değiştir">
           {tema === "koyu" ? "☀️" : "🌙"}
         </button>
