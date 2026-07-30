@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { usePerde } from "../hooks/usePerde";
 import "./TableWelcome.css";
 
 /*
@@ -15,6 +16,7 @@ export default function TableWelcome() {
   const [params] = useSearchParams();
   const masaNo = params.get("no");
   const { setAktifMasa, setMisafir } = useApp();
+  const { perdeIleGit } = usePerde();
 
   // Masa numarasını hemen kaydet
   useEffect(() => {
@@ -37,12 +39,12 @@ export default function TableWelcome() {
 
   const misafirDevam = () => {
     setMisafir(true);
-    git("/anasayfa");
+    perdeIleGit(() => git("/anasayfa"), "normal", `Masa ${masaNo}`);
   };
 
   const girisYap = () => {
     setMisafir(false); // daimi kullanıcı
-    git("/anasayfa");  // giriş şimdilik sahte: doğrudan menüye
+    perdeIleGit(() => git("/anasayfa"), "normal", `Masa ${masaNo}`);
   };
 
   return (

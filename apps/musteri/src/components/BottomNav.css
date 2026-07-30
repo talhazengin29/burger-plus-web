@@ -39,19 +39,18 @@
 }
 
 .nav-icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   width: 42px;
   height: 30px;
   border-radius: var(--r-full);
   transition: background 0.2s;
 }
 
-.nav-icon { width: 22px; height: 22px; }
+.nav-icon { width: 22px; height: 22px; display: block; flex: none; transform: translateX(1px); }
 
 /* Aktif sekme — turuncu ikon + turuncu alt çizgi */
-.nav-item--aktif { color: var(--primary-container); }
+.nav-item--aktif { color: var(--primary-container); transform: scale(1.11); animation: nav-sekme-secildi 280ms ease-out; }
 .nav-item--aktif .nav-icon-wrap {
   background: var(--primary-fixed);
   filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.5));
@@ -76,3 +75,13 @@
   cursor: not-allowed;
 }
 .nav-item--pasif .nav-icon { width: 22px; height: 22px; }
+
+@keyframes nav-sekme-secildi {
+  0% { transform: scale(0.96); }
+  65% { transform: scale(1.14); }
+  100% { transform: scale(1.11); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-item--aktif { animation: none; }
+}

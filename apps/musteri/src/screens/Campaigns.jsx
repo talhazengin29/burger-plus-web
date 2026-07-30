@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { kampanyalar, kampanyaDurumu } from "../data/mockData";
+import { kampanyaDurumu } from "../data/mockData";
 import { useApp } from "../context/AppContext";
 import { IconClock, IconInvite } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
@@ -22,7 +22,7 @@ const durumMetni = { aktif: "AKTİF", baslamadi: "BAŞLAMADI", sonaerdi: "SONA E
 
 export default function Campaigns() {
   const git = useNavigate();
-  const { misafir, kullanici } = useApp();
+  const { misafir, kullanici, kampanyalar } = useApp();
 
   // Saatli kampanyaların (Happy Hour) durumu canlı kalsın diye dakikada bir tazelenir.
   const [simdi, setSimdi] = useState(() => new Date());
@@ -88,13 +88,13 @@ export default function Campaigns() {
           <motion.div className="camp-liste" {...siraliKonteyner} initial="initial" animate="animate">
             {kampanyalar.map((k) => {
               const durum = kampanyaDurumu(k, simdi);
-              const siparisVerilebilir = k.buton === "Sipariş Ver";
-              const davetKampanyasi = k.etiket === "Davet Et";
+              const davetKampanyasi = k.kod === "davet-et" || k.etiket === "Davet Et";
+              const siparisVerilebilir = !davetKampanyasi;
               const pasif = siparisVerilebilir && durum !== "aktif";
               return (
                 <motion.article key={k.id} className="camp-kart" variants={siraliOge}>
                   <div className="camp-gorsel-wrap">
-                    <img className="camp-gorsel" src={k.gorsel} alt={k.baslik} />
+                    <img className="camp-gorsel" src={k.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=500&fit=crop"} alt={k.baslik} />
                     <span className="camp-rozet">
                       <EtiketIkon etiket={k.etiket} />
                       {k.etiket}

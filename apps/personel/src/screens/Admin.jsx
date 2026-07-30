@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { adminIstek, jsonGonder } from "../lib/adminApi";
+import logoFull from "../../../musteri/src/assets/logo-full.png";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
@@ -7,10 +8,14 @@ const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", temelMiktar: "", go
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
+const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
+const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
 
 const BOLUMLER = [
   ["genel", "Genel Bakış", "▦"],
   ["urunler", "Ürünler", "◆"],
+  ["kampanyalar", "Kampanyalar", "%"],
+  ["oduller", "Puan Marketi", "★"],
   ["duyurular", "Duyurular", "●"],
   ["personel", "Personel", "♟"],
   ["raporlar", "Satış Raporları", "↗"],
@@ -56,6 +61,8 @@ export default function Admin({ onCikis }) {
   const [kategoriler, setKategoriler] = useState([]);
   const [personeller, setPersoneller] = useState([]);
   const [duyurular, setDuyurular] = useState([]);
+  const [kampanyalar, setKampanyalar] = useState([]);
+  const [oduller, setOduller] = useState([]);
   const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
@@ -64,6 +71,8 @@ export default function Admin({ onCikis }) {
   const [kategoriForm, setKategoriForm] = useState(null);
   const [personelForm, setPersonelForm] = useState(null);
   const [duyuruForm, setDuyuruForm] = useState(null);
+  const [kampanyaForm, setKampanyaForm] = useState(null);
+  const [odulForm, setOdulForm] = useState(null);
 
   const verileriYukle = useCallback(async () => {
     setYukleniyor(true);
@@ -71,6 +80,7 @@ export default function Admin({ onCikis }) {
     const istekler = [
       ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
       ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
+      ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"],
     ];
     const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
     const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -82,7 +92,7 @@ export default function Admin({ onCikis }) {
       return;
     }
 
-    const [d, u, p, r, duy, k] = sonuclar.map((sonuc) =>
+    const [d, u, p, r, duy, k, kamp, od] = sonuclar.map((sonuc) =>
       sonuc.status === "fulfilled" ? sonuc.value : null
     );
     if (d) setDashboard(d);
@@ -92,6 +102,8 @@ export default function Admin({ onCikis }) {
     if (duy) setDuyurular(duy.duyurular || []);
     if (k) setKategoriler(k.kategoriler || []);
     else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
+    if (kamp) setKampanyalar(kamp.kampanyalar || []);
+    if (od) setOduller(od.oduller || []);
 
     const hatalar = sonuclar.flatMap((sonuc, index) =>
       sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -167,6 +179,25 @@ export default function Admin({ onCikis }) {
     if (await islem(() => adminIstek("/duyurular", jsonGonder("POST", duyuruForm)), "Duyuru yayınlandı.")) setDuyuruForm(null);
   };
 
+  const kampanyaKaydet = async (e) => {
+    e.preventDefault();
+    const veri = { ...kampanyaForm, indirimYuzde: Number(kampanyaForm.indirimYuzde), sira: Number(kampanyaForm.sira), baslangicSaat: Number(kampanyaForm.baslangicSaat), bitisSaat: Number(kampanyaForm.bitisSaat) };
+    if (await islem(() => adminIstek("/kampanyalar", jsonGonder("POST", veri)), "Kampanya uygulamaya kaydedildi.")) setKampanyaForm(null);
+  };
+
+  const odulKaydet = async (e) => {
+    e.preventDefault();
+    const veri = { ...odulForm, puan: Number(odulForm.puan), urunId: Number(odulForm.urunId) };
+    if (await islem(() => adminIstek("/oduller", jsonGonder("POST", veri)), "Puan marketi güncellendi.")) setOdulForm(null);
+  };
+
+  const kampanyaKategoriDegistir = (kategori) => setKampanyaForm((onceki) => ({
+    ...onceki,
+    gecerliKategoriler: onceki.gecerliKategoriler.includes(kategori)
+      ? onceki.gecerliKategoriler.filter((ad) => ad !== kategori)
+      : [...onceki.gecerliKategoriler, kategori],
+  }));
+
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
   const toplamUrun = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.adet), 0), [rapor]);
   const yogunSaat = useMemo(() => (rapor.saatlik || []).reduce((en, s) => s.adet > en.adet ? s : en, { saat: null, adet: 0 }), [rapor]);
@@ -174,7 +205,7 @@ export default function Admin({ onCikis }) {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-marka"><span>BP</span><div>Burger Plus<small>Yönetim Merkezi</small></div></div>
+        <div className="admin-marka"><img src={logoFull} alt="Burger Plus" /><small>Yönetim Merkezi</small></div>
         <nav>{BOLUMLER.map(([id, ad, ikon]) => (
           <button key={id} className={bolum === id ? "aktif" : ""} onClick={() => setBolum(id)}><b>{ikon}</b>{ad}</button>
         ))}</nav>
@@ -236,6 +267,41 @@ export default function Admin({ onCikis }) {
                   <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button className="tehlike" onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button></footer>
                 </article>
               ))}</div>
+            </>}
+
+            {bolum === "kampanyalar" && <>
+              <BolumBaslik baslik="Kampanya yönetimi" aciklama="Uygulamada görünen kampanyaları, geçerli kategorileri ve indirim saatlerini yönetin." buton="+ Yeni kampanya" onClick={() => setKampanyaForm({ ...BOS_KAMPANYA, gecerliKategoriler: [] })} />
+              <div className="yonetim-kart-grid">{kampanyalar.length ? kampanyalar.map((kampanya) => (
+                <article className={`yonetim-kart kampanya-yonetim-kart ${!kampanya.aktif ? "pasif" : ""}`} key={kampanya.id}>
+                  <div className="yonetim-kart-gorsel">
+                    {kampanya.gorsel ? <img src={kampanya.gorsel} alt="" /> : <span>%{kampanya.indirimYuzde}</span>}
+                    <b>{kampanya.aktif ? "YAYINDA" : "PASİF"}</b>
+                  </div>
+                  <div className="yonetim-kart-icerik">
+                    <small>{kampanya.etiket}</small><h3>{kampanya.baslik}</h3><p>{kampanya.aciklama}</p>
+                    <div className="yonetim-etiketler">
+                      {Number(kampanya.indirimYuzde) > 0 && <span>%{kampanya.indirimYuzde} indirim</span>}
+                      <span>{kampanya.kampanyaTipi === "saatli" ? `${String(kampanya.baslangicSaat).padStart(2, "0")}:00–${String(kampanya.bitisSaat).padStart(2, "0")}:00` : "Sürekli"}</span>
+                      {(kampanya.gecerliKategoriler || []).map((kategori) => <span key={kategori}>{kategori}</span>)}
+                    </div>
+                  </div>
+                  <footer><button type="button" onClick={() => setKampanyaForm({ ...kampanya, gecerliKategoriler: [...(kampanya.gecerliKategoriler || [])] })}>Düzenle</button></footer>
+                </article>
+              )) : <Bos yazi="Henüz kampanya tanımlanmamış." />}</div>
+            </>}
+
+            {bolum === "oduller" && <>
+              <BolumBaslik baslik="Puan marketi" aciklama="Müşterilerin puanlarıyla alabileceği ürünleri ve gerekli puan tutarını belirleyin." buton="+ Yeni ödül" onClick={() => setOdulForm({ ...BOS_ODUL, urunId: urunler.find((urun) => urun.aktif)?.id || urunler[0]?.id || "" })} />
+              <div className="yonetim-kart-grid">{oduller.length ? oduller.map((odul) => (
+                <article className={`yonetim-kart odul-yonetim-kart ${!odul.aktif ? "pasif" : ""}`} key={odul.id}>
+                  <div className="yonetim-kart-gorsel">
+                    {odul.gorsel ? <img src={odul.gorsel} alt="" /> : <span>★</span>}
+                    <b>{odul.aktif ? "MARKETTE" : "PASİF"}</b>
+                  </div>
+                  <div className="yonetim-kart-icerik"><small>PUAN ÖDÜLÜ</small><h3>{odul.ad}</h3><strong>{Number(odul.puan).toLocaleString("tr-TR")} Puan</strong><p>Bağlı ürün: {odul.urunAd}</p><div className="yonetim-etiketler"><span>{odul.kazanilmaSayisi} kez kazanıldı</span></div></div>
+                  <footer><button type="button" onClick={() => setOdulForm({ ...odul })}>Düzenle</button></footer>
+                </article>
+              )) : <Bos yazi="Puan marketinde henüz ödül yok." />}</div>
             </>}
 
             {bolum === "duyurular" && <>
@@ -326,6 +392,33 @@ export default function Admin({ onCikis }) {
             <Alan etiket="Kategori görsel URL"><input required type="url" maxLength="1000" value={kategoriForm.gorsel || ""} onChange={(e) => setKategoriForm({ ...kategoriForm, gorsel: e.target.value })} placeholder="https://..." /></Alan>
             <Alan etiket="Menü sırası"><input required type="number" min="0" max="999" step="1" value={kategoriForm.sira} onChange={(e) => setKategoriForm({ ...kategoriForm, sira: e.target.value })} /></Alan>
             <FormAlt kapat={() => setKategoriForm(null)} />
+          </form>
+        </Modal>
+      )}
+      {kampanyaForm && (
+        <Modal baslik={kampanyaForm.id ? "Kampanyayı düzenle" : "Yeni kampanya"} aciklama="Kaydettiğiniz değişiklikler müşteri uygulamasına anında yansır." sinif="admin-modal--yonetim" kapat={() => setKampanyaForm(null)}>
+          <form className="admin-form" onSubmit={kampanyaKaydet}>
+            <Ikili><Alan etiket="Kısa etiket"><input required maxLength="80" value={kampanyaForm.etiket} onChange={(e) => setKampanyaForm({ ...kampanyaForm, etiket: e.target.value })} placeholder="Örn. HAFTA SONU" /></Alan><Alan etiket="Kampanya başlığı"><input required maxLength="120" value={kampanyaForm.baslik} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslik: e.target.value })} /></Alan></Ikili>
+            <Alan etiket="Açıklama"><textarea required maxLength="600" value={kampanyaForm.aciklama} onChange={(e) => setKampanyaForm({ ...kampanyaForm, aciklama: e.target.value })} /></Alan>
+            <Alan etiket="Kampanya görsel URL"><input type="url" maxLength="1000" value={kampanyaForm.gorsel || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, gorsel: e.target.value })} placeholder="https://... (isteğe bağlı)" /></Alan>
+            <Ikili><Alan etiket="Kampanya türü"><select value={kampanyaForm.kampanyaTipi} onChange={(e) => setKampanyaForm({ ...kampanyaForm, kampanyaTipi: e.target.value })}><option value="surekli">Sürekli</option><option value="saatli">Saat aralığı</option></select></Alan><Alan etiket="İndirim oranı (%)"><input required type="number" min="0" max="90" step="1" value={kampanyaForm.indirimYuzde} onChange={(e) => setKampanyaForm({ ...kampanyaForm, indirimYuzde: e.target.value })} /></Alan></Ikili>
+            {kampanyaForm.kampanyaTipi === "saatli" && <Ikili><Alan etiket="Başlangıç saati"><input required type="number" min="0" max="23" step="1" value={kampanyaForm.baslangicSaat} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslangicSaat: e.target.value })} /></Alan><Alan etiket="Bitiş saati"><input required type="number" min="1" max="24" step="1" value={kampanyaForm.bitisSaat} onChange={(e) => setKampanyaForm({ ...kampanyaForm, bitisSaat: e.target.value })} /></Alan></Ikili>}
+            <fieldset className="kampanya-kategori-secimi"><legend>İndirimin geçerli olduğu kategoriler</legend><p>İndirim oranı sıfırdan büyükse en az bir kategori seçin.</p><div>{kategoriler.filter((kategori) => kategori.aktif !== false).map((kategori) => <label key={kategori.id}><input type="checkbox" checked={(kampanyaForm.gecerliKategoriler || []).includes(kategori.ad)} onChange={() => kampanyaKategoriDegistir(kategori.ad)} /><span>{kategori.ad}</span></label>)}</div></fieldset>
+            <Ikili><Alan etiket="Buton metni"><input required maxLength="60" value={kampanyaForm.buton} onChange={(e) => setKampanyaForm({ ...kampanyaForm, buton: e.target.value })} /></Alan><Alan etiket="Buton görünümü"><select value={kampanyaForm.butonTipi} onChange={(e) => setKampanyaForm({ ...kampanyaForm, butonTipi: e.target.value })}><option value="primary">Turuncu</option><option value="charcoal">Koyu</option></select></Alan></Ikili>
+            <Ikili><Alan etiket="Gösterim sırası"><input required type="number" min="0" max="999" step="1" value={kampanyaForm.sira} onChange={(e) => setKampanyaForm({ ...kampanyaForm, sira: e.target.value })} /></Alan><label className="yonetim-aktiflik"><input type="checkbox" checked={kampanyaForm.aktif === true} onChange={(e) => setKampanyaForm({ ...kampanyaForm, aktif: e.target.checked })} /><span>Uygulamada yayınla</span></label></Ikili>
+            <FormAlt kapat={() => setKampanyaForm(null)} />
+          </form>
+        </Modal>
+      )}
+      {odulForm && (
+        <Modal baslik={odulForm.id ? "Ödülü düzenle" : "Yeni puan ödülü"} aciklama="Ödül, seçilen gerçek menü ürünüyle eşleşir; fiyat ve sipariş güvenliği backend tarafından korunur." sinif="admin-modal--yonetim" kapat={() => setOdulForm(null)}>
+          <form className="admin-form" onSubmit={odulKaydet}>
+            <Alan etiket="Markette görünen ad"><input required maxLength="120" value={odulForm.ad} onChange={(e) => setOdulForm({ ...odulForm, ad: e.target.value })} placeholder="Örn. Seçili Burger" /></Alan>
+            <Ikili><Alan etiket="Gerekli puan"><input required type="number" min="1" max="1000000" step="1" value={odulForm.puan} onChange={(e) => setOdulForm({ ...odulForm, puan: e.target.value })} /></Alan><Alan etiket="Verilecek ürün"><select required value={odulForm.urunId} onChange={(e) => setOdulForm({ ...odulForm, urunId: e.target.value })}>{urunler.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}{!urun.aktif ? " (pasif ürün)" : ""}</option>)}</select></Alan></Ikili>
+            {Number(odulForm.kazanilmaSayisi) > 0 && <p className="yonetim-uyari">Bu ödül daha önce {odulForm.kazanilmaSayisi} kez kazanılmış. Geçmiş siparişleri korumak için bağlı ürünü değiştirmek isterseniz yeni ödül oluşturun.</p>}
+            <Alan etiket="Ödül görsel URL"><input type="url" maxLength="1000" value={odulForm.gorsel || ""} onChange={(e) => setOdulForm({ ...odulForm, gorsel: e.target.value })} placeholder="Boşsa ürün görseli kullanılır" /></Alan>
+            <label className="yonetim-aktiflik"><input type="checkbox" checked={odulForm.aktif === true} onChange={(e) => setOdulForm({ ...odulForm, aktif: e.target.checked })} /><span>Puan marketinde yayınla</span></label>
+            <FormAlt kapat={() => setOdulForm(null)} />
           </form>
         </Modal>
       )}

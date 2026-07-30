@@ -5,12 +5,14 @@ import { useApp } from "../context/AppContext";
 import { girisYap, tokeniKaydet } from "../lib/authApi";
 import { IconEye, IconEyeOff } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama";
+import { usePerde } from "../hooks/usePerde";
 import logoFull from "../assets/logo-full.png";
 import "./Login.css";
 
 export default function Login() {
   const git = useNavigate();
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
+  const { perdeAktif, perdeIleGit } = usePerde();
   const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
   const [sifreGorunur, setSifreGorunur] = useState(false);
@@ -21,8 +23,8 @@ export default function Login() {
 
   // Zaten giriş yapılmışsa ana sayfaya yönlendir (F5 sonrası oturum korunur)
   useEffect(() => {
-    if (authYuklendi && kullanici) git("/anasayfa", { replace: true });
-  }, [authYuklendi, kullanici, git]);
+    if (authYuklendi && kullanici && !perdeAktif) git("/anasayfa", { replace: true });
+  }, [authYuklendi, kullanici, perdeAktif, git]);
 
   const gonder = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ export default function Login() {
       } else {
         tokeniKaydet(sonuc.token, beniHatirla);
         girisiTamamla(sonuc.kullanici);
-        git("/anasayfa");
+        perdeIleGit(() => git("/anasayfa"), "normal");
       }
     } catch {
       setHata("Sunucuya ulaşılamadı. Backend çalışıyor mu?");
@@ -146,7 +148,7 @@ export default function Login() {
 
       <motion.button
         className="login-misafir-link"
-        onClick={() => { setMisafir(true); git("/anasayfa"); }}
+        onClick={() => { setMisafir(true); perdeIleGit(() => git("/anasayfa"), "normal"); }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
 import { odemeSonucunuGetir } from "../lib/authApi";
+import { usePerde } from "../hooks/usePerde";
 import "./PaymentSuccess.css";
 
 export default function PaymentSuccess() {
@@ -10,6 +11,7 @@ export default function PaymentSuccess() {
   const [params] = useSearchParams();
   const odemeId = params.get("odeme");
   const { sonOdeme, puan, odemeyiTamamla } = useApp();
+  const { perdeIleGit } = usePerde();
   const [yukleniyor, setYukleniyor] = useState(!!odemeId);
   const [hata, setHata] = useState(params.get("odemeHatasi") || "");
 
@@ -21,6 +23,7 @@ export default function PaymentSuccess() {
         if (iptal) return;
         if (odeme.durum !== "basarili") throw new Error("Ödeme henüz onaylanmadı.");
         odemeyiTamamla(odeme);
+        perdeIleGit(() => {}, "kutlama", "Siparişin Alındı 🎉");
       })
       .catch((e) => { if (!iptal) setHata(e.message || "Ödeme sonucu alınamadı."); })
       .finally(() => { if (!iptal) setYukleniyor(false); });

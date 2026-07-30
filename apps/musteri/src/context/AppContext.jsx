@@ -5,7 +5,7 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import {
-  kampanyalar,
+  kampanyalar as varsayilanKampanyalar,
   kampanyaAktifMi,
   kategoriler as varsayilanKategoriAdlari,
   kategoriGorseller,
@@ -69,6 +69,7 @@ export function AppProvider({ children }) {
   const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
   const [urunler, setUrunler] = useState(varsayilanUrunler);
   const [menuKategorileri, setMenuKategorileri] = useState(varsayilanKategoriler);
+  const [kampanyalar, setKampanyalar] = useState(varsayilanKampanyalar);
 
   // Backend kataloğu varsa onu kullan; sunucu kapalıyken mevcut menü çalışmaya devam eder.
   useEffect(() => {
@@ -90,6 +91,12 @@ export function AppProvider({ children }) {
         }
       })
       .catch(() => {});
+    fetch(`${backendUrl}/api/kampanyalar`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then(({ kampanyalar: uzakKampanyalar }) => {
+        if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -102,11 +109,16 @@ export function AppProvider({ children }) {
     const kategorilerGuncelle = (uzakKategoriler) => {
       if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
     };
+    const kampanyalarGuncelle = (uzakKampanyalar) => {
+      if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
+    };
     socket.on("urunler-guncellendi", katalogGuncelle);
     socket.on("kategoriler-guncellendi", kategorilerGuncelle);
+    socket.on("kampanyalar-guncellendi", kampanyalarGuncelle);
     return () => {
       socket.off("urunler-guncellendi", katalogGuncelle);
       socket.off("kategoriler-guncellendi", kategorilerGuncelle);
+      socket.off("kampanyalar-guncellendi", kampanyalarGuncelle);
     };
   }, []);
 
@@ -259,14 +271,16 @@ export function AppProvider({ children }) {
   }, []);
   const aktifKampanyalar = useMemo(
     () => kampanyalar.filter((k) => kampanyaAktifMi(k, kampanyaSaati)),
-    [kampanyaSaati]
+    [kampanyalar, kampanyaSaati]
   );
   // Ürünün kategorisine uygulanan aktif kampanya varsa indirimli fiyatı döner.
   // Kampanya indirimleri sadece giriş yapmış (üye) kullanıcılar içindir — misafir
   // kampanyayı görebilir ama fiyat indirimi/otomatik uygulama misafire yapılmaz.
   const indirimliFiyat = (urun) => {
     if (!kullanici) return null;
-    const k = aktifKampanyalar.find((kk) => kk.gecerliKategoriler?.includes(urun.kategori));
+    const k = aktifKampanyalar
+      .filter((kk) => kk.gecerliKategoriler?.includes(urun.kategori) && Number(kk.indirimYuzde) > 0)
+      .sort((a, b) => Number(b.indirimYuzde) - Number(a.indirimYuzde))[0];
     if (!k) return null;
     return {
       kampanya: k,
@@ -348,6 +362,12 @@ export function AppProvider({ children }) {
     setPuan(guncel.puan);
     return guncel;
   }, [kullanici?.id]);
+
+  useEffect(() => {
+    const odulleriYenile = () => sadakatiYenile().catch(() => {});
+    socket.on("oduller-guncellendi", odulleriYenile);
+    return () => socket.off("oduller-guncellendi", odulleriYenile);
+  }, [sadakatiYenile]);
 
   useEffect(() => {
     if (!authYuklendi || !kullanici?.id) {
@@ -435,6 +455,7 @@ export function AppProvider({ children }) {
     kullaniciyiYenile,
     // kampanyalar (saatli/sürekli indirimler)
     aktifKampanyalar,
+    kampanyalar,
     indirimliFiyat,
     // Backend tarafından yönetilen dinamik ürün kataloğu
     urunler,

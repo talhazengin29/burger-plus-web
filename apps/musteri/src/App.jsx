@@ -20,6 +20,7 @@ import Hediyelerim from "./screens/Hediyelerim";
 import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { Navigate } from "react-router-dom";
+import { PerdeSaglayici } from "./hooks/usePerde";
 import "./App.css";
 
 // Alt menünün gösterileceği ekranlar. Giriş, sepet, ödeme akışında alt menü olmaz.
@@ -70,7 +71,9 @@ export default function App() {
   return (
     <AppProvider>
       <BrowserRouter>
-        <Icerik />
+        <PerdeSaglayici>
+          <Icerik />
+        </PerdeSaglayici>
       </BrowserRouter>
     </AppProvider>
   );
