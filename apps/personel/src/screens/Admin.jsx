@@ -10,7 +10,7 @@ const BOS_BOYUTLAR = (birim = "gr") => [
   { kod: "buyuk", etiket: "Büyük Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
 ];
 const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
+const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -56,6 +56,8 @@ const gramajVarsayilani = (urun) => {
 const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], menuYapisi: { ...BOS_MENU } });
 const urunuFormaCevir = (urun) => ({
   ...urun,
+  populer: urun.populer === true,
+  onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
   malzemeler: (urun.malzemeler || []).join(", "),
   alerjenler: (urun.alerjenler || []).join(", "),
   gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
@@ -164,6 +166,8 @@ export default function Admin({ onCikis }) {
         yanLezzetUrunId: Number(urunForm.menuYapisi.yanLezzetUrunId),
         icecekUrunId: Number(urunForm.menuYapisi.icecekUrunId),
       } : null,
+      populer: urunForm.populer === true,
+      onerilenUrunler: [...new Set((urunForm.onerilenUrunler || []).map(Number).filter(Number.isInteger))].slice(0, 5),
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
@@ -278,6 +282,7 @@ export default function Admin({ onCikis }) {
   const burgerUrunleri = urunler.filter((urun) => urun.urunTipi === "burger" && urun.aktif);
   const yanLezzetUrunleri = urunler.filter((urun) => urun.urunTipi === "yan_lezzet" && urun.aktif);
   const icecekUrunleri = urunler.filter((urun) => urun.urunTipi === "icecek" && urun.aktif);
+  const onerilebilecekUrunler = urunler.filter((urun) => urun.aktif && String(urun.id) !== String(urunForm?.id || ""));
 
   return (
     <div className="admin-shell">
@@ -435,6 +440,21 @@ export default function Admin({ onCikis }) {
               <Alan etiket="Ürün türü"><select value={urunForm.urunTipi} onChange={(e) => urunTipiniDegistir(e.target.value)}>{Object.entries(TIP_ETIKETLERI).map(([tip, etiket]) => <option key={tip} value={tip}>{etiket}</option>)}</select></Alan>
               <Alan etiket="Başlangıç fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
             </Ikili>
+
+            <section className={`urun-vitrin-kart ${urunForm.populer ? "aktif" : ""}`}>
+              <header>
+                <div><b>Popüler ürün vitrini</b><small>Açıksa müşteri ana sayfasında bu kategorinin popüler ürünleri arasında gösterilir.</small></div>
+                <label className="admin-switch"><input type="checkbox" checked={urunForm.populer === true} onChange={(e) => setUrunForm({ ...urunForm, populer: e.target.checked })} /><span /></label>
+              </header>
+            </section>
+
+            <section className="urun-oneri-editoru">
+              <header><div><b>Bu ürünle önerilecekler</b><small>Sepette ve ürün detayında gösterilir. En fazla 5 aktif ürün seçebilirsin.</small></div><strong>{urunForm.onerilenUrunler?.length || 0}/5</strong></header>
+              <select multiple value={(urunForm.onerilenUrunler || []).map(String)} onChange={(e) => setUrunForm({ ...urunForm, onerilenUrunler: Array.from(e.target.selectedOptions).map((secenek) => Number(secenek.value)).slice(0, 5) })} aria-label="Önerilen ürünler">
+                {onerilebilecekUrunler.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad} · {para(urun.fiyat)}</option>)}
+              </select>
+              {!onerilebilecekUrunler.length && <p>Öneri eklemek için önce başka bir aktif ürün oluşturmalısın.</p>}
+            </section>
 
             {urunForm.urunTipi === "burger" && <Alan etiket="Standart burger gramajı"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>}
 

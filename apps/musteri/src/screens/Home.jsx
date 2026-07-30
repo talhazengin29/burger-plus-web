@@ -54,8 +54,8 @@ export default function Home() {
   }, [aktifKategori, arama, siralama, urunler]);
 
   const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
-  const populerUrunler = gosterilen.slice(0, 4);
-  const digerUrunler = gosterilen.slice(4);
+  const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
+  const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
 
   return (
@@ -201,12 +201,12 @@ export default function Home() {
         </motion.div>
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
-        {gosterilen.length > 0 && <div className="bolum-satir">
+        {populerUrunler.length > 0 && <div className="bolum-satir">
           <h3 className="bolum-baslik">Popüler {kategoriBasligi}</h3>
         </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
-        {gosterilen.length > 0 && <AnimatePresence mode="wait">
+        {populerUrunler.length > 0 && <AnimatePresence mode="wait">
           <motion.div
             className="populer-urun-listesi"
             key={`populer-${aktifKategori}-${siralama}-${arama}`}

@@ -39,6 +39,9 @@
 
 .cart-liste { display: flex; flex-direction: column; gap: 14px; }
 
+/* --- Çapraz satış: koyu cam öneri kartı --- */
+.cart-oneri-kart{margin-top:18px;padding:15px;border:1px solid rgba(255,255,255,.11);border-radius:var(--r-lg);background:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);box-shadow:var(--glass-shadow)}.cart-oneri-kart header{margin-bottom:11px}.cart-oneri-kart header span{display:block;margin-bottom:3px;color:var(--accent,var(--primary));font-size:9px;font-weight:800;letter-spacing:.12em}.cart-oneri-kart h2{font-family:'Montserrat';font-size:16px;color:var(--on-surface)}.cart-oneri-liste{display:flex;flex-direction:column;gap:8px}.cart-oneri-satir{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(8,8,8,.2)}.cart-oneri-satir img{width:44px;height:44px;flex:none;border-radius:9px;object-fit:cover}.cart-oneri-satir>div{flex:1;min-width:0}.cart-oneri-satir h3{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--on-surface);font-size:12px}.cart-oneri-satir strong{display:block;margin-top:3px;color:var(--accent,var(--primary));font-size:12px}.cart-oneri-satir button{padding:8px 10px;border:1px solid rgba(255,107,0,.35);border-radius:9px;background:rgba(255,107,0,.14);color:var(--accent,var(--primary));font-size:11px;font-weight:800;transition:background .18s,transform .18s}.cart-oneri-satir button:hover{background:rgba(255,107,0,.25)}.cart-oneri-satir button:active{transform:scale(.94)}
+
 /* --- Ürün satırı — cam --- */
 .cart-satir {
   display: flex;

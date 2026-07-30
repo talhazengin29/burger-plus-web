@@ -194,6 +194,7 @@ export function AppProvider({ children }) {
   // --- Sepet ---
   // Al götür (masasız) için YEREL sepet.
   const [sepet, setSepet] = useState([]);
+  const [oneriler, setOneriler] = useState([]);
 
   // Aktif masa: QR ile karşılama ekranından gelince set edilir.
   // null ise al götür; dolu ise masaya servis. Sipariş tipini bu belirler.
@@ -337,6 +338,30 @@ export function AppProvider({ children }) {
   const sepetToplam = sepet.reduce((t, s) => t + s.fiyat * s.adet, 0);
   const sepetAdet = sepet.reduce((t, s) => t + s.adet, 0);
 
+  // Sepet değiştikten kısa süre sonra çapraz satış önerilerini katalogdan al.
+  // Debounce, adet artırma/azaltmada gereksiz ağ isteğini önler.
+  useEffect(() => {
+    const urunIdleri = [...new Set(sepet.map((urun) => Number(urun.id)).filter((id) => Number.isInteger(id) && id > 0))];
+    if (!urunIdleri.length) {
+      setOneriler([]);
+      return undefined;
+    }
+    let iptalEdildi = false;
+    const zamanlayici = setTimeout(() => {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+      fetch(`${backendUrl}/api/oneriler?urunler=${encodeURIComponent(urunIdleri.join(","))}`)
+        .then((yanit) => yanit.ok ? yanit.json() : Promise.reject())
+        .then(({ urunler: uzakUrunler }) => {
+          if (!iptalEdildi && Array.isArray(uzakUrunler)) setOneriler(kataloguBirlestir(uzakUrunler));
+        })
+        .catch(() => { if (!iptalEdildi) setOneriler([]); });
+    }, 300);
+    return () => {
+      iptalEdildi = true;
+      clearTimeout(zamanlayici);
+    };
+  }, [sepet]);
+
   // --- Ödeme ---
   // Son ödemenin özeti (onay ekranı bunu gösterir)
   const [sonOdeme, setSonOdeme] = useState(null);
@@ -469,6 +494,7 @@ export function AppProvider({ children }) {
     sepetiBosalt,
     sepetToplam,
     sepetAdet,
+    oneriler,
     // ödeme
     sonOdeme,
     odemeyiTamamla,
