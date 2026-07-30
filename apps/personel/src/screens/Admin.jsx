@@ -84,6 +84,7 @@ export default function Admin({ onCikis }) {
   const [urunTipFiltre, setUrunTipFiltre] = useState("tumu");
   const [urunDurumFiltre, setUrunDurumFiltre] = useState("tumu");
   const [urunSiralama, setUrunSiralama] = useState("yeni");
+  const [oneriArama, setOneriArama] = useState("");
   const [gorselYukleniyor, setGorselYukleniyor] = useState(false);
   const [kategoriForm, setKategoriForm] = useState(null);
   const [personelForm, setPersonelForm] = useState(null);
@@ -283,6 +284,17 @@ export default function Admin({ onCikis }) {
   const yanLezzetUrunleri = urunler.filter((urun) => urun.urunTipi === "yan_lezzet" && urun.aktif);
   const icecekUrunleri = urunler.filter((urun) => urun.urunTipi === "icecek" && urun.aktif);
   const onerilebilecekUrunler = urunler.filter((urun) => urun.aktif && String(urun.id) !== String(urunForm?.id || ""));
+  const filtreliOneriUrunleri = onerilebilecekUrunler.filter((urun) => urun.ad.toLocaleLowerCase("tr").includes(oneriArama.trim().toLocaleLowerCase("tr")));
+  const onerilenUrunuDegistir = (urunId) => {
+    const seciliIdler = urunForm?.onerilenUrunler || [];
+    if (seciliIdler.includes(urunId)) {
+      setUrunForm({ ...urunForm, onerilenUrunler: seciliIdler.filter((id) => id !== urunId) });
+    } else if (seciliIdler.length >= 5) {
+      setHata("En fazla 5 önerilen ürün seçebilirsin.");
+    } else {
+      setUrunForm({ ...urunForm, onerilenUrunler: [...seciliIdler, urunId] });
+    }
+  };
 
   return (
     <div className="admin-shell">
@@ -450,9 +462,17 @@ export default function Admin({ onCikis }) {
 
             <section className="urun-oneri-editoru">
               <header><div><b>Bu ürünle önerilecekler</b><small>Sepette ve ürün detayında gösterilir. En fazla 5 aktif ürün seçebilirsin.</small></div><strong>{urunForm.onerilenUrunler?.length || 0}/5</strong></header>
-              <select multiple value={(urunForm.onerilenUrunler || []).map(String)} onChange={(e) => setUrunForm({ ...urunForm, onerilenUrunler: Array.from(e.target.selectedOptions).map((secenek) => Number(secenek.value)).slice(0, 5) })} aria-label="Önerilen ürünler">
-                {onerilebilecekUrunler.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad} · {para(urun.fiyat)}</option>)}
-              </select>
+              <input className="oneri-arama" type="search" value={oneriArama} onChange={(e) => setOneriArama(e.target.value.slice(0, 80))} placeholder="Ürün ara…" aria-label="Önerilecek ürün ara" />
+              <div className="oneri-secim-listesi">{filtreliOneriUrunleri.map((urun) => {
+                const secili = (urunForm.onerilenUrunler || []).includes(urun.id);
+                const devreDisi = !secili && (urunForm.onerilenUrunler || []).length >= 5;
+                return <label className={`oneri-secim-karti ${secili ? "secili" : ""} ${devreDisi ? "devre-disi" : ""}`} key={urun.id}>
+                  <input type="checkbox" checked={secili} disabled={devreDisi} onChange={() => onerilenUrunuDegistir(urun.id)} />
+                  {urun.gorsel ? <img src={urun.gorsel} alt="" /> : <span className="oneri-secim-gorselsiz">BP</span>}
+                  <span><b>{urun.ad}</b><small>{para(urun.fiyat)}</small></span><i>✓</i>
+                </label>;
+              })}</div>
+              {onerilebilecekUrunler.length > 0 && !filtreliOneriUrunleri.length && <p>Aramana uygun ürün bulunamadı.</p>}
               {!onerilebilecekUrunler.length && <p>Öneri eklemek için önce başka bir aktif ürün oluşturmalısın.</p>}
             </section>
 

@@ -245,15 +245,17 @@ export default function UrunDetay() {
               </div>
             </section>
           )}
+
+          {urunOnerileri.length > 0 && <motion.section className="urun-detay-kart urun-detay-oneri-bolumu" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
+            <span>YANINDA İYİ GİDER</span>
+            <h2 className="urun-detay-baslik">Siparişini tamamla</h2>
+            <div className="urun-detay-oneri-cipleri">{urunOnerileri.map((onerilen) => <motion.button key={onerilen.id} type="button" onClick={() => sepeteEkle(onerilen)} whileTap={{ scale: 0.94 }}><i>{urunSimgesi(onerilen)}</i><b>{onerilen.ad}</b><small>+₺{Number(onerilen.fiyat).toFixed(0)}</small></motion.button>)}</div>
+          </motion.section>}
         </motion.div>
       </div>
 
       {/* Alt sabit bar — adet seçici + sepete ekle */}
       <div className="urun-detay-alt-bar">
-        {urunOnerileri.length > 0 && <motion.div className="urun-detay-oneri-cipleri" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <span>Yanında iyi gider:</span>
-          <div>{urunOnerileri.map((onerilen) => <motion.button key={onerilen.id} type="button" onClick={() => sepeteEkle(onerilen)} whileTap={{ scale: 0.94 }}><i>{urunSimgesi(onerilen)}</i>{onerilen.ad}<b>+₺{Number(onerilen.fiyat).toFixed(0)}</b></motion.button>)}</div>
-        </motion.div>}
         <div className="urun-detay-alt-satir">
           <div className="adet-kontrol">
             <button onClick={() => setAdet((a) => Math.max(1, a - 1))} aria-label="Azalt">

@@ -5,7 +5,7 @@
    ========================================================================== */
 
 .urun-detay { display: flex; flex-direction: column; }
-.urun-detay-govde { flex: 1; padding-bottom: 230px; }
+.urun-detay-govde { flex: 1; padding-bottom: 150px; }
 
 /* --- Üst görsel --- */
 .urun-detay-gorsel-wrap {
@@ -197,8 +197,7 @@
   position: absolute;
   bottom: 0; left: 0; right: 0;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   background: rgba(13, 13, 13, 0.7);
   -webkit-backdrop-filter: var(--glass-blur-lg);
   backdrop-filter: var(--glass-blur-lg);
@@ -207,8 +206,7 @@
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   border-top-left-radius: var(--r-xl);
   border-top-right-radius: var(--r-xl);
-}
-.urun-detay-alt-satir{display:flex;align-items:center;gap:12px;width:100%}.urun-detay-oneri-cipleri{display:flex;align-items:center;gap:8px;width:100%;overflow:hidden}.urun-detay-oneri-cipleri>span{flex:none;color:var(--on-surface-variant);font-size:10px;font-weight:700}.urun-detay-oneri-cipleri>div{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.urun-detay-oneri-cipleri>div::-webkit-scrollbar{display:none}.urun-detay-oneri-cipleri button{display:flex;align-items:center;gap:4px;flex:none;max-width:180px;padding:6px 8px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:var(--on-surface);font-size:10px;white-space:nowrap}.urun-detay-oneri-cipleri i{font-style:normal}.urun-detay-oneri-cipleri b{color:var(--accent,var(--primary));font-size:10px}
+.urun-detay-oneri-bolumu{margin-top:0}.urun-detay-oneri-bolumu>span{display:block;margin-bottom:4px;color:var(--accent,var(--primary));font-size:9px;font-weight:850;letter-spacing:.12em}.urun-detay-oneri-bolumu .urun-detay-baslik{margin-bottom:12px}.urun-detay-oneri-cipleri{display:flex;flex-wrap:wrap;gap:8px}.urun-detay-oneri-cipleri button{display:flex;align-items:center;gap:5px;max-width:100%;padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:var(--on-surface);font-size:11px}.urun-detay-oneri-cipleri i{font-style:normal}.urun-detay-oneri-cipleri b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.urun-detay-oneri-cipleri small{color:var(--accent,var(--primary));font-size:10px;font-weight:800}
 .urun-detay-alt-bar .adet-kontrol {
   display: flex;
   align-items: center;
