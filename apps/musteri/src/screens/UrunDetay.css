@@ -197,6 +197,7 @@
   position: absolute;
   bottom: 0; left: 0; right: 0;
   display: flex;
+  align-items: center;
   gap: 12px;
   background: rgba(13, 13, 13, 0.7);
   -webkit-backdrop-filter: var(--glass-blur-lg);
@@ -207,7 +208,78 @@
   border-top-left-radius: var(--r-xl);
   border-top-right-radius: var(--r-xl);
 }
-.urun-detay-oneri-bolumu{margin-top:0}.urun-detay-oneri-bolumu>span{display:block;margin-bottom:4px;color:var(--accent,var(--primary));font-size:9px;font-weight:850;letter-spacing:.12em}.urun-detay-oneri-bolumu .urun-detay-baslik{margin-bottom:12px}.urun-detay-oneri-cipleri{display:flex;flex-wrap:wrap;gap:8px}.urun-detay-oneri-cipleri button{display:flex;align-items:center;gap:5px;max-width:100%;padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:var(--on-surface);font-size:11px}.urun-detay-oneri-cipleri i{font-style:normal}.urun-detay-oneri-cipleri b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.urun-detay-oneri-cipleri small{color:var(--accent,var(--primary));font-size:10px;font-weight:800}
+
+/* İçindekiler kartının hemen altındaki gerçek sepete ekleme önerileri. */
+.urun-detay-oneri-bolumu {
+  margin-top: 0;
+  padding: 16px;
+}
+.urun-detay-oneri-etiket {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent, var(--primary));
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.urun-detay-oneri-bolumu .urun-detay-baslik { margin-bottom: 12px; }
+.urun-detay-oneri-listesi {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.urun-detay-oneri {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.045);
+}
+.urun-detay-oneri > img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+}
+.urun-detay-oneri-bilgi {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.urun-detay-oneri-bilgi b {
+  overflow: hidden;
+  color: var(--on-surface);
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.urun-detay-oneri-bilgi small {
+  color: var(--accent, var(--primary));
+  font-size: 11px;
+  font-weight: 800;
+}
+.urun-detay-oneri > button {
+  width: 64px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: 0 3px 12px rgba(255, 107, 0, 0.28);
+}
+.urun-detay-oneri > button svg { width: 14px; height: 14px; }
 .urun-detay-alt-bar .adet-kontrol {
   display: flex;
   align-items: center;

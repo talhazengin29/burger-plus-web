@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconMinus, IconPlus, IconWarning } from "../components/Icons";
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
+import { varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
 import "./UrunDetay.css";
 
 // Besin değerleri sabit sırayla gösterilir
@@ -24,6 +25,7 @@ export default function UrunDetay() {
   const [boyutKodu, setBoyutKodu] = useState("");
   const [yanBoyutKodu, setYanBoyutKodu] = useState("");
   const [icecekBoyutKodu, setIcecekBoyutKodu] = useState("");
+  const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to="/anasayfa" replace />;
@@ -31,6 +33,9 @@ export default function UrunDetay() {
     .map((onerilenId) => urunler.find((aday) => Number(aday.id) === Number(onerilenId)))
     .filter((aday) => aday && Number(aday.id) !== Number(urun.id))
     .slice(0, 3);
+  const gorunenUrunOnerileri = urunOnerileri.filter(
+    (onerilen) => !eklenenOneriIdleri.includes(Number(onerilen.id))
+  );
 
   const indirim = indirimliFiyat(urun);
   const urunTipi = urun.urunTipi || "burger";
@@ -97,6 +102,11 @@ export default function UrunDetay() {
       sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi });
     }
     git(-1);
+  };
+
+  const oneriyiSepeteEkle = (onerilen) => {
+    sepeteEkle(varsayilanSecimliUrunHazirla(onerilen, urunler));
+    setEklenenOneriIdleri((onceki) => [...onceki, Number(onerilen.id)]);
   };
 
   return (
@@ -246,46 +256,76 @@ export default function UrunDetay() {
             </section>
           )}
 
-          {urunOnerileri.length > 0 && <motion.section className="urun-detay-kart urun-detay-oneri-bolumu" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
-            <span>YANINDA İYİ GİDER</span>
-            <h2 className="urun-detay-baslik">Siparişini tamamla</h2>
-            <div className="urun-detay-oneri-cipleri">{urunOnerileri.map((onerilen) => <motion.button key={onerilen.id} type="button" onClick={() => sepeteEkle(onerilen)} whileTap={{ scale: 0.94 }}><i>{urunSimgesi(onerilen)}</i><b>{onerilen.ad}</b><small>+₺{Number(onerilen.fiyat).toFixed(0)}</small></motion.button>)}</div>
-          </motion.section>}
+          <AnimatePresence>
+            {gorunenUrunOnerileri.length > 0 && (
+              <motion.section
+                className="urun-detay-kart urun-detay-oneri-bolumu"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.22 }}
+              >
+                <span className="urun-detay-oneri-etiket">YANINDA İYİ GİDER</span>
+                <h2 className="urun-detay-baslik">Siparişini tamamla</h2>
+                <div className="urun-detay-oneri-listesi">
+                  <AnimatePresence mode="popLayout">
+                    {gorunenUrunOnerileri.map((onerilen) => (
+                      <motion.article
+                        layout
+                        key={onerilen.id}
+                        className="urun-detay-oneri"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.92, x: 18 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <img src={onerilen.gorsel} alt="" />
+                        <div className="urun-detay-oneri-bilgi">
+                          <b>{onerilen.ad}</b>
+                          <small>₺{Number(onerilen.fiyat).toFixed(2)}</small>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={() => oneriyiSepeteEkle(onerilen)}
+                          aria-label={`${onerilen.ad} sepete ekle`}
+                          whileTap={{ scale: 0.88 }}
+                        >
+                          <IconPlus />
+                          <span>Ekle</span>
+                        </motion.button>
+                      </motion.article>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </motion.section>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 
       {/* Alt sabit bar — adet seçici + sepete ekle */}
       <div className="urun-detay-alt-bar">
-        <div className="urun-detay-alt-satir">
-          <div className="adet-kontrol">
-            <button onClick={() => setAdet((a) => Math.max(1, a - 1))} aria-label="Azalt">
-              <IconMinus />
-            </button>
-            <span className="adet-sayi">{adet}</span>
-            <button onClick={() => setAdet((a) => a + 1)} aria-label="Artır">
-              <IconPlus />
-            </button>
-          </div>
-          <motion.button
-            type="button"
-            className="urun-detay-sepet-btn"
-            onClick={sepeteEkleyeBas}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            {`Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
-          </motion.button>
+        <div className="adet-kontrol">
+          <button onClick={() => setAdet((a) => Math.max(1, a - 1))} aria-label="Azalt">
+            <IconMinus />
+          </button>
+          <span className="adet-sayi">{adet}</span>
+          <button onClick={() => setAdet((a) => a + 1)} aria-label="Artır">
+            <IconPlus />
+          </button>
         </div>
+        <motion.button
+          type="button"
+          className="urun-detay-sepet-btn"
+          onClick={sepeteEkleyeBas}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          {`Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
+        </motion.button>
       </div>
     </div>
   );
-}
-
-function urunSimgesi(urun) {
-  if (urun.urunTipi === "yan_lezzet") return "🍟";
-  if (urun.urunTipi === "icecek") return "🥤";
-  if (urun.urunTipi === "menu" || urun.urunTipi === "burger") return "🍔";
-  return "🍽️";
 }
 
 function BoyutSecici({ baslik, urun, baslangicKodu, seciliKod, onSec }) {

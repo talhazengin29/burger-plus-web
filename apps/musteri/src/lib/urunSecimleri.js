@@ -23,3 +23,63 @@ export function sepetAnahtariOlustur(urun) {
     secimler: urun.secimler || {},
   });
 }
+
+export function varsayilanSecimliUrunHazirla(urun, urunler) {
+  const urunTipi = urun.urunTipi || "burger";
+  const varsayilanBoyut = (boyutlar, kod) =>
+    boyutlar?.find((boyut) => boyut.kod === kod)
+    || boyutlar?.find((boyut) => boyut.varsayilan)
+    || boyutlar?.[0]
+    || null;
+  const menuYapisi = urunTipi === "menu" ? urun.menuYapisi : null;
+  const menuBurger = menuYapisi
+    ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.burgerUrunId))
+    : null;
+  const menuYanLezzet = menuYapisi
+    ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.yanLezzetUrunId))
+    : null;
+  const menuIcecek = menuYapisi
+    ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.icecekUrunId))
+    : null;
+  const gramajKaynagi = menuBurger || urun;
+  const gramajOpsiyonu = gramajKaynagi.gramajOpsiyonu?.aktif ? gramajKaynagi.gramajOpsiyonu : null;
+  const urunBoyutu = varsayilanBoyut(urun.boyutSecenekleri);
+  const yanBoyut = varsayilanBoyut(menuYanLezzet?.boyutSecenekleri, menuYapisi?.varsayilanYanBoyut);
+  const icecekBoyut = varsayilanBoyut(menuIcecek?.boyutSecenekleri, menuYapisi?.varsayilanIcecekBoyut);
+  const dahilMalzemeler = gramajKaynagi.malzemeler || [];
+  const secimler = {
+    dahilMalzemeler,
+    haricMalzemeler: [],
+    ...(gramajOpsiyonu ? {
+      ekstraGramaj: 0,
+      standartGramaj: Number(gramajKaynagi.temelMiktar || 0),
+      toplamGramaj: Number(gramajKaynagi.temelMiktar || 0),
+      gramajEtiketi: gramajOpsiyonu.etiket,
+      gramajBirim: gramajOpsiyonu.birim,
+    } : {}),
+    ...(["yan_lezzet", "icecek"].includes(urunTipi) && urunBoyutu ? {
+      boyutKodu: urunBoyutu.kod,
+      boyutEtiketi: urunBoyutu.etiket,
+      boyutMiktar: urunBoyutu.miktar,
+      boyutBirim: urunBoyutu.birim,
+    } : {}),
+    ...(menuYapisi ? {
+      menuBurgerId: menuBurger?.id,
+      menuBurgerAd: menuBurger?.ad,
+      yanLezzetId: menuYanLezzet?.id,
+      yanLezzetAd: menuYanLezzet?.ad,
+      yanBoyutKodu: yanBoyut?.kod,
+      yanBoyutEtiketi: yanBoyut?.etiket,
+      yanBoyutMiktar: yanBoyut?.miktar,
+      yanBoyutBirim: yanBoyut?.birim,
+      icecekId: menuIcecek?.id,
+      icecekAd: menuIcecek?.ad,
+      icecekBoyutKodu: icecekBoyut?.kod,
+      icecekBoyutEtiketi: icecekBoyut?.etiket,
+      icecekBoyutMiktar: icecekBoyut?.miktar,
+      icecekBoyutBirim: icecekBoyut?.birim,
+    } : {}),
+  };
+
+  return { ...urun, haricMalzemeler: [], secimler };
+}

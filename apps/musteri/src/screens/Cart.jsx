@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
-import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
+import { gramajMetni, haricMalzemeleriGetir, varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
 import "./Cart.css";
 
 export default function Cart() {
   const git = useNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, sepeteEkle } = useApp();
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, sepeteEkle, urunler } = useApp();
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
   const gorunenOneriler = oneriler.filter((urun) => !eklenenOneriIdleri.includes(Number(urun.id)));
 
@@ -79,7 +79,7 @@ export default function Cart() {
                         <motion.article key={urun.id} layout className="cart-oneri-satir" variants={{ gizli: { opacity: 0, x: -10 }, goster: { opacity: 1, x: 0 } }} exit={{ opacity: 0, scale: 0.94, x: 16 }} transition={{ duration: 0.2 }}>
                           <img src={urun.gorsel} alt="" />
                           <div><h3>{urun.ad}</h3><strong>₺{Number(urun.fiyat).toFixed(2)}</strong></div>
-                          <button type="button" onClick={() => { setEklenenOneriIdleri((onceki) => [...onceki, Number(urun.id)]); sepeteEkle(urun); }}>+ Ekle</button>
+                          <button type="button" onClick={() => { setEklenenOneriIdleri((onceki) => [...onceki, Number(urun.id)]); sepeteEkle(varsayilanSecimliUrunHazirla(urun, urunler)); }}>+ Ekle</button>
                         </motion.article>
                       ))}
                     </AnimatePresence>
