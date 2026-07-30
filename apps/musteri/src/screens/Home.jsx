@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
-import { IconPlus, IconSearch, IconFilter, IconArrowRight } from "../components/Icons";
+import { IconPlus, IconSearch, IconFilter } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, barDolumu, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
@@ -54,15 +54,9 @@ export default function Home() {
   }, [aktifKategori, arama, siralama, urunler]);
 
   const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
-  const populerUrunler = gosterilen.slice(0, 5);
-  const digerUrunler = gosterilen.slice(5);
+  const populerUrunler = gosterilen.slice(0, 4);
+  const digerUrunler = gosterilen.slice(4);
   const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
-
-  // "Tümünü Gör" — kategori/arama filtrelerini kaldırıp tüm menüyü gösterir
-  const tumunuGoster = () => {
-    setAktifKategori("Tümü");
-    setArama("");
-  };
 
   return (
     <div className="ekran home">
@@ -209,10 +203,6 @@ export default function Home() {
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         <div className="bolum-satir">
           <h3 className="bolum-baslik">Popüler {kategoriBasligi}</h3>
-          <button type="button" className="tumu-link" onClick={tumunuGoster}>
-            Tümünü Gör
-            <IconArrowRight className="tumu-ikon" aria-hidden="true" />
-          </button>
         </div>
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
@@ -233,7 +223,7 @@ export default function Home() {
 
         {digerUrunler.length > 0 && (
           <section className="diger-urunler">
-            <div className="bolum-satir diger-urunler-baslik"><div><span>MENÜDE DAHA FAZLASI</span><h3 className="bolum-baslik">{kategoriBasligi}</h3></div><small>{digerUrunler.length} ürün</small></div>
+            <div className="bolum-satir diger-urunler-baslik"><h3 className="bolum-baslik">Tüm {kategoriBasligi}</h3><small>{digerUrunler.length} ürün</small></div>
             <AnimatePresence mode="wait">
               <motion.div className="urun-grid" key={`diger-${aktifKategori}-${siralama}-${arama}`} {...siraliKonteyner} initial="initial" animate="animate">
                 {digerUrunler.map((u) => <UrunKarti key={u.id} urun={u} indirim={indirimliFiyat(u)} git={git} sepeteEkle={sepeteEkle} />)}

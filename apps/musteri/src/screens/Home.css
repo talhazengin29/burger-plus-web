@@ -423,23 +423,13 @@
 
 /* --- Ürün grid — cam kartlar --- */
 .populer-urun-listesi {
-  display: flex;
-  gap: 13px;
-  overflow-x: auto;
-  padding: 2px 2px 10px;
-  margin: 0 -2px 24px;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
 }
-.populer-urun-listesi::-webkit-scrollbar { display: none; }
-.populer-urun-listesi .urun-kart { flex: 0 0 min(44vw, 174px); scroll-snap-align: start; }
-.populer-urun-listesi .urun-alt { padding: 12px; }
-.populer-urun-listesi .urun-ad { font-size: 14px; margin-bottom: 9px; }
-.populer-urun-listesi .ekle-btn { width: 33px; height: 33px; }
 .diger-urunler { padding-top: 3px; }
 .diger-urunler-baslik { align-items: flex-end; margin-bottom: 14px; }
-.diger-urunler-baslik > div { display: flex; flex-direction: column; gap: 3px; }
-.diger-urunler-baslik span { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: .11em; }
 .diger-urunler-baslik small { color: var(--outline); font-size: 11px; }
 .urun-grid {
   display: grid;

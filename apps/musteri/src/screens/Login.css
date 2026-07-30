@@ -2,6 +2,12 @@
   display: flex;
   flex-direction: column;
   padding: 0 var(--margin) 40px;
+  /* Giriş kendi opak zeminini kullanır; uygulama arkasındaki bloblar form ve
+     logo alanlarında ayrı katman/kart sınırı gibi görünmez. */
+  background:
+    radial-gradient(68% 42% at 50% 14%, rgba(255, 107, 0, 0.13), transparent 76%),
+    radial-gradient(76% 40% at 50% 62%, rgba(255, 107, 0, 0.07), transparent 78%),
+    #0d0d0d;
 }
 
 /* Üst logo bölümü */
@@ -42,10 +48,9 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+  /* Cam yerine opak yüzey: mobil GPU'da görünen katman ayrışmalarını önler. */
+  background: #15110f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--r-xl);
   padding: 24px 20px;
   box-shadow: var(--glass-shadow);
@@ -69,7 +74,7 @@
   box-sizing: border-box;
   padding: 14px 16px;
   border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.05);
+  background: #211a16;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
   font-size: 15px;
@@ -79,7 +84,7 @@
 .login-input:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.07);
+  background: #261d18;
   box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
 }
 .login-input::placeholder { color: rgba(255, 255, 255, 0.3); opacity: 1; }
