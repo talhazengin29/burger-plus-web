@@ -15,13 +15,14 @@ export const sadakatVarsayilan = {
   burgerDamgaHedef: 5,
 };
 
-export const kategoriler = ["Tümü", "Burgerler", "Yan Lezzetler", "İçecekler"];
+export const kategoriler = ["Tümü", "Menüler", "Burgerler", "Yan Lezzetler", "İçecekler"];
 
 // Ana sayfadaki yuvarlak kategori rozetlerinin görselleri.
 // Anahtar = `kategoriler` içindeki ad. Yeni kategori eklenirse buraya da bir
 // görsel eklenir; eksikse rozet görselsiz (sadece yazı) gösterilir.
 export const kategoriGorseller = {
   "Tümü": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=160&h=160&fit=crop",
+  "Menüler": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=160&h=160&fit=crop",
   "Burgerler": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=160&h=160&fit=crop",
   "Yan Lezzetler": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=160&h=160&fit=crop",
   "İçecekler": "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=160&h=160&fit=crop",
@@ -95,7 +96,7 @@ export function urunKurallariniUygula(urun) {
   };
 }
 
-const urunListesi = [
+const temelUrunListesi = [
   {
     id: 1,
     ad: "Classic Burger",
@@ -241,6 +242,51 @@ const urunListesi = [
     alerjenler: [],
   },
 ];
+
+// Katalog, backend kapalıyken de zengin görünür. Backend aynı id'lerle geldiğinde
+// fiyat, aktiflik ve yönetim panelinden değiştirilmiş ürün bilgileri önceliklidir.
+const ekUrun = (id, ad, fiyat, kategori, temelMiktar, gorsel, malzemeler, gramajOpsiyonu) => ({
+  id, ad, fiyat, kategori, temelMiktar, gorsel, malzemeler,
+  aciklama: `${ad}, özenle hazırlanmış Burger Plus lezzeti.`,
+  besinDegerleri: {},
+  alerjenler: [],
+  ...(gramajOpsiyonu === undefined ? {} : { gramajOpsiyonu }),
+});
+
+const ekUrunListesi = [
+  ekUrun(13, "Trüflü Mushroom Burger", 275, "Burgerler", 220, "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop", ["Dana köfte", "Cheddar", "Mantar", "Trüf sos", "Marul"]),
+  ekUrun(14, "Acılı Mexican Burger", 260, "Burgerler", 200, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop", ["Dana köfte", "Cheddar", "Jalapeno", "Meksika sosu", "Marul"]),
+  ekUrun(15, "Crispy Chicken Burger", 220, "Burgerler", 180, "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=400&fit=crop", ["Çıtır tavuk", "Cheddar", "Coleslaw", "Ranch sos"]),
+  ekUrun(16, "BBQ Ranch Burger", 285, "Burgerler", 250, "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=400&fit=crop", ["Dana köfte", "Cheddar", "BBQ sos", "Ranch sos", "Çıtır soğan"]),
+  ekUrun(17, "Mozzarella Sticks", 110, "Yan Lezzetler", 180, "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=400&h=400&fit=crop", ["Mozzarella", "Galeta unu", "Marinara sos"]),
+  ekUrun(18, "Coleslaw Salata", 70, "Yan Lezzetler", 160, "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=400&fit=crop", ["Lahana", "Havuç", "Yoğurtlu sos"]),
+  ekUrun(19, "Şeftalili Ice Tea", 50, "İçecekler", 330, "https://images.unsplash.com/photo-1497534446932-c925b458314e?w=400&h=400&fit=crop", ["Çay", "Şeftali", "Su"]),
+  ekUrun(20, "Çikolatalı Milkshake", 95, "İçecekler", 400, "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&h=400&fit=crop", ["Süt", "Çikolata", "Dondurma"]),
+  ekUrun(21, "Classic Menü", 255, "Menüler", 200, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop", ["Classic Burger", "Çıtır Patates", "Kola"], null),
+  ekUrun(22, "BBQ Smoke Menü", 305, "Menüler", 300, "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=400&fit=crop", ["BBQ Smoke Burger", "Çıtır Patates", "Kola"], null),
+  ekUrun(23, "Double Cheese Menü", 340, "Menüler", 400, "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop", ["Double Cheese", "Çıtır Patates", "İçecek"], null),
+  ekUrun(24, "Vegan Menü", 275, "Menüler", 180, "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop", ["Vegan Burger", "Patates", "Limonata"], null),
+  ekUrun(25, "Crispy Chicken Menü", 305, "Menüler", 180, "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=400&fit=crop", ["Crispy Chicken Burger", "Patates", "İçecek"], null),
+  ekUrun(26, "Çocuk Menü", 190, "Menüler", 120, "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=400&fit=crop", ["Mini Burger", "Patates", "Meyve suyu"], null),
+  ekUrun(27, "Mantar Swiss Burger", 265, "Burgerler", 220, "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop", ["Dana köfte", "Swiss peynir", "Mantar", "Karamelize soğan"]),
+  ekUrun(28, "Firehouse Burger", 270, "Burgerler", 250, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop", ["Dana köfte", "Cheddar", "Acı sos", "Jalapeno"]),
+  ekUrun(29, "Avokadolu Burger", 255, "Burgerler", 180, "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop", ["Dana köfte", "Avokado", "Marul", "Domates"]),
+  ekUrun(30, "Smashed Burger", 240, "Burgerler", 200, "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop", ["Smashed köfte", "Cheddar", "Soğan", "Özel sos"]),
+  ekUrun(31, "Cheddar Soslu Patates", 95, "Yan Lezzetler", 300, "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop", ["Patates", "Cheddar sos", "Taze soğan"]),
+  ekUrun(32, "Baharatlı Patates", 90, "Yan Lezzetler", 300, "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop", ["Patates", "Baharat karışımı", "Tuz"]),
+  ekUrun(33, "Çıtır Tavuk Parçaları", 135, "Yan Lezzetler", 220, "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=400&fit=crop", ["Tavuk", "Çıtır kaplama", "Ranch sos"]),
+  ekUrun(34, "Jalapeno Poppers", 115, "Yan Lezzetler", 180, "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=400&h=400&fit=crop", ["Jalapeno", "Krem peynir", "Galeta unu"]),
+  ekUrun(35, "Mac & Cheese Bites", 120, "Yan Lezzetler", 180, "https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?w=400&h=400&fit=crop", ["Makarna", "Cheddar", "Galeta unu"]),
+  ekUrun(36, "Akdeniz Salata", 100, "Yan Lezzetler", 220, "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=400&fit=crop", ["Yeşillik", "Domates", "Zeytin", "Peynir"]),
+  ekUrun(37, "Zero Kola", 40, "İçecekler", 330, "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&h=400&fit=crop", ["Karbonatlı su", "Kola aroması"]),
+  ekUrun(38, "Fanta", 40, "İçecekler", 330, "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&h=400&fit=crop", ["Karbonatlı su", "Portakal aroması"]),
+  ekUrun(39, "Sprite", 40, "İçecekler", 330, "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&h=400&fit=crop", ["Karbonatlı su", "Limon aroması"]),
+  ekUrun(40, "Soğuk Kahve", 90, "İçecekler", 300, "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop", ["Kahve", "Süt", "Buz"]),
+  ekUrun(41, "Vanilyalı Milkshake", 105, "İçecekler", 400, "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&h=400&fit=crop", ["Süt", "Vanilya", "Dondurma"]),
+  ekUrun(42, "Taze Portakal Suyu", 80, "İçecekler", 300, "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&h=400&fit=crop", ["Portakal"]),
+];
+
+const urunListesi = [...temelUrunListesi, ...ekUrunListesi];
 
 export const urunler = urunListesi.map(urunKurallariniUygula);
 

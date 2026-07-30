@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import logoFull from "../assets/logo-full.png";
+import logoFull from "../assets/logo-full-transparent.png";
 import "./PerdeGecis.css";
 
 const SURELER = {
@@ -55,8 +55,6 @@ export default function PerdeGecis({ aktif, varyant = "normal", altMetin = "", o
         >
           <motion.div className="perde-panel perde-panel--ust" initial={hareketAzalt ? { opacity: 0 } : { y: "-100%" }} animate={hareketAzalt ? { opacity: aciliyor ? 0 : 1 } : { y: ustKonum }} transition={panelGecisi} />
           <motion.div className="perde-panel perde-panel--alt" initial={hareketAzalt ? { opacity: 0 } : { y: "100%" }} animate={hareketAzalt ? { opacity: aciliyor ? 0 : 1 } : { y: altKonum }} transition={panelGecisi} />
-
-          <motion.div className="perde-birlesim" initial={{ opacity: 0, scaleX: 0.35 }} animate={{ opacity: asama === "bekliyor" ? 1 : 0, scaleX: asama === "bekliyor" ? 1 : 0.35 }} transition={{ duration: hareketAzalt ? 0.03 : 0.16 }} />
 
           <motion.div
             className="perde-merkez"

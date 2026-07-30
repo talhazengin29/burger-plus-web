@@ -16,10 +16,18 @@ const siralamalar = [
   { id: "azalan", etiket: "Fiyat: Azalan" },
 ];
 
+function sayfaYenilendiMi() {
+  if (typeof window === "undefined") return false;
+  return window.performance?.getEntriesByType?.("navigation")?.[0]?.type === "reload";
+}
+
 export default function Home() {
   const location = useLocation();
   // Kampanyalar'dan "Sipariş Ver" ile gelinirse ilgili kategori otomatik seçili açılır.
-  const [aktifKategori, setAktifKategori] = useState(location.state?.kategori || "Burgerler");
+  // Tarayıcı yenilemesinde history state geri gelse bile menü her zaman Tümü'nden başlar.
+  const [aktifKategori, setAktifKategori] = useState(
+    sayfaYenilendiMi() ? "Tümü" : (location.state?.kategori || "Tümü")
+  );
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
@@ -29,7 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     if (kategoriler.some((kategori) => kategori.ad === aktifKategori)) return;
-    setAktifKategori(kategoriler.find((kategori) => kategori.ad === "Burgerler")?.ad || kategoriler[0]?.ad || "Tümü");
+    setAktifKategori(kategoriler.find((kategori) => kategori.ad === "Tümü")?.ad || kategoriler[0]?.ad || "Tümü");
   }, [aktifKategori, kategoriler]);
 
   // Kategori + arama + sıralama; hepsi yalnızca listelemeyi etkiler
@@ -46,6 +54,9 @@ export default function Home() {
   }, [aktifKategori, arama, siralama, urunler]);
 
   const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
+  const populerUrunler = gosterilen.slice(0, 5);
+  const digerUrunler = gosterilen.slice(5);
+  const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
 
   // "Tümünü Gör" — kategori/arama filtrelerini kaldırıp tüm menüyü gösterir
   const tumunuGoster = () => {
@@ -195,77 +206,41 @@ export default function Home() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Bölüm başlığı + tümünü gör */}
+        {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         <div className="bolum-satir">
-          <h3 className="bolum-baslik">Popüler Ürünler</h3>
+          <h3 className="bolum-baslik">Popüler {kategoriBasligi}</h3>
           <button type="button" className="tumu-link" onClick={tumunuGoster}>
             Tümünü Gör
             <IconArrowRight className="tumu-ikon" aria-hidden="true" />
           </button>
         </div>
 
-        {/* Ürün grid — sıralı animasyonla gelir */}
+        {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
         <AnimatePresence mode="wait">
           <motion.div
-            className="urun-grid"
-            key={aktifKategori + siralama + arama}
+            className="populer-urun-listesi"
+            key={`populer-${aktifKategori}-${siralama}-${arama}`}
             {...siraliKonteyner}
             initial="initial"
             animate="animate"
           >
-            {gosterilen.map((u) => {
+            {populerUrunler.map((u) => {
               const indirim = indirimliFiyat(u);
-              return (
-              <motion.article
-                key={u.id}
-                className="urun-kart"
-                variants={siraliOge}
-                onClick={() => git(`/urun/${u.id}`)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") git(`/urun/${u.id}`);
-                }}
-              >
-                <div className="urun-gorsel-wrap">
-                  <img className="urun-gorsel" src={u.gorsel} alt={u.ad} loading="lazy" />
-                </div>
-                <div className="urun-alt">
-                  <h4 className="urun-ad">{u.ad}</h4>
-                  {u.temelMiktar > 0 && (
-                    <span className="urun-standart-miktar">
-                      Standart {u.temelMiktar} {u.gramajOpsiyonu?.birim || (u.kategori === "İçecekler" ? "ml" : "gr")}
-                    </span>
-                  )}
-                  <div className="urun-fiyat-satir">
-                    {indirim ? (
-                      <span className="urun-fiyat-grup">
-                        <span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span>
-                        <span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span>
-                      </span>
-                    ) : (
-                      <span className="urun-fiyat">₺{u.fiyat.toFixed(2)}</span>
-                    )}
-                    <motion.button
-                      className="ekle-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        sepeteEkle(u);
-                      }}
-                      aria-label={`${u.ad} sepete ekle`}
-                      whileTap={{ scale: 0.85 }}
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    >
-                      <IconPlus className="ekle-ikon" />
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.article>
-              );
+              return <UrunKarti key={u.id} urun={u} indirim={indirim} git={git} sepeteEkle={sepeteEkle} />;
             })}
           </motion.div>
         </AnimatePresence>
+
+        {digerUrunler.length > 0 && (
+          <section className="diger-urunler">
+            <div className="bolum-satir diger-urunler-baslik"><div><span>MENÜDE DAHA FAZLASI</span><h3 className="bolum-baslik">{kategoriBasligi}</h3></div><small>{digerUrunler.length} ürün</small></div>
+            <AnimatePresence mode="wait">
+              <motion.div className="urun-grid" key={`diger-${aktifKategori}-${siralama}-${arama}`} {...siraliKonteyner} initial="initial" animate="animate">
+                {digerUrunler.map((u) => <UrunKarti key={u.id} urun={u} indirim={indirimliFiyat(u)} git={git} sepeteEkle={sepeteEkle} />)}
+              </motion.div>
+            </AnimatePresence>
+          </section>
+        )}
 
         {gosterilen.length === 0 && (
           <p className="bos-sonuc">"{arama}" için sonuç bulunamadı.</p>
@@ -273,4 +248,11 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+function UrunKarti({ urun, indirim, git, sepeteEkle }) {
+  return <motion.article className="urun-kart" variants={siraliOge} onClick={() => git(`/urun/${urun.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") git(`/urun/${urun.id}`); }}>
+    <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urun.ad} loading="lazy" /></div>
+    <div className="urun-alt"><h4 className="urun-ad">{urun.ad}</h4>{urun.temelMiktar > 0 && <span className="urun-standart-miktar">Standart {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || (urun.kategori === "İçecekler" ? "ml" : "gr")}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span><span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span></span> : <span className="urun-fiyat">₺{urun.fiyat.toFixed(2)}</span>}<motion.button className="ekle-btn" onClick={(e) => { e.stopPropagation(); sepeteEkle(urun); }} aria-label={`${urun.ad} sepete ekle`} whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
+  </motion.article>;
 }

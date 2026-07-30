@@ -36,10 +36,8 @@
 .brand-logo {
   width: 36px; height: 36px;
   object-fit: contain;
-  /* Logo beyaz zeminli PNG. invert+hue-rotate ile zemin siyaha döner,
-     screen ile koyu arka planda erir (bkz. Login.css'teki uzun not). */
+  /* Saydam logo arka planı olmadan kullanılır. */
   filter: invert(1) hue-rotate(180deg);
-  mix-blend-mode: screen;
 }
 .brand-name {
   font-family: 'Montserrat';
@@ -159,8 +157,8 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .arama-kutu:focus-within {
-  border-color: rgba(255, 107, 0, 0.4);
-  box-shadow: var(--glass-shadow-sm), var(--glow-sm);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-sm);
 }
 .arama-ikon { width: 20px; height: 20px; color: var(--outline); flex-shrink: 0; }
 .arama-input {
@@ -215,7 +213,7 @@
   display: flex;
   flex-direction: column;
   padding: 6px;
-  background: rgba(24, 24, 24, 0.85);
+  background: rgba(18, 18, 18, 0.97);
   -webkit-backdrop-filter: var(--glass-blur-lg);
   backdrop-filter: var(--glass-blur-lg);
   border: 1px solid var(--glass-border-strong);
@@ -424,6 +422,25 @@
 .tumu-ikon { width: 15px; height: 15px; }
 
 /* --- Ürün grid — cam kartlar --- */
+.populer-urun-listesi {
+  display: flex;
+  gap: 13px;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+  margin: 0 -2px 24px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.populer-urun-listesi::-webkit-scrollbar { display: none; }
+.populer-urun-listesi .urun-kart { flex: 0 0 min(44vw, 174px); scroll-snap-align: start; }
+.populer-urun-listesi .urun-alt { padding: 12px; }
+.populer-urun-listesi .urun-ad { font-size: 14px; margin-bottom: 9px; }
+.populer-urun-listesi .ekle-btn { width: 33px; height: 33px; }
+.diger-urunler { padding-top: 3px; }
+.diger-urunler-baslik { align-items: flex-end; margin-bottom: 14px; }
+.diger-urunler-baslik > div { display: flex; flex-direction: column; gap: 3px; }
+.diger-urunler-baslik span { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: .11em; }
+.diger-urunler-baslik small { color: var(--outline); font-size: 11px; }
 .urun-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

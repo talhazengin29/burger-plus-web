@@ -15,14 +15,8 @@
   height: auto;
   margin: 0 auto 12px;
   display: block;
-  /* Logo beyaz zeminli PNG (saydam değil). Koyu temada zemini eritmek için:
-     1) invert(1)      → beyaz zemin siyaha, koyu "BURGER" yazısı açık tona döner
-     2) hue-rotate(180)→ inverte giden turuncu marka rengi geri kazanılır
-     3) screen         → siyah zemin backdrop ile birleşip görünmez olur
-     Tek başına screen beyazı KORUR (screen'de beyaz baskındır), o yüzden
-     invert+hue-rotate ön adımları şart. Kalıcı çözüm: saydam zeminli PNG/SVG. */
+  /* Saydam logo: yalnızca koyu marka yazısını aydınlatır; arka planı yoktur. */
   filter: invert(1) hue-rotate(180deg);
-  mix-blend-mode: screen;
 }
 .login-slogan { color: var(--on-surface-variant); font-size: 15px; }
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { adminIstek, jsonGonder } from "../lib/adminApi";
-import logoFull from "../../../musteri/src/assets/logo-full.png";
+import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };

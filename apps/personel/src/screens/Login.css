@@ -20,7 +20,7 @@
   backdrop-filter: blur(18px);
 }
 .personel-login-ust { display:flex; flex-direction:column; align-items:center; gap:7px; margin-bottom:16px; }.personel-login-ust span{color:var(--primary);font-size:10px;font-weight:800;letter-spacing:.14em}
-.login-logo { width: 185px; height: auto; margin: 0 auto; display:block; filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+.login-logo { width: 185px; height: auto; margin: 0 auto; display:block; filter: invert(1) hue-rotate(180deg); }
 .login-baslik {
   font-size: 24px;
   font-weight: 800;

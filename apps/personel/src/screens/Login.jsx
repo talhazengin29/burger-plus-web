@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminGiris, personelGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
-import logoFull from "../../../musteri/src/assets/logo-full.png";
+import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
 
 export default function Login({ onGirisBasarili }) {

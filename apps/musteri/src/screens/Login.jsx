@@ -6,7 +6,7 @@ import { girisYap, tokeniKaydet } from "../lib/authApi";
 import { IconEye, IconEyeOff } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama";
 import { usePerde } from "../hooks/usePerde";
-import logoFull from "../assets/logo-full.png";
+import logoFull from "../assets/logo-full-transparent.png";
 import "./Login.css";
 
 export default function Login() {
