@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
 import { socket } from "../lib/socket";
@@ -38,6 +38,14 @@ const BOLUMLER = [
   ["revizyonlar", "Revizyon Kayıtları", "↺", "revizyon-kayitlari"],
   ["raporlar", "Satış Raporları", "↗", "satis-raporlari"],
 ];
+
+const MENU_GRUPLARI = [
+  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Müşterinin gördüğü alanlar", bolumler: ["urunler", "kampanyalar", "oduller", "duyurular"] },
+  { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
+  { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["musteriler", "personel-kayitlari", "revizyonlar"] },
+  { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
+];
+const KAYIT_BOLUMLERI = ["satislar", "mutfak-kayitlari", "musteriler", "personel-kayitlari", "revizyonlar"];
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const TIP_ETIKETLERI = { burger: "Burger", yan_lezzet: "Yan Lezzet", icecek: "İçecek", menu: "Menü" };
@@ -114,51 +122,51 @@ export default function Admin({ onCikis }) {
   const [duyuruForm, setDuyuruForm] = useState(null);
   const [kampanyaForm, setKampanyaForm] = useState(null);
   const [odulForm, setOdulForm] = useState(null);
+  const aktifMenuGrubu = MENU_GRUPLARI.find((grup) => grup.bolumler.includes(bolum))?.id;
+  const [acikMenuGrubu, setAcikMenuGrubu] = useState(aktifMenuGrubu || "uygulama");
+  const veriYuklemeDevamEdiyor = useRef(false);
 
   const verileriYukle = useCallback(async () => {
+    if (veriYuklemeDevamEdiyor.current) return;
+    veriYuklemeDevamEdiyor.current = true;
     setYukleniyor(true);
     setHata("");
-    const istekler = [
-      ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
-      ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
-      ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"],
-      ["Canlı satışlar", "/satislar/canli?limit=100"], ["Mutfak kayıtları", "/kayitlar/mutfak?limit=200"],
-      ["Müşteriler", "/kayitlar/musteriler?limit=300"], ["Personel kayıtları", "/kayitlar/personel?limit=300"],
-      ["Revizyonlar", "/revizyonlar?limit=200"],
-    ];
-    const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
-    const yetkiHatasi = sonuclar.find((sonuc) =>
-      sonuc.status === "rejected" && [401, 403].includes(sonuc.reason?.status)
-    );
-    if (yetkiHatasi) {
+    try {
+      const istekler = [
+        ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
+        ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
+        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"],
+      ];
+      const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
+      const yetkiHatasi = sonuclar.find((sonuc) =>
+        sonuc.status === "rejected" && [401, 403].includes(sonuc.reason?.status)
+      );
+      if (yetkiHatasi) {
+        onCikis();
+        return;
+      }
+
+      const [d, u, p, r, duy, k, kamp, od] = sonuclar.map((sonuc) =>
+        sonuc.status === "fulfilled" ? sonuc.value : null
+      );
+      if (d) setDashboard(d);
+      if (u) setUrunler(u.urunler || []);
+      if (p) setPersoneller(p.personeller || []);
+      if (r) setRapor(r);
+      if (duy) setDuyurular(duy.duyurular || []);
+      if (k) setKategoriler(k.kategoriler || []);
+      else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
+      if (kamp) setKampanyalar(kamp.kampanyalar || []);
+      if (od) setOduller(od.oduller || []);
+
+      const hatalar = sonuclar.flatMap((sonuc, index) =>
+        sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
+      );
+      setHata(hatalar.join(" • "));
+    } finally {
+      veriYuklemeDevamEdiyor.current = false;
       setYukleniyor(false);
-      onCikis();
-      return;
     }
-
-    const [d, u, p, r, duy, k, kamp, od, satis, mutfak, musteri, personelKaydi, revizyon] = sonuclar.map((sonuc) =>
-      sonuc.status === "fulfilled" ? sonuc.value : null
-    );
-    if (d) setDashboard(d);
-    if (u) setUrunler(u.urunler || []);
-    if (p) setPersoneller(p.personeller || []);
-    if (r) setRapor(r);
-    if (duy) setDuyurular(duy.duyurular || []);
-    if (k) setKategoriler(k.kategoriler || []);
-    else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
-    if (kamp) setKampanyalar(kamp.kampanyalar || []);
-    if (od) setOduller(od.oduller || []);
-    if (satis) setCanliSatislar(satis.satislar || []);
-    if (mutfak) setMutfakKayitlari(mutfak.kayitlar || []);
-    if (musteri) setMusteriler(musteri.musteriler || []);
-    if (personelKaydi) setPersonelKayitlari({ vardiyalar: personelKaydi.vardiyalar || [], performans: personelKaydi.performans || [] });
-    if (revizyon) setRevizyonlar(revizyon.revizyonlar || []);
-
-    const hatalar = sonuclar.flatMap((sonuc, index) =>
-      sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
-    );
-    setHata(hatalar.join(" • "));
-    setYukleniyor(false);
   }, [onCikis]);
 
   useEffect(() => { verileriYukle(); }, [verileriYukle]);
@@ -168,6 +176,9 @@ export default function Admin({ onCikis }) {
   useEffect(() => {
     setKayitFiltre({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
   }, [bolum]);
+  useEffect(() => {
+    if (aktifMenuGrubu) setAcikMenuGrubu(aktifMenuGrubu);
+  }, [aktifMenuGrubu]);
   useEffect(() => {
     const yonetimeKatil = () => socket.emit("yonetime-katil");
     const satisGeldi = (satis) => {
@@ -388,14 +399,38 @@ export default function Admin({ onCikis }) {
       setUrunForm({ ...urunForm, onerilenUrunler: [...seciliIdler, urunId] });
     }
   };
+  const kayitSayilari = {
+    satislar: canliSatislar.length,
+    "mutfak-kayitlari": mutfakKayitlari.length,
+    musteriler: musteriler.length,
+    "personel-kayitlari": personelKayitlari.vardiyalar.length,
+    revizyonlar: revizyonlar.length,
+  };
 
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <div className="admin-marka"><img src={logoFull} alt="Burger Plus" /><small>Yönetim Merkezi</small></div>
-        <nav>{BOLUMLER.map(([id, ad, ikon, yol]) => (
-          <button key={id} className={bolum === id ? "aktif" : ""} onClick={() => git(`/yonetim/${yol}`)}><b>{ikon}</b>{ad}</button>
-        ))}</nav>
+        <nav aria-label="Yönetim bölümleri">
+          <button type="button" className={`admin-nav-ana ${bolum === "genel" ? "aktif" : ""}`} onClick={() => git("/yonetim/genel-bakis")}><b>▦</b><span>Genel Bakış</span></button>
+          {MENU_GRUPLARI.map((grup) => {
+            const acik = acikMenuGrubu === grup.id;
+            const grupSecili = grup.bolumler.includes(bolum);
+            return <section className={`admin-menu-grup ${acik ? "acik" : ""} ${grupSecili ? "secili" : ""}`} key={grup.id}>
+              <button type="button" className="admin-menu-grup-baslik" aria-expanded={acik} aria-controls={`admin-menu-${grup.id}`} onClick={() => setAcikMenuGrubu((onceki) => onceki === grup.id ? null : grup.id)}>
+                <b>{grup.ikon}</b><span><strong>{grup.ad}</strong><small>{grup.aciklama}</small></span><i>⌄</i>
+              </button>
+              <div className="admin-menu-alt" id={`admin-menu-${grup.id}`}>
+                {grup.bolumler.map((bolumId) => {
+                  const menu = BOLUMLER.find(([id]) => id === bolumId);
+                  if (!menu) return null;
+                  const [id, ad, ikon, yol] = menu;
+                  return <button type="button" key={id} className={bolum === id ? "aktif" : ""} onClick={() => git(`/yonetim/${yol}`)}><b>{ikon}</b><span>{ad}</span></button>;
+                })}
+              </div>
+            </section>;
+          })}
+        </nav>
         <div className="admin-sidebar-alt"><i className={hata ? "durum-hata" : ""} />{hata ? "Bağlantı sorunu" : "Sistem çevrimiçi"}</div>
       </aside>
 
@@ -410,6 +445,7 @@ export default function Admin({ onCikis }) {
         {hata && <div className="admin-hata">{hata}</div>}
         {yukleniyor && !dashboard ? <div className="admin-yukleniyor">Veriler hazırlanıyor…</div> : (
           <div className="admin-icerik">
+            {KAYIT_BOLUMLERI.includes(bolum) && <KayitGezgini aktif={bolum} sayilar={kayitSayilari} git={git} />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
@@ -879,18 +915,45 @@ function haftayiDoldur(veriler) {
 }
 
 function haftaAdi(gun) { return ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][Number(gun) - 1] || "—"; }
+function KayitGezgini({ aktif, sayilar, git }) {
+  const sekmeler = [
+    ["satislar", "Canlı Satış", "Ödemeler", "satislar", "◉"],
+    ["mutfak-kayitlari", "Mutfak", "Hazırlama süreleri", "mutfak-kayitlari", "◇"],
+    ["musteriler", "Müşteriler", "Hesap ve sadakat", "musteriler", "◎"],
+    ["personel-kayitlari", "Personel", "Vardiya ve performans", "personel-kayitlari", "♟"],
+    ["revizyonlar", "Revizyon", "Yönetim hareketleri", "revizyon-kayitlari", "↻"],
+  ];
+  return <section className="kayit-merkezi-gecis">
+    <header><div><span>KAYIT MERKEZİ</span><h2>İşletme hareketleri</h2></div><p>Canlı işleyişten geçmiş değişikliklere kadar bütün kayıtları tek noktadan takip edin.</p></header>
+    <div>{sekmeler.map(([id, ad, aciklama, yol, ikon]) => <button type="button" className={aktif === id ? "aktif" : ""} key={id} onClick={() => git(`/yonetim/${yol}`)}><i>{ikon}</i><span><b>{ad}</b><small>{aciklama}</small></span><strong>{aktif === id ? Number(sayilar[id] || 0).toLocaleString("tr-TR") : "Aç"}</strong></button>)}</div>
+  </section>;
+}
+
 function KayitFiltreleri({ tur, filtre, setFiltre, personeller = [] }) {
   const guncelle = (alan, deger) => setFiltre((onceki) => ({ ...onceki, [alan]: deger }));
   const temizle = () => setFiltre({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
+  const tarihDegeri = (tarih) => `${tarih.getFullYear()}-${String(tarih.getMonth() + 1).padStart(2, "0")}-${String(tarih.getDate()).padStart(2, "0")}`;
+  const hizliAralik = (gun) => {
+    const bitis = new Date();
+    const baslangic = new Date();
+    baslangic.setDate(bitis.getDate() - Math.max(0, gun - 1));
+    setFiltre((onceki) => ({ ...onceki, baslangic: tarihDegeri(baslangic), bitis: tarihDegeri(bitis) }));
+  };
+  const aktifFiltre = Object.values(filtre).filter(Boolean).length;
+  const basliklar = { satis: "Satış kayıtlarını süz", mutfak: "Mutfak hareketlerini süz", musteri: "Müşteri hesaplarını süz", personel: "Personel hareketlerini süz", revizyon: "Revizyon günlüğünü süz" };
   return <section className="kayit-filtreleri">
-    <label className="kayit-arama"><span>Ara</span><input type="search" value={filtre.arama} onChange={(e) => guncelle("arama", e.target.value.slice(0, 100))} placeholder={tur === "musteri" ? "Ad, e-posta veya telefon…" : "Sipariş no, kişi veya kayıt…"} /></label>
-    <label><span>Başlangıç</span><input type="date" value={filtre.baslangic} onChange={(e) => guncelle("baslangic", e.target.value)} /></label>
-    <label><span>Bitiş</span><input type="date" value={filtre.bitis} onChange={(e) => guncelle("bitis", e.target.value)} /></label>
-    {["satis", "mutfak"].includes(tur) && <label><span>Durum</span><select value={filtre.durum} onChange={(e) => guncelle("durum", e.target.value)}><option value="">Tüm durumlar</option><option value="yeni">Yeni</option><option value="hazirlaniyor">Hazırlanıyor</option><option value="hazir">Hazır</option></select></label>}
-    {["mutfak", "personel"].includes(tur) && <label><span>Personel</span><select value={filtre.personelId} onChange={(e) => guncelle("personelId", e.target.value)}><option value="">Tüm personel</option>{personeller.map((personel) => <option key={personel.id} value={personel.id}>{personel.ad} {personel.soyad}</option>)}</select></label>}
-    {tur === "personel" && <label><span>Rol</span><select value={filtre.rol} onChange={(e) => guncelle("rol", e.target.value)}><option value="">Tüm roller</option><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></label>}
-    {tur === "revizyon" && <><label><span>Kayıt türü</span><select value={filtre.varlikTuru} onChange={(e) => guncelle("varlikTuru", e.target.value)}><option value="">Tüm kayıtlar</option><option value="urun">Ürün</option><option value="kategori">Kategori</option><option value="kampanya">Kampanya</option><option value="odul">Ödül</option><option value="duyuru">Duyuru</option><option value="personel">Personel</option><option value="vardiya">Vardiya</option></select></label><label><span>İşlem</span><select value={filtre.islem} onChange={(e) => guncelle("islem", e.target.value)}><option value="">Tüm işlemler</option><option value="ekleme">Ekleme</option><option value="guncelleme">Güncelleme</option><option value="durum">Durum</option><option value="arsivleme">Arşivleme</option></select></label></>}
-    <button type="button" onClick={temizle}>Filtreleri temizle</button>
+    <header><div><b>{basliklar[tur] || "Kayıtları süz"}</b><small>Aradığınız kayda tarih, durum veya kişi bilgisiyle hızla ulaşın.</small></div><span>{aktifFiltre ? `${aktifFiltre} aktif filtre` : "Tüm kayıtlar"}</span></header>
+    <div className="kayit-hizli-tarih"><span>Hızlı tarih</span><button type="button" onClick={() => hizliAralik(1)}>Bugün</button><button type="button" onClick={() => hizliAralik(7)}>Son 7 gün</button><button type="button" onClick={() => hizliAralik(30)}>Son 30 gün</button></div>
+    <div className="kayit-filtre-alanlari">
+      <label className="kayit-arama"><span>Ara</span><input type="search" value={filtre.arama} onChange={(e) => guncelle("arama", e.target.value.slice(0, 100))} placeholder={tur === "musteri" ? "Ad, e-posta veya telefon…" : "Sipariş no, kişi veya kayıt…"} /></label>
+      <label><span>Başlangıç</span><input type="date" value={filtre.baslangic} onChange={(e) => guncelle("baslangic", e.target.value)} /></label>
+      <label><span>Bitiş</span><input type="date" value={filtre.bitis} onChange={(e) => guncelle("bitis", e.target.value)} /></label>
+      {["satis", "mutfak"].includes(tur) && <label><span>Durum</span><select value={filtre.durum} onChange={(e) => guncelle("durum", e.target.value)}><option value="">Tüm durumlar</option><option value="yeni">Yeni</option><option value="hazirlaniyor">Hazırlanıyor</option><option value="hazir">Hazır</option></select></label>}
+      {["mutfak", "personel"].includes(tur) && <label><span>Personel</span><select value={filtre.personelId} onChange={(e) => guncelle("personelId", e.target.value)}><option value="">Tüm personel</option>{personeller.map((personel) => <option key={personel.id} value={personel.id}>{personel.ad} {personel.soyad}</option>)}</select></label>}
+      {tur === "personel" && <label><span>Rol</span><select value={filtre.rol} onChange={(e) => guncelle("rol", e.target.value)}><option value="">Tüm roller</option><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></label>}
+      {tur === "revizyon" && <><label><span>Kayıt türü</span><select value={filtre.varlikTuru} onChange={(e) => guncelle("varlikTuru", e.target.value)}><option value="">Tüm kayıtlar</option><option value="urun">Ürün</option><option value="kategori">Kategori</option><option value="kampanya">Kampanya</option><option value="odul">Ödül</option><option value="duyuru">Duyuru</option><option value="personel">Personel</option><option value="vardiya">Vardiya</option></select></label><label><span>İşlem</span><select value={filtre.islem} onChange={(e) => guncelle("islem", e.target.value)}><option value="">Tüm işlemler</option><option value="ekleme">Ekleme</option><option value="guncelleme">Güncelleme</option><option value="durum">Durum</option><option value="arsivleme">Arşivleme</option></select></label></>}
+      <button type="button" className="kayit-filtre-temizle" disabled={!aktifFiltre} onClick={temizle}>Filtreleri temizle</button>
+    </div>
   </section>;
 }
 function DurumRozeti({ durum }) {
