@@ -31,6 +31,7 @@ const BOLUMLER = [
   ["oduller", "Puan Marketi", "★", "puan-marketi"],
   ["duyurular", "Duyurular", "●", "duyurular"],
   ["satislar", "Canlı Satışlar", "◉", "satislar"],
+  ["gecmis-siparisler", "Geçmiş Siparişler", "◷", "gecmis-siparisler"],
   ["mutfak-kayitlari", "Mutfak Kayıtları", "◫", "mutfak-kayitlari"],
   ["musteriler", "Müşteri Kayıtları", "◎", "musteriler"],
   ["personel", "Personel", "♟", "personel"],
@@ -42,10 +43,10 @@ const BOLUMLER = [
 const MENU_GRUPLARI = [
   { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Müşterinin gördüğü alanlar", bolumler: ["urunler", "kampanyalar", "oduller", "duyurular"] },
   { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
-  { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["musteriler", "personel-kayitlari", "revizyonlar"] },
+  { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
 ];
-const KAYIT_BOLUMLERI = ["satislar", "mutfak-kayitlari", "musteriler", "personel-kayitlari", "revizyonlar"];
+const KAYIT_BOLUMLERI = ["satislar", "gecmis-siparisler", "mutfak-kayitlari", "musteriler", "personel-kayitlari", "revizyonlar"];
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const TIP_ETIKETLERI = { burger: "Burger", yan_lezzet: "Yan Lezzet", icecek: "İçecek", menu: "Menü" };
@@ -100,6 +101,7 @@ export default function Admin({ onCikis }) {
   const [oduller, setOduller] = useState([]);
   const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
   const [canliSatislar, setCanliSatislar] = useState([]);
+  const [gecmisSatislar, setGecmisSatislar] = useState([]);
   const [mutfakKayitlari, setMutfakKayitlari] = useState([]);
   const [musteriler, setMusteriler] = useState([]);
   const [personelKayitlari, setPersonelKayitlari] = useState({ vardiyalar: [], performans: [] });
@@ -188,7 +190,11 @@ export default function Admin({ onCikis }) {
     };
     const satislarGeldi = (satislar) => setCanliSatislar(satislar || []);
     const operasyonGuncellendi = () => {
-      adminIstek("/kayitlar/mutfak?limit=200").then((veri) => setMutfakKayitlari(veri.kayitlar || [])).catch(() => {});
+      Promise.allSettled([
+        adminIstek("/satislar/canli?limit=100").then((veri) => setCanliSatislar(veri.satislar || [])),
+        adminIstek("/satislar/gecmis?limit=100").then((veri) => setGecmisSatislar(veri.satislar || [])),
+        adminIstek("/kayitlar/mutfak?limit=200").then((veri) => setMutfakKayitlari(veri.kayitlar || [])),
+      ]);
     };
     yonetimeKatil();
     socket.on("connect", yonetimeKatil);
@@ -215,6 +221,7 @@ export default function Admin({ onCikis }) {
   useEffect(() => {
     const yollar = {
       satislar: ["/satislar/canli", (veri) => setCanliSatislar(veri.satislar || [])],
+      "gecmis-siparisler": ["/satislar/gecmis", (veri) => setGecmisSatislar(veri.satislar || [])],
       "mutfak-kayitlari": ["/kayitlar/mutfak", (veri) => setMutfakKayitlari(veri.kayitlar || [])],
       musteriler: ["/kayitlar/musteriler", (veri) => setMusteriler(veri.musteriler || [])],
       "personel-kayitlari": ["/kayitlar/personel", (veri) => setPersonelKayitlari({ vardiyalar: veri.vardiyalar || [], performans: veri.performans || [] })],
@@ -224,7 +231,7 @@ export default function Admin({ onCikis }) {
     const timer = setTimeout(async () => {
       const sorgu = new URLSearchParams();
       Object.entries(kayitFiltre).forEach(([anahtar, deger]) => deger && sorgu.set(anahtar, deger));
-      sorgu.set("limit", bolum === "satislar" ? "100" : "300");
+      sorgu.set("limit", ["satislar", "gecmis-siparisler"].includes(bolum) ? "100" : "300");
       try {
         const [yol, uygula] = yollar[bolum];
         uygula(await adminIstek(`${yol}?${sorgu.toString()}`));
@@ -364,6 +371,7 @@ export default function Admin({ onCikis }) {
   const toplamUrun = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.adet), 0), [rapor]);
   const yogunSaat = useMemo(() => (rapor.saatlik || []).reduce((en, s) => s.adet > en.adet ? s : en, { saat: null, adet: 0 }), [rapor]);
   const canliSatisToplami = useMemo(() => canliSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [canliSatislar]);
+  const gecmisSatisToplami = useMemo(() => gecmisSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [gecmisSatislar]);
   const tamamlananMutfak = useMemo(() => mutfakKayitlari.filter((kayit) => kayit.durum === "hazir"), [mutfakKayitlari]);
   const ortalamaHazirlama = useMemo(() => {
     const sureli = tamamlananMutfak.filter((kayit) => kayit.hazirlamaDakika != null);
@@ -401,6 +409,7 @@ export default function Admin({ onCikis }) {
   };
   const kayitSayilari = {
     satislar: canliSatislar.length,
+    "gecmis-siparisler": gecmisSatislar.length,
     "mutfak-kayitlari": mutfakKayitlari.length,
     musteriler: musteriler.length,
     "personel-kayitlari": personelKayitlari.vardiyalar.length,
@@ -558,17 +567,18 @@ export default function Admin({ onCikis }) {
                 <Metrik ad="Hazır" deger={canliSatislar.filter((s) => s.durum === "hazir").length} alt="Teslime hazır" renk="yesil" />
               </section>
               <KayitFiltreleri tur="satis" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
-              <div className="canli-satis-listesi">
-                {canliSatislar.length ? canliSatislar.map((satis, index) => {
-                  const siparisNo = satis.siparisNo || satis.siparis_no;
-                  const urunlerListesi = Array.isArray(satis.urunler) ? satis.urunler : [];
-                  return <article className="canli-satis-karti" key={`${siparisNo}-${index}`}>
-                    <header><div><span className="canli-nokta" /> <b>{siparisNo}</b><small>{tarihSaat(satis.olusturma)}</small></div><DurumRozeti durum={satis.durum} /></header>
-                    <div className="canli-satis-ozet"><strong>{para(satis.tutar)}</strong><span>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</span><span>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</span></div>
-                    <div className="canli-urunler">{urunlerListesi.map((urun, sira) => <span key={`${urun.ad}-${sira}`}><b>{urun.ad}</b> x{urun.adet}</span>)}</div>
-                  </article>;
-                }) : <Bos yazi="Filtreye uygun satış kaydı bulunamadı." />}
-              </div>
+              <SatisKartlari satislar={canliSatislar} />
+            </>}
+
+            {bolum === "gecmis-siparisler" && <>
+              <BolumBaslik baslik="Geçmiş siparişler" aciklama="Masa kapatıldığında canlı satıştan çıkan siparişler burada kalıcı olarak saklanır ve geriye dönük incelenebilir." />
+              <section className="admin-metrikler kayit-metrikleri">
+                <Metrik ad="Kapanan sipariş" deger={gecmisSatislar.length} alt="Filtre sonucundaki kayıt" renk="mavi" />
+                <Metrik ad="Geçmiş satış toplamı" deger={para(gecmisSatisToplami)} alt="Görünen kayıtlar" renk="turuncu" />
+                <Metrik ad="Hazır tamamlanan" deger={gecmisSatislar.filter((s) => s.durum === "hazir").length} alt="Masa kapanmadan hazırlanmış" renk="yesil" />
+              </section>
+              <KayitFiltreleri tur="gecmis" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
+              <SatisKartlari satislar={gecmisSatislar} gecmis />
             </>}
 
             {bolum === "mutfak-kayitlari" && <>
@@ -581,7 +591,7 @@ export default function Admin({ onCikis }) {
               </section>
               <KayitFiltreleri tur="mutfak" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
               <Panel baslik="Hazırlık geçmişi" alt={`${mutfakKayitlari.length} kayıt`}>
-                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>Hazırlama</th><th>Toplam bekleme</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{String(kayit.masa_no).toLowerCase() === "algotur" ? "Al Götür" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><SureRozeti dakika={kayit.hazirlamaDakika} /></td><td>{kayit.toplamDakika == null ? "—" : `${kayit.toplamDakika} dk`}</td></tr>)}</tbody></table></div>
+                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu mutfak-zaman-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>İşlem zamanları</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{String(kayit.masa_no).toLowerCase() === "algotur" ? "Al Götür" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><MutfakSureAkisi kayit={kayit} /></td></tr>)}</tbody></table></div>
               </Panel>
             </>}
 
@@ -915,9 +925,45 @@ function haftayiDoldur(veriler) {
 }
 
 function haftaAdi(gun) { return ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][Number(gun) - 1] || "—"; }
+function sureMetni(saniye) {
+  if (saniye == null || !Number.isFinite(Number(saniye))) return "—";
+  const toplam = Math.max(0, Math.round(Number(saniye)));
+  const saat = Math.floor(toplam / 3600);
+  const dakika = Math.floor((toplam % 3600) / 60);
+  const kalanSaniye = toplam % 60;
+  if (saat) return `${saat} sa ${dakika} dk ${kalanSaniye} sn`;
+  if (dakika) return `${dakika} dk ${kalanSaniye} sn`;
+  return `${kalanSaniye} sn`;
+}
+
+function SatisKartlari({ satislar, gecmis = false }) {
+  return <div className={`canli-satis-listesi ${gecmis ? "gecmis-satis-listesi" : ""}`}>
+    {satislar.length ? satislar.map((satis, index) => {
+      const siparisNo = satis.siparisNo || satis.siparis_no;
+      const urunlerListesi = Array.isArray(satis.urunler) ? satis.urunler : [];
+      return <article className="canli-satis-karti" key={`${siparisNo}-${index}`}>
+        <header><div><span className={gecmis ? "gecmis-nokta" : "canli-nokta"} /> <b>{siparisNo}</b><small>{tarihSaat(satis.olusturma)}</small></div><DurumRozeti durum={satis.durum} /></header>
+        <div className="canli-satis-ozet"><strong>{para(satis.tutar)}</strong><span>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</span><span>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</span></div>
+        <div className="canli-urunler">{urunlerListesi.map((urun, sira) => <span key={`${urun.ad}-${sira}`}><b>{urun.ad}</b> x{urun.adet}</span>)}</div>
+        {gecmis && <footer className="gecmis-satis-alt"><span>Masa kapatıldı</span><time>{tarihSaat(satis.kapandi_at)}</time></footer>}
+      </article>;
+    }) : <Bos yazi={gecmis ? "Filtreye uygun geçmiş sipariş bulunamadı." : "Şu anda açık masaya ait canlı satış yok."} />}
+  </div>;
+}
+
+function MutfakSureAkisi({ kayit }) {
+  const adimlar = [
+    { ad: "Sipariş alındı", zaman: kayit.siparis_at, bilgi: "Başlangıç" },
+    { ad: "Hazırlamaya başladı", zaman: kayit.baslangic_at, bilgi: kayit.beklemeSaniye == null ? "Henüz başlamadı" : `${sureMetni(kayit.beklemeSaniye)} sonra` },
+    { ad: "Servise gönderildi", zaman: kayit.hazir_at, bilgi: kayit.hazirlamaSaniye == null ? "Hazırlanıyor" : `${sureMetni(kayit.hazirlamaSaniye)} sürdü` },
+  ];
+  return <div className="mutfak-sure-akisi">{adimlar.map((adim, index) => <div className={adim.zaman ? "tamam" : "bekliyor"} key={adim.ad}><i>{index + 1}</i><span><b>{adim.ad}</b><small>{adim.zaman ? tarihSaat(adim.zaman) : adim.bilgi}</small>{adim.zaman && index > 0 && <em>{adim.bilgi}</em>}</span></div>)}</div>;
+}
+
 function KayitGezgini({ aktif, sayilar, git }) {
   const sekmeler = [
     ["satislar", "Canlı Satış", "Ödemeler", "satislar", "◉"],
+    ["gecmis-siparisler", "Geçmiş", "Kapanan masalar", "gecmis-siparisler", "◷"],
     ["mutfak-kayitlari", "Mutfak", "Hazırlama süreleri", "mutfak-kayitlari", "◇"],
     ["musteriler", "Müşteriler", "Hesap ve sadakat", "musteriler", "◎"],
     ["personel-kayitlari", "Personel", "Vardiya ve performans", "personel-kayitlari", "♟"],
@@ -940,7 +986,7 @@ function KayitFiltreleri({ tur, filtre, setFiltre, personeller = [] }) {
     setFiltre((onceki) => ({ ...onceki, baslangic: tarihDegeri(baslangic), bitis: tarihDegeri(bitis) }));
   };
   const aktifFiltre = Object.values(filtre).filter(Boolean).length;
-  const basliklar = { satis: "Satış kayıtlarını süz", mutfak: "Mutfak hareketlerini süz", musteri: "Müşteri hesaplarını süz", personel: "Personel hareketlerini süz", revizyon: "Revizyon günlüğünü süz" };
+  const basliklar = { satis: "Canlı satışları süz", gecmis: "Geçmiş siparişleri süz", mutfak: "Mutfak hareketlerini süz", musteri: "Müşteri hesaplarını süz", personel: "Personel hareketlerini süz", revizyon: "Revizyon günlüğünü süz" };
   return <section className="kayit-filtreleri">
     <header><div><b>{basliklar[tur] || "Kayıtları süz"}</b><small>Aradığınız kayda tarih, durum veya kişi bilgisiyle hızla ulaşın.</small></div><span>{aktifFiltre ? `${aktifFiltre} aktif filtre` : "Tüm kayıtlar"}</span></header>
     <div className="kayit-hizli-tarih"><span>Hızlı tarih</span><button type="button" onClick={() => hizliAralik(1)}>Bugün</button><button type="button" onClick={() => hizliAralik(7)}>Son 7 gün</button><button type="button" onClick={() => hizliAralik(30)}>Son 30 gün</button></div>
@@ -948,7 +994,7 @@ function KayitFiltreleri({ tur, filtre, setFiltre, personeller = [] }) {
       <label className="kayit-arama"><span>Ara</span><input type="search" value={filtre.arama} onChange={(e) => guncelle("arama", e.target.value.slice(0, 100))} placeholder={tur === "musteri" ? "Ad, e-posta veya telefon…" : "Sipariş no, kişi veya kayıt…"} /></label>
       <label><span>Başlangıç</span><input type="date" value={filtre.baslangic} onChange={(e) => guncelle("baslangic", e.target.value)} /></label>
       <label><span>Bitiş</span><input type="date" value={filtre.bitis} onChange={(e) => guncelle("bitis", e.target.value)} /></label>
-      {["satis", "mutfak"].includes(tur) && <label><span>Durum</span><select value={filtre.durum} onChange={(e) => guncelle("durum", e.target.value)}><option value="">Tüm durumlar</option><option value="yeni">Yeni</option><option value="hazirlaniyor">Hazırlanıyor</option><option value="hazir">Hazır</option></select></label>}
+      {["satis", "gecmis", "mutfak"].includes(tur) && <label><span>Durum</span><select value={filtre.durum} onChange={(e) => guncelle("durum", e.target.value)}><option value="">Tüm durumlar</option><option value="yeni">Yeni</option><option value="hazirlaniyor">Hazırlanıyor</option><option value="hazir">Hazır</option></select></label>}
       {["mutfak", "personel"].includes(tur) && <label><span>Personel</span><select value={filtre.personelId} onChange={(e) => guncelle("personelId", e.target.value)}><option value="">Tüm personel</option>{personeller.map((personel) => <option key={personel.id} value={personel.id}>{personel.ad} {personel.soyad}</option>)}</select></label>}
       {tur === "personel" && <label><span>Rol</span><select value={filtre.rol} onChange={(e) => guncelle("rol", e.target.value)}><option value="">Tüm roller</option><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></label>}
       {tur === "revizyon" && <><label><span>Kayıt türü</span><select value={filtre.varlikTuru} onChange={(e) => guncelle("varlikTuru", e.target.value)}><option value="">Tüm kayıtlar</option><option value="urun">Ürün</option><option value="kategori">Kategori</option><option value="kampanya">Kampanya</option><option value="odul">Ödül</option><option value="duyuru">Duyuru</option><option value="personel">Personel</option><option value="vardiya">Vardiya</option></select></label><label><span>İşlem</span><select value={filtre.islem} onChange={(e) => guncelle("islem", e.target.value)}><option value="">Tüm işlemler</option><option value="ekleme">Ekleme</option><option value="guncelleme">Güncelleme</option><option value="durum">Durum</option><option value="arsivleme">Arşivleme</option></select></label></>}
@@ -959,11 +1005,6 @@ function KayitFiltreleri({ tur, filtre, setFiltre, personeller = [] }) {
 function DurumRozeti({ durum }) {
   const etiketler = { yeni: "Yeni", hazirlaniyor: "Hazırlanıyor", hazir: "Hazır", tamamlandi: "Tamamlandı" };
   return <span className={`durum-rozeti ${durum || "yeni"}`}>{etiketler[durum] || durum || "Yeni"}</span>;
-}
-function SureRozeti({ dakika }) {
-  if (dakika == null) return <span className="sure-rozeti bekliyor">Başlamadı</span>;
-  const seviye = Number(dakika) > 15 ? "gecikti" : Number(dakika) > 10 ? "uyari" : "hizli";
-  return <span className={`sure-rozeti ${seviye}`}>{Number(dakika).toFixed(1)} dk</span>;
 }
 function Modal({ baslik, aciklama, sinif = "", kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}>×</button></header>{children}</section></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }

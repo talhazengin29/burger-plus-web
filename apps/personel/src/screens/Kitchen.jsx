@@ -38,7 +38,7 @@ function gecenSure(tarih) {
 export default function Kitchen() {
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
-  const [islemdeMasalar, setIslemdeMasalar] = useState(new Set());
+  const [islemdeSiparisler, setIslemdeSiparisler] = useState(new Set());
 
   useEffect(() => {
     const acildi = () => {
@@ -63,26 +63,44 @@ export default function Kitchen() {
   }, []);
 
   // Bir masanin tum kalemlerinin durumunu degistir
-  const durumDegistir = (masaNo, durum) => {
-    if (islemdeMasalar.has(masaNo)) return;
-    setIslemdeMasalar((onceki) => new Set(onceki).add(masaNo));
-    socket.timeout(8000).emit("masa-durum-degistir", { masaNo, durum }, () => {
-      setIslemdeMasalar((onceki) => {
+  const durumDegistir = (masaNo, siparisNo, durum) => {
+    const islemAnahtari = `${masaNo}-${siparisNo || "legacy"}`;
+    if (islemdeSiparisler.has(islemAnahtari)) return;
+    setIslemdeSiparisler((onceki) => new Set(onceki).add(islemAnahtari));
+    socket.timeout(8000).emit("masa-durum-degistir", { masaNo, siparisNo, durum }, () => {
+      setIslemdeSiparisler((onceki) => {
         const sonraki = new Set(onceki);
-        sonraki.delete(masaNo);
+        sonraki.delete(islemAnahtari);
         return sonraki;
       });
     });
   };
 
   // Masaları öncelik sırasına diz: yeni siparişler önce, sonra hazırlanıyor, sonra hazır
-  const siraliMasalar = useMemo(() => {
+  const siraliSiparisler = useMemo(() => {
     const sira = { yeni: 0, hazirlaniyor: 1, hazir: 2 };
-    return [...masalar].sort((a, b) => {
-      const durumA = a.kalemler[0]?.durum || "yeni";
-      const durumB = b.kalemler[0]?.durum || "yeni";
-      return (sira[durumA] ?? 3) - (sira[durumB] ?? 3);
+    const siparisler = masalar.flatMap((masa) => {
+      const gruplar = new Map();
+      masa.kalemler.forEach((kalem) => {
+        const siparisNo = kalem.siparis_no || `LEGACY-${masa.masaNo}`;
+        if (!gruplar.has(siparisNo)) gruplar.set(siparisNo, []);
+        gruplar.get(siparisNo).push(kalem);
+      });
+      return [...gruplar.entries()].map(([siparisNo, kalemler]) => {
+        const durum = kalemler.every((kalem) => kalem.durum === "hazir")
+          ? "hazir"
+          : kalemler.some((kalem) => kalem.durum === "hazirlaniyor") ? "hazirlaniyor" : "yeni";
+        return {
+          masaNo: masa.masaNo,
+          siparisNo,
+          kalemler,
+          durum,
+          toplam: kalemler.reduce((toplam, kalem) => toplam + Number(kalem.fiyat || 0) * Number(kalem.adet || 1), 0),
+          olusturma: kalemler.reduce((ilk, kalem) => !ilk || new Date(kalem.olusturma) < new Date(ilk) ? kalem.olusturma : ilk, null),
+        };
+      });
     });
+    return siparisler.sort((a, b) => (sira[a.durum] ?? 3) - (sira[b.durum] ?? 3) || new Date(a.olusturma) - new Date(b.olusturma));
   }, [masalar]);
 
   return (
@@ -96,12 +114,12 @@ export default function Kitchen() {
             {bagli ? "● Bağlı" : "● Bağlantı yok"}
           </span>
           <span className="mutfak-sayi">
-            {masalar.length} aktif masa
+            {siraliSiparisler.length} aktif sipariş
           </span>
         </div>
       </header>
 
-      {siraliMasalar.length === 0 ? (
+      {siraliSiparisler.length === 0 ? (
         <div className="bos-durum">
           <div className="bos-emoji">🍽️</div>
           <h2>Aktif sipariş yok</h2>
@@ -109,17 +127,18 @@ export default function Kitchen() {
         </div>
       ) : (
         <div className="masa-liste">
-          {siraliMasalar.map((masa) => {
-            // Masanin durumu = ilk kaleminin durumu (topluca degisir)
-            const durum = masa.kalemler[0]?.durum || "yeni";
+          {siraliSiparisler.map((siparis) => {
+            const durum = siparis.durum;
             const dbilgi = DURUM_BILGI[durum];
+            const islemAnahtari = `${siparis.masaNo}-${siparis.siparisNo || "legacy"}`;
+            const gonderilenSiparisNo = siparis.siparisNo.startsWith("LEGACY-") ? null : siparis.siparisNo;
             return (
-              <article key={masa.masaNo} className={`masa-kart durum-${dbilgi.renk}`}>
+              <article key={islemAnahtari} className={`masa-kart durum-${dbilgi.renk}`}>
                 <div className="masa-kart-ust">
                   <div className="masa-baslik">
-                    <span className="masa-no">Masa {masa.masaNo}</span>
+                    <span className="masa-no">Masa {siparis.masaNo}</span>
                     <span className="masa-sure">
-                      {gecenSure(masa.kalemler[0]?.olusturma)}
+                      {gonderilenSiparisNo || "Eski sipariş"} · {gecenSure(siparis.olusturma)}
                     </span>
                   </div>
                   <span className={`durum-rozet durum-${dbilgi.renk}`}>
@@ -128,7 +147,7 @@ export default function Kitchen() {
                 </div>
 
                 <ul className="kalem-liste">
-                  {masa.kalemler.map((k) => {
+                  {siparis.kalemler.map((k) => {
                     // Backend alanı henüz snake_case'e taşımamış olabilir — ikisini de destekle.
                     const secimler = k.secimler || {};
                     const haric = k.haricMalzemeler || k.haric_malzemeler || secimler.haricMalzemeler;
@@ -160,13 +179,13 @@ export default function Kitchen() {
                 </ul>
 
                 <div className="masa-alt">
-                  <span className="masa-toplam">Toplam: ₺{Number(masa.toplam).toFixed(2)}</span>
+                  <span className="masa-toplam">Toplam: ₺{Number(siparis.toplam).toFixed(2)}</span>
                   <div className="masa-butonlar">
                     {durum === "yeni" && (
                       <button
                         className="btn btn-uyari"
-                        disabled={islemdeMasalar.has(masa.masaNo)}
-                        onClick={() => durumDegistir(masa.masaNo, "hazirlaniyor")}
+                        disabled={islemdeSiparisler.has(islemAnahtari)}
+                        onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazirlaniyor")}
                       >
                         Hazırlamaya Başla
                       </button>
@@ -174,8 +193,8 @@ export default function Kitchen() {
                     {durum === "hazirlaniyor" && (
                       <button
                         className="btn btn-basari"
-                        disabled={islemdeMasalar.has(masa.masaNo)}
-                        onClick={() => durumDegistir(masa.masaNo, "hazir")}
+                        disabled={islemdeSiparisler.has(islemAnahtari)}
+                        onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazir")}
                       >
                         Hazır ✓
                       </button>
