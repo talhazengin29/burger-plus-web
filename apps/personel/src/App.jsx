@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Login from "./screens/Login";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
@@ -19,6 +20,7 @@ const OTURUM = "burger-plus-personel";
 const TEMA_ANAHTARI = "burger-plus-personel-tema";
 
 export default function App() {
+  const git = useNavigate();
   const [rol, setRol] = useState(null); // "mutfak" | "salon" | null
   const [aktifSekme, setAktifSekme] = useState("mutfak");
   const [tema, setTema] = useState("koyu"); // "koyu" | "acik"
@@ -27,7 +29,7 @@ export default function App() {
     const kayitli = sessionStorage.getItem(OTURUM);
     if (kayitli && adminToken.al()) {
       setRol(kayitli);
-      setAktifSekme(kayitli);
+      setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
       personelSocketiniBagla();
     }
     const kayitliTema = localStorage.getItem(TEMA_ANAHTARI);
@@ -47,6 +49,7 @@ export default function App() {
     setRol(girenRol);
     setAktifSekme(girenRol);
     personelSocketiniBagla();
+    git(girenRol === "admin" ? "/yonetim/genel-bakis" : `/${girenRol}`);
   };
 
   const cikis = () => {
@@ -54,6 +57,7 @@ export default function App() {
     adminToken.sil();
     personelSocketiniKes();
     setRol(null);
+    git("/");
   };
 
   if (!rol) return <Login onGirisBasarili={girisBasarili} />;
@@ -65,7 +69,7 @@ export default function App() {
         {(rol === "mutfak" || rol === "admin") && (
         <button
           className={"sekme " + (aktifSekme === "mutfak" ? "sekme--aktif" : "")}
-          onClick={() => setAktifSekme("mutfak")}
+          onClick={() => { setAktifSekme("mutfak"); git("/mutfak"); }}
         >
           🍳 Mutfak
         </button>
@@ -73,7 +77,7 @@ export default function App() {
         {(rol === "salon" || rol === "admin") && (
         <button
           className={"sekme " + (aktifSekme === "salon" ? "sekme--aktif" : "")}
-          onClick={() => setAktifSekme("salon")}
+          onClick={() => { setAktifSekme("salon"); git("/salon"); }}
         >
           🍽️ Salon
         </button>

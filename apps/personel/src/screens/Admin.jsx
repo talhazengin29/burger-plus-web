@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
+import { socket } from "../lib/socket";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Admin.css";
 
@@ -14,22 +16,33 @@ const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger",
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
-const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
+const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", ikon: "🎯", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
 const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
+const KAMPANYA_IKONLARI = [
+  ["🎯", "Fırsat"], ["🕒", "Saat"], ["🎓", "Öğrenci"], ["🎁", "Hediye"],
+  ["🔥", "Popüler"], ["🍔", "Burger"], ["🥤", "İçecek"], ["👥", "Davet"],
+  ["💳", "Ödeme"], ["⭐", "Özel"], ["⚡", "Hızlı"], ["💸", "İndirim"],
+];
 
 const BOLUMLER = [
-  ["genel", "Genel Bakış", "▦"],
-  ["urunler", "Ürünler", "◆"],
-  ["kampanyalar", "Kampanyalar", "%"],
-  ["oduller", "Puan Marketi", "★"],
-  ["duyurular", "Duyurular", "●"],
-  ["personel", "Personel", "♟"],
-  ["raporlar", "Satış Raporları", "↗"],
+  ["genel", "Genel Bakış", "▦", "genel-bakis"],
+  ["urunler", "Ürünler", "◆", "urunler"],
+  ["kampanyalar", "Kampanyalar", "%", "kampanyalar"],
+  ["oduller", "Puan Marketi", "★", "puan-marketi"],
+  ["duyurular", "Duyurular", "●", "duyurular"],
+  ["satislar", "Canlı Satışlar", "◉", "satislar"],
+  ["mutfak-kayitlari", "Mutfak Kayıtları", "◫", "mutfak-kayitlari"],
+  ["musteriler", "Müşteri Kayıtları", "◎", "musteriler"],
+  ["personel", "Personel", "♟", "personel"],
+  ["personel-kayitlari", "Personel Kayıtları", "◷", "personel-kayitlari"],
+  ["revizyonlar", "Revizyon Kayıtları", "↺", "revizyon-kayitlari"],
+  ["raporlar", "Satış Raporları", "↗", "satis-raporlari"],
 ];
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const TIP_ETIKETLERI = { burger: "Burger", yan_lezzet: "Yan Lezzet", icecek: "İçecek", menu: "Menü" };
 const tarihSaat = (d) => d ? new Date(d).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+const kampanyaIkonu = (kampanya) => kampanya?.ikon || (String(kampanya?.etiket || "").includes(":") ? "🕒" : kampanya?.kod === "davet-et" || kampanya?.etiket === "Davet Et" ? "👥" : "🎓");
 
 const GRAMAJ_KURALLARI = {
   "Burgerler": { etiket: "Köfte gramajı", birim: "gr", artisOrani: .25, miktarYuvarlama: 25, fiyatArtisOrani: .20, fiyatYuvarlama: 5 },
@@ -66,7 +79,10 @@ const urunuFormaCevir = (urun) => ({
 });
 
 export default function Admin({ onCikis }) {
-  const [bolum, setBolum] = useState("genel");
+  const konum = useLocation();
+  const git = useNavigate();
+  const yolParcasi = konum.pathname.split("/").filter(Boolean).at(-1) || "genel-bakis";
+  const bolum = BOLUMLER.find(([, , , yol]) => yol === yolParcasi)?.[0] || "genel";
   const [dashboard, setDashboard] = useState(null);
   const [urunler, setUrunler] = useState([]);
   const [kategoriler, setKategoriler] = useState([]);
@@ -75,6 +91,13 @@ export default function Admin({ onCikis }) {
   const [kampanyalar, setKampanyalar] = useState([]);
   const [oduller, setOduller] = useState([]);
   const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
+  const [canliSatislar, setCanliSatislar] = useState([]);
+  const [mutfakKayitlari, setMutfakKayitlari] = useState([]);
+  const [musteriler, setMusteriler] = useState([]);
+  const [personelKayitlari, setPersonelKayitlari] = useState({ vardiyalar: [], performans: [] });
+  const [revizyonlar, setRevizyonlar] = useState([]);
+  const [kayitFiltre, setKayitFiltre] = useState({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
+  const [canliBildirim, setCanliBildirim] = useState("");
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
   const [bildirim, setBildirim] = useState("");
@@ -99,6 +122,9 @@ export default function Admin({ onCikis }) {
       ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
       ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
       ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"],
+      ["Canlı satışlar", "/satislar/canli?limit=100"], ["Mutfak kayıtları", "/kayitlar/mutfak?limit=200"],
+      ["Müşteriler", "/kayitlar/musteriler?limit=300"], ["Personel kayıtları", "/kayitlar/personel?limit=300"],
+      ["Revizyonlar", "/revizyonlar?limit=200"],
     ];
     const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
     const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -110,7 +136,7 @@ export default function Admin({ onCikis }) {
       return;
     }
 
-    const [d, u, p, r, duy, k, kamp, od] = sonuclar.map((sonuc) =>
+    const [d, u, p, r, duy, k, kamp, od, satis, mutfak, musteri, personelKaydi, revizyon] = sonuclar.map((sonuc) =>
       sonuc.status === "fulfilled" ? sonuc.value : null
     );
     if (d) setDashboard(d);
@@ -122,6 +148,11 @@ export default function Admin({ onCikis }) {
     else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
     if (kamp) setKampanyalar(kamp.kampanyalar || []);
     if (od) setOduller(od.oduller || []);
+    if (satis) setCanliSatislar(satis.satislar || []);
+    if (mutfak) setMutfakKayitlari(mutfak.kayitlar || []);
+    if (musteri) setMusteriler(musteri.musteriler || []);
+    if (personelKaydi) setPersonelKayitlari({ vardiyalar: personelKaydi.vardiyalar || [], performans: personelKaydi.performans || [] });
+    if (revizyon) setRevizyonlar(revizyon.revizyonlar || []);
 
     const hatalar = sonuclar.flatMap((sonuc, index) =>
       sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -132,10 +163,66 @@ export default function Admin({ onCikis }) {
 
   useEffect(() => { verileriYukle(); }, [verileriYukle]);
   useEffect(() => {
+    if (!BOLUMLER.some(([, , , yol]) => yol === yolParcasi)) git("/yonetim/genel-bakis", { replace: true });
+  }, [git, yolParcasi]);
+  useEffect(() => {
+    setKayitFiltre({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
+  }, [bolum]);
+  useEffect(() => {
+    const yonetimeKatil = () => socket.emit("yonetime-katil");
+    const satisGeldi = (satis) => {
+      setCanliSatislar((onceki) => [satis, ...onceki.filter((kayit) => kayit.siparis_no !== satis.siparisNo)].slice(0, 100));
+      setCanliBildirim(`${satis.kisiAdi || "Yeni müşteri"} · ${para(satis.tutar)}`);
+      adminIstek("/dashboard").then(setDashboard).catch(() => {});
+    };
+    const satislarGeldi = (satislar) => setCanliSatislar(satislar || []);
+    const operasyonGuncellendi = () => {
+      adminIstek("/kayitlar/mutfak?limit=200").then((veri) => setMutfakKayitlari(veri.kayitlar || [])).catch(() => {});
+    };
+    yonetimeKatil();
+    socket.on("connect", yonetimeKatil);
+    socket.on("yonetim-satis-guncellendi", satisGeldi);
+    socket.on("yonetim-satislar", satislarGeldi);
+    socket.on("yonetim-operasyon-guncellendi", operasyonGuncellendi);
+    return () => {
+      socket.off("yonetim-satis-guncellendi", satisGeldi);
+      socket.off("yonetim-satislar", satislarGeldi);
+      socket.off("yonetim-operasyon-guncellendi", operasyonGuncellendi);
+      socket.off("connect", yonetimeKatil);
+    };
+  }, []);
+  useEffect(() => {
+    if (!canliBildirim) return;
+    const timer = setTimeout(() => setCanliBildirim(""), 4200);
+    return () => clearTimeout(timer);
+  }, [canliBildirim]);
+  useEffect(() => {
     if (!bildirim) return;
     const timer = setTimeout(() => setBildirim(""), 3000);
     return () => clearTimeout(timer);
   }, [bildirim]);
+  useEffect(() => {
+    const yollar = {
+      satislar: ["/satislar/canli", (veri) => setCanliSatislar(veri.satislar || [])],
+      "mutfak-kayitlari": ["/kayitlar/mutfak", (veri) => setMutfakKayitlari(veri.kayitlar || [])],
+      musteriler: ["/kayitlar/musteriler", (veri) => setMusteriler(veri.musteriler || [])],
+      "personel-kayitlari": ["/kayitlar/personel", (veri) => setPersonelKayitlari({ vardiyalar: veri.vardiyalar || [], performans: veri.performans || [] })],
+      revizyonlar: ["/revizyonlar", (veri) => setRevizyonlar(veri.revizyonlar || [])],
+    };
+    if (!yollar[bolum]) return;
+    const timer = setTimeout(async () => {
+      const sorgu = new URLSearchParams();
+      Object.entries(kayitFiltre).forEach(([anahtar, deger]) => deger && sorgu.set(anahtar, deger));
+      sorgu.set("limit", bolum === "satislar" ? "100" : "300");
+      try {
+        const [yol, uygula] = yollar[bolum];
+        uygula(await adminIstek(`${yol}?${sorgu.toString()}`));
+      } catch (err) {
+        setHata(err.message);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [bolum, kayitFiltre]);
 
   const islem = async (fn, mesaj) => {
     setHata("");
@@ -265,6 +352,12 @@ export default function Admin({ onCikis }) {
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
   const toplamUrun = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.adet), 0), [rapor]);
   const yogunSaat = useMemo(() => (rapor.saatlik || []).reduce((en, s) => s.adet > en.adet ? s : en, { saat: null, adet: 0 }), [rapor]);
+  const canliSatisToplami = useMemo(() => canliSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [canliSatislar]);
+  const tamamlananMutfak = useMemo(() => mutfakKayitlari.filter((kayit) => kayit.durum === "hazir"), [mutfakKayitlari]);
+  const ortalamaHazirlama = useMemo(() => {
+    const sureli = tamamlananMutfak.filter((kayit) => kayit.hazirlamaDakika != null);
+    return sureli.length ? sureli.reduce((toplam, kayit) => toplam + kayit.hazirlamaDakika, 0) / sureli.length : 0;
+  }, [tamamlananMutfak]);
   const filtreliUrunler = useMemo(() => {
     const arama = urunArama.trim().toLocaleLowerCase("tr");
     const liste = urunler.filter((urun) =>
@@ -300,8 +393,8 @@ export default function Admin({ onCikis }) {
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <div className="admin-marka"><img src={logoFull} alt="Burger Plus" /><small>Yönetim Merkezi</small></div>
-        <nav>{BOLUMLER.map(([id, ad, ikon]) => (
-          <button key={id} className={bolum === id ? "aktif" : ""} onClick={() => setBolum(id)}><b>{ikon}</b>{ad}</button>
+        <nav>{BOLUMLER.map(([id, ad, ikon, yol]) => (
+          <button key={id} className={bolum === id ? "aktif" : ""} onClick={() => git(`/yonetim/${yol}`)}><b>{ikon}</b>{ad}</button>
         ))}</nav>
         <div className="admin-sidebar-alt"><i className={hata ? "durum-hata" : ""} />{hata ? "Bağlantı sorunu" : "Sistem çevrimiçi"}</div>
       </aside>
@@ -313,6 +406,7 @@ export default function Admin({ onCikis }) {
         </header>
 
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}
+        {canliBildirim && <div className="admin-canli-toast"><i /> <div><b>Yeni satış alındı</b><span>{canliBildirim}</span></div></div>}
         {hata && <div className="admin-hata">{hata}</div>}
         {yukleniyor && !dashboard ? <div className="admin-yukleniyor">Veriler hazırlanıyor…</div> : (
           <div className="admin-icerik">
@@ -322,6 +416,8 @@ export default function Admin({ onCikis }) {
                 <Metrik ad="Bugünkü sipariş" deger={dashboard.bugunSiparis} alt="Toplam sipariş" renk="yesil" />
                 <Metrik ad="Menü" deger={urunler.length} alt="Katalogdaki ürünler" renk="mavi" />
                 <Metrik ad="Ekip" deger={`${dashboard.vardiyada}/${dashboard.personel}`} alt="Şu an vardiyada" renk="mor" />
+                <Metrik ad="Mutfak ortalaması" deger={dashboard.ortalamaHazirlamaDakika == null ? "—" : `${dashboard.ortalamaHazirlamaDakika} dk`} alt="Son 30 gün" renk="yesil" />
+                <Metrik ad="Geciken sipariş" deger={dashboard.gecikenSiparis || 0} alt="15 dakika üzeri" renk="turuncu" />
               </section>
               <section className="admin-grid-2">
                 <Panel baslik="Son 30 gün satış hareketi" alt={para(toplamCiro)}>
@@ -338,6 +434,9 @@ export default function Admin({ onCikis }) {
                 <Panel baslik="Kategori dağılımı" alt="Son 30 gün"><KategoriDagilimi veriler={rapor.kategoriler || []} toplam={toplamUrun} /></Panel>
                 <Panel baslik="Haftalık ritim" alt="Hangi gün daha yoğun?"><MiniCizgiGrafigi veriler={haftayiDoldur(rapor.haftalik || [])} deger="adet" etiket={(g) => haftaAdi(g.gun)} renk="mor" /></Panel>
               </section>
+              <Panel baslik="Canlı satış akışı" alt="Yeni ödemeler otomatik görünür">
+                <div className="dashboard-canli-akis">{canliSatislar.slice(0, 5).map((satis, index) => <button type="button" key={`${satis.siparisNo || satis.siparis_no}-${index}`} onClick={() => git("/yonetim/satislar")}><i /><span><b>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</b><small>{(Array.isArray(satis.urunler) ? satis.urunler : []).map((urun) => `${urun.ad} x${urun.adet}`).join(", ") || `${satis.urunAdedi || satis.urun_adedi || 0} ürün`}</small></span><em>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</em><strong>{para(satis.tutar)}</strong><time>{tarihSaat(satis.olusturma)}</time></button>)}{!canliSatislar.length && <Bos yazi="Henüz satış kaydı yok." />}</div>
+              </Panel>
             </>}
 
             {bolum === "urunler" && <>
@@ -346,11 +445,14 @@ export default function Admin({ onCikis }) {
                 <header><div><span>UYGULAMA MENÜSÜ</span><h3>Kategoriler</h3><p>Buradaki sıralama ve görseller müşteri uygulamasına anında yansır.</p></div><button type="button" onClick={() => setKategoriForm({ ...BOS_KATEGORI, sira: (kategoriler.at(-1)?.sira || 0) + 10 })}>+ Kategori ekle</button></header>
                 <div className="kategori-yonetim-listesi">
                   {kategoriler.map((kategori) => (
-                    <button type="button" className={!kategori.aktif ? "pasif" : ""} key={kategori.id} onClick={() => setKategoriForm({ ...kategori })}>
-                      <span className="kategori-yonetim-gorsel">{kategori.gorsel ? <img src={kategori.gorsel} alt="" /> : <b>{kategori.ad.charAt(0)}</b>}</span>
-                      <span><b>{kategori.ad}</b><small>{urunler.filter((urun) => urun.kategori === kategori.ad).length} ürün · sıra {kategori.sira}</small></span>
-                      <em>Düzenle</em>
-                    </button>
+                    <article className={!kategori.aktif ? "pasif" : ""} key={kategori.id}>
+                      <button type="button" className="kategori-duzenle" onClick={() => setKategoriForm({ ...kategori })}>
+                        <span className="kategori-yonetim-gorsel">{kategori.gorsel ? <img src={kategori.gorsel} alt="" /> : <b>{kategori.ad.charAt(0)}</b>}</span>
+                        <span><b>{kategori.ad}</b><small>{urunler.filter((urun) => urun.kategori === kategori.ad).length} ürün · sıra {kategori.sira}</small></span>
+                        <em>Düzenle</em>
+                      </button>
+                      <button type="button" className="kategori-sil" onClick={() => { if (window.confirm(`${kategori.ad} kategorisi silinsin mi? İçinde ürün varsa işlem güvenli biçimde engellenir.`)) islem(() => adminIstek(`/kategoriler/${kategori.id}`, { method: "DELETE" }), "Kategori arşivlendi."); }}>Sil</button>
+                    </article>
                   ))}
                 </div>
               </section>
@@ -380,14 +482,14 @@ export default function Admin({ onCikis }) {
                     <b>{kampanya.aktif ? "YAYINDA" : "PASİF"}</b>
                   </div>
                   <div className="yonetim-kart-icerik">
-                    <small>{kampanya.etiket}</small><h3>{kampanya.baslik}</h3><p>{kampanya.aciklama}</p>
+                    <small><span className="kampanya-kart-ikonu">{kampanyaIkonu(kampanya)}</span>{kampanya.etiket}</small><h3>{kampanya.baslik}</h3><p>{kampanya.aciklama}</p>
                     <div className="yonetim-etiketler">
                       {Number(kampanya.indirimYuzde) > 0 && <span>%{kampanya.indirimYuzde} indirim</span>}
                       <span>{kampanya.kampanyaTipi === "saatli" ? `${String(kampanya.baslangicSaat).padStart(2, "0")}:00–${String(kampanya.bitisSaat).padStart(2, "0")}:00` : "Sürekli"}</span>
                       {(kampanya.gecerliKategoriler || []).map((kategori) => <span key={kategori}>{kategori}</span>)}
                     </div>
                   </div>
-                  <footer><button type="button" onClick={() => setKampanyaForm({ ...kampanya, gecerliKategoriler: [...(kampanya.gecerliKategoriler || [])] })}>Düzenle</button></footer>
+                  <footer><button type="button" onClick={() => setKampanyaForm({ ...kampanya, gecerliKategoriler: [...(kampanya.gecerliKategoriler || [])] })}>Düzenle</button><button type="button" className="tehlike" onClick={() => { if (window.confirm(`${kampanya.baslik} kampanyası arşivlensin mi?`)) islem(() => adminIstek(`/kampanyalar/${kampanya.id}`, { method: "DELETE" }), "Kampanya arşivlendi."); }}>Sil</button></footer>
                 </article>
               )) : <Bos yazi="Henüz kampanya tanımlanmamış." />}</div>
             </>}
@@ -401,20 +503,81 @@ export default function Admin({ onCikis }) {
                     <b>{odul.aktif ? "MARKETTE" : "PASİF"}</b>
                   </div>
                   <div className="yonetim-kart-icerik"><small>PUAN ÖDÜLÜ</small><h3>{odul.ad}</h3><strong>{Number(odul.puan).toLocaleString("tr-TR")} Puan</strong><p>Bağlı ürün: {odul.urunAd}</p><div className="yonetim-etiketler"><span>{odul.kazanilmaSayisi} kez kazanıldı</span></div></div>
-                  <footer><button type="button" onClick={() => setOdulForm({ ...odul })}>Düzenle</button></footer>
+                  <footer><button type="button" onClick={() => setOdulForm({ ...odul })}>Düzenle</button><button type="button" className="tehlike" onClick={() => { if (window.confirm(`${odul.ad} puan marketinden kaldırılsın mı? Kazanılmış ödüller korunur.`)) islem(() => adminIstek(`/oduller/${odul.id}`, { method: "DELETE" }), "Ödül puan marketinden arşivlendi."); }}>Sil</button></footer>
                 </article>
               )) : <Bos yazi="Puan marketinde henüz ödül yok." />}</div>
             </>}
 
             {bolum === "duyurular" && <>
               <BolumBaslik baslik="Müşteri duyuruları" aciklama="Yayınlanan duyurular müşterilerin bildirim panelinde görünür." buton="+ Duyuru yayınla" onClick={() => setDuyuruForm({ ...BOS_DUYURU })} />
-              <div className="duyuru-liste">{duyurular.length ? duyurular.map((duyuru) => <article key={duyuru.id} className={!duyuru.aktif ? "pasif" : ""}><span>DUYURU</span><h3>{duyuru.baslik}</h3><p>{duyuru.mesaj}</p><footer><small>{tarihSaat(duyuru.olusturma)}</small><b>{duyuru.hedef}</b></footer></article>) : <Bos yazi="Henüz yayınlanmış duyuru yok." />}</div>
+              <div className="duyuru-liste">{duyurular.length ? duyurular.map((duyuru) => <article key={duyuru.id} className={!duyuru.aktif ? "pasif" : ""}><span>DUYURU</span><h3>{duyuru.baslik}</h3><p>{duyuru.mesaj}</p><footer><small>{tarihSaat(duyuru.olusturma)}</small><b>{duyuru.hedef}</b><button type="button" className="tehlike" onClick={() => { if (window.confirm(`${duyuru.baslik} duyurusu yayından kaldırılsın mı?`)) islem(() => adminIstek(`/duyurular/${duyuru.id}`, { method: "DELETE" }), "Duyuru yayından kaldırıldı."); }}>Sil</button></footer></article>) : <Bos yazi="Henüz yayınlanmış duyuru yok." />}</div>
+            </>}
+
+            {bolum === "satislar" && <>
+              <BolumBaslik baslik="Canlı satış merkezi" aciklama="Yeni ödemeler bu ekrana sayfa yenilemeden düşer; sipariş içeriğini ve mutfak durumunu anlık izleyin." />
+              <section className="admin-metrikler kayit-metrikleri">
+                <Metrik ad="Görünen satış" deger={canliSatislar.length} alt="Filtre sonucundaki sipariş" renk="mavi" />
+                <Metrik ad="Satış toplamı" deger={para(canliSatisToplami)} alt="Görünen kayıtlar" renk="turuncu" />
+                <Metrik ad="Hazırlanıyor" deger={canliSatislar.filter((s) => s.durum === "hazirlaniyor").length} alt="Mutfakta aktif" renk="mor" />
+                <Metrik ad="Hazır" deger={canliSatislar.filter((s) => s.durum === "hazir").length} alt="Teslime hazır" renk="yesil" />
+              </section>
+              <KayitFiltreleri tur="satis" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
+              <div className="canli-satis-listesi">
+                {canliSatislar.length ? canliSatislar.map((satis, index) => {
+                  const siparisNo = satis.siparisNo || satis.siparis_no;
+                  const urunlerListesi = Array.isArray(satis.urunler) ? satis.urunler : [];
+                  return <article className="canli-satis-karti" key={`${siparisNo}-${index}`}>
+                    <header><div><span className="canli-nokta" /> <b>{siparisNo}</b><small>{tarihSaat(satis.olusturma)}</small></div><DurumRozeti durum={satis.durum} /></header>
+                    <div className="canli-satis-ozet"><strong>{para(satis.tutar)}</strong><span>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</span><span>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</span></div>
+                    <div className="canli-urunler">{urunlerListesi.map((urun, sira) => <span key={`${urun.ad}-${sira}`}><b>{urun.ad}</b> x{urun.adet}</span>)}</div>
+                  </article>;
+                }) : <Bos yazi="Filtreye uygun satış kaydı bulunamadı." />}
+              </div>
+            </>}
+
+            {bolum === "mutfak-kayitlari" && <>
+              <BolumBaslik baslik="Mutfak işleyiş kayıtları" aciklama="Siparişin gelişinden hazırlanmasına kadar geçen süreyi, işlemi yapan personeli ve gecikmeleri kontrol edin." />
+              <section className="admin-metrikler kayit-metrikleri">
+                <Metrik ad="Ortalama hazırlama" deger={`${ortalamaHazirlama.toFixed(1)} dk`} alt="Tamamlanan siparişler" renk="turuncu" />
+                <Metrik ad="Tamamlanan" deger={tamamlananMutfak.length} alt="Hazır durumundaki kayıt" renk="yesil" />
+                <Metrik ad="Aktif mutfak" deger={mutfakKayitlari.filter((k) => k.durum === "hazirlaniyor").length} alt="Şu an hazırlanıyor" renk="mavi" />
+                <Metrik ad="15 dk üzeri" deger={mutfakKayitlari.filter((k) => Number(k.hazirlamaDakika) > 15).length} alt="İncelenmesi gereken" renk="mor" />
+              </section>
+              <KayitFiltreleri tur="mutfak" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
+              <Panel baslik="Hazırlık geçmişi" alt={`${mutfakKayitlari.length} kayıt`}>
+                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>Hazırlama</th><th>Toplam bekleme</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{String(kayit.masa_no).toLowerCase() === "algotur" ? "Al Götür" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><SureRozeti dakika={kayit.hazirlamaDakika} /></td><td>{kayit.toplamDakika == null ? "—" : `${kayit.toplamDakika} dk`}</td></tr>)}</tbody></table></div>
+              </Panel>
+            </>}
+
+            {bolum === "musteriler" && <>
+              <BolumBaslik baslik="Müşteri kayıtları" aciklama="Hesap sahiplerini, sipariş sıklığını, toplam harcamayı ve sadakat puanlarını tek ekrandan inceleyin." />
+              <section className="admin-metrikler kayit-metrikleri">
+                <Metrik ad="Kayıtlı müşteri" deger={musteriler.length} alt="Filtre sonucundaki hesap" renk="mavi" />
+                <Metrik ad="Sipariş veren" deger={musteriler.filter((m) => m.siparisSayisi > 0).length} alt="En az bir sipariş" renk="yesil" />
+                <Metrik ad="Toplam harcama" deger={para(musteriler.reduce((t, m) => t + m.toplamHarcama, 0))} alt="Müşteri hesapları" renk="turuncu" />
+                <Metrik ad="Toplam puan" deger={musteriler.reduce((t, m) => t + m.puan, 0).toLocaleString("tr-TR")} alt="Kullanılabilir puan" renk="mor" />
+              </section>
+              <KayitFiltreleri tur="musteri" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
+              <Panel baslik="Müşteri listesi" alt={`${musteriler.length} hesap`}><div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Müşteri</th><th>İletişim</th><th>Kayıt tarihi</th><th>Sipariş</th><th>Toplam harcama</th><th>Puan</th><th>Son sipariş</th></tr></thead><tbody>{musteriler.map((musteri) => <tr key={musteri.id}><td><div className="tablo-kisi"><i>{musteri.ad?.[0]}{musteri.soyad?.[0]}</i><b>{musteri.ad} {musteri.soyad}</b></div></td><td><b>{musteri.email}</b><span>{musteri.telefon || "—"}</span></td><td>{tarihSaat(musteri.olusturma)}</td><td>{musteri.siparisSayisi}</td><td><strong>{para(musteri.toplamHarcama)}</strong></td><td>{musteri.puan.toLocaleString("tr-TR")}</td><td>{tarihSaat(musteri.son_siparis)}</td></tr>)}</tbody></table></div></Panel>
+            </>}
+
+            {bolum === "personel-kayitlari" && <>
+              <BolumBaslik baslik="Personel performansı" aciklama="Vardiya sürelerini ve mutfakta tamamlanan sipariş performansını tarih aralığına göre karşılaştırın." />
+              <KayitFiltreleri tur="personel" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
+              <div className="performans-grid">{personelKayitlari.performans.map((p) => <article key={p.id}><div className="personel-avatar">{p.ad?.[0]}{p.soyad?.[0]}</div><div><span>{p.rol}</span><h3>{p.ad} {p.soyad}</h3></div><strong>{p.hazirlananSiparis}</strong><small>hazırlanan sipariş</small><b>{p.ortalamaDakika == null ? "—" : `${p.ortalamaDakika} dk ort.`}</b></article>)}</div>
+              <Panel baslik="Vardiya hareketleri" alt={`${personelKayitlari.vardiyalar.length} kayıt`}><div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Personel</th><th>Rol</th><th>Giriş</th><th>Çıkış</th><th>Çalışma</th><th>Durum</th></tr></thead><tbody>{personelKayitlari.vardiyalar.map((v) => <tr key={v.id}><td><b>{v.ad} {v.soyad}</b></td><td>{v.rol}</td><td>{tarihSaat(v.giris)}</td><td>{v.cikis ? tarihSaat(v.cikis) : "—"}</td><td><strong>{v.calismaSaati.toFixed(2)} saat</strong></td><td><span className={`vardiya-rozet ${v.cikis ? "kapali" : "acik"}`}>{v.cikis ? "Tamamlandı" : "Vardiyada"}</span></td></tr>)}</tbody></table></div></Panel>
+            </>}
+
+            {bolum === "revizyonlar" && <>
+              <BolumBaslik baslik="Revizyon günlüğü" aciklama="Yönetim panelindeki ekleme, düzenleme, durum değiştirme ve arşivleme işlemleri geriye dönük izlenir." />
+              <KayitFiltreleri tur="revizyon" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
+              <div className="revizyon-zaman-cizgisi">{revizyonlar.length ? revizyonlar.map((kayit) => <article key={kayit.id}><i className={`revizyon-ikon ${kayit.islem}`}>{kayit.islem === "arsivleme" ? "×" : kayit.islem === "ekleme" ? "+" : "↺"}</i><div className="revizyon-icerik"><header><div><span>{kayit.varlik_turu}</span><h3>{kayit.aciklama}</h3></div><time>{tarihSaat(kayit.olusturma)}</time></header><p>{kayit.yapan_ad} tarafından gerçekleştirildi.</p>{(kayit.eski_deger || kayit.yeni_deger) && <details><summary>Değişiklik ayrıntısı</summary><div>{kayit.eski_deger && <pre>{JSON.stringify(kayit.eski_deger, null, 2)}</pre>}{kayit.yeni_deger && <pre>{JSON.stringify(kayit.yeni_deger, null, 2)}</pre>}</div></details>}</div></article>) : <Bos yazi="Filtreye uygun revizyon kaydı bulunamadı." />}</div>
             </>}
 
             {bolum === "personel" && <>
               <BolumBaslik baslik="Ekip ve vardiyalar" aciklama="Giriş–çıkış saatleri, çalışma süresi ve tahmini ücret takibi." buton="+ Personel ekle" onClick={() => setPersonelForm({ ...BOS_PERSONEL })} />
               <div className="admin-personel-grid">{personeller.map((p) => (
-                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div><button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><button className="duzenle-link" onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret, sifre: "" })}>Düzenle</button></article>
+                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div><button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><div className="personel-kart-islemleri"><button onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret, sifre: "" })}>Düzenle</button><button className="tehlike" onClick={() => { if (window.confirm(`${p.ad} ${p.soyad} ekipten çıkarılsın mı? Açık vardiyası kapatılır ve personel girişi devre dışı kalır.`)) islem(() => adminIstek(`/personeller/${p.id}`, { method: "DELETE" }), "Personel güvenli biçimde arşivlendi."); }}>Sil</button></div></article>
               ))}</div>
             </>}
 
@@ -557,6 +720,10 @@ export default function Admin({ onCikis }) {
       {kampanyaForm && (
         <Modal baslik={kampanyaForm.id ? "Kampanyayı düzenle" : "Yeni kampanya"} aciklama="Kaydettiğiniz değişiklikler müşteri uygulamasına anında yansır." sinif="admin-modal--yonetim" kapat={() => setKampanyaForm(null)}>
           <form className="admin-form" onSubmit={kampanyaKaydet}>
+            <section className="kampanya-ikon-editoru">
+              <header><div><span>{kampanyaIkonu(kampanyaForm)}</span><div><b>Kampanya ikonu</b><small>Müşteri uygulamasındaki kampanya etiketinin yanında görünür.</small></div></div><input aria-label="Özel kampanya emojisi" maxLength="16" value={kampanyaForm.ikon || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, ikon: e.target.value })} placeholder="Emoji" /></header>
+              <div>{KAMPANYA_IKONLARI.map(([ikon, ad]) => <button type="button" key={ikon} className={kampanyaForm.ikon === ikon ? "secili" : ""} title={ad} aria-label={`${ad} ikonunu seç`} onClick={() => setKampanyaForm({ ...kampanyaForm, ikon })}><span>{ikon}</span><small>{ad}</small></button>)}</div>
+            </section>
             <Ikili><Alan etiket="Kısa etiket"><input required maxLength="80" value={kampanyaForm.etiket} onChange={(e) => setKampanyaForm({ ...kampanyaForm, etiket: e.target.value })} placeholder="Örn. HAFTA SONU" /></Alan><Alan etiket="Kampanya başlığı"><input required maxLength="120" value={kampanyaForm.baslik} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslik: e.target.value })} /></Alan></Ikili>
             <Alan etiket="Açıklama"><textarea required maxLength="600" value={kampanyaForm.aciklama} onChange={(e) => setKampanyaForm({ ...kampanyaForm, aciklama: e.target.value })} /></Alan>
             <Alan etiket="Kampanya görsel URL"><input type="url" maxLength="1000" value={kampanyaForm.gorsel || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, gorsel: e.target.value })} placeholder="https://... (isteğe bağlı)" /></Alan>
@@ -712,6 +879,29 @@ function haftayiDoldur(veriler) {
 }
 
 function haftaAdi(gun) { return ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"][Number(gun) - 1] || "—"; }
+function KayitFiltreleri({ tur, filtre, setFiltre, personeller = [] }) {
+  const guncelle = (alan, deger) => setFiltre((onceki) => ({ ...onceki, [alan]: deger }));
+  const temizle = () => setFiltre({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
+  return <section className="kayit-filtreleri">
+    <label className="kayit-arama"><span>Ara</span><input type="search" value={filtre.arama} onChange={(e) => guncelle("arama", e.target.value.slice(0, 100))} placeholder={tur === "musteri" ? "Ad, e-posta veya telefon…" : "Sipariş no, kişi veya kayıt…"} /></label>
+    <label><span>Başlangıç</span><input type="date" value={filtre.baslangic} onChange={(e) => guncelle("baslangic", e.target.value)} /></label>
+    <label><span>Bitiş</span><input type="date" value={filtre.bitis} onChange={(e) => guncelle("bitis", e.target.value)} /></label>
+    {["satis", "mutfak"].includes(tur) && <label><span>Durum</span><select value={filtre.durum} onChange={(e) => guncelle("durum", e.target.value)}><option value="">Tüm durumlar</option><option value="yeni">Yeni</option><option value="hazirlaniyor">Hazırlanıyor</option><option value="hazir">Hazır</option></select></label>}
+    {["mutfak", "personel"].includes(tur) && <label><span>Personel</span><select value={filtre.personelId} onChange={(e) => guncelle("personelId", e.target.value)}><option value="">Tüm personel</option>{personeller.map((personel) => <option key={personel.id} value={personel.id}>{personel.ad} {personel.soyad}</option>)}</select></label>}
+    {tur === "personel" && <label><span>Rol</span><select value={filtre.rol} onChange={(e) => guncelle("rol", e.target.value)}><option value="">Tüm roller</option><option>Mutfak</option><option>Salon</option><option>Kasiyer</option><option>Yönetici</option></select></label>}
+    {tur === "revizyon" && <><label><span>Kayıt türü</span><select value={filtre.varlikTuru} onChange={(e) => guncelle("varlikTuru", e.target.value)}><option value="">Tüm kayıtlar</option><option value="urun">Ürün</option><option value="kategori">Kategori</option><option value="kampanya">Kampanya</option><option value="odul">Ödül</option><option value="duyuru">Duyuru</option><option value="personel">Personel</option><option value="vardiya">Vardiya</option></select></label><label><span>İşlem</span><select value={filtre.islem} onChange={(e) => guncelle("islem", e.target.value)}><option value="">Tüm işlemler</option><option value="ekleme">Ekleme</option><option value="guncelleme">Güncelleme</option><option value="durum">Durum</option><option value="arsivleme">Arşivleme</option></select></label></>}
+    <button type="button" onClick={temizle}>Filtreleri temizle</button>
+  </section>;
+}
+function DurumRozeti({ durum }) {
+  const etiketler = { yeni: "Yeni", hazirlaniyor: "Hazırlanıyor", hazir: "Hazır", tamamlandi: "Tamamlandı" };
+  return <span className={`durum-rozeti ${durum || "yeni"}`}>{etiketler[durum] || durum || "Yeni"}</span>;
+}
+function SureRozeti({ dakika }) {
+  if (dakika == null) return <span className="sure-rozeti bekliyor">Başlamadı</span>;
+  const seviye = Number(dakika) > 15 ? "gecikti" : Number(dakika) > 10 ? "uyari" : "hizli";
+  return <span className={`sure-rozeti ${seviye}`}>{Number(dakika).toFixed(1)} dk</span>;
+}
 function Modal({ baslik, aciklama, sinif = "", kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}>×</button></header>{children}</section></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }

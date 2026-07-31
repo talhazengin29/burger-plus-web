@@ -70,7 +70,7 @@
   border-radius: var(--r-full);
 }
 .rozet-ikon { width: 14px; height: 14px; }
-.rozet-emoji { font-size: 13px; }
+.rozet-emoji { display: inline-grid; place-items: center; min-width: 15px; font-size: 14px; line-height: 1; }
 
 /* Canlı kampanya durumu — AKTİF (yeşil) / BAŞLAMADI / SONA ERDİ (gri) */
 .camp-durum-rozet {

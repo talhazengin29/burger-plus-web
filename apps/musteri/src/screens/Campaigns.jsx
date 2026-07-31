@@ -11,7 +11,8 @@ import { davetOzetiniGetir } from "../lib/authApi";
 import "./Campaigns.css";
 
 // Etikete göre küçük ikon seçimi (saat / davet / öğrenci)
-function EtiketIkon({ etiket }) {
+function EtiketIkon({ ikon, etiket }) {
+  if (ikon) return <span className="rozet-emoji" aria-hidden="true">{ikon}</span>;
   if (etiket.includes(":")) return <IconClock className="rozet-ikon" />;
   if (etiket === "Davet Et") return <IconInvite className="rozet-ikon" />;
   return <span className="rozet-emoji">🎓</span>;
@@ -96,7 +97,7 @@ export default function Campaigns() {
                   <div className="camp-gorsel-wrap">
                     <img className="camp-gorsel" src={k.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=500&fit=crop"} alt={k.baslik} />
                     <span className="camp-rozet">
-                      <EtiketIkon etiket={k.etiket} />
+                      <EtiketIkon ikon={k.ikon} etiket={k.etiket} />
                       {k.etiket}
                     </span>
                     {durum !== "pasif" && (
