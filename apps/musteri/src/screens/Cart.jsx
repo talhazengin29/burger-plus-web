@@ -1,20 +1,12 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
-import { gramajMetni, haricMalzemeleriGetir, varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
+import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./Cart.css";
 
 export default function Cart() {
   const git = useNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, sepeteEkle, urunler } = useApp();
-  const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
-  const gorunenOneriler = oneriler.filter((urun) => !eklenenOneriIdleri.includes(Number(urun.id)));
-
-  useEffect(() => {
-    setEklenenOneriIdleri((onceki) => onceki.filter((id) => oneriler.some((urun) => Number(urun.id) === id)));
-  }, [oneriler]);
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
 
   return (
     <div className="ekran cart">
@@ -68,25 +60,6 @@ export default function Cart() {
                 </article>
               ))}
             </div>
-
-            <AnimatePresence initial={false}>
-              {gorunenOneriler.length > 0 && (
-                <motion.section className="cart-oneri-kart" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
-                  <header><div><span>SEPETİ TAMAMLA</span><h2>Yanına iyi gider</h2></div></header>
-                  <motion.div className="cart-oneri-liste" initial="gizli" animate="goster" variants={{ gizli: {}, goster: { transition: { staggerChildren: 0.07 } } }}>
-                    <AnimatePresence mode="popLayout">
-                      {gorunenOneriler.map((urun) => (
-                        <motion.article key={urun.id} layout className="cart-oneri-satir" variants={{ gizli: { opacity: 0, x: -10 }, goster: { opacity: 1, x: 0 } }} exit={{ opacity: 0, scale: 0.94, x: 16 }} transition={{ duration: 0.2 }}>
-                          <img src={urun.gorsel} alt="" />
-                          <div><h3>{urun.ad}</h3><strong>₺{Number(urun.fiyat).toFixed(2)}</strong></div>
-                          <button type="button" onClick={() => { setEklenenOneriIdleri((onceki) => [...onceki, Number(urun.id)]); sepeteEkle(varsayilanSecimliUrunHazirla(urun, urunler)); }}>+ Ekle</button>
-                        </motion.article>
-                      ))}
-                    </AnimatePresence>
-                  </motion.div>
-                </motion.section>
-              )}
-            </AnimatePresence>
           </div>
 
           {/* Alt sabit özet + sipariş tipi seçimi */}
