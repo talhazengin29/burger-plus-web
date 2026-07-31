@@ -99,7 +99,10 @@ export default function Admin({ onCikis }) {
   const [duyurular, setDuyurular] = useState([]);
   const [kampanyalar, setKampanyalar] = useState([]);
   const [oduller, setOduller] = useState([]);
-  const [rapor, setRapor] = useState({ gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [] });
+  const [rapor, setRapor] = useState({
+    gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [],
+    ozet: { ciro: 0, adet: 0, siparis: 0 }, oncekiOzet: { ciro: 0, adet: 0, siparis: 0 },
+  });
   const [canliSatislar, setCanliSatislar] = useState([]);
   const [gecmisSatislar, setGecmisSatislar] = useState([]);
   const [mutfakKayitlari, setMutfakKayitlari] = useState([]);
@@ -370,6 +373,16 @@ export default function Admin({ onCikis }) {
   const toplamCiro = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.ciro), 0), [rapor]);
   const toplamUrun = useMemo(() => rapor.gunluk.reduce((t, g) => t + Number(g.adet), 0), [rapor]);
   const yogunSaat = useMemo(() => (rapor.saatlik || []).reduce((en, s) => s.adet > en.adet ? s : en, { saat: null, adet: 0 }), [rapor]);
+  const siparisSayisi = rapor.ozet?.siparis || 0;
+  const ortalamaSepet = siparisSayisi ? toplamCiro / siparisSayisi : 0;
+  const oncekiOrtalamaSepet = rapor.oncekiOzet?.siparis ? rapor.oncekiOzet.ciro / rapor.oncekiOzet.siparis : 0;
+  const ciroTrend = useMemo(() => yuzdeDegisim(toplamCiro, rapor.oncekiOzet?.ciro), [toplamCiro, rapor]);
+  const urunTrend = useMemo(() => yuzdeDegisim(toplamUrun, rapor.oncekiOzet?.adet), [toplamUrun, rapor]);
+  const sepetTrend = useMemo(() => yuzdeDegisim(ortalamaSepet, oncekiOrtalamaSepet), [ortalamaSepet, oncekiOrtalamaSepet]);
+  const gunlukDoldurulmus = useMemo(() => sonOtuzGunuDoldur(rapor.gunluk), [rapor]);
+  const ciroSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.ciro), [gunlukDoldurulmus]);
+  const urunSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.adet), [gunlukDoldurulmus]);
+  const sepetSpark = useMemo(() => gunlukDoldurulmus.map((g) => (g.siparis ? g.ciro / g.siparis : 0)), [gunlukDoldurulmus]);
   const canliSatisToplami = useMemo(() => canliSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [canliSatislar]);
   const gecmisSatisToplami = useMemo(() => gecmisSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [gecmisSatislar]);
   const tamamlananMutfak = useMemo(() => mutfakKayitlari.filter((kayit) => kayit.durum === "hazir"), [mutfakKayitlari]);
@@ -629,7 +642,13 @@ export default function Admin({ onCikis }) {
 
             {bolum === "raporlar" && <>
               <BolumBaslik baslik="Satış analizi" aciklama="Son 30 günün ürün, adet ve ciro performansı." />
-              <section className="admin-metrikler rapor-metrik"><Metrik ad="30 günlük ciro" deger={para(toplamCiro)} alt={`${toplamUrun} ürün`} renk="turuncu" /><Metrik ad="Günlük ortalama" deger={para(toplamCiro / Math.max(1, rapor.gunluk.length))} alt={`${rapor.gunluk.length} aktif satış günü`} renk="mavi" /><Metrik ad="Satılan ürün" deger={toplamUrun} alt={`${rapor.urunler.length} farklı ürün`} renk="yesil" /><Metrik ad="Yoğun saat" deger={yogunSaat.saat == null ? "—" : `${String(yogunSaat.saat).padStart(2, "0")}:00`} alt={`${yogunSaat.adet} ürün satıldı`} renk="mor" /></section>
+              <section className="admin-metrikler rapor-metrik">
+                <Metrik ad="30 günlük ciro" deger={para(toplamCiro)} alt={`${toplamUrun} ürün`} renk="turuncu" trend={ciroTrend} spark={ciroSpark} />
+                <Metrik ad="Günlük ortalama" deger={para(toplamCiro / Math.max(1, rapor.gunluk.length))} alt={`${rapor.gunluk.length} aktif satış günü`} renk="mavi" trend={ciroTrend} spark={ciroSpark} />
+                <Metrik ad="Ortalama sepet tutarı" deger={para(ortalamaSepet)} alt={`${siparisSayisi} sipariş`} renk="kirmizi" trend={sepetTrend} spark={sepetSpark} />
+                <Metrik ad="Satılan ürün" deger={toplamUrun} alt={`${rapor.urunler.length} farklı ürün`} renk="yesil" trend={urunTrend} spark={urunSpark} />
+                <Metrik ad="Yoğun saat" deger={yogunSaat.saat == null ? "—" : `${String(yogunSaat.saat).padStart(2, "0")}:00`} alt={`${yogunSaat.adet} ürün satıldı`} renk="mor" />
+              </section>
               <Panel baslik="Ciro ve sipariş trendi" alt="Son 30 gün"><SatisCizgiGrafigi veriler={rapor.gunluk} /></Panel>
               <section className="admin-grid-2">
                 <Panel baslik="Ürün talep sıralaması" alt="Kaç adet satıldı?"><UrunAdetGrafigi veriler={rapor.urunler} /></Panel>
@@ -800,7 +819,41 @@ export default function Admin({ onCikis }) {
   );
 }
 
-function Metrik({ ad, deger, alt, renk }) { return <article className={`admin-metrik ${renk}`}><span>{ad}</span><strong>{deger}</strong><small>{alt}</small></article>; }
+function yuzdeDegisim(simdi, once) { return once > 0 ? ((simdi - once) / once) * 100 : null; }
+
+function Metrik({ ad, deger, alt, renk, trend, spark }) {
+  return (
+    <article className={`admin-metrik ${renk}`}>
+      <div className="admin-metrik-ust">
+        <span>{ad}</span>
+        {trend != null && (
+          <b className={`admin-metrik-trend ${trend >= 0 ? "arti" : "eksi"}`}>
+            {trend >= 0 ? "▲" : "▼"} %{Math.abs(trend).toFixed(1)}
+          </b>
+        )}
+      </div>
+      <strong>{deger}</strong>
+      <small>{alt}</small>
+      {spark && spark.length > 1 && <MetrikSparkline veriler={spark} />}
+    </article>
+  );
+}
+
+function MetrikSparkline({ veriler }) {
+  const w = 100;
+  const h = 30;
+  const max = Math.max(1, ...veriler);
+  const min = Math.min(0, ...veriler);
+  const aralik = Math.max(1, max - min);
+  const x = (i) => (i / Math.max(1, veriler.length - 1)) * w;
+  const y = (v) => h - ((v - min) / aralik) * h;
+  const points = veriler.map((v, i) => `${x(i)},${y(v)}`).join(" ");
+  return (
+    <svg className="admin-metrik-spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
+      <polyline points={points} />
+    </svg>
+  );
+}
 function Panel({ baslik, alt, children }) { return <section className="admin-panel"><header><h2>{baslik}</h2><span>{alt}</span></header>{children}</section>; }
 function Bos({ yazi }) { return <div className="admin-bos">{yazi}</div>; }
 function BolumBaslik({ baslik, aciklama, buton, onClick }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div>{buton && <button onClick={onClick}>{buton}</button>}</div>; }
@@ -854,13 +907,13 @@ function SatisCizgiGrafigi({ veriler }) {
 }
 
 function sonOtuzGunuDoldur(veriler) {
-  const kayitlar = new Map(veriler.map((g) => [String(g.gun).slice(0, 10), { ciro: Number(g.ciro || 0), adet: Number(g.adet || 0) }]));
+  const kayitlar = new Map(veriler.map((g) => [String(g.gun).slice(0, 10), { ciro: Number(g.ciro || 0), adet: Number(g.adet || 0), siparis: Number(g.siparis || 0) }]));
   return Array.from({ length: 30 }, (_, i) => {
     const tarih = new Date();
     tarih.setHours(12, 0, 0, 0);
     tarih.setDate(tarih.getDate() - (29 - i));
     const gun = tarih.toISOString().slice(0, 10);
-    return { gun, ...(kayitlar.get(gun) || { ciro: 0, adet: 0 }) };
+    return { gun, ...(kayitlar.get(gun) || { ciro: 0, adet: 0, siparis: 0 }) };
   });
 }
 
