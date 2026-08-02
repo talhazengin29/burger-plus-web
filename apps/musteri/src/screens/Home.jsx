@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
@@ -32,7 +33,7 @@ export default function Home() {
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
   const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, urunler, kategoriler } = useApp();
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const chipRef = useSuruklenebilir();
 
   useEffect(() => {

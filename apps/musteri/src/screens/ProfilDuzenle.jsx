@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar, telefonTemizle } from "../lib/dogrulama";
@@ -11,7 +11,7 @@ import "./ProfilDuzenle.css";
   Ad, soyad, cinsiyet KALICI (değiştirilemez, salt-okunur gösterilir).
 */
 export default function ProfilDuzenle() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { kullanici, profiliGuncelle, avatar, avatarGuncelle } = useApp();
 
   const [email, setEmail] = useState(kullanici?.email || "");

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { kayitOl, tokeniKaydet } from "../lib/authApi";
 import { IconBack, IconEye, IconEyeOff } from "../components/Icons";
@@ -17,7 +17,7 @@ const KAYIT_SEMASI = {
 };
 
 export default function Kayit() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { girisiTamamla } = useApp();
   const [form, setForm] = useState({
     ad: "", soyad: "", cinsiyet: "", email: "", telefon: "", sifre: "", davetKodu: "",

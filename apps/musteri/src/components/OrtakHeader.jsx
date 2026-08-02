@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBell, IconBag } from "./Icons";
 import { badgePop } from "../lib/animasyonlar";
 import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
+import { useIsletme } from "../context/IsletmeContext";
 
 const okunanlariGetir = (anahtar) => {
   try {
@@ -28,11 +29,12 @@ const okunanlariKaydet = (anahtar, duyuruIdleri) => {
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
+  const { isletme, isletmeSlug } = useIsletme();
   const { sepetAdet, kullanici, misafir, avatar } = useApp();
   const [bildirimlerAcik, setBildirimlerAcik] = useState(false);
   const [duyurular, setDuyurular] = useState([]);
-  const okunanAnahtari = `bp_okunan_duyurular_${kullanici?.id || (misafir ? "misafir" : "anonim")}`;
+  const okunanAnahtari = `bp_okunan_duyurular_${isletmeSlug}_${kullanici?.id || (misafir ? "misafir" : "anonim")}`;
   const [okunanDuyurular, setOkunanDuyurular] = useState(() => okunanlariGetir(okunanAnahtari));
   const okunmamisSayisi = useMemo(
     () => duyurular.filter((duyuru) => !okunanDuyurular.includes(String(duyuru.id))).length,
@@ -95,7 +97,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       ) : (
         <div className="brand">
-          <span className="brand-name">BURGER PLUS</span>
+          <span className="brand-name">{isletme.ad.toLocaleUpperCase("tr")}</span>
         </div>
       )}
       <div className="home-header-sag">

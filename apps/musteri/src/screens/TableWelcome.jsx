@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { usePerde } from "../hooks/usePerde";
 import "./TableWelcome.css";
@@ -12,7 +13,7 @@ import "./TableWelcome.css";
   Her iki durumda da masa QR'dan biliniyor; ödeme öncesi tekrar QR sorulmaz.
 */
 export default function TableWelcome() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("no");
   const { setAktifMasa, setMisafir } = useApp();

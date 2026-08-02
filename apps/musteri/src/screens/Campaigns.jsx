@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { kampanyaDurumu } from "../data/mockData";
 import { useApp } from "../context/AppContext";
@@ -22,7 +22,7 @@ function EtiketIkon({ ikon, etiket }) {
 const durumMetni = { aktif: "AKTİF", baslamadi: "BAŞLAMADI", sonaerdi: "SONA ERDİ" };
 
 export default function Campaigns() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { misafir, kullanici, kampanyalar } = useApp();
 
   // Saatli kampanyaların (Happy Hour) durumu canlı kalsın diye dakikada bir tazelenir.

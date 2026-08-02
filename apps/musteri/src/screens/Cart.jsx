@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import "./Cart.css";
 
 export default function Cart() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
 
   return (

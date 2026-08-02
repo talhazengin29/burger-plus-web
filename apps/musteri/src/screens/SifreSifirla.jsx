@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion } from "framer-motion";
 import { sifreSifirla, tokenDogrula as tokenSunucudaDogrula } from "../lib/authApi";
 import { IconCheck, IconEye, IconEyeOff, IconWarning } from "../components/Icons";
@@ -14,7 +15,7 @@ function sifreGucu(sifre) {
 }
 
 export default function SifreSifirla() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [parametreler] = useSearchParams();
   const token = parametreler.get("token") || "";
 

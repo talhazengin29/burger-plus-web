@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import QRCode from "qrcode";
 import { useApp } from "../context/AppContext";
 import {
@@ -20,7 +20,7 @@ const menuSatirlari = [
 
 export default function Profile() {
   const { misafir, adminMi, kullanici, cikisYap, avatar, kullaniciyiYenile } = useApp();
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [yardimAcik, setYardimAcik] = useState(false);
   const [davetOzeti, setDavetOzeti] = useState(null);
   const [davetKopyalandi, setDavetKopyalandi] = useState(false);

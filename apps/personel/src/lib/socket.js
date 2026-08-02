@@ -1,29 +1,18 @@
-/* ==========================================================================
-   Backend'e Socket.io baglantisi (mutfak uygulamasi).
-   ========================================================================== */
-
 import { io } from "socket.io-client";
-import { adminToken } from "./adminApi";
+import { adminToken, aktifIsletmeSlug } from "./adminApi";
 
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-
-export const socket = io(BACKEND_URL, {
-  autoConnect: false,
-  auth: (tamamlandi) => tamamlandi({ token: adminToken.al() || "" }),
-});
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+export const socket = io(BACKEND_URL, { autoConnect: false });
 
 export function personelSocketiniBagla() {
+  const isletme = aktifIsletmeSlug();
+  socket.auth = { isletme, token: adminToken.al() || "" };
   if (socket.connected) socket.disconnect();
   socket.connect();
 }
 
-export function personelSocketiniKes() {
-  socket.disconnect();
-}
+export function personelSocketiniKes() { socket.disconnect(); }
 
-socket.on("connect", () => console.log("Mutfak backend'e baglandi:", socket.id));
-socket.on("disconnect", () => console.log("Mutfak baglantisi kesildi"));
-socket.on("connect_error", (e) =>
-  console.warn("Backend'e ulasilamiyor:", e.message)
-);
+socket.on("connect", () => console.log("Personel backend'e bağlandı:", socket.id));
+socket.on("disconnect", () => console.log("Personel bağlantısı kesildi"));
+socket.on("connect_error", (e) => console.warn("Backend'e ulaşılamıyor:", e.message));

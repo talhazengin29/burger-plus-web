@@ -1,4 +1,5 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { IconCheck } from "../components/Icons";
 import "./OrderReceived.css";
 
@@ -7,7 +8,7 @@ import "./OrderReceived.css";
   Ödeme ve puan YOK — bunlar yemek sonuna ait.
 */
 export default function OrderReceived() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("masa") || "?";
 

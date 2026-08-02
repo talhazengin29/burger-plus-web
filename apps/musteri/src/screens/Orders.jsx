@@ -1,13 +1,12 @@
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { IconBag } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
+import { istekAt } from "../lib/authApi";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import "./Orders.css";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 /*
   Siparişlerim ekranı — KİŞİSEL, iki bölüm:
@@ -71,7 +70,7 @@ function SiparisKart({ s, durum, gecmis }) {
 }
 
 export default function Orders() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo } = useApp();
 
   useEffect(() => {
@@ -100,7 +99,7 @@ export default function Orders() {
       const yeni = {};
       for (const no of masalar) {
         try {
-          const r = await fetch(`${BACKEND_URL}/api/masa/${no}`);
+          const r = await istekAt(`/api/masa/${encodeURIComponent(no)}`);
           if (!r.ok) continue;
           const d = await r.json();
           const k = d.kalemler || [];

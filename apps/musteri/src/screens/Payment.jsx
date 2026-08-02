@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
 import { IconBack, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
@@ -22,7 +23,7 @@ const ODEME_SEMASI = {
 };
 
 export default function Payment() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("masa");
   const masaModu = !!masaNo;

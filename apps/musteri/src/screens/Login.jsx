@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { girisYap, ikiFaktorGirisiniTamamla, tokeniKaydet } from "../lib/authApi";
@@ -10,7 +10,7 @@ import logoFull from "../assets/logo-full-transparent.png";
 import "./Login.css";
 
 export default function Login() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
   const { perdeAktif, perdeIleGit } = usePerde();
   const [email, setEmail] = useState("");

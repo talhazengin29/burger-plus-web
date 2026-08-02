@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { IconStar } from "../components/Icons";
 import "./UyeOl.css";
 
@@ -9,7 +9,7 @@ import "./UyeOl.css";
   baslik/aciklama props ile hangi sekmeden gelindiğine göre değişir.
 */
 export default function UyeOl({ baslik, aciklama }) {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
 
   return (
     <div className="ekran uyeol">

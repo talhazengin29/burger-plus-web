@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
 import { odemeSonucunuGetir } from "../lib/authApi";
@@ -7,7 +8,7 @@ import { usePerde } from "../hooks/usePerde";
 import "./PaymentSuccess.css";
 
 export default function PaymentSuccess() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const odemeId = params.get("odeme");
   const { sonOdeme, puan, odemeyiTamamla } = useApp();

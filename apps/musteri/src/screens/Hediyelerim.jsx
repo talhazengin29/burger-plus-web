@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -47,7 +47,7 @@ function HediyeKart({ h, kullanilmis, onKullan, islemde }) {
 
 export default function Hediyelerim() {
   const { misafir, hediyeler, hediyeKullan, odemeyiTamamla } = useApp();
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [islemde, setIslemde] = useState(null);
   const [hata, setHata] = useState("");
 
@@ -70,7 +70,7 @@ export default function Hediyelerim() {
     try {
       const odeme = await hediyeKullan(h);
       odemeyiTamamla(odeme);
-      git("/odeme-basarili");
+      git("/odeme-sonuc");
     } catch (e) {
       setHata(e.message || "Hediye kullanılamadı.");
     } finally {

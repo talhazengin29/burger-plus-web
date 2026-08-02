@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav";
 import Home from "./screens/Home";
 import Rewards from "./screens/Rewards";
@@ -21,50 +20,32 @@ import UrunDetay from "./screens/UrunDetay";
 import Hediyelerim from "./screens/Hediyelerim";
 import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
-import { Navigate } from "react-router-dom";
+import { IsletmeSarici } from "./context/IsletmeContext";
+import { useIsletme } from "./context/IsletmeContext";
 import { PerdeSaglayici } from "./hooks/usePerde";
 import "./App.css";
 
-// Alt menünün gösterileceği ekranlar. Giriş, sepet, ödeme akışında alt menü olmaz.
 const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil", "/hediyelerim"];
 
-// Sadece admin girebilir; değilse ana sayfaya yönlendir.
-function AdminKorumali({ children }) {
-  const { adminMi, authYuklendi } = useApp();
-  if (!authYuklendi) return null;
-  return adminMi ? children : <Navigate to="/anasayfa" replace />;
+function IsletmeSecim() {
+  return <Navigate to="/burger-plus" replace />;
 }
 
-function Icerik() {
-  const konum = useLocation();
-  const altMenuGoster = altMenuluYollar.includes(konum.pathname);
+function AdminKorumali({ children }) {
+  const { adminMi, authYuklendi } = useApp();
+  const { isletmeSlug } = useIsletme();
+  if (!authYuklendi) return null;
+  return adminMi ? children : <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
+}
 
+function TelefonYerlesimi() {
+  const konum = useLocation();
+  const tenantSonrasiYol = `/${konum.pathname.split("/").filter(Boolean).slice(1).join("/")}`;
+  const altMenuGoster = altMenuluYollar.includes(tenantSonrasiYol);
   return (
     <div className="telefon">
       <div className="telefon-ekran">
-        <Routes>
-          {/* Açık rotalar: giriş, kayıt, QR ile masa */}
-          <Route path="/" element={<Login />} />
-          <Route path="/kayit" element={<Kayit />} />
-          <Route path="/sifremi-unuttum" element={<SifremiUnuttum />} />
-          <Route path="/sifre-sifirla" element={<SifreSifirla />} />
-          <Route path="/masa" element={<TableWelcome />} />
-          {/* Korumalı rotalar: giriş yapmış veya misafir olmalı */}
-          <Route path="/anasayfa" element={<Korumali><Home /></Korumali>} />
-          <Route path="/kampanyalar" element={<Korumali><Campaigns /></Korumali>} />
-          <Route path="/puanlarim" element={<Korumali><Rewards /></Korumali>} />
-          <Route path="/profil" element={<Korumali><Profile /></Korumali>} />
-          <Route path="/profil-duzenle" element={<Korumali><ProfilDuzenle /></Korumali>} />
-          <Route path="/hediyelerim" element={<Korumali><Hediyelerim /></Korumali>} />
-          <Route path="/sepet" element={<Korumali><Cart /></Korumali>} />
-          <Route path="/qr" element={<Korumali><QrScan /></Korumali>} />
-          <Route path="/odeme" element={<Korumali><Payment /></Korumali>} />
-          <Route path="/odeme-basarili" element={<Korumali><PaymentSuccess /></Korumali>} />
-          <Route path="/siparislerim" element={<Korumali><Orders /></Korumali>} />
-          <Route path="/urun/:id" element={<Korumali><UrunDetay /></Korumali>} />
-          {/* İşletme: masa QR'ları üret — SADECE ADMIN */}
-          <Route path="/qr-uret" element={<AdminKorumali><QrGenerator /></AdminKorumali>} />
-        </Routes>
+        <Outlet />
         {altMenuGoster && <BottomNav />}
       </div>
     </div>
@@ -73,12 +54,36 @@ function Icerik() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <PerdeSaglayici>
-          <Icerik />
-        </PerdeSaglayici>
-      </BrowserRouter>
-    </AppProvider>
+    <BrowserRouter>
+      <PerdeSaglayici>
+        <Routes>
+          <Route path="/" element={<IsletmeSecim />} />
+          <Route path="/:isletmeSlug" element={<IsletmeSarici />}>
+            <Route element={<TelefonYerlesimi />}>
+              <Route index element={<Login />} />
+              <Route path="kayit" element={<Kayit />} />
+              <Route path="sifremi-unuttum" element={<SifremiUnuttum />} />
+              <Route path="sifre-sifirla" element={<SifreSifirla />} />
+              <Route path="masa" element={<TableWelcome />} />
+              <Route path="anasayfa" element={<Korumali><Home /></Korumali>} />
+              <Route path="kampanyalar" element={<Korumali><Campaigns /></Korumali>} />
+              <Route path="puanlarim" element={<Korumali><Rewards /></Korumali>} />
+              <Route path="profil" element={<Korumali><Profile /></Korumali>} />
+              <Route path="profil-duzenle" element={<Korumali><ProfilDuzenle /></Korumali>} />
+              <Route path="hediyelerim" element={<Korumali><Hediyelerim /></Korumali>} />
+              <Route path="sepet" element={<Korumali><Cart /></Korumali>} />
+              <Route path="qr" element={<Korumali><QrScan /></Korumali>} />
+              <Route path="odeme" element={<Korumali><Payment /></Korumali>} />
+              <Route path="odeme-sonuc" element={<Korumali><PaymentSuccess /></Korumali>} />
+              <Route path="odeme-basarili" element={<Korumali><PaymentSuccess /></Korumali>} />
+              <Route path="siparislerim" element={<Korumali><Orders /></Korumali>} />
+              <Route path="urun/:id" element={<Korumali><UrunDetay /></Korumali>} />
+              <Route path="qr-uret" element={<AdminKorumali><QrGenerator /></AdminKorumali>} />
+            </Route>
+          </Route>
+          <Route path="*" element={<IsletmeSecim />} />
+        </Routes>
+      </PerdeSaglayici>
+    </BrowserRouter>
   );
 }

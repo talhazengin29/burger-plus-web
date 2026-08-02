@@ -3,6 +3,7 @@
 
 import { NavLink } from "react-router-dom";
 import { IconHome, IconTag, IconCutlery, IconStar, IconUser } from "./Icons";
+import { useIsletme } from "../context/IsletmeContext";
 import "./BottomNav.css";
 
 const sekmeler = [
@@ -14,6 +15,7 @@ const sekmeler = [
 ];
 
 export default function BottomNav() {
+  const { isletmeSlug } = useIsletme();
   return (
     <nav className="bottom-nav">
       {sekmeler.map(({ yol, etiket, Ikon, pasif }) =>
@@ -25,7 +27,7 @@ export default function BottomNav() {
         ) : (
           <NavLink
             key={yol}
-            to={yol}
+            to={`/${isletmeSlug}${yol}`}
             className={({ isActive }) =>
               "nav-item" + (isActive ? " nav-item--aktif" : "")
             }

@@ -1,4 +1,5 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
@@ -10,7 +11,7 @@ import "./TableOrder.css";
   Puan da bu aşamada kazanılmaz (ödeme sistemde değil).
 */
 export default function TableOrder() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("masa") || "?";
   const { sepet, sepetToplam, siparisiGonder } = useApp();

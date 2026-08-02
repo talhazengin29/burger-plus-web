@@ -12,18 +12,22 @@ import {
   urunler as varsayilanUrunler,
   urunKurallariniUygula,
 } from "../data/mockData";
-import { socket } from "../lib/socket";
+import { socket, socketIsletmesiniAyarla } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
+import { useIsletme } from "./IsletmeContext";
 import {
   beniGetir, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
   sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
+  istekAt, tenantDepoAnahtari,
 } from "../lib/authApi";
 
 const AppContext = createContext(null);
 
-function kataloguBirlestir(uzakUrunler) {
+function kataloguBirlestir(uzakUrunler, isletmeSlug) {
   return uzakUrunler.map((uzak) => {
-    const yerel = varsayilanUrunler.find((u) => String(u.id) === String(uzak.id)) || {};
+    const yerel = isletmeSlug === "burger-plus"
+      ? varsayilanUrunler.find((u) => String(u.id) === String(uzak.id)) || {}
+      : {};
     const doluUzakAlanlar = Object.fromEntries(
       Object.entries(uzak).filter(([, deger]) => deger !== null && deger !== undefined)
     );
@@ -38,14 +42,14 @@ const varsayilanKategoriler = varsayilanKategoriAdlari.map((ad, sira) => ({
   sira,
 }));
 
-function kategorileriBirlestir(uzakKategoriler) {
+function kategorileriBirlestir(uzakKategoriler, isletmeSlug) {
   const tumu = varsayilanKategoriler[0];
   const liste = uzakKategoriler
     .filter((kategori) => kategori && String(kategori.ad || "").trim() && kategori.aktif !== false)
     .map((kategori, sira) => ({
       id: kategori.id ?? `uzak-${sira}`,
       ad: String(kategori.ad).trim(),
-      gorsel: kategori.gorsel || kategoriGorseller[kategori.ad] || null,
+      gorsel: kategori.gorsel || (isletmeSlug === "burger-plus" ? kategoriGorseller[kategori.ad] : null) || null,
       sira: Number.isFinite(Number(kategori.sira)) ? Number(kategori.sira) : sira + 1,
     }));
   const benzersiz = Array.from(new Map(liste.map((kategori) => [kategori.ad, kategori])).values());
@@ -65,49 +69,50 @@ function kategorileriUrunlerdenTamamla(mevcut, urunler) {
 }
 
 export function AppProvider({ children }) {
+  const { isletmeSlug } = useIsletme();
+  const depoAnahtari = useCallback((anahtar) => tenantDepoAnahtari(anahtar, isletmeSlug), [isletmeSlug]);
   const [puan, setPuan] = useState(0);
   const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
-  const [urunler, setUrunler] = useState(varsayilanUrunler);
-  const [menuKategorileri, setMenuKategorileri] = useState(varsayilanKategoriler);
-  const [kampanyalar, setKampanyalar] = useState(varsayilanKampanyalar);
+  const [urunler, setUrunler] = useState(() => isletmeSlug === "burger-plus" ? varsayilanUrunler : []);
+  const [menuKategorileri, setMenuKategorileri] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKategoriler : [varsayilanKategoriler[0]]);
+  const [kampanyalar, setKampanyalar] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKampanyalar : []);
 
   // Backend kataloğu varsa onu kullan; sunucu kapalıyken mevcut menü çalışmaya devam eder.
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-    fetch(`${backendUrl}/api/urunler`)
+    istekAt("/api/urunler")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ urunler: uzakUrunler }) => {
         if (!Array.isArray(uzakUrunler)) return;
-        const katalog = kataloguBirlestir(uzakUrunler);
+        const katalog = kataloguBirlestir(uzakUrunler, isletmeSlug);
         setUrunler(katalog);
         setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
       })
       .catch(() => {});
-    fetch(`${backendUrl}/api/kategoriler`)
+    istekAt("/api/kategoriler")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ kategoriler: uzakKategoriler }) => {
         if (Array.isArray(uzakKategoriler) && uzakKategoriler.length) {
-          setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
+          setMenuKategorileri(kategorileriBirlestir(uzakKategoriler, isletmeSlug));
         }
       })
       .catch(() => {});
-    fetch(`${backendUrl}/api/kampanyalar`)
+    istekAt("/api/kampanyalar")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ kampanyalar: uzakKampanyalar }) => {
         if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
       })
       .catch(() => {});
-  }, []);
+  }, [isletmeSlug]);
 
   useEffect(() => {
     const katalogGuncelle = (uzakUrunler) => {
       if (!Array.isArray(uzakUrunler)) return;
-      const katalog = kataloguBirlestir(uzakUrunler);
+      const katalog = kataloguBirlestir(uzakUrunler, isletmeSlug);
       setUrunler(katalog);
       setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
     };
     const kategorilerGuncelle = (uzakKategoriler) => {
-      if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
+      if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler, isletmeSlug));
     };
     const kampanyalarGuncelle = (uzakKampanyalar) => {
       if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
@@ -120,7 +125,7 @@ export function AppProvider({ children }) {
       socket.off("kategoriler-guncellendi", kategorilerGuncelle);
       socket.off("kampanyalar-guncellendi", kampanyalarGuncelle);
     };
-  }, []);
+  }, [isletmeSlug]);
 
   // --- Giriş yapmış kullanıcı (auth) ---
   // null ise misafir/giriş yapılmamış. Doluysa gerçek hesap.
@@ -139,8 +144,8 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    setAvatar(kullanici?.id ? localStorage.getItem(`bp_avatar_${kullanici.id}`) : null);
-  }, [kullanici?.id]);
+    setAvatar(kullanici?.id ? localStorage.getItem(`bp_avatar_${isletmeSlug}_${kullanici.id}`) : null);
+  }, [isletmeSlug, kullanici?.id]);
 
   // Açılışta token varsa kullanıcıyı geri getir (oturum korunur)
   useEffect(() => {
@@ -172,7 +177,8 @@ export function AppProvider({ children }) {
   const girisiTamamla = (k) => {
     setKullanici(k);
     setPuan(k.puan || 0);
-    sessionStorage.removeItem("bp_misafir"); // giriş yapan misafir değildir
+    sessionStorage.removeItem(depoAnahtari("bp_misafir")); // giriş yapan misafir değildir
+    socketIsletmesiniAyarla(isletmeSlug);
   };
   // Çıkış
   const cikisYap = () => {
@@ -182,6 +188,7 @@ export function AppProvider({ children }) {
     setAvatar(null);
     setSiparislerim([]);
     setSadakat({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
+    socketIsletmesiniAyarla(isletmeSlug);
   };
 
   // Profil güncelle (email + telefon). Başarılıysa kullanıcı state'ini tazeler.
@@ -200,11 +207,12 @@ export function AppProvider({ children }) {
   // null ise al götür; dolu ise masaya servis. Sipariş tipini bu belirler.
   // sessionStorage'a yazılır → sayfa yenilenince (F5) korunur.
   const [aktifMasa, setAktifMasaState] = useState(
-    () => sessionStorage.getItem("bp_aktifMasa") || null
+    () => sessionStorage.getItem(tenantDepoAnahtari("bp_aktifMasa", isletmeSlug)) || null
   );
   const setAktifMasa = (deger) => {
-    if (deger) sessionStorage.setItem("bp_aktifMasa", deger);
-    else sessionStorage.removeItem("bp_aktifMasa");
+    const anahtar = depoAnahtari("bp_aktifMasa");
+    if (deger) sessionStorage.setItem(anahtar, deger);
+    else sessionStorage.removeItem(anahtar);
     setAktifMasaState(deger);
   };
 
@@ -212,12 +220,13 @@ export function AppProvider({ children }) {
   // sessionStorage'a yazılır → sayfa yenilenince korunur.
   // ÖNEMLİ: Giriş yapmış kullanıcı ASLA misafir değildir (kullanici doluysa misafir=false).
   const [misafirState, setMisafirState] = useState(
-    () => sessionStorage.getItem("bp_misafir") === "1"
+    () => sessionStorage.getItem(tenantDepoAnahtari("bp_misafir", isletmeSlug)) === "1"
   );
   const misafir = kullanici ? false : misafirState;
   const setMisafir = (deger) => {
-    if (deger) sessionStorage.setItem("bp_misafir", "1");
-    else sessionStorage.removeItem("bp_misafir");
+    const anahtar = depoAnahtari("bp_misafir");
+    if (deger) sessionStorage.setItem(anahtar, "1");
+    else sessionStorage.removeItem(anahtar);
     setMisafirState(deger);
   };
 
@@ -226,7 +235,7 @@ export function AppProvider({ children }) {
   // Masa numarası localStorage'da tutulur → sekme/tarayıcı kapansa bile
   // masaya bağlanmaya devam eder, sipariş durumu (hazırlanıyor→hazır) güncellenir.
   const [ozetMasaNo, setOzetMasaNo] = useState(
-    () => localStorage.getItem("bp_ozetMasa") || sessionStorage.getItem("bp_ozetMasa") || null
+    () => localStorage.getItem(tenantDepoAnahtari("bp_ozetMasa", isletmeSlug)) || sessionStorage.getItem(tenantDepoAnahtari("bp_ozetMasa", isletmeSlug)) || null
   );
   const [masaOzeti, setMasaOzeti] = useState({ kalemler: [], toplam: 0 });
 
@@ -244,9 +253,9 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (aktifMasa) {
       setOzetMasaNo(aktifMasa);
-      localStorage.setItem("bp_ozetMasa", aktifMasa);
+      localStorage.setItem(depoAnahtari("bp_ozetMasa"), aktifMasa);
     }
-  }, [aktifMasa]);
+  }, [aktifMasa, depoAnahtari]);
 
   // Özet masasına bağlan, canlı güncellemeleri dinle
   useEffect(() => {
@@ -315,8 +324,9 @@ export function AppProvider({ children }) {
 
   const avatarGuncelle = (gorsel) => {
     if (!kullanici?.id) return;
-    if (gorsel) localStorage.setItem(`bp_avatar_${kullanici.id}`, gorsel);
-    else localStorage.removeItem(`bp_avatar_${kullanici.id}`);
+    const anahtar = `bp_avatar_${isletmeSlug}_${kullanici.id}`;
+    if (gorsel) localStorage.setItem(anahtar, gorsel);
+    else localStorage.removeItem(anahtar);
     setAvatar(gorsel || null);
   };
 
@@ -348,11 +358,10 @@ export function AppProvider({ children }) {
     }
     let iptalEdildi = false;
     const zamanlayici = setTimeout(() => {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-      fetch(`${backendUrl}/api/oneriler?urunler=${encodeURIComponent(urunIdleri.join(","))}`)
+      istekAt(`/api/oneriler?urunler=${encodeURIComponent(urunIdleri.join(","))}`)
         .then((yanit) => yanit.ok ? yanit.json() : Promise.reject())
         .then(({ urunler: uzakUrunler }) => {
-          if (!iptalEdildi && Array.isArray(uzakUrunler)) setOneriler(kataloguBirlestir(uzakUrunler));
+          if (!iptalEdildi && Array.isArray(uzakUrunler)) setOneriler(kataloguBirlestir(uzakUrunler, isletmeSlug));
         })
         .catch(() => { if (!iptalEdildi) setOneriler([]); });
     }, 300);
@@ -360,7 +369,7 @@ export function AppProvider({ children }) {
       iptalEdildi = true;
       clearTimeout(zamanlayici);
     };
-  }, [sepet]);
+  }, [sepet, isletmeSlug]);
 
   // --- Ödeme ---
   // Son ödemenin özeti (onay ekranı bunu gösterir)
@@ -435,13 +444,13 @@ export function AppProvider({ children }) {
       // Bu masaya bağlıysak bağlantıyı bırak (yeni müşteri temiz başlasın)
       if (String(masaNo) === String(ozetMasaNo)) {
         setOzetMasaNo(null);
-        localStorage.removeItem("bp_ozetMasa");
+        localStorage.removeItem(depoAnahtari("bp_ozetMasa"));
         setMasaOzeti({ kalemler: [], toplam: 0 });
       }
     };
     socket.on("masa-kapandi", kapandi);
     return () => socket.off("masa-kapandi", kapandi);
-  }, [ozetMasaNo, masaSiparisleriniTamamla]);
+  }, [ozetMasaNo, masaSiparisleriniTamamla, depoAnahtari]);
 
   // Başarı yalnızca backend'in onayladığı ödeme nesnesiyle işlenir. Böylece
   // tarayıcı tutarı/puanı değiştiremez ve mutfak aktarımı backend'de kalır.

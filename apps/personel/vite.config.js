@@ -5,6 +5,6 @@ import react from "@vitejs/plugin-react";
 // Yerel geliştirmede kök (/) olarak çalışır — port 5174.
 export default defineConfig({
   plugins: [react()],
-  base: process.env.VITE_BASE || "/",
+  base: process.env.VITE_BASE || (process.env.NODE_ENV === "production" ? "/personel/" : "/"),
   server: { port: 5174 },
 });

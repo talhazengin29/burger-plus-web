@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./screens/Login";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
 import { adminToken } from "./lib/adminApi";
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
+import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
+import { useIsletmeNavigate } from "./hooks/useIsletmeNavigate";
 import "./App.css";
 
 /*
@@ -19,33 +21,36 @@ import "./App.css";
 const OTURUM = "burger-plus-personel";
 const TEMA_ANAHTARI = "burger-plus-personel-tema";
 
-export default function App() {
-  const git = useNavigate();
+function PersonelPaneli() {
+  const git = useIsletmeNavigate();
+  const { isletmeSlug } = useIsletme();
+  const oturumAnahtari = `${OTURUM}_${isletmeSlug}`;
+  const temaAnahtari = `${TEMA_ANAHTARI}_${isletmeSlug}`;
   const [rol, setRol] = useState(null); // "mutfak" | "salon" | null
   const [aktifSekme, setAktifSekme] = useState("mutfak");
   const [tema, setTema] = useState("koyu"); // "koyu" | "acik"
 
   useEffect(() => {
-    const kayitli = sessionStorage.getItem(OTURUM);
+    const kayitli = sessionStorage.getItem(oturumAnahtari);
     if (kayitli && adminToken.al()) {
       setRol(kayitli);
       setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
       personelSocketiniBagla();
     }
-    const kayitliTema = localStorage.getItem(TEMA_ANAHTARI);
+    const kayitliTema = localStorage.getItem(temaAnahtari);
     if (kayitliTema) setTema(kayitliTema);
-  }, []);
+  }, [oturumAnahtari, temaAnahtari]);
 
   // Temayı <html data-tema> ile uygula
   useEffect(() => {
     document.documentElement.setAttribute("data-tema", tema);
-    localStorage.setItem(TEMA_ANAHTARI, tema);
-  }, [tema]);
+    localStorage.setItem(temaAnahtari, tema);
+  }, [tema, temaAnahtari]);
 
   const temaDegistir = () => setTema((t) => (t === "koyu" ? "acik" : "koyu"));
 
   const girisBasarili = (girenRol) => {
-    sessionStorage.setItem(OTURUM, girenRol);
+    sessionStorage.setItem(oturumAnahtari, girenRol);
     setRol(girenRol);
     setAktifSekme(girenRol);
     personelSocketiniBagla();
@@ -53,7 +58,7 @@ export default function App() {
   };
 
   const cikis = () => {
-    sessionStorage.removeItem(OTURUM);
+    sessionStorage.removeItem(oturumAnahtari);
     adminToken.sil();
     personelSocketiniKes();
     setRol(null);
@@ -92,5 +97,15 @@ export default function App() {
         {aktifSekme === "mutfak" ? <Kitchen /> : <Salon />}
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/burger-plus" replace />} />
+      <Route path="/:isletmeSlug/*" element={<IsletmeSarici><PersonelPaneli /></IsletmeSarici>} />
+      <Route path="*" element={<Navigate to="/burger-plus" replace />} />
+    </Routes>
   );
 }

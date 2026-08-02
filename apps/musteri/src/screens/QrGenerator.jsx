@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 import { IconBack } from "../components/Icons";
+import { useIsletme } from "../context/IsletmeContext";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import "./QrGenerator.css";
 
 /*
@@ -10,7 +11,8 @@ import "./QrGenerator.css";
   Yazdırılıp masalara konur. Müşteri okutunca TableWelcome ekranı açılır.
 */
 export default function QrGenerator() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
+  const { isletmeSlug } = useIsletme();
   const [masaSayisi, setMasaSayisi] = useState(5);
   const [qrler, setQrler] = useState([]); // { no, dataUrl }
 
@@ -20,7 +22,7 @@ export default function QrGenerator() {
   const uret = async () => {
     const sonuc = [];
     for (let i = 1; i <= masaSayisi; i++) {
-      const url = `${kokAdres}/masa?no=${i}`;
+      const url = `${kokAdres}/${isletmeSlug}/masa?no=${i}`;
       const dataUrl = await QRCode.toDataURL(url, {
         width: 300,
         margin: 2,

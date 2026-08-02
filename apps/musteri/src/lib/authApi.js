@@ -1,243 +1,193 @@
-/* ==========================================================================
-   Backend auth API'sine baglanan yardimci fonksiyonlar.
-   Token localStorage'da tutulur (oturum kalici).
-   ========================================================================== */
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+export function aktifIsletmeSlug() {
+  if (typeof window === "undefined") return "";
+  return decodeURIComponent(window.location.pathname.split("/").filter(Boolean)[0] || "").trim().toLowerCase();
+}
 
-const TOKEN_ANAHTARI = "bp_token";
+export function tenantDepoAnahtari(anahtar, slug = aktifIsletmeSlug()) {
+  const temizSlug = String(slug || "").trim().toLowerCase();
+  if (!temizSlug) throw new Error("İşletme slug bilgisi bulunamadı.");
+  return `${anahtar}_${temizSlug}`;
+}
 
-async function jsonYanitiOku(r, varsayilanHata) {
-  const icerikTipi = r.headers.get("content-type") || "";
+function tokenAnahtari() {
+  return tenantDepoAnahtari("bp_token");
+}
+
+export function tokeniKaydet(token, hatirla = true) {
+  const anahtar = tokenAnahtari();
+  if (hatirla) {
+    localStorage.setItem(anahtar, token);
+    sessionStorage.removeItem(anahtar);
+  } else {
+    sessionStorage.setItem(anahtar, token);
+    localStorage.removeItem(anahtar);
+  }
+}
+
+export function tokeniAl() {
+  const anahtar = tokenAnahtari();
+  return localStorage.getItem(anahtar) || sessionStorage.getItem(anahtar);
+}
+
+export function tokeniSil() {
+  const anahtar = tokenAnahtari();
+  localStorage.removeItem(anahtar);
+  sessionStorage.removeItem(anahtar);
+}
+
+export function tokenBasligi() {
+  const token = tokeniAl();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function istekAt(yol, secenekler = {}) {
+  const { isletmeBasligi = true, ...fetchSecenekleri } = secenekler;
+  const slug = aktifIsletmeSlug();
+  const headers = new Headers(fetchSecenekleri.headers || {});
+  if (isletmeBasligi) {
+    if (!slug) throw new Error("İşletme belirtilmedi.");
+    headers.set("X-Isletme", slug);
+    const token = tokeniAl();
+    if (token && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${token}`);
+  }
+  return fetch(`${BACKEND_URL}${yol}`, { ...fetchSecenekleri, headers });
+}
+
+async function jsonYanitiOku(yanit, varsayilanHata) {
+  const icerikTipi = yanit.headers.get("content-type") || "";
   if (!icerikTipi.toLowerCase().includes("application/json")) {
-    // Vercel/Express 404 sayfalari HTML donerse JSON.parse'in teknik hatasini
-    // son kullaniciya gostermek yerine asil dagitim sorununu anlat.
-    await r.text().catch(() => "");
-    if (r.status === 404) {
-      throw new Error("İki adımlı doğrulama servisi backend'de henüz yayınlanmamış. Backend'i güncelleyip yeniden dağıtın.");
-    }
+    await yanit.text().catch(() => "");
     throw new Error(varsayilanHata);
   }
-
   try {
-    return await r.json();
+    return await yanit.json();
   } catch {
     throw new Error(varsayilanHata);
   }
 }
 
-// Beni hatırla: true → localStorage (kalıcı), false → sessionStorage (sekme kapanınca gider)
-export function tokeniKaydet(token, hatirla = true) {
-  if (hatirla) {
-    localStorage.setItem(TOKEN_ANAHTARI, token);
-    sessionStorage.removeItem(TOKEN_ANAHTARI);
-  } else {
-    sessionStorage.setItem(TOKEN_ANAHTARI, token);
-    localStorage.removeItem(TOKEN_ANAHTARI);
+async function jsonIstegi(yol, secenekler = {}, varsayilanHata = "İstek tamamlanamadı.") {
+  const yanit = await istekAt(yol, secenekler);
+  const veri = await jsonYanitiOku(yanit, varsayilanHata);
+  if (!yanit.ok) throw new Error(veri.hata || varsayilanHata);
+  return veri;
+}
+
+export async function isletmeBilgisiniGetir(slug) {
+  const temizSlug = encodeURIComponent(String(slug || "").trim().toLowerCase());
+  const veri = await jsonIstegi(`/api/isletme/${temizSlug}`, { isletmeBasligi: false }, "İşletme bulunamadı.");
+  return veri.isletme;
+}
+
+export async function kayitOl(veri) {
+  try {
+    return await jsonIstegi("/api/kayit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Kayıt işlemi tamamlanamadı.");
+  } catch (hata) {
+    return { hata: hata.message };
   }
 }
-export function tokeniAl() {
-  // Önce kalıcı (localStorage), yoksa oturumluk (sessionStorage)
-  return localStorage.getItem(TOKEN_ANAHTARI) || sessionStorage.getItem(TOKEN_ANAHTARI);
-}
-export function tokeniSil() {
-  localStorage.removeItem(TOKEN_ANAHTARI);
-  sessionStorage.removeItem(TOKEN_ANAHTARI);
-}
 
-// Kayit ol
-export async function kayitOl(veri) {
-  const r = await fetch(`${BACKEND_URL}/api/kayit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(veri),
-  });
-  return r.json();
-}
-
-// Giris yap
 export async function girisYap(email, sifre) {
-  const r = await fetch(`${BACKEND_URL}/api/giris`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, sifre }),
-  });
-  return r.json();
+  try {
+    return await jsonIstegi("/api/giris", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, sifre }) }, "Giriş yapılamadı.");
+  } catch (hata) {
+    return { hata: hata.message };
+  }
 }
 
 export async function ikiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
-  const r = await fetch(`${BACKEND_URL}/api/giris/2fa`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ikiFaktorToken, kod }),
-  });
-  return jsonYanitiOku(r, "İki adımlı doğrulama yanıtı okunamadı.");
+  try {
+    return await jsonIstegi("/api/giris/2fa", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ikiFaktorToken, kod }) }, "İki adımlı doğrulama tamamlanamadı.");
+  } catch (hata) {
+    return { hata: hata.message };
+  }
 }
 
-async function ikiFaktorIstegi(yol, veri) {
-  const r = await fetch(`${BACKEND_URL}/api/2fa/${yol}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
-    body: JSON.stringify(veri),
-  });
-  const sonuc = await jsonYanitiOku(r, "İki adımlı doğrulama işlemi tamamlanamadı.");
-  if (!r.ok) throw new Error(sonuc.hata || "İki adımlı doğrulama işlemi tamamlanamadı.");
-  return sonuc;
+function ikiFaktorIstegi(yol, veri) {
+  return jsonIstegi(`/api/2fa/${yol}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "İki adımlı doğrulama işlemi tamamlanamadı.");
 }
 
 export const ikiFaktorKurulumBaslat = (sifre) => ikiFaktorIstegi("kurulum-baslat", { sifre });
 export const ikiFaktorKurulumOnayla = (kod) => ikiFaktorIstegi("kurulum-onayla", { kod });
 export const ikiFaktorKapat = (sifre, kod) => ikiFaktorIstegi("kapat", { sifre, kod });
 
-// Sifremi unuttum: talep gonder (backend her zaman ayni mesajla doner)
 export async function sifirlamaTalep(email) {
-  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirlama-talep`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-  return r.json();
+  return jsonIstegi("/api/sifre-sifirlama-talep", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }, "Sıfırlama isteği gönderilemedi.");
 }
 
-// Sifre sifirlama linkindeki token'i backend'de dogrula
 export async function tokenDogrula(token) {
-  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirla/dogrula?token=${encodeURIComponent(token)}`);
-  if (!r.ok) return { gecerli: false };
-  return r.json();
+  try {
+    return await jsonIstegi(`/api/sifre-sifirla/dogrula?token=${encodeURIComponent(token)}`, {}, "Bağlantı doğrulanamadı.");
+  } catch {
+    return { gecerli: false };
+  }
 }
 
-// Yeni sifreyi token ile birlikte gonder
 export async function sifreSifirla(token, yeniSifre) {
-  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirla`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, yeniSifre }),
-  });
-  return r.json();
+  try {
+    return await jsonIstegi("/api/sifre-sifirla", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, yeniSifre }) }, "Şifre sıfırlanamadı.");
+  } catch (hata) {
+    return { hata: hata.message };
+  }
 }
 
-// Token ile guncel kullanici bilgisi (sayfa yenilenince oturum korunur)
 export async function beniGetir() {
-  const token = tokeniAl();
-  if (!token) return null;
-  const r = await fetch(`${BACKEND_URL}/api/ben`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!r.ok) return null;
-  const d = await r.json();
-  return d.kullanici;
+  if (!tokeniAl()) return null;
+  try {
+    const veri = await jsonIstegi("/api/ben", {}, "Oturum doğrulanamadı.");
+    return veri.kullanici;
+  } catch {
+    return null;
+  }
 }
 
 export async function davetOzetiniGetir() {
-  const token = tokeniAl();
-  if (!token) return null;
-  const r = await fetch(`${BACKEND_URL}/api/davetim`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const veri = await r.json();
-  if (!r.ok) throw new Error(veri.hata || "Davet bilgileri alınamadı.");
-  return veri.davet;
+  if (!tokeniAl()) return null;
+  return (await jsonIstegi("/api/davetim", {}, "Davet bilgileri alınamadı.")).davet;
 }
 
-// Profil guncelle (email + telefon)
 export async function profilGuncelle(email, telefon) {
-  const token = tokeniAl();
-  if (!token) return { hata: "Giriş gerekli." };
-  const r = await fetch(`${BACKEND_URL}/api/profil`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ email, telefon }),
-  });
-  return r.json();
+  if (!tokeniAl()) return { hata: "Giriş gerekli." };
+  try {
+    return await jsonIstegi("/api/profil", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, telefon }) }, "Profil güncellenemedi.");
+  } catch (hata) {
+    return { hata: hata.message };
+  }
 }
 
 export async function duyurulariGetir() {
-  const r = await fetch(`${BACKEND_URL}/api/duyurular`);
-  if (!r.ok) return [];
-  const veri = await r.json();
-  return veri.duyurular || [];
+  try { return (await jsonIstegi("/api/duyurular", {}, "Duyurular alınamadı.")).duyurular || []; }
+  catch { return []; }
 }
 
 export async function siparisGecmisiniGetir() {
-  const token = tokeniAl();
-  if (!token) return [];
-  const r = await fetch(`${BACKEND_URL}/api/siparislerim`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!r.ok) throw new Error("Sipariş geçmişi alınamadı.");
-  const veri = await r.json();
-  return veri.siparisler || [];
+  if (!tokeniAl()) return [];
+  return (await jsonIstegi("/api/siparislerim", {}, "Sipariş geçmişi alınamadı.")).siparisler || [];
 }
 
 export async function sadakatOzetiniGetir() {
-  const token = tokeniAl();
-  if (!token) return null;
-  const r = await fetch(`${BACKEND_URL}/api/sadakat`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const veri = await r.json();
-  if (!r.ok) throw new Error(veri.hata || "Sadakat bilgileri alınamadı.");
-  return veri.sadakat;
+  if (!tokeniAl()) return null;
+  return (await jsonIstegi("/api/sadakat", {}, "Sadakat bilgileri alınamadı.")).sadakat;
 }
 
 export async function puanlaOdulSatinAl(odulId, istekAnahtari) {
-  const r = await fetch(`${BACKEND_URL}/api/sadakat/oduller/${encodeURIComponent(odulId)}/satin-al`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
-    body: JSON.stringify({ istekAnahtari }),
-  });
-  const veri = await r.json();
-  if (!r.ok) throw new Error(veri.hata || "Ödül alınamadı.");
-  return veri.sadakat;
+  return (await jsonIstegi(`/api/sadakat/oduller/${encodeURIComponent(odulId)}/satin-al`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ istekAnahtari }) }, "Ödül alınamadı.")).sadakat;
 }
 
 export async function kullaniciHediyesiniKullan(hediyeId, masaNo) {
-  const r = await fetch(`${BACKEND_URL}/api/sadakat/hediyeler/${encodeURIComponent(hediyeId)}/kullan`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
-    body: JSON.stringify({ masaNo: masaNo || null }),
-  });
-  const veri = await r.json();
-  if (!r.ok) throw new Error(veri.hata || "Hediye kullanılamadı.");
-  return veri;
-}
-
-function yetkiBasligi() {
-  const token = tokeniAl();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return jsonIstegi(`/api/sadakat/hediyeler/${encodeURIComponent(hediyeId)}/kullan`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ masaNo: masaNo || null }) }, "Hediye kullanılamadı.");
 }
 
 export async function odemeTaslagiOlustur(veri) {
-  const r = await fetch(`${BACKEND_URL}/api/odeme/taslak`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
-    body: JSON.stringify(veri),
-  });
-  const yanit = await r.json();
-  if (!r.ok) throw new Error(yanit.hata || "Ödeme taslağı oluşturulamadı.");
-  return yanit.odeme;
+  return (await jsonIstegi("/api/odeme/taslak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Ödeme taslağı oluşturulamadı.")).odeme;
 }
 
 export async function iyzicoOdemesiniBaslat(odemeId, alici) {
-  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
-    body: JSON.stringify({ alici }),
-  });
-  const yanit = await r.json();
-  if (!r.ok) throw new Error(yanit.hata || "İyzico ödeme formu başlatılamadı.");
-  return yanit.paymentPageUrl;
+  return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alici }) }, "İyzico ödeme formu başlatılamadı.")).paymentPageUrl;
 }
 
 export async function odemeSonucunuGetir(odemeId) {
-  const r = await fetch(`${BACKEND_URL}/api/odeme/${encodeURIComponent(odemeId)}/sonuc`, {
-    headers: yetkiBasligi(),
-  });
-  const yanit = await r.json();
-  if (!r.ok) throw new Error(yanit.hata || "Ödeme sonucu alınamadı.");
-  return yanit.odeme;
+  return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/sonuc`, {}, "Ödeme sonucu alınamadı.")).odeme;
 }

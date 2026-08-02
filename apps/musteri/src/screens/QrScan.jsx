@@ -1,4 +1,5 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { IconBack, IconQr } from "../components/Icons";
 import "./QrScan.css";
 
@@ -11,7 +12,7 @@ import "./QrScan.css";
   ?mod=masa     → okutunca masa siparişi ekranına git (masa no simüle)
 */
 export default function QrScan() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const mod = params.get("mod") || "algotur";
 

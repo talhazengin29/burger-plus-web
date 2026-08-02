@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion } from "framer-motion";
 import { sifirlamaTalep } from "../lib/authApi";
 import { IconCheck } from "../components/Icons";
@@ -8,7 +8,7 @@ import logoFull from "../assets/logo-full-transparent.png";
 import "./Login.css";
 
 export default function SifremiUnuttum() {
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const [email, setEmail] = useState("");
   const [alanHatalari, setAlanHatalari] = useState({});
   const [hata, setHata] = useState("");

@@ -7,7 +7,7 @@
   "scripts": {
     "install:all": "cd apps/musteri && npm install && cd ../personel && npm install",
     "build:musteri": "cd apps/musteri && npm install && npm run build",
-    "build:personel": "cd apps/personel && npm install && VITE_BASE=/personel/ npm run build",
+    "build:personel": "cd apps/personel && npm install && npm run build",
     "build": "npm run build:musteri && npm run build:personel && node birlestir.js",
     "dev:musteri": "cd apps/musteri && npm run dev",
     "dev:personel": "cd apps/personel && npm run dev"

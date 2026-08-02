@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
 import { socket } from "../lib/socket";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Admin.css";
 
@@ -89,7 +90,7 @@ const urunuFormaCevir = (urun) => ({
 
 export default function Admin({ onCikis }) {
   const konum = useLocation();
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
   const yolParcasi = konum.pathname.split("/").filter(Boolean).at(-1) || "genel-bakis";
   const bolum = BOLUMLER.find(([, , , yol]) => yol === yolParcasi)?.[0] || "genel";
   const [dashboard, setDashboard] = useState(null);

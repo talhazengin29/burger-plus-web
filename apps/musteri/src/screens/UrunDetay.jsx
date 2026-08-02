@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useParams, useNavigate, Navigate } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
+import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
+import { useIsletme } from "../context/IsletmeContext";
 import { IconBack, IconMinus, IconPlus, IconWarning } from "../components/Icons";
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
 import { varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
@@ -17,7 +19,8 @@ const besinEtiketleri = [
 
 export default function UrunDetay() {
   const { id } = useParams();
-  const git = useNavigate();
+  const git = useIsletmeNavigate();
+  const { isletmeSlug } = useIsletme();
   const { sepeteEkle, indirimliFiyat, urunler } = useApp();
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
@@ -28,7 +31,7 @@ export default function UrunDetay() {
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
 
   const urun = urunler.find((u) => String(u.id) === id);
-  if (!urun) return <Navigate to="/anasayfa" replace />;
+  if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
   const urunOnerileri = (urun.onerilenUrunler || [])
     .map((onerilenId) => urunler.find((aday) => Number(aday.id) === Number(onerilenId)))
     .filter((aday) => aday && Number(aday.id) !== Number(urun.id))
