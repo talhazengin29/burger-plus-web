@@ -188,6 +188,10 @@ export async function iyzicoOdemesiniBaslat(odemeId, alici) {
   return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alici }) }, "İyzico ödeme formu başlatılamadı.")).paymentPageUrl;
 }
 
+export async function iyzicoOdemesiniDogrula(odemeId) {
+  return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-dogrula`, { method: "POST" }, "İyzico ödeme sonucu doğrulanamadı.")).odeme;
+}
+
 export async function odemeSonucunuGetir(odemeId) {
   return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/sonuc`, {}, "Ödeme sonucu alınamadı.")).odeme;
 }

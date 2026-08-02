@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
-import { odemeSonucunuGetir } from "../lib/authApi";
+import { iyzicoOdemesiniDogrula, odemeSonucunuGetir } from "../lib/authApi";
 import { usePerde } from "../hooks/usePerde";
 import "./PaymentSuccess.css";
 
@@ -26,12 +26,22 @@ export default function PaymentSuccess() {
     let iptal = false;
     const sonucuDogrula = async () => {
       let sonHata = null;
+      let saglayiciDogrulamasiDenendi = false;
       for (let deneme = 0; deneme < SONUC_DENEME_ADEDI; deneme += 1) {
         if (iptal) return null;
         try {
           const odeme = await odemeSonucunuGetir(odemeId);
           if (odeme.durum === "basarili") return odeme;
-          sonHata = new Error("Ödeme henüz onaylanmadı.");
+          if (!saglayiciDogrulamasiDenendi) {
+            saglayiciDogrulamasiDenendi = true;
+            try {
+              return await iyzicoOdemesiniDogrula(odemeId);
+            } catch (e) {
+              sonHata = e;
+            }
+          } else if (!sonHata) {
+            sonHata = new Error("Ödeme henüz onaylanmadı.");
+          }
         } catch (e) {
           sonHata = e;
         }
