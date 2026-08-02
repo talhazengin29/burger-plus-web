@@ -81,6 +81,18 @@ export async function yerelAdminDurumu() {
   return (await jsonOku(r)).kurulumGerekli === true;
 }
 
+export async function personelOturumunuDogrula() {
+  if (!adminToken.al()) return null;
+  const r = await istekAt("/api/ben");
+  const veri = await jsonOku(r).catch(() => ({}));
+  if ([401, 403].includes(r.status)) {
+    adminToken.sil();
+    return null;
+  }
+  if (!r.ok) throw new Error(veri.hata || "Personel oturumu doğrulanamadı.");
+  return veri.kullanici || null;
+}
+
 export async function adminIstek(yol, secenekler = {}) {
   const r = await istekAt(`/api/admin${yol}`, {
     ...secenekler,

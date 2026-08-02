@@ -16,7 +16,7 @@ import { socket, socketIsletmesiniAyarla } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
 import { useIsletme } from "./IsletmeContext";
 import {
-  beniGetir, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
+  beniGetir, tokeniAl, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
   sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
   istekAt, tenantDepoAnahtari,
 } from "../lib/authApi";
@@ -139,9 +139,13 @@ export function AppProvider({ children }) {
     if (guncel) {
       setKullanici(guncel);
       setPuan(guncel.puan || 0);
+    } else if (!tokeniAl()) {
+      setKullanici(null);
+      setPuan(0);
+      socketIsletmesiniAyarla(isletmeSlug);
     }
     return guncel;
-  }, []);
+  }, [isletmeSlug]);
 
   useEffect(() => {
     setAvatar(kullanici?.id ? localStorage.getItem(`bp_avatar_${isletmeSlug}_${kullanici.id}`) : null);

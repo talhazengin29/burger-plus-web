@@ -125,6 +125,7 @@ export default function SifreSifirla() {
               onChange={(e) => { setSifre(e.target.value.slice(0, 72)); setHata(""); }}
               placeholder="••••••"
               autoComplete="new-password"
+              minLength="8"
               maxLength="72"
               autoFocus
               required
@@ -149,6 +150,7 @@ export default function SifreSifirla() {
               onChange={(e) => { setSifreTekrar(e.target.value.slice(0, 72)); setHata(""); }}
               placeholder="••••••"
               autoComplete="new-password"
+              minLength="8"
               maxLength="72"
               required
             />

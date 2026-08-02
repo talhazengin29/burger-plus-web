@@ -20,7 +20,12 @@ export function emailTemizle(deger) {
 
 export function telefonTemizle(deger) {
   const ham = guvenliMetin(deger, 20).replace(/[^\d+]/g, "");
-  return ham.startsWith("+") ? `+${ham.slice(1).replace(/\+/g, "")}` : ham.replace(/\+/g, "");
+  const temiz = ham.startsWith("+") ? `+${ham.slice(1).replace(/\+/g, "")}` : ham.replace(/\+/g, "");
+  const rakamlar = temiz.replace(/\D/g, "");
+  if (/^05\d{9}$/.test(rakamlar)) return `+9${rakamlar}`;
+  if (/^5\d{9}$/.test(rakamlar)) return `+90${rakamlar}`;
+  if (/^90\d{10}$/.test(rakamlar)) return `+${rakamlar}`;
+  return temiz;
 }
 
 export function davetKoduTemizle(deger) {
@@ -61,7 +66,7 @@ export const kurallar = {
   yeniSifre(deger) {
     const sifre = String(deger ?? "");
     if (!sifre) return "Şifre zorunludur.";
-    if (sifre.length < 6) return "Şifre en az 6 karakter olmalıdır.";
+    if (sifre.length < 8) return "Şifre en az 8 karakter olmalıdır.";
     if (sifre.length > 72) return "Şifre en fazla 72 karakter olabilir.";
     if (/[\r\n\t]/.test(sifre)) return "Şifre satır sonu veya sekme içeremez.";
     return "";

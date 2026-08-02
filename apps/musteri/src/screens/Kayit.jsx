@@ -128,7 +128,7 @@ export default function Kayit() {
           <input type={sifreGorunur ? "text" : "password"} className="login-input" value={form.sifre}
             onChange={(e) => guncelle("sifre", e.target.value.slice(0, 72))}
             onBlur={() => setAlanHatalari((o) => ({ ...o, sifre: KAYIT_SEMASI.sifre(form.sifre) }))}
-            placeholder="En az 6 karakter" autoComplete="new-password" minLength="6" maxLength="72" required
+            placeholder="En az 8 karakter" autoComplete="new-password" minLength="8" maxLength="72" required
             aria-invalid={Boolean(alanHatalari.sifre)} aria-describedby={alanHatalari.sifre ? "kayit-sifre-hata" : undefined} />
           <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
             {sifreGorunur ? <IconEyeOff /> : <IconEye />}

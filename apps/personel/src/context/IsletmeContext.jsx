@@ -9,6 +9,7 @@ export function IsletmeSarici({ children }) {
   const [durum, setDurum] = useState({ yukleniyor: true, isletme: null, hata: "" });
   useEffect(() => {
     let aktif = true;
+    setDurum({ yukleniyor: true, isletme: null, hata: "" });
     isletmeBilgisiniGetir(isletmeSlug)
       .then((isletme) => { if (aktif) setDurum({ yukleniyor: false, isletme, hata: "" }); })
       .catch((hata) => { if (aktif) setDurum({ yukleniyor: false, isletme: null, hata: hata.message }); });
@@ -17,7 +18,7 @@ export function IsletmeSarici({ children }) {
   const deger = useMemo(() => ({ isletme: durum.isletme, isletmeSlug: durum.isletme?.slug || isletmeSlug }), [durum.isletme, isletmeSlug]);
   if (durum.yukleniyor) return <main className="tenant-durum">İşletme yükleniyor…</main>;
   if (!durum.isletme) return <main className="tenant-durum"><h1>İşletme bulunamadı</h1><p>{durum.hata}</p></main>;
-  return <IsletmeContext.Provider value={deger}>{children}</IsletmeContext.Provider>;
+  return <IsletmeContext.Provider key={durum.isletme.slug} value={deger}>{children}</IsletmeContext.Provider>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

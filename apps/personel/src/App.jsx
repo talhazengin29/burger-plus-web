@@ -4,7 +4,7 @@ import Login from "./screens/Login";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
-import { adminToken } from "./lib/adminApi";
+import { adminToken, personelOturumunuDogrula } from "./lib/adminApi";
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
 import { useIsletmeNavigate } from "./hooks/useIsletmeNavigate";
@@ -29,16 +29,37 @@ function PersonelPaneli() {
   const [rol, setRol] = useState(null); // "mutfak" | "salon" | null
   const [aktifSekme, setAktifSekme] = useState("mutfak");
   const [tema, setTema] = useState("koyu"); // "koyu" | "acik"
+  const [oturumYukleniyor, setOturumYukleniyor] = useState(true);
 
   useEffect(() => {
     const kayitli = sessionStorage.getItem(oturumAnahtari);
-    if (kayitli && adminToken.al()) {
-      setRol(kayitli);
-      setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
-      personelSocketiniBagla();
-    }
     const kayitliTema = localStorage.getItem(temaAnahtari);
     if (kayitliTema) setTema(kayitliTema);
+    let iptal = false;
+    const izinler = { admin: ["admin"], mutfak: ["mutfak", "admin"], salon: ["salon", "kasiyer", "admin"] };
+
+    async function oturumuYukle() {
+      try {
+        const kullanici = kayitli && adminToken.al() ? await personelOturumunuDogrula() : null;
+        if (iptal) return;
+        if (kullanici && izinler[kayitli]?.includes(kullanici.rol)) {
+          setRol(kayitli);
+          setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
+          personelSocketiniBagla();
+        } else {
+          sessionStorage.removeItem(oturumAnahtari);
+          adminToken.sil();
+          personelSocketiniKes();
+        }
+      } catch {
+        if (!iptal) personelSocketiniKes();
+      } finally {
+        if (!iptal) setOturumYukleniyor(false);
+      }
+    }
+
+    oturumuYukle();
+    return () => { iptal = true; };
   }, [oturumAnahtari, temaAnahtari]);
 
   // Temayı <html data-tema> ile uygula
@@ -65,6 +86,7 @@ function PersonelPaneli() {
     git("/");
   };
 
+  if (oturumYukleniyor) return <main className="tenant-durum">Oturum doğrulanıyor…</main>;
   if (!rol) return <Login onGirisBasarili={girisBasarili} />;
   if (rol === "admin") return <Admin onCikis={cikis} />;
 

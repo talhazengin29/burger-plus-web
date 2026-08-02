@@ -71,7 +71,11 @@ async function jsonYanitiOku(yanit, varsayilanHata) {
 async function jsonIstegi(yol, secenekler = {}, varsayilanHata = "İstek tamamlanamadı.") {
   const yanit = await istekAt(yol, secenekler);
   const veri = await jsonYanitiOku(yanit, varsayilanHata);
-  if (!yanit.ok) throw new Error(veri.hata || varsayilanHata);
+  if (!yanit.ok) {
+    const hata = new Error(veri.hata || varsayilanHata);
+    hata.status = yanit.status;
+    throw hata;
+  }
   return veri;
 }
 
@@ -138,7 +142,8 @@ export async function beniGetir() {
   try {
     const veri = await jsonIstegi("/api/ben", {}, "Oturum doğrulanamadı.");
     return veri.kullanici;
-  } catch {
+  } catch (hata) {
+    if ([401, 403].includes(hata?.status)) tokeniSil();
     return null;
   }
 }
