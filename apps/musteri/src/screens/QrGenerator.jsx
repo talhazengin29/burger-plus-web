@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { IconBack } from "../components/Icons";
 import { useIsletme } from "../context/IsletmeContext";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
+import { istekAt } from "../lib/authApi";
 import "./QrGenerator.css";
 
 /*
@@ -12,16 +13,17 @@ import "./QrGenerator.css";
 */
 export default function QrGenerator() {
   const git = useIsletmeNavigate();
-  const { isletmeSlug } = useIsletme();
-  const [masaSayisi, setMasaSayisi] = useState(5);
+  const { isletme, isletmeSlug } = useIsletme();
+  const [masaSayisi, setMasaSayisi] = useState(10);
   const [qrler, setQrler] = useState([]); // { no, dataUrl }
 
   // Uygulamanın kök adresi (gerçek sitede otomatik doğru gelir)
   const kokAdres = window.location.origin;
 
-  const uret = async () => {
+  const uret = async (istenenAdet = masaSayisi) => {
+    const adet = Math.min(500, Math.max(1, Number(istenenAdet) || 10));
     const sonuc = [];
-    for (let i = 1; i <= masaSayisi; i++) {
+    for (let i = 1; i <= adet; i++) {
       const url = `${kokAdres}/${isletmeSlug}/masa?no=${i}`;
       const dataUrl = await QRCode.toDataURL(url, {
         width: 300,
@@ -35,7 +37,18 @@ export default function QrGenerator() {
 
   // İlk açılışta otomatik üret
   useEffect(() => {
-    uret();
+    let iptal = false;
+    istekAt("/api/admin/kurulum-ayarlari")
+      .then(async (yanit) => {
+        if (!yanit.ok) throw new Error("Masa ayarı alınamadı.");
+        const ayar = await yanit.json();
+        const adet = Math.min(500, Math.max(1, Number(ayar.masaSayisi) || 10));
+        if (iptal) return;
+        setMasaSayisi(adet);
+        await uret(adet);
+      })
+      .catch(() => { if (!iptal) uret(10); });
+    return () => { iptal = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,7 +69,7 @@ export default function QrGenerator() {
           <div className="qr-gen-secici">
             <button onClick={() => setMasaSayisi((s) => Math.max(1, s - 1))}>−</button>
             <span className="qr-gen-sayi">{masaSayisi}</span>
-            <button onClick={() => setMasaSayisi((s) => Math.min(50, s + 1))}>+</button>
+            <button onClick={() => setMasaSayisi((s) => Math.min(500, s + 1))}>+</button>
           </div>
           <button className="qr-gen-uret-btn" onClick={uret}>QR'ları Oluştur</button>
           {qrler.length > 0 && (
@@ -73,7 +86,7 @@ export default function QrGenerator() {
             <div key={q.no} className="qr-kart">
               <div className="qr-kart-baslik">Masa {q.no}</div>
               <img className="qr-kart-img" src={q.dataUrl} alt={`Masa ${q.no} QR`} />
-              <div className="qr-kart-marka">🍔 BURGER PLUS</div>
+              <div className="qr-kart-marka">{isletme?.ad || "Burger Plus"}</div>
               <div className="qr-kart-alt">Okut · Sipariş Ver · Öde</div>
             </div>
           ))}
