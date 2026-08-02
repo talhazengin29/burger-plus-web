@@ -26,7 +26,7 @@
 .geri-btn:hover { background: var(--glass-bg-strong); }
 .geri-btn svg { width: 22px; height: 22px; }
 .alt-header-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 20px;
   color: var(--on-surface);
@@ -62,7 +62,7 @@
 .cart-gorsel--bos {
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-card);
   font-size: 30px;
 }
 .cart-kisi {
@@ -76,7 +76,7 @@
   font-size: 14px;
   color: var(--primary-bright);
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.28);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   padding: 6px 12px;
   border-radius: var(--r-full);
 }
@@ -152,7 +152,7 @@
   backdrop-filter: var(--glass-blur-lg);
   border-top: 1px solid var(--glass-border);
   padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--bg-card);
   border-top-left-radius: var(--r-xl);
   border-top-right-radius: var(--r-xl);
 }
@@ -166,7 +166,7 @@
   color: var(--on-surface-variant);
 }
 .cart-toplam-tutar {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 24px;
   color: var(--primary-container);
@@ -179,7 +179,7 @@
 }
 .cart-masa-bilgi {
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--on-surface);
   font-weight: 700;
   font-size: 15px;
@@ -195,13 +195,13 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.odeme-gec-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.odeme-gec-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .odeme-gec-btn:active { transform: scale(0.99); }
 
 .cart-secim-butonlar {
@@ -216,7 +216,7 @@
   gap: 6px;
   padding: 16px 8px;
   border-radius: var(--r-lg);
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 15px;
   transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
@@ -235,9 +235,9 @@
 .siparis-tip-btn--masa {
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
-.siparis-tip-btn--masa:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.siparis-tip-btn--masa:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 
 /* --- Boş sepet --- */
 .sepet-bos {
@@ -258,7 +258,7 @@
   color: #fff;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.sepet-bos-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.sepet-bos-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }

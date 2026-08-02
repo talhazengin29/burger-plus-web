@@ -8,6 +8,7 @@ import { IconPlus, IconSearch, IconFilter } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, barDolumu, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
+import { useTema } from "../context/TemaContext";
 import "./Home.css";
 
 // Arama çubuğundaki filtre düğmesinin sıralama seçenekleri
@@ -23,6 +24,7 @@ function sayfaYenilendiMi() {
 }
 
 export default function Home() {
+  const { metinler } = useTema();
   const location = useLocation();
   // Kampanyalar'dan "Sipariş Ver" ile gelinirse ilgili kategori otomatik seçili açılır.
   // Tarayıcı yenilemesinde history state geri gelse bile menü her zaman Tümü'nden başlar.
@@ -58,6 +60,10 @@ export default function Home() {
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
+  const sloganVurguIndex = metinler.slogan.lastIndexOf(metinler.sloganVurgu);
+  const sloganBaslangici = sloganVurguIndex >= 0 ? metinler.slogan.slice(0, sloganVurguIndex).trim() : metinler.slogan;
+  const damgaMetni = metinler.damgaMetni.replace("{hedef}", burgerDamgaHedef);
+  const [damgaBaslangici, ...damgaVurgusu] = damgaMetni.split(/,\s*/);
 
   return (
     <div className="ekran home">
@@ -71,9 +77,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          Lezzetli Yemek
-          <br />
-          <span className="vurgu">Harika Deneyim!</span>
+          {sloganBaslangici}
+          {sloganVurguIndex >= 0 && <><br /><span className="vurgu">{metinler.sloganVurgu}</span></>}
         </motion.h1>
 
         {/* Ye Kazan damga kartı */}
@@ -85,9 +90,9 @@ export default function Home() {
         >
           <div className="damga-ust">
             <div>
-              <span className="damga-rozet">YE KAZAN</span>
+              <span className="damga-rozet">{metinler.kampanyaBaslik}</span>
               <h2 className="damga-baslik">
-                {burgerDamgaHedef} Burger Ye, <span className="vurgu">1 Burger HEDİYE!</span>
+                {damgaBaslangici}{damgaVurgusu.length > 0 && <>, <span className="vurgu">{damgaVurgusu.join(", ")}</span></>}
               </h2>
             </div>
             {!misafir && (
@@ -109,7 +114,7 @@ export default function Home() {
                 <motion.div className="ilerleme-dolgu" {...barDolumu(damgaYuzde)} />
               </div>
               <span className="damga-durum">
-                {burgerDamgaHedef - burgerDamga} burger sonra hediyen hazır
+                {burgerDamgaHedef - burgerDamga} {metinler.damgaBirim.toLocaleLowerCase("tr")} sonra hediyen hazır
               </span>
             </>
           )}
@@ -154,8 +159,8 @@ export default function Home() {
               type="search"
               value={arama}
               onChange={(e) => setArama(guvenliMetin(e.target.value, 80))}
-              placeholder="Menüde ara..."
-              aria-label="Menüde ara"
+              placeholder={metinler.aramaPlaceholder}
+              aria-label={metinler.aramaPlaceholder}
               maxLength="80"
             />
             <motion.button
@@ -203,7 +208,7 @@ export default function Home() {
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         {populerUrunler.length > 0 && <div className="bolum-satir">
-          <h3 className="bolum-baslik">Popüler {kategoriBasligi}</h3>
+          <h3 className="bolum-baslik">{aktifKategori === "Tümü" ? metinler.urunBolumBaslik : `${metinler.urunBolumBaslik}: ${kategoriBasligi}`}</h3>
         </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}

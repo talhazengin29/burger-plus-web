@@ -1,13 +1,13 @@
 .hediyelerim-govde { padding: 8px var(--margin) 24px; }
 .hediyelerim-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 24px;
   color: var(--on-surface);
   margin-bottom: 20px;
 }
 .hediyelerim-bolum-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
   color: var(--on-surface);
@@ -57,7 +57,7 @@
   min-width: 0;
 }
 .hediye-ad {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 15px;
   color: var(--on-surface);
@@ -73,10 +73,10 @@
   color: #fff;
   font-weight: 700;
   font-size: 13px;
-  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.hediye-sepet-btn:hover { box-shadow: 0 4px 14px rgba(255, 107, 0, 0.4), var(--glow-sm); }
+.hediye-sepet-btn:hover { box-shadow: 0 4px 14px var(--accent-glow), var(--glow-sm); }
 .hediye-sepet-btn:active { transform: scale(0.97); }
 
 .hediye-kullanildi-rozet {

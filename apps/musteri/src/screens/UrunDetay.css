@@ -52,7 +52,7 @@
   box-shadow: var(--glass-shadow);
 }
 .urun-detay-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   color: var(--on-surface);
@@ -62,14 +62,14 @@
 /* Özet — ad, fiyat, açıklama */
 .urun-detay-ozet { display: flex; flex-direction: column; gap: 8px; }
 .urun-detay-ad {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 24px;
   line-height: 1.2;
   color: var(--on-surface);
 }
 .urun-detay-fiyat {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 20px;
   color: var(--primary-container);
@@ -82,14 +82,14 @@
   flex-wrap: wrap;
 }
 .urun-detay-fiyat-eski {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-size: 15px;
   color: var(--on-surface-variant);
   text-decoration: line-through;
 }
 .urun-detay-fiyat--indirim {
   color: var(--primary-bright);
-  text-shadow: 0 0 14px rgba(255, 107, 0, 0.35);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .urun-detay-aciklama {
   font-size: 14px;
@@ -113,7 +113,7 @@
 .gramaj-kontrol span { min-width: 18px; text-align: center; font-weight: 700; }
 .boyut-secenekleri { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .boyut-secenekleri button { min-width: 0; padding: 11px 7px; border: 1px solid var(--glass-border-strong); border-radius: var(--r-md); background: rgba(255,255,255,.045); display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--on-surface-variant); }
-.boyut-secenekleri button.aktif { border-color: var(--primary); background: var(--primary-fixed); color: var(--on-surface); box-shadow: 0 0 16px rgba(255,107,0,.16); }
+.boyut-secenekleri button.aktif { border-color: var(--primary); background: var(--primary-fixed); color: var(--on-surface); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 16%, transparent); }
 .boyut-secenekleri b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 .boyut-secenekleri span { font-size: 10px; color: var(--on-surface-variant); }
 .boyut-secenekleri small { font-size: 9px; color: var(--primary-container); font-weight: 700; }
@@ -140,7 +140,7 @@
   border-radius: var(--r-md);
 }
 .besin-deger {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 13px;
   color: var(--primary-container);
@@ -204,7 +204,7 @@
   backdrop-filter: var(--glass-blur-lg);
   border-top: 1px solid var(--glass-border);
   padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--bg-card);
   border-top-left-radius: var(--r-xl);
   border-top-right-radius: var(--r-xl);
 }
@@ -277,7 +277,7 @@
   color: #fff;
   font-size: 10px;
   font-weight: 800;
-  box-shadow: 0 3px 12px rgba(255, 107, 0, 0.28);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 .urun-detay-oneri > button svg { width: 14px; height: 14px; }
 .urun-detay-alt-bar .adet-kontrol {
@@ -315,11 +315,11 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.urun-detay-sepet-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.urun-detay-sepet-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .urun-detay-sepet-btn:active { transform: scale(0.99); }

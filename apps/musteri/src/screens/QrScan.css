@@ -44,7 +44,7 @@
   position: absolute;
   width: 32px; height: 32px;
   border: 3px solid var(--primary-container);
-  filter: drop-shadow(0 0 6px rgba(255, 107, 0, 0.5));
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 50%, transparent));
 }
 .qr-kose--sol-ust { top: 14px; left: 14px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
 .qr-kose--sag-ust { top: 14px; right: 14px; border-left: none; border-bottom: none; border-top-right-radius: 8px; }
@@ -77,12 +77,12 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   margin-top: 20px;
   transition: box-shadow 0.2s;
 }
-.qr-okut-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.qr-okut-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .qr-okut-btn:active { transform: scale(0.99); }

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import logoFull from "../assets/logo-full-transparent.png";
+import MarkaLogosu from "./MarkaLogosu";
 import "./PerdeGecis.css";
 
 const SURELER = {
@@ -62,7 +62,7 @@ export default function PerdeGecis({ aktif, varyant = "normal", altMetin = "", o
             animate={{ opacity: asama === "bekliyor" ? 1 : 0, scale: asama === "bekliyor" ? 1 : aciliyor ? 1.04 : 0.88, x: "-50%", y: "-50%" }}
             transition={{ duration: hareketAzalt ? 0.03 : 0.22, ease: "easeOut" }}
           >
-            <img src={logoFull} alt="" />
+            <MarkaLogosu alt="" />
             {altMetin && <strong>{altMetin}</strong>}
             <span className="perde-ilerleme"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: asama === "kapaniyor" ? 0 : 1 }} transition={{ duration: hareketAzalt ? 0.05 : 0.6, ease: "easeInOut" }} /></span>
           </motion.div>

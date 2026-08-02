@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { sifirlamaTalep } from "../lib/authApi";
 import { IconCheck } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama";
-import logoFull from "../assets/logo-full-transparent.png";
+import MarkaLogosu from "../components/MarkaLogosu";
 import "./Login.css";
 
 export default function SifremiUnuttum() {
@@ -44,7 +44,7 @@ export default function SifremiUnuttum() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <img className="login-logo" src={logoFull} alt="Burger Plus" />
+        <MarkaLogosu className="login-logo" />
         <p className="login-slogan">Şifreni mi unuttun?</p>
       </motion.div>
 

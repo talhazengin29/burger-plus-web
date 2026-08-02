@@ -2,9 +2,11 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
+import { useTema } from "../context/TemaContext";
 import "./Cart.css";
 
 export default function Cart() {
+  const { metinler } = useTema();
   const git = useIsletmeNavigate();
   const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
 
@@ -21,7 +23,7 @@ export default function Cart() {
       {sepet.length === 0 ? (
         <div className="sepet-bos">
           <IconBag className="sepet-bos-ikon" />
-          <p className="sepet-bos-yazi">Sepetin şu an boş</p>
+          <p className="sepet-bos-yazi">{metinler.sepetBos}</p>
           <button className="sepet-bos-btn" onClick={() => git("/anasayfa")}>
             Menüye Dön
           </button>

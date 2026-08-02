@@ -5,9 +5,9 @@
   /* Giriş kendi opak zeminini kullanır; uygulama arkasındaki bloblar form ve
      logo alanlarında ayrı katman/kart sınırı gibi görünmez. */
   background:
-    radial-gradient(68% 42% at 50% 14%, rgba(255, 107, 0, 0.13), transparent 76%),
-    radial-gradient(76% 40% at 50% 62%, rgba(255, 107, 0, 0.07), transparent 78%),
-    #0d0d0d;
+    radial-gradient(68% 42% at 50% 14%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 76%),
+    radial-gradient(76% 40% at 50% 62%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 78%),
+    var(--bg-primary);
 }
 
 /* Üst logo bölümü */
@@ -23,6 +23,13 @@
   display: block;
   /* Saydam logo: yalnızca koyu marka yazısını aydınlatır; arka planı yoktur. */
   filter: invert(1) hue-rotate(180deg);
+}
+.login-logo.marka-logo-metin {
+  width: auto;
+  max-width: 100%;
+  min-height: 64px;
+  font-size: clamp(28px, 8vw, 44px);
+  filter: none;
 }
 .login-slogan { color: var(--on-surface-variant); font-size: 15px; }
 
@@ -50,14 +57,14 @@
   flex-direction: column;
   /* Cam yerine opak yüzey: mobil GPU'da görünen katman ayrışmalarını önler. */
   background: #15110f;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bg-card);
   border-radius: var(--r-xl);
   padding: 24px 20px;
   box-shadow: var(--glass-shadow);
 }
 .kayit-form { margin-top: 16px; }
 .login-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 20px;
   color: var(--on-surface);
@@ -85,7 +92,7 @@
   outline: none;
   border-color: var(--primary);
   background: #261d18;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .login-input::placeholder { color: rgba(255, 255, 255, 0.3); opacity: 1; }
 .login-input[aria-invalid="true"] { margin-bottom: 7px; }
@@ -93,7 +100,7 @@
 .kayit-alan > .alan-hata { margin: 0 0 12px; }
 .alan-hata--sifre { margin-top: -9px !important; }
 .istege-bagli { color: var(--outline); font-size: 11px; font-weight: 500; }
-.davet-kodu-input { text-transform: uppercase; letter-spacing: .14em; font-family: 'Montserrat'; font-weight: 700; }
+.davet-kodu-input { text-transform: uppercase; letter-spacing: .14em; font-family: var(--font-baslik); font-weight: 700; }
 .alan-yardim { margin: -8px 0 14px; color: var(--outline); font-size: 11px; line-height: 1.4; }
 .sifre-alani { position: relative; margin-bottom: 16px; }
 .sifre-alani .login-input { margin-bottom: 0; padding-right: 50px; }
@@ -158,14 +165,14 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: opacity 0.15s, box-shadow 0.2s;
 }
 .login-giris-btn:not(:disabled):hover {
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow);
+  box-shadow: 0 4px 16px var(--accent-glow), var(--glow);
 }
 .login-giris-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 .login-giris-btn:not(:disabled):active { transform: scale(0.99); }
@@ -237,4 +244,4 @@
 .sifre-guc small { font-size: 11px; font-weight: 700; color: var(--on-surface-variant); white-space: nowrap; }
 
 .login-2fa-aciklama { margin: 0 0 20px; color: var(--on-surface-variant); font-size: 13px; line-height: 1.55; text-align: center; }
-.login-2fa-input { text-align: center; font-family: 'Montserrat'; font-size: 24px; font-weight: 700; letter-spacing: .18em; }
+.login-2fa-input { text-align: center; font-family: var(--font-baslik); font-size: 24px; font-weight: 700; letter-spacing: .18em; }

@@ -6,11 +6,13 @@ import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
 import { siraliKonteyner, siraliOge, barDolumu } from "../lib/animasyonlar";
+import { useTema } from "../context/TemaContext";
 import "./Rewards.css";
 
 const ODUL_IKONLARI = { IconTicket, IconCutlery, IconGift };
 
 export default function Rewards() {
+  const { metinler } = useTema();
   const { puan, misafir, odulSatinAl, oduller, puanGecmisi } = useApp();
   const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
   const [islemde, setIslemde] = useState(null);
@@ -79,7 +81,7 @@ export default function Rewards() {
             </div>
             <div className="puan-ilerleme-bilgi">
               <span>Başlangıç</span>
-              <span className="puan-hedef">Hediye Burger ({hedef.toLocaleString("tr-TR")} Puan)</span>
+              <span className="puan-hedef">Hediye {metinler.damgaBirim} ({hedef.toLocaleString("tr-TR")} Puan)</span>
             </div>
             <div className="puan-ilerleme-ray">
               <motion.div className="puan-ilerleme-dolgu" {...barDolumu(yuzde)} />

@@ -82,7 +82,7 @@ async function jsonIstegi(yol, secenekler = {}, varsayilanHata = "İstek tamamla
 export async function isletmeBilgisiniGetir(slug) {
   const temizSlug = encodeURIComponent(String(slug || "").trim().toLowerCase());
   const veri = await jsonIstegi(`/api/isletme/${temizSlug}`, { isletmeBasligi: false }, "İşletme bulunamadı.");
-  return veri.isletme;
+  return { ...veri.isletme, tema: veri.tema };
 }
 
 export async function kayitOl(veri) {

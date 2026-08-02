@@ -21,12 +21,12 @@
   display: grid;
   place-items: center;
   margin-bottom: 22px;
-  box-shadow: 0 8px 28px rgba(255, 107, 0, 0.4), var(--glow-lg);
+  box-shadow: 0 8px 28px var(--accent-glow), var(--glow-lg);
 }
 .uyeol-ikon { width: 44px; height: 44px; color: #fff; }
 
 .uyeol-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 26px;
   color: var(--on-surface);
@@ -68,14 +68,14 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   margin-bottom: 12px;
   transition: box-shadow 0.2s;
 }
-.uyeol-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.uyeol-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .uyeol-btn:active { transform: scale(0.99); }
 .uyeol-btn-ikincil {
   width: 100%;
@@ -83,7 +83,7 @@
   border-radius: var(--r-lg);
   background: transparent;
   color: var(--on-surface-variant);
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 600;
   font-size: 15px;
   transition: color 0.15s;

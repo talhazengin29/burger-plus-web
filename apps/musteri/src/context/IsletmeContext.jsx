@@ -2,7 +2,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { AppProvider } from "./AppContext";
 import { isletmeBilgisiniGetir } from "../lib/authApi";
-import { socketIsletmesiniAyarla } from "../lib/socket";
+import { socket, socketIsletmesiniAyarla } from "../lib/socket";
+import { TemaSaglayici } from "./TemaContext";
+import varsayilanLogo from "../assets/logo-full-transparent.png";
 
 const IsletmeContext = createContext(null);
 
@@ -25,16 +27,31 @@ export function IsletmeSarici() {
     return () => { aktif = false; };
   }, [isletmeSlug]);
 
-  const deger = useMemo(() => ({ isletme: durum.isletme, isletmeSlug: durum.isletme?.slug || isletmeSlug }), [durum.isletme, isletmeSlug]);
+  useEffect(() => {
+    const temaGuncellendi = ({ isletme, tema } = {}) => {
+      if (isletme?.slug !== isletmeSlug || !tema) return;
+      setDurum({ yukleniyor: false, isletme: { ...isletme, tema }, hata: "" });
+    };
+    socket.on("tema-guncellendi", temaGuncellendi);
+    return () => socket.off("tema-guncellendi", temaGuncellendi);
+  }, [isletmeSlug]);
 
-  if (durum.yukleniyor) return <div className="isletme-durum"><div className="isletme-spinner" /><p>İşletme yükleniyor…</p></div>;
+  const deger = useMemo(() => ({
+    isletme: durum.isletme,
+    isletmeSlug: durum.isletme?.slug || isletmeSlug,
+    tema: durum.isletme?.tema || null,
+  }), [durum.isletme, isletmeSlug]);
+
+  if (durum.yukleniyor) return <div className="isletme-durum"><img className="isletme-splash-logo" src={varsayilanLogo} alt="" /><div className="isletme-spinner" /><p>İşletme yükleniyor…</p></div>;
   if (!durum.isletme) return <div className="isletme-durum"><h1>İşletme bulunamadı</h1><p>{durum.hata}</p></div>;
 
   return (
     <IsletmeContext.Provider value={deger}>
-      <AppProvider key={durum.isletme.slug}>
-        <Outlet />
-      </AppProvider>
+      <TemaSaglayici tema={durum.isletme.tema} isletme={durum.isletme}>
+        <AppProvider key={durum.isletme.slug}>
+          <Outlet />
+        </AppProvider>
+      </TemaSaglayici>
     </IsletmeContext.Provider>
   );
 }

@@ -41,7 +41,7 @@ export async function isletmeBilgisiniGetir(slug) {
   const r = await istekAt(`/api/isletme/${encodeURIComponent(String(slug || "").trim().toLowerCase())}`, { isletmeBasligi: false });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "İşletme bulunamadı.");
-  return veri.isletme;
+  return { ...veri.isletme, tema: veri.tema };
 }
 
 export async function adminGiris(email, sifre) { return personelGiris(email, sifre, "admin"); }
@@ -118,4 +118,18 @@ export async function gorselYukle(dosya) {
   if (!dosya || !DESTEKLENEN_GORSELLER.has(dosya.type)) throw new Error("PNG, JPG/JPEG, WebP, GIF, AVIF veya BMP formatında bir görsel seçebilirsin.");
   if (dosya.size > 5 * 1024 * 1024) throw new Error("Görsel en fazla 5 MB olabilir.");
   return adminIstek("/gorseller", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
+}
+
+export function temaKaydet(tema) {
+  return adminIstek("/tema", jsonGonder("PUT", tema));
+}
+
+const DESTEKLENEN_LOGOLAR = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
+export async function logoYukle(dosya) {
+  if (!dosya || !DESTEKLENEN_LOGOLAR.has(dosya.type)) throw new Error("Logo PNG, JPG/JPEG, WebP veya SVG formatında olmalı.");
+  if (dosya.size > 2 * 1024 * 1024) throw new Error("Logo en fazla 2 MB olabilir.");
+  const r = await istekAt("/api/admin/logo", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
+  const veri = await jsonOku(r).catch(() => ({}));
+  if (!r.ok) throw new Error(veri.hata || `Logo yüklenemedi (HTTP ${r.status}).`);
+  return veri;
 }

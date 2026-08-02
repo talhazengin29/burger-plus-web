@@ -13,7 +13,7 @@
 }
 .qr-gen-label {
   display: block;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   color: var(--on-surface);
@@ -39,7 +39,7 @@
 .qr-gen-secici button:hover { background: var(--primary-fixed-strong); }
 .qr-gen-secici button:active { transform: scale(0.9); }
 .qr-gen-sayi {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 36px;
   color: var(--on-surface);
@@ -52,14 +52,14 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   margin-bottom: 10px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.3);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent);
   transition: box-shadow 0.2s;
 }
-.qr-gen-uret-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.qr-gen-uret-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 /* İkincil — cam efektli */
 .qr-gen-yazdir-btn {
   width: 100%;
@@ -70,7 +70,7 @@
   backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border-strong);
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   transition: background 0.15s;
@@ -102,7 +102,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 .qr-kart-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: #1b1c19;
@@ -115,7 +115,7 @@
   margin: 0 auto 10px;
 }
 .qr-kart-marka {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 13px;
   color: #a04100;

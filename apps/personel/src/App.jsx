@@ -19,22 +19,17 @@ import "./App.css";
 */
 
 const OTURUM = "burger-plus-personel";
-const TEMA_ANAHTARI = "burger-plus-personel-tema";
 
 function PersonelPaneli() {
   const git = useIsletmeNavigate();
   const { isletmeSlug } = useIsletme();
   const oturumAnahtari = `${OTURUM}_${isletmeSlug}`;
-  const temaAnahtari = `${TEMA_ANAHTARI}_${isletmeSlug}`;
   const [rol, setRol] = useState(null); // "mutfak" | "salon" | null
   const [aktifSekme, setAktifSekme] = useState("mutfak");
-  const [tema, setTema] = useState("koyu"); // "koyu" | "acik"
   const [oturumYukleniyor, setOturumYukleniyor] = useState(true);
 
   useEffect(() => {
     const kayitli = sessionStorage.getItem(oturumAnahtari);
-    const kayitliTema = localStorage.getItem(temaAnahtari);
-    if (kayitliTema) setTema(kayitliTema);
     let iptal = false;
     const izinler = { admin: ["admin"], mutfak: ["mutfak", "admin"], salon: ["salon", "kasiyer", "admin"] };
 
@@ -60,15 +55,12 @@ function PersonelPaneli() {
 
     oturumuYukle();
     return () => { iptal = true; };
-  }, [oturumAnahtari, temaAnahtari]);
+  }, [oturumAnahtari]);
 
-  // Temayı <html data-tema> ile uygula
+  // Personel ekranları işletmenin yalnızca vurgu rengini alır; zemin koyu kalır.
   useEffect(() => {
-    document.documentElement.setAttribute("data-tema", tema);
-    localStorage.setItem(temaAnahtari, tema);
-  }, [tema, temaAnahtari]);
-
-  const temaDegistir = () => setTema((t) => (t === "koyu" ? "acik" : "koyu"));
+    document.documentElement.setAttribute("data-tema", "koyu");
+  }, []);
 
   const girisBasarili = (girenRol) => {
     sessionStorage.setItem(oturumAnahtari, girenRol);
@@ -109,9 +101,6 @@ function PersonelPaneli() {
           🍽️ Salon
         </button>
         )}
-        <button className="sekme-tema" onClick={temaDegistir} title="Tema değiştir">
-          {tema === "koyu" ? "☀️" : "🌙"}
-        </button>
         <button className="sekme-cikis" onClick={cikis}>Çıkış</button>
       </nav>
 

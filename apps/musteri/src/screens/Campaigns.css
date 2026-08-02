@@ -11,7 +11,7 @@
   border-bottom: 1px solid var(--glass-border);
 }
 .camp-brand {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: #fff;
@@ -19,7 +19,7 @@
 
 .camp-govde { padding: 20px var(--margin) 0; }
 .camp-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 24px;
   color: var(--on-surface);
@@ -48,7 +48,7 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .camp-kart:hover {
-  border-color: rgba(255, 107, 0, 0.28);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
 .camp-gorsel-wrap { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
@@ -105,13 +105,13 @@
   margin-bottom: 8px;
 }
 .camp-kart-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 22px;
   color: var(--on-surface);
 }
 .camp-fiyat {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 24px;
   color: var(--primary-container);
@@ -127,7 +127,7 @@
   width: 100%;
   padding: 15px;
   border-radius: var(--r-lg);
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
@@ -177,7 +177,7 @@
   text-align: center;
 }
 .uye-modal-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 18px;
   color: var(--on-surface);
@@ -197,10 +197,10 @@
 .camp-btn--primary {
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .camp-btn--primary:hover {
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow);
+  box-shadow: 0 4px 16px var(--accent-glow), var(--glow);
 }
 /* İkincil buton — cam efektli */
 .camp-btn--charcoal {
@@ -212,12 +212,12 @@
 }
 .camp-btn--charcoal:hover { background: rgba(255, 255, 255, 0.12); }
 
-.davet-kodu-kutu { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; padding: 13px; border: 1px solid rgba(255, 107, 0, 0.42); border-radius: var(--r-lg); background: rgba(255, 107, 0, 0.09); }
+.davet-kodu-kutu { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; padding: 13px; border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent); border-radius: var(--r-lg); background: color-mix(in srgb, var(--accent) 9%, transparent); }
 .davet-kodu-kutu span { grid-column: 1 / -1; color: var(--on-surface-variant); font-size: 11px; font-weight: 700; }
-.davet-kodu-kutu strong { align-self: center; color: var(--primary-container); font-family: 'Montserrat'; font-size: 20px; letter-spacing: .12em; }
+.davet-kodu-kutu strong { align-self: center; color: var(--primary-container); font-family: var(--font-baslik); font-size: 20px; letter-spacing: .12em; }
 .davet-kodu-kutu button { padding: 8px 10px; border-radius: var(--r-md); background: var(--primary); color: #fff; font-size: 12px; font-weight: 800; }
 .davet-kodu-kutu button:disabled { opacity: .45; cursor: wait; }
 .davet-istatistikler { grid-column: 1 / -1; display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08) }
 .davet-istatistikler span { grid-column:auto;text-align:center;color:var(--on-surface-variant);font-size:10px;font-weight:600 }
-.davet-istatistikler b { display:block;color:var(--on-surface);font-family:'Montserrat';font-size:15px }
+.davet-istatistikler b { display:block;color:var(--on-surface);font-family: var(--font-baslik);font-size:15px }
 .davet-hata { grid-column:1 / -1;color:var(--error);font-size:11px }

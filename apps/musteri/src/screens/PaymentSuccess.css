@@ -21,7 +21,7 @@
   display: grid;
   place-items: center;
   margin-bottom: 24px;
-  box-shadow: 0 8px 28px rgba(255, 107, 0, 0.45), var(--glow-lg);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 45%, transparent), var(--glow-lg);
   animation: pop 0.35s ease;
 }
 @keyframes pop {
@@ -32,7 +32,7 @@
 .success-check { width: 48px; height: 48px; color: #fff; }
 
 .success-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 28px;
   color: var(--on-surface);
@@ -62,7 +62,7 @@
 }
 .siparis-durum-kart--hazir {
   background: var(--primary-fixed);
-  border-color: rgba(255, 107, 0, 0.4);
+  border-color: var(--accent-glow);
   box-shadow: var(--glass-shadow-sm), var(--glow);
 }
 .durum-ikon { font-size: 30px; flex-shrink: 0; }
@@ -74,7 +74,7 @@
   text-align: left;
 }
 .durum-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   color: var(--on-surface);
@@ -111,7 +111,7 @@
 }
 .success-tutar-etiket { font-weight: 600; font-size: 15px; color: var(--on-surface-variant); }
 .success-tutar {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 22px;
   color: var(--on-surface);
@@ -125,11 +125,11 @@
   align-items: center;
   gap: 4px;
   background:
-    linear-gradient(135deg, rgba(255, 107, 0, 0.16), rgba(255, 145, 77, 0.05)),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 5%, transparent)),
     var(--glass-bg);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255, 107, 0, 0.2);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
   border-radius: var(--r-xl);
   padding: 24px;
   margin-bottom: 32px;
@@ -141,11 +141,11 @@
   font-weight: 600;
 }
 .success-puan-buyuk {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 52px;
   color: var(--primary-container);
-  text-shadow: 0 0 32px rgba(255, 107, 0, 0.5);
+  text-shadow: 0 0 32px color-mix(in srgb, var(--accent) 50%, transparent);
   line-height: 1;
 }
 .success-puan-toplam {
@@ -182,13 +182,13 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.success-btn-ana:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.success-btn-ana:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 /* İkincil — cam efektli */
 .success-btn-puan {
   width: 100%;
@@ -199,7 +199,7 @@
   backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border-strong);
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   transition: background 0.15s;

@@ -8,8 +8,6 @@
    devam eder; o adlar burada cam karşılıklarına bağlanmıştır.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
 :root {
   /* --- Tasarım referansının çekirdek tokenları ---
      Tema buradan başlar. Aşağıdaki tüm token'lar bu altı değere dayanır;
@@ -17,17 +15,19 @@
   --bg-primary: #0d0d0d;
   /* Derinlik efekti kartlarda değil, sayfa zemininde üretilir. Böylece
      kartların dikdörtgen sınırları/parçalı blur alanları görünmez. */
-  --bg-card: transparent;
-  --bg-card-hover: transparent;
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-card-hover: rgba(255, 255, 255, 0.09);
   --bg-input: rgba(255, 255, 255, 0.05);
   --accent: #ff6b00;
   --accent-glow: rgba(255, 107, 0, 0.4);
+  --font-baslik: "Montserrat", sans-serif;
+  --font-govde: "Plus Jakarta Sans", sans-serif;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
   --border-glass: rgba(255, 255, 255, 0.05);
   /* Zeminin arkasındaki sıcak turuncu parlama (dekoratif bloblar) */
-  --warm-glow: radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.15), transparent 50%);
+  --warm-glow: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 50%);
 
   /* --- Sayfa zeminleri --- */
   --bg-page: var(--bg-primary);  /* uygulama zemini */
@@ -68,22 +68,22 @@
   /* --- Marka rengi — turuncu --- */
   --primary: var(--accent);
   --primary-container: var(--accent);
-  --primary-bright: #ff8534;
+  --primary-bright: color-mix(in srgb, var(--accent) 78%, white);
   --on-primary: #ffffff;
-  --on-primary-container: #ffd6b8;
+  --on-primary-container: color-mix(in srgb, var(--accent) 30%, white);
   /* Turuncu cam: üstünde turuncu yazı taşıyan rozet/hap zeminleri */
-  --primary-fixed: rgba(255, 107, 0, 0.16);
-  --primary-fixed-strong: rgba(255, 107, 0, 0.28);
+  --primary-fixed: color-mix(in srgb, var(--accent) 16%, transparent);
+  --primary-fixed-strong: color-mix(in srgb, var(--accent) 28%, transparent);
 
   /* Buton gradyanı (tasarımdaki "tıklanabilir" his) */
   --primary-grad-start: var(--accent);
-  --primary-grad-end: #ff914d;
+  --primary-grad-end: color-mix(in srgb, var(--accent) 70%, white);
   /* Turuncu parlama — buton hover / aktif eleman.
      Spread eklenmesi + blur artışı köşeli/keskin görünen glow'u yumuşatır. */
   --glow: 0 0 28px 3px var(--accent-glow);
-  --glow-sm: 0 0 18px 2px rgba(255, 107, 0, 0.35);
-  --glow-lg: 0 0 40px 4px rgba(255, 107, 0, 0.45);
-  --shadow-primary: 0 4px 16px rgba(255, 107, 0, 0.3);
+  --glow-sm: 0 0 18px 2px var(--accent-glow);
+  --glow-lg: 0 0 40px 4px var(--accent-glow);
+  --shadow-primary: 0 4px 16px var(--accent-glow);
 
   /* Charcoal — ikincil cam yüzey (üstünde beyaz yazı taşır) */
   --charcoal: rgba(255, 255, 255, 0.08);
@@ -140,20 +140,20 @@ body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-govde);
   background: var(--bg-deep);
   color: var(--on-surface);
   -webkit-font-smoothing: antialiased;
 }
 
 /* Tipografi yardımcıları */
-.t-headline-xl { font-family: 'Montserrat'; font-size: 40px; font-weight: 800; line-height: 48px; letter-spacing: -0.02em; }
-.t-headline-lg { font-family: 'Montserrat'; font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -0.01em; }
-.t-headline-mobile { font-family: 'Montserrat'; font-size: 24px; font-weight: 700; line-height: 30px; }
-.t-title-md { font-family: 'Montserrat'; font-size: 20px; font-weight: 600; line-height: 26px; }
-.t-body-lg { font-family: 'Plus Jakarta Sans'; font-size: 16px; font-weight: 500; line-height: 24px; }
-.t-body-sm { font-family: 'Plus Jakarta Sans'; font-size: 14px; font-weight: 400; line-height: 20px; }
-.t-label-bold { font-family: 'Plus Jakarta Sans'; font-size: 12px; font-weight: 700; line-height: 16px; }
+.t-headline-xl { font-family: var(--font-baslik); font-size: 40px; font-weight: 800; line-height: 48px; letter-spacing: -0.02em; }
+.t-headline-lg { font-family: var(--font-baslik); font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -0.01em; }
+.t-headline-mobile { font-family: var(--font-baslik); font-size: 24px; font-weight: 700; line-height: 30px; }
+.t-title-md { font-family: var(--font-baslik); font-size: 20px; font-weight: 600; line-height: 26px; }
+.t-body-lg { font-family: var(--font-govde); font-size: 16px; font-weight: 500; line-height: 24px; }
+.t-body-sm { font-family: var(--font-govde); font-size: 14px; font-weight: 400; line-height: 20px; }
+.t-label-bold { font-family: var(--font-govde); font-size: 12px; font-weight: 700; line-height: 16px; }
 
 button { font-family: inherit; color: inherit; cursor: pointer; border: none; background: none; }
 img { display: block; max-width: 100%; }
@@ -167,7 +167,22 @@ img { display: block; max-width: 100%; }
 
 /* Koyu zeminde form elemanları ve seçim rengi */
 input, textarea, select { color-scheme: dark; }
-::selection { background: rgba(255, 107, 0, 0.35); color: #fff; }
+::selection { background: var(--accent-glow); color: #fff; }
+
+.marka-logo-metin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface);
+  font-family: var(--font-baslik);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+.marka-logo-yuklu {
+  filter: none !important;
+  mix-blend-mode: screen;
+}
 /* Ortak form doğrulama durumları */
 input[aria-invalid="true"],
 textarea[aria-invalid="true"] {

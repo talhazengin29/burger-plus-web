@@ -3,7 +3,7 @@
 
 .odeme-masa-rozet {
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--on-surface);
   font-weight: 700;
   font-size: 15px;
@@ -11,7 +11,7 @@
   border-radius: var(--r-lg);
   margin-bottom: 20px;
   text-align: center;
-  box-shadow: 0 0 20px rgba(255, 107, 0, 0.12);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .misafir-rozet {
   background: var(--glass-bg);
@@ -28,7 +28,7 @@
 }
 
 .odeme-bolum-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 20px;
   color: var(--on-surface);
@@ -68,7 +68,7 @@
 .yontem-ikon {
   width: 28px; height: 28px;
   color: var(--primary-container);
-  filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.35));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 35%, transparent));
 }
 .yontem-ad { font-weight: 700; font-size: 13px; color: var(--on-surface); }
 .yontem-aciklama { font-size: 10px; color: var(--outline); line-height: 1.3; }
@@ -85,7 +85,7 @@
   margin-bottom: 20px;
 }
 .secim-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
   color: var(--on-surface);
@@ -112,7 +112,7 @@
 .kisi-secici button svg { width: 20px; height: 20px; }
 .kisi-secici button:active { transform: scale(0.9); }
 .kisi-sayi {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 32px;
   color: var(--on-surface);
@@ -142,7 +142,7 @@
 }
 .urun-sec-satir--secili {
   background: var(--primary-fixed);
-  border-color: rgba(255, 107, 0, 0.3);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .sec-kutu {
   width: 24px; height: 24px;
@@ -193,7 +193,7 @@
   backdrop-filter: var(--glass-blur-lg);
   border-top: 1px solid var(--glass-border);
   padding: 16px var(--margin) calc(20px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--bg-card);
   border-top-left-radius: var(--r-xl);
   border-top-right-radius: var(--r-xl);
 }
@@ -207,7 +207,7 @@
   color: var(--on-surface-variant);
 }
 .odenecek-tutar {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 26px;
   color: var(--primary-container);
@@ -218,13 +218,13 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.ode-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.ode-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .ode-btn:active { transform: scale(0.99); }
 .ode-btn--pasif {
   background: rgba(255, 255, 255, 0.07);
@@ -251,7 +251,7 @@
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .odeme-hata { margin: 16px 0 0; padding: 12px 14px; border: 1px solid rgba(255, 102, 102, .45); border-radius: var(--r-md); background: rgba(180, 28, 28, .16); color: #ffd1d1; font-size: 13px; line-height: 1.45; }
 .odeme-bilgi-not { margin: -5px 0 14px; color: var(--on-surface-variant); font-size: 12px; line-height: 1.4; }
@@ -259,7 +259,7 @@
 .odeme-bilgi-grid label { display: flex; flex-direction: column; gap: 6px; color: var(--on-surface-variant); font-size: 12px; font-weight: 600; }
 .odeme-bilgi-grid .tam-genislik { grid-column: 1 / -1; }
 .odeme-bilgi-grid input, .odeme-bilgi-grid textarea { width: 100%; border: 1px solid var(--glass-border); border-radius: var(--r-sm); background: rgba(0,0,0,.2); color: var(--on-surface); padding: 11px 12px; font: inherit; font-size: 14px; outline: none; resize: vertical; }
-.odeme-bilgi-grid input:focus, .odeme-bilgi-grid textarea:focus { border-color: var(--primary-container); box-shadow: 0 0 0 3px rgba(255,107,0,.12); }
+.odeme-bilgi-grid input:focus, .odeme-bilgi-grid textarea:focus { border-color: var(--primary-container); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
 .odeme-bilgi-grid .alan-hata { margin-top: -2px; }
 
 /* Ürüne göre ödeme: satır düzeni */

@@ -39,8 +39,15 @@
   /* Saydam logo arka planı olmadan kullanılır. */
   filter: invert(1) hue-rotate(180deg);
 }
+.brand-logo.marka-logo-metin {
+  width: auto;
+  max-width: 170px;
+  filter: none;
+  font-size: 17px;
+  line-height: 1.05;
+}
 .brand-name {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: #fff;
@@ -56,7 +63,7 @@
   letter-spacing: 0.02em;
 }
 .selam-ad {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
   color: var(--on-surface);
@@ -79,7 +86,7 @@
 .ikon-btn:hover { color: var(--primary); background: var(--glass-bg); }
 .bildirim-sarici { position: relative; }
 .bildirim-btn { position: relative; }.bildirim-badge { position:absolute;right:2px;top:2px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:99px;background:var(--primary-container);color:#fff;font-size:10px;font-weight:800;box-shadow:var(--glow-sm) }
-.bildirim-panel { position:fixed;z-index:4;top:88px;left:max(14px,calc(50vw - 170px));width:min(340px,calc(100vw - 28px));overflow:hidden;border:1px solid var(--glass-border-strong);border-radius:var(--r-lg);background:rgba(20,20,20,.97);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);box-shadow:var(--shadow-modal);transform-origin:top center }.bildirim-panel>header{display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-bottom:1px solid var(--hairline)}.bildirim-panel>header b{font-family:'Montserrat';font-size:14px;color:var(--on-surface)}.bildirim-panel>header span{color:var(--primary-container);font-size:11px;font-weight:700}.bildirim-panel>div{max-height:320px;overflow:auto}.bildirim-panel button{width:100%;display:grid;grid-template-columns:12px 1fr auto;gap:9px;padding:13px 15px;text-align:left;border-bottom:1px solid var(--hairline);transition:background .15s,opacity .15s}.bildirim-panel button:hover{background:rgba(255,255,255,.06)}.bildirim-panel button>i{color:var(--primary);font-size:19px;line-height:14px}.bildirim-panel button span{display:flex;flex-direction:column;gap:3px;min-width:0}.bildirim-panel button b{color:var(--on-surface);font-size:13px}.bildirim-panel button small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--on-surface-variant);font-size:11px;line-height:1.35}.bildirim-panel button em{align-self:center;color:var(--outline);font-size:22px;font-style:normal}.bildirim-panel button.okundu{opacity:.58}.bildirim-panel button.okundu>i{color:transparent}.bildirim-panel button.okunmadi b{font-weight:800}.bildirim-panel>p{padding:20px 16px;color:var(--on-surface-variant);font-size:13px;text-align:center}
+.bildirim-panel { position:fixed;z-index:4;top:88px;left:max(14px,calc(50vw - 170px));width:min(340px,calc(100vw - 28px));overflow:hidden;border:1px solid var(--glass-border-strong);border-radius:var(--r-lg);background:rgba(20,20,20,.97);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);box-shadow:var(--shadow-modal);transform-origin:top center }.bildirim-panel>header{display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-bottom:1px solid var(--hairline)}.bildirim-panel>header b{font-family: var(--font-baslik);font-size:14px;color:var(--on-surface)}.bildirim-panel>header span{color:var(--primary-container);font-size:11px;font-weight:700}.bildirim-panel>div{max-height:320px;overflow:auto}.bildirim-panel button{width:100%;display:grid;grid-template-columns:12px 1fr auto;gap:9px;padding:13px 15px;text-align:left;border-bottom:1px solid var(--hairline);transition:background .15s,opacity .15s}.bildirim-panel button:hover{background:var(--bg-card)}.bildirim-panel button>i{color:var(--primary);font-size:19px;line-height:14px}.bildirim-panel button span{display:flex;flex-direction:column;gap:3px;min-width:0}.bildirim-panel button b{color:var(--on-surface);font-size:13px}.bildirim-panel button small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--on-surface-variant);font-size:11px;line-height:1.35}.bildirim-panel button em{align-self:center;color:var(--outline);font-size:22px;font-style:normal}.bildirim-panel button.okundu{opacity:.58}.bildirim-panel button.okundu>i{color:transparent}.bildirim-panel button.okunmadi b{font-weight:800}.bildirim-panel>p{padding:20px 16px;color:var(--on-surface-variant);font-size:13px;text-align:center}
 .bildirim-katman { position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:max(78px,calc(env(safe-area-inset-top,0px) + 70px)) 14px max(90px,calc(env(safe-area-inset-bottom,0px) + 82px));pointer-events:none }
 .bildirim-perde { position:absolute;inset:max(78px,calc(env(safe-area-inset-top,0px) + 70px)) 0 0;z-index:0;width:auto;height:auto;border:0;border-radius:0;background:rgba(0,0,0,.12);pointer-events:auto }
 .bildirim-katman .bildirim-panel { position:relative;z-index:1;top:auto;left:auto;width:min(340px,100%);max-height:calc(100dvh - 180px);pointer-events:auto;transform-origin:center }
@@ -115,7 +122,7 @@
   -webkit-backdrop-filter: var(--glass-blur-sm);
   backdrop-filter: var(--glass-blur-sm);
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 18px;
   border: 2px solid var(--primary-fixed-strong);
@@ -127,7 +134,7 @@
 
 /* --- Kahraman başlık --- */
 .home-hero {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 32px;
   line-height: 1.16;
@@ -138,7 +145,7 @@
 .home-hero .vurgu,
 .damga-baslik .vurgu {
   color: var(--primary-container);
-  text-shadow: 0 0 24px var(--accent-glow, rgba(255, 107, 0, 0.4));
+  text-shadow: 0 0 24px var(--accent-glow, var(--accent-glow));
 }
 
 /* --- Arama çubuğu --- */
@@ -283,7 +290,7 @@
   z-index: -1;
   border-radius: inherit;
   opacity: 0;
-  background: radial-gradient(circle, rgba(255, 107, 0, 0.18) 0%, rgba(255, 107, 0, 0.06) 65%, transparent 80%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0%, color-mix(in srgb, var(--accent) 6%, transparent) 65%, transparent 80%);
   filter: blur(1.5px);
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -304,7 +311,7 @@
 .kategori--aktif { z-index: 5; }
 .kategori--aktif .kategori-daire {
   border-color: var(--primary-container);
-  box-shadow: 0 0 0 1px rgba(255, 107, 0, 0.4), 0 0 6px rgba(255, 107, 0, 0.36), 0 5px 12px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 1px var(--accent-glow), 0 0 6px color-mix(in srgb, var(--accent) 36%, transparent), 0 5px 12px rgba(0, 0, 0, 0.45);
   transform: translateY(-1px);
 }
 .kategori--aktif .kategori-daire::before { opacity: 1; transform: scale(1); }
@@ -313,7 +320,7 @@
 /* --- Ye Kazan damga kartı --- */
 .damga-kart {
   background:
-    linear-gradient(135deg, rgba(255, 107, 0, 0.12), rgba(255, 145, 77, 0.04)),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), color-mix(in srgb, var(--accent) 4%, transparent)),
     var(--glass-bg);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
@@ -333,7 +340,7 @@
 .damga-rozet {
   display: inline-block;
   background: var(--primary-fixed-strong);
-  border: 1px solid rgba(255, 107, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--primary-bright);
   font-size: 11px;
   font-weight: 700;
@@ -342,7 +349,7 @@
   letter-spacing: 0.04em;
 }
 .damga-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
   line-height: 1.3;
@@ -351,12 +358,12 @@
 }
 .damga-sayac {
   flex-shrink: 0;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 28px;
   line-height: 1;
   color: var(--primary-container);
-  text-shadow: 0 0 20px rgba(255, 107, 0, 0.45);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 .damga-sayac-hedef { font-size: 16px; color: var(--outline); text-shadow: none; }
 
@@ -389,7 +396,7 @@
   color: var(--on-surface-variant);
   padding: 11px 16px;
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.2);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
   border-radius: var(--r-md);
   line-height: 1.5;
 }
@@ -403,7 +410,7 @@
   margin-bottom: 16px;
 }
 .bolum-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 22px;
   color: var(--on-surface);
@@ -448,14 +455,14 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .urun-kart:hover {
-  border-color: rgba(255, 107, 0, 0.28);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
 .urun-gorsel-wrap { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
 .urun-gorsel { width: 100%; height: 100%; object-fit: cover; }
 .urun-alt { padding: 14px; }
 .urun-ad {
-  font-family: 'Plus Jakarta Sans';
+  font-family: var(--font-govde);
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 12px;
@@ -494,7 +501,7 @@
 }
 .urun-fiyat--indirim {
   color: var(--primary-bright);
-  text-shadow: 0 0 14px rgba(255, 107, 0, 0.35);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .urun-uye-not {
   display: block;
@@ -512,10 +519,10 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: 0 2px 10px rgba(255, 107, 0, 0.45), var(--glow-sm);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 45%, transparent), var(--glow-sm);
   transition: box-shadow 0.2s;
 }
-.ekle-btn:hover { box-shadow: 0 2px 10px rgba(255, 107, 0, 0.5), var(--glow-lg); }
+.ekle-btn:hover { box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 50%, transparent), var(--glow-lg); }
 .ekle-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
 .ekle-ikon { width: 20px; height: 20px; }
 

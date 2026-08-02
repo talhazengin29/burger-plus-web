@@ -10,7 +10,7 @@
   --metin: #e8e9ec;
   --metin-soluk: #9aa0aa;
   --primary: #ff6b00;
-  --primary-hafif: #4a2a10;
+  --primary-hafif: color-mix(in srgb, var(--primary) 20%, transparent);
   --uyari: #f59e0b;
   --basari: #10b981;
   --tehlike: #ef4444;
@@ -27,7 +27,7 @@
   --metin: #1a1d24;
   --metin-soluk: #6b7280;
   --primary: #ff6b00;
-  --primary-hafif: #ffe8d6;
+  --primary-hafif: color-mix(in srgb, var(--primary) 14%, transparent);
   --uyari: #d97706;
   --basari: #059669;
   --tehlike: #dc2626;

@@ -1,12 +1,12 @@
 .orders-brand {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: #fff;
 }
 .orders-govde { padding: 8px var(--margin) 0; }
 .orders-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 24px;
   color: var(--on-surface);
@@ -34,7 +34,7 @@
 }
 .siparis-ust-sol { display: flex; flex-direction: column; gap: 4px; }
 .siparis-tip-rozet {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
   color: var(--on-surface);
@@ -46,7 +46,7 @@
   font-weight: 700;
   color: var(--primary-bright);
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   padding: 6px 12px;
   border-radius: var(--r-full);
   white-space: nowrap;
@@ -107,7 +107,7 @@
   color: var(--on-surface-variant);
 }
 .siparis-toplam-tutar {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: var(--primary-container);
@@ -132,7 +132,7 @@
 }
 .siparis-not--odendi {
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.25);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--primary-bright);
   font-weight: 700;
   text-align: center;
@@ -154,7 +154,7 @@
   margin-bottom: 8px;
 }
 .orders-bos-yazi {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 18px;
   color: var(--on-surface);
@@ -167,10 +167,10 @@
   color: #fff;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.orders-bos-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.orders-bos-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .orders-bos-btn:active { transform: scale(0.98); }
 
 /* --- Durum sorgulanırken (ilk poll bekleniyor) --- */
@@ -183,7 +183,7 @@
 /* --- Bölümler (Senin Siparişlerin / Masanın Tamamı) --- */
 .orders-bolum { margin-bottom: 28px; }
 .orders-bolum-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 17px;
   margin-bottom: 14px;
@@ -201,7 +201,7 @@
   font-weight: 700;
   color: var(--primary-bright);
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   padding: 5px 12px;
   border-radius: var(--r-full);
 }
@@ -211,8 +211,8 @@
   margin-bottom: 14px;
 }
 .masa-ozet-kart {
-  border: 1px solid rgba(255, 107, 0, 0.35);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 107, 0, 0.12), var(--glass-inset);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 24px color-mix(in srgb, var(--accent) 12%, transparent), var(--glass-inset);
 }
 .masa-ozet-adet {
   width: 40px;
@@ -221,7 +221,7 @@
   display: grid;
   place-items: center;
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--primary-bright);
   font-weight: 800;
   font-size: 15px;
@@ -247,7 +247,7 @@
 }
 .siparis-durum-rozet.durum--hazirlaniyor {
   background: var(--primary-fixed);
-  border-color: rgba(255, 107, 0, 0.3);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--primary-bright);
   box-shadow: var(--glow-sm);
 }

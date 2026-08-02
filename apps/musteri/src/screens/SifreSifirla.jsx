@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { sifreSifirla, tokenDogrula as tokenSunucudaDogrula } from "../lib/authApi";
 import { IconCheck, IconEye, IconEyeOff, IconWarning } from "../components/Icons";
 import { kurallar } from "../lib/dogrulama";
-import logoFull from "../assets/logo-full-transparent.png";
+import MarkaLogosu from "../components/MarkaLogosu";
 import "./Login.css";
 
 function sifreGucu(sifre) {
@@ -66,7 +66,7 @@ export default function SifreSifirla() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <img className="login-logo" src={logoFull} alt="Burger Plus" />
+        <MarkaLogosu className="login-logo" />
         <p className="login-slogan">Yeni şifreni belirle</p>
       </motion.div>
 

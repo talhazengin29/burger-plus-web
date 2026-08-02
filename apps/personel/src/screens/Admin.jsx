@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
 import { socket } from "../lib/socket";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
+import { useIsletme } from "../context/IsletmeContext";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
+import TemaYonetimi from "./admin/TemaYonetimi";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
@@ -27,6 +29,7 @@ const KAMPANYA_IKONLARI = [
 
 const BOLUMLER = [
   ["genel", "Genel Bakış", "▦", "genel-bakis"],
+  ["tema", "Tema", "◐", "tema"],
   ["urunler", "Ürünler", "◆", "urunler"],
   ["kampanyalar", "Kampanyalar", "%", "kampanyalar"],
   ["oduller", "Puan Marketi", "★", "puan-marketi"],
@@ -42,7 +45,7 @@ const BOLUMLER = [
 ];
 
 const MENU_GRUPLARI = [
-  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Müşterinin gördüğü alanlar", bolumler: ["urunler", "kampanyalar", "oduller", "duyurular"] },
+  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "kampanyalar", "oduller", "duyurular"] },
   { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
@@ -91,6 +94,7 @@ const urunuFormaCevir = (urun) => ({
 export default function Admin({ onCikis }) {
   const konum = useLocation();
   const git = useIsletmeNavigate();
+  const { isletme } = useIsletme();
   const yolParcasi = konum.pathname.split("/").filter(Boolean).at(-1) || "genel-bakis";
   const bolum = BOLUMLER.find(([, , , yol]) => yol === yolParcasi)?.[0] || "genel";
   const [dashboard, setDashboard] = useState(null);
@@ -433,7 +437,7 @@ export default function Admin({ onCikis }) {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-marka"><img src={logoFull} alt="Burger Plus" /><small>Yönetim Merkezi</small></div>
+        <div className="admin-marka"><img className={isletme.logoUrl ? "admin-marka-logo-yuklu" : ""} src={isletme.logoUrl || logoFull} alt={isletme.ad} /><small>{isletme.ad} · Yönetim Merkezi</small></div>
         <nav aria-label="Yönetim bölümleri">
           <button type="button" className={`admin-nav-ana ${bolum === "genel" ? "aktif" : ""}`} onClick={() => git("/yonetim/genel-bakis")}><b>▦</b><span>Genel Bakış</span></button>
           {MENU_GRUPLARI.map((grup) => {
@@ -469,6 +473,7 @@ export default function Admin({ onCikis }) {
         {yukleniyor && !dashboard ? <div className="admin-yukleniyor">Veriler hazırlanıyor…</div> : (
           <div className="admin-icerik">
             {KAYIT_BOLUMLERI.includes(bolum) && <KayitGezgini aktif={bolum} sayilar={kayitSayilari} git={git} />}
+            {bolum === "tema" && <TemaYonetimi />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
@@ -886,7 +891,7 @@ function SatisCizgiGrafigi({ veriler }) {
     <div className="cizgi-cizim">
       <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Son 30 gün ciro ve ürün adedi çizgi grafiği">
         <defs>
-          <linearGradient id="ciro-alani" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#ff6b00" stopOpacity=".32" /><stop offset="1" stopColor="#ff6b00" stopOpacity="0" /></linearGradient>
+          <linearGradient id="ciro-alani" x1="0" x2="0" y1="0" y2="1"><stop stopColor="var(--primary)" stopOpacity=".32" /><stop offset="1" stopColor="var(--primary)" stopOpacity="0" /></linearGradient>
         </defs>
         {[0.2, 0.4, 0.6, 0.8].map((oran) => <line key={oran} className="cizgi-grid" x1={pad.sol} x2={w - pad.sag} y1={pad.ust + oran * (h - pad.ust - pad.alt)} y2={pad.ust + oran * (h - pad.ust - pad.alt)} />)}
         <path d={alan} fill="url(#ciro-alani)" />

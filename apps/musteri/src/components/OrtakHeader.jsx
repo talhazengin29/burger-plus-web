@@ -8,6 +8,7 @@ import { badgePop } from "../lib/animasyonlar";
 import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import { useIsletme } from "../context/IsletmeContext";
+import MarkaLogosu from "./MarkaLogosu";
 
 const okunanlariGetir = (anahtar) => {
   try {
@@ -97,7 +98,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       ) : (
         <div className="brand">
-          <span className="brand-name">{isletme.ad.toLocaleUpperCase("tr")}</span>
+          <MarkaLogosu className="brand-logo" alt={isletme.ad} />
         </div>
       )}
       <div className="home-header-sag">

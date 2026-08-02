@@ -19,7 +19,7 @@
   display: grid;
   place-items: center;
   margin-bottom: 24px;
-  box-shadow: 0 8px 28px rgba(255, 107, 0, 0.45), var(--glow-lg);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 45%, transparent), var(--glow-lg);
   animation: or-pop 0.35s ease;
 }
 @keyframes or-pop {
@@ -30,7 +30,7 @@
 .or-check { width: 48px; height: 48px; color: #fff; }
 
 .or-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 28px;
   color: var(--on-surface);
@@ -70,7 +70,7 @@
   font-size: 14px;
   color: var(--primary-bright);
   background: var(--primary-fixed);
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   padding: 5px 12px;
   border-radius: var(--r-full);
   box-shadow: var(--glow-sm);
@@ -89,11 +89,11 @@
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 16px;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
-.or-btn:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.or-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .or-btn:active { transform: scale(0.99); }

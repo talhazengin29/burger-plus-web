@@ -6,10 +6,12 @@ import { girisYap, ikiFaktorGirisiniTamamla, tokeniKaydet } from "../lib/authApi
 import { IconEye, IconEyeOff } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama";
 import { usePerde } from "../hooks/usePerde";
-import logoFull from "../assets/logo-full-transparent.png";
+import MarkaLogosu from "../components/MarkaLogosu";
+import { useTema } from "../context/TemaContext";
 import "./Login.css";
 
 export default function Login() {
+  const { metinler } = useTema();
   const git = useIsletmeNavigate();
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
   const { perdeAktif, perdeIleGit } = usePerde();
@@ -91,8 +93,8 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <img className="login-logo" src={logoFull} alt="Burger Plus" />
-        <p className="login-slogan">Lezzet ve puanlar seni bekliyor</p>
+        <MarkaLogosu className="login-logo" />
+        <p className="login-slogan">{metinler.slogan}</p>
       </motion.div>
 
       {/* Form — aşağıdan yukarı kayarak gelir */}

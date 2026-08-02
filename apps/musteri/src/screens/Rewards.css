@@ -13,7 +13,7 @@
   z-index: 5;
 }
 .basit-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 20px;
   color: #fff;
@@ -79,18 +79,18 @@
   box-shadow: var(--glow);
 }
 .puan-kart-baslik {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 20px;
   color: var(--on-surface);
   margin-bottom: 4px;
 }
 .puan-buyuk {
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 800;
   font-size: 48px;
   color: var(--primary-container);
-  text-shadow: 0 0 32px rgba(255, 107, 0, 0.45);
+  text-shadow: 0 0 32px color-mix(in srgb, var(--accent) 45%, transparent);
   line-height: 1;
   margin-bottom: 18px;
 }
@@ -152,16 +152,16 @@
   gap: 12px;
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
-  font-family: 'Montserrat';
+  font-family: var(--font-baslik);
   font-weight: 700;
   font-size: 18px;
   padding: 18px;
   border-radius: var(--r-lg);
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   margin-bottom: 28px;
   transition: box-shadow 0.2s;
 }
-.qr-cta:hover { box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4), var(--glow); }
+.qr-cta:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .qr-cta-ikon { width: 26px; height: 26px; }
 .qr-cta:active { transform: scale(0.99); }
 
@@ -193,7 +193,7 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .odul-kart:hover {
-  border-color: rgba(255, 107, 0, 0.28);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
 .odul-gorsel-wrap { aspect-ratio: 4 / 3; overflow: hidden; }
@@ -208,12 +208,12 @@
 .odul-gorsel-yer svg {
   width: 48px; height: 48px;
   color: var(--primary-container);
-  filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+  filter: drop-shadow(0 0 12px var(--accent-glow));
 }
 .odul-buyuk-ikon {
   width: 48px; height: 48px;
   color: var(--primary-container);
-  filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+  filter: drop-shadow(0 0 12px var(--accent-glow));
 }
 .odul-alt { padding: 12px 14px 14px; }
 .odul-ad { font-weight: 600; font-size: 15px; color: var(--on-surface); margin-bottom: 8px; }
@@ -282,7 +282,7 @@
 }
 .gecmis-ad { font-weight: 600; font-size: 15px; color: var(--on-surface); }
 .gecmis-tarih { font-size: 13px; color: var(--outline); }
-.gecmis-puan { font-family: 'Montserrat'; font-weight: 700; font-size: 20px; }
+.gecmis-puan { font-family: var(--font-baslik); font-weight: 700; font-size: 20px; }
 .gecmis-puan.arti { color: var(--primary-container); }
 .gecmis-puan.eksi { color: var(--on-surface-variant); }
 
