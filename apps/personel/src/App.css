@@ -4,6 +4,32 @@
   flex-direction: column;
 }
 
+.impersonation-oturumu { min-height: 100vh; }
+.impersonation-bandi {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 44px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: #fff7ed;
+  background: #b91c1c;
+  border-bottom: 1px solid #f97316;
+  font-size: 14px;
+}
+.impersonation-bandi button {
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 6px;
+  color: #fff;
+  background: transparent;
+  font-weight: 700;
+}
+.impersonation-bandi button:hover { background: rgba(255, 255, 255, 0.14); }
+
 /* Sekme barı */
 .sekme-bar {
   display: flex;

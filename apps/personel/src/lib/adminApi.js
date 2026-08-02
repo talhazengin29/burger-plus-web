@@ -7,12 +7,26 @@ export function aktifIsletmeSlug() {
   return decodeURIComponent(parcalar.slice(temelParcalari.length)[0] || "").trim().toLowerCase();
 }
 
-const tokenAnahtari = () => `burger-plus-admin-token_${aktifIsletmeSlug()}`;
+export const adminTokenAnahtari = (slug = aktifIsletmeSlug()) => `burger-plus-admin-token_${String(slug || "").trim().toLowerCase()}`;
+
+export function erisimTokeniniCoz(token) {
+  try {
+    const parca = String(token || "").split(".")[1];
+    if (!parca) return null;
+    const duzeltilmis = parca.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(parca.length / 4) * 4, "=");
+    const veri = JSON.parse(atob(duzeltilmis));
+    if (veri.tip !== "impersonation" || !veri.isletmeSlug || !veri.impersonatedBy) return null;
+    if (Number(veri.exp || 0) * 1000 <= Date.now()) return null;
+    return veri;
+  } catch {
+    return null;
+  }
+}
 
 export const adminToken = {
-  al: () => sessionStorage.getItem(tokenAnahtari()),
-  kaydet: (token) => sessionStorage.setItem(tokenAnahtari(), token),
-  sil: () => sessionStorage.removeItem(tokenAnahtari()),
+  al: (slug) => sessionStorage.getItem(adminTokenAnahtari(slug)),
+  kaydet: (token, slug) => sessionStorage.setItem(adminTokenAnahtari(slug), token),
+  sil: (slug) => sessionStorage.removeItem(adminTokenAnahtari(slug)),
 };
 
 async function istekAt(yol, secenekler = {}) {
@@ -38,7 +52,11 @@ async function jsonOku(r) {
 }
 
 export async function isletmeBilgisiniGetir(slug) {
-  const r = await istekAt(`/api/isletme/${encodeURIComponent(String(slug || "").trim().toLowerCase())}`, { isletmeBasligi: false });
+  const erisimTokeni = adminToken.al(slug);
+  const r = await istekAt(`/api/isletme/${encodeURIComponent(String(slug || "").trim().toLowerCase())}`, {
+    isletmeBasligi: false,
+    headers: erisimTokeni ? { Authorization: `Bearer ${erisimTokeni}` } : {},
+  });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "İşletme bulunamadı.");
   return { ...veri.isletme, tema: veri.tema };
@@ -82,15 +100,17 @@ export async function yerelAdminDurumu() {
 }
 
 export async function personelOturumunuDogrula() {
-  if (!adminToken.al()) return null;
-  const r = await istekAt("/api/ben");
+  const token = adminToken.al();
+  if (!token) return null;
+  const impersonation = erisimTokeniniCoz(token);
+  const r = await istekAt(impersonation ? "/api/admin/ben" : "/api/ben");
   const veri = await jsonOku(r).catch(() => ({}));
   if ([401, 403].includes(r.status)) {
     adminToken.sil();
     return null;
   }
   if (!r.ok) throw new Error(veri.hata || "Personel oturumu doğrulanamadı.");
-  return veri.kullanici || null;
+  return veri.kullanici ? { ...veri.kullanici, impersonation: veri.impersonation || null } : null;
 }
 
 export async function adminIstek(yol, secenekler = {}) {
@@ -105,7 +125,10 @@ export async function adminIstek(yol, secenekler = {}) {
       : r.status === 429 ? "Çok fazla istek gönderildi. Birkaç saniye bekleyin." : `${yol} verisi alınamadı (HTTP ${r.status}).`));
     hata.status = r.status;
     hata.yol = yol;
-    if ([401, 403].includes(r.status)) adminToken.sil();
+    if ([401, 403].includes(r.status)) {
+      adminToken.sil();
+      window.dispatchEvent(new CustomEvent("personel-oturum-bitti"));
+    }
     throw hata;
   }
   return veri;

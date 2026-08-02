@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Login from "./screens/Login";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
-import { adminToken, personelOturumunuDogrula } from "./lib/adminApi";
+import { adminToken, erisimTokeniniCoz, personelOturumunuDogrula } from "./lib/adminApi";
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
 import { useIsletmeNavigate } from "./hooks/useIsletmeNavigate";
@@ -20,12 +20,32 @@ import "./App.css";
 
 const OTURUM = "burger-plus-personel";
 
+function ImpersonationYonlendir() {
+  const [arama] = useSearchParams();
+  const token = arama.get("erisim") || "";
+  const [hedef, setHedef] = useState(null);
+  useEffect(() => {
+    const erisim = erisimTokeniniCoz(token);
+    if (!erisim) {
+      setHedef("/burger-plus");
+      return;
+    }
+    const slug = String(erisim.isletmeSlug).trim().toLowerCase();
+    adminToken.kaydet(token, slug);
+    sessionStorage.setItem(`${OTURUM}_${slug}`, "admin");
+    setHedef(`/${encodeURIComponent(slug)}/yonetim/genel-bakis`);
+  }, [token]);
+  if (!hedef) return <main className="tenant-durum">Erişim doğrulanıyor…</main>;
+  return <Navigate to={hedef} replace />;
+}
+
 function PersonelPaneli() {
   const git = useIsletmeNavigate();
-  const { isletmeSlug } = useIsletme();
+  const { isletme, isletmeSlug } = useIsletme();
   const oturumAnahtari = `${OTURUM}_${isletmeSlug}`;
   const [rol, setRol] = useState(null); // "mutfak" | "salon" | null
   const [aktifSekme, setAktifSekme] = useState("mutfak");
+  const [impersonation, setImpersonation] = useState(null);
   const [oturumYukleniyor, setOturumYukleniyor] = useState(true);
 
   useEffect(() => {
@@ -39,6 +59,7 @@ function PersonelPaneli() {
         if (iptal) return;
         if (kullanici && izinler[kayitli]?.includes(kullanici.rol)) {
           setRol(kayitli);
+          setImpersonation(kullanici.impersonation || null);
           setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
           personelSocketiniBagla();
         } else {
@@ -75,12 +96,28 @@ function PersonelPaneli() {
     adminToken.sil();
     personelSocketiniKes();
     setRol(null);
+    setImpersonation(null);
     git("/");
   };
 
+  useEffect(() => {
+    window.addEventListener("personel-oturum-bitti", cikis);
+    return () => window.removeEventListener("personel-oturum-bitti", cikis);
+  });
+
   if (oturumYukleniyor) return <main className="tenant-durum">Oturum doğrulanıyor…</main>;
   if (!rol) return <Login onGirisBasarili={girisBasarili} />;
-  if (rol === "admin") return <Admin onCikis={cikis} />;
+  if (rol === "admin") return (
+    <div className={impersonation ? "impersonation-oturumu" : ""}>
+      {impersonation && (
+        <aside className="impersonation-bandi" role="status">
+          <span>⚠️ Super admin erişimi — <b>{isletme?.ad || isletmeSlug}</b> adına işlem yapıyorsunuz.</span>
+          <button type="button" onClick={cikis}>Çık</button>
+        </aside>
+      )}
+      <Admin onCikis={cikis} />
+    </div>
+  );
 
   return (
     <div className="personel">
@@ -114,7 +151,7 @@ function PersonelPaneli() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/burger-plus" replace />} />
+      <Route path="/" element={<ImpersonationYonlendir />} />
       <Route path="/:isletmeSlug/*" element={<IsletmeSarici><PersonelPaneli /></IsletmeSarici>} />
       <Route path="*" element={<Navigate to="/burger-plus" replace />} />
     </Routes>

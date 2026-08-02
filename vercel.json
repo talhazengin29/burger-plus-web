@@ -4,11 +4,19 @@
   "framework": null,
   "rewrites": [
     {
+      "source": "/super-admin",
+      "destination": "/super-admin/index.html"
+    },
+    {
+      "source": "/super-admin/:path((?!assets/).*)",
+      "destination": "/super-admin/index.html"
+    },
+    {
       "source": "/personel/:path((?!assets/).*)",
       "destination": "/personel/index.html"
     },
     {
-      "source": "/((?!assets/|personel|.*\\.[a-zA-Z0-9]+$).*)",
+      "source": "/((?!assets/|personel|super-admin|.*\\.[a-zA-Z0-9]+$).*)",
       "destination": "/index.html"
     }
   ]
