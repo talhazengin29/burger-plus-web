@@ -101,6 +101,17 @@
 .sifre-goster-btn:hover, .sifre-goster-btn:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.1); outline: none; }
 .sifre-goster-btn svg { width: 20px; height: 20px; }
 
+.login-sifremi-unuttum {
+  display: block;
+  margin: -8px 0 16px;
+  padding: 0;
+  text-align: right;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+.login-sifremi-unuttum:hover { text-decoration: underline; }
+
 /* Kayıt: ad-soyad yan yana */
 .kayit-ikili { display: flex; gap: 12px; }
 .kayit-alan {
@@ -181,3 +192,46 @@
   transition: color 0.15s;
 }
 .login-misafir-link:hover { color: rgba(255, 255, 255, 0.7); }
+
+/* Şifremi unuttum / şifre sıfırlama ekranları */
+.sifirlama-aciklama { margin: -10px 0 18px; color: var(--on-surface-variant); font-size: 13px; line-height: 1.5; }
+.sifirlama-yukleniyor { text-align: center; color: var(--on-surface-variant); font-size: 14px; padding: 32px 20px; }
+.sifirlama-basari { align-items: center; text-align: center; gap: 4px; }
+.sifirlama-basari-ikon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--basari, #10b981);
+}
+.sifirlama-basari-ikon svg { width: 28px; height: 28px; }
+.sifirlama-hata-ikon { background: rgba(255, 90, 82, 0.14); color: var(--error); }
+.sifirlama-basari .login-baslik { margin-bottom: 8px; }
+.sifirlama-basari-metin { color: var(--on-surface-variant); font-size: 14px; line-height: 1.55; margin-bottom: 20px; }
+.sifirlama-basari .login-giris-btn { width: 100%; }
+
+/* Şifre gücü göstergesi */
+.sifre-guc { display: flex; align-items: center; gap: 8px; margin: -8px 0 16px; }
+.sifre-guc-cubuk {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.sifre-guc-cubuk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: calc(var(--oran, 0) * 100%);
+  border-radius: inherit;
+  transition: width 0.2s;
+}
+.sifre-guc--zayif .sifre-guc-cubuk::after { background: var(--error); }
+.sifre-guc--orta .sifre-guc-cubuk::after { background: #f5a623; }
+.sifre-guc--guclu .sifre-guc-cubuk::after { background: var(--basari, #10b981); }
+.sifre-guc small { font-size: 11px; font-weight: 700; color: var(--on-surface-variant); white-space: nowrap; }

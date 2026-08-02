@@ -7,6 +7,8 @@ import Campaigns from "./screens/Campaigns";
 import Profile from "./screens/Profile";
 import Orders from "./screens/Orders";
 import Login from "./screens/Login";
+import SifremiUnuttum from "./screens/SifremiUnuttum";
+import SifreSifirla from "./screens/SifreSifirla";
 import Cart from "./screens/Cart";
 import QrScan from "./screens/QrScan";
 import Payment from "./screens/Payment";
@@ -44,6 +46,8 @@ function Icerik() {
           {/* Açık rotalar: giriş, kayıt, QR ile masa */}
           <Route path="/" element={<Login />} />
           <Route path="/kayit" element={<Kayit />} />
+          <Route path="/sifremi-unuttum" element={<SifremiUnuttum />} />
+          <Route path="/sifre-sifirla" element={<SifreSifirla />} />
           <Route path="/masa" element={<TableWelcome />} />
           {/* Korumalı rotalar: giriş yapmış veya misafir olmalı */}
           <Route path="/anasayfa" element={<Korumali><Home /></Korumali>} />

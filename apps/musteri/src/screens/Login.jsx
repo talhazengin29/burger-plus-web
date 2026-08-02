@@ -116,6 +116,10 @@ export default function Login() {
         </div>
         {alanHatalari.sifre && <small id="login-sifre-hata" className="alan-hata alan-hata--sifre">{alanHatalari.sifre}</small>}
 
+        <button type="button" className="login-sifremi-unuttum" onClick={() => git("/sifremi-unuttum")}>
+          Şifremi unuttum
+        </button>
+
         {/* Beni hatırla */}
         <label className="beni-hatirla">
           <input

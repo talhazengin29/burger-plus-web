@@ -47,6 +47,33 @@ export async function girisYap(email, sifre) {
   return r.json();
 }
 
+// Sifremi unuttum: talep gonder (backend her zaman ayni mesajla doner)
+export async function sifirlamaTalep(email) {
+  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirlama-talep`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return r.json();
+}
+
+// Sifre sifirlama linkindeki token'i backend'de dogrula
+export async function tokenDogrula(token) {
+  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirla/dogrula?token=${encodeURIComponent(token)}`);
+  if (!r.ok) return { gecerli: false };
+  return r.json();
+}
+
+// Yeni sifreyi token ile birlikte gonder
+export async function sifreSifirla(token, yeniSifre) {
+  const r = await fetch(`${BACKEND_URL}/api/sifre-sifirla`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, yeniSifre }),
+  });
+  return r.json();
+}
+
 // Token ile guncel kullanici bilgisi (sayfa yenilenince oturum korunur)
 export async function beniGetir() {
   const token = tokeniAl();
