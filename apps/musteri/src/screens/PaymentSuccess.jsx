@@ -7,6 +7,11 @@ import { odemeSonucunuGetir } from "../lib/authApi";
 import { usePerde } from "../hooks/usePerde";
 import "./PaymentSuccess.css";
 
+const SONUC_DENEME_ADEDI = 8;
+const SONUC_BEKLEME_MS = 1250;
+
+const bekle = (sure) => new Promise((resolve) => setTimeout(resolve, sure));
+
 export default function PaymentSuccess() {
   const git = useIsletmeNavigate();
   const [params] = useSearchParams();
@@ -19,14 +24,32 @@ export default function PaymentSuccess() {
   useEffect(() => {
     if (!odemeId) return;
     let iptal = false;
-    odemeSonucunuGetir(odemeId)
+    const sonucuDogrula = async () => {
+      let sonHata = null;
+      for (let deneme = 0; deneme < SONUC_DENEME_ADEDI; deneme += 1) {
+        if (iptal) return null;
+        try {
+          const odeme = await odemeSonucunuGetir(odemeId);
+          if (odeme.durum === "basarili") return odeme;
+          sonHata = new Error("Ödeme henüz onaylanmadı.");
+        } catch (e) {
+          sonHata = e;
+        }
+        if (deneme < SONUC_DENEME_ADEDI - 1) await bekle(SONUC_BEKLEME_MS);
+      }
+      throw sonHata || new Error("Ödeme sonucu alınamadı.");
+    };
+
+    sonucuDogrula()
       .then((odeme) => {
-        if (iptal) return;
-        if (odeme.durum !== "basarili") throw new Error("Ödeme henüz onaylanmadı.");
+        if (iptal || !odeme) return;
+        setHata("");
         odemeyiTamamla(odeme);
         perdeIleGit(() => {}, "kutlama", "Siparişin Alındı 🎉");
       })
-      .catch((e) => { if (!iptal) setHata(e.message || "Ödeme sonucu alınamadı."); })
+      .catch((e) => {
+        if (!iptal) setHata(e.message || "Ödeme sonucu alınamadı. Birkaç saniye sonra tekrar deneyin.");
+      })
       .finally(() => { if (!iptal) setYukleniyor(false); });
     return () => { iptal = true; };
     // odemeId URL'den sabittir; callback sonrası tek defa işlenmelidir.
