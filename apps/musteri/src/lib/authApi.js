@@ -8,6 +8,25 @@ const BACKEND_URL =
 
 const TOKEN_ANAHTARI = "bp_token";
 
+async function jsonYanitiOku(r, varsayilanHata) {
+  const icerikTipi = r.headers.get("content-type") || "";
+  if (!icerikTipi.toLowerCase().includes("application/json")) {
+    // Vercel/Express 404 sayfalari HTML donerse JSON.parse'in teknik hatasini
+    // son kullaniciya gostermek yerine asil dagitim sorununu anlat.
+    await r.text().catch(() => "");
+    if (r.status === 404) {
+      throw new Error("İki adımlı doğrulama servisi backend'de henüz yayınlanmamış. Backend'i güncelleyip yeniden dağıtın.");
+    }
+    throw new Error(varsayilanHata);
+  }
+
+  try {
+    return await r.json();
+  } catch {
+    throw new Error(varsayilanHata);
+  }
+}
+
 // Beni hatırla: true → localStorage (kalıcı), false → sessionStorage (sekme kapanınca gider)
 export function tokeniKaydet(token, hatirla = true) {
   if (hatirla) {
@@ -53,7 +72,7 @@ export async function ikiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ikiFaktorToken, kod }),
   });
-  return r.json();
+  return jsonYanitiOku(r, "İki adımlı doğrulama yanıtı okunamadı.");
 }
 
 async function ikiFaktorIstegi(yol, veri) {
@@ -62,7 +81,7 @@ async function ikiFaktorIstegi(yol, veri) {
     headers: { "Content-Type": "application/json", ...yetkiBasligi() },
     body: JSON.stringify(veri),
   });
-  const sonuc = await r.json();
+  const sonuc = await jsonYanitiOku(r, "İki adımlı doğrulama işlemi tamamlanamadı.");
   if (!r.ok) throw new Error(sonuc.hata || "İki adımlı doğrulama işlemi tamamlanamadı.");
   return sonuc;
 }
