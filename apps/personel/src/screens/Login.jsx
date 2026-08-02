@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adminGiris, personelGiris, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import { adminGiris, personelGiris, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
 
@@ -11,6 +11,8 @@ export default function Login({ onGirisBasarili }) {
   const [hata, setHata] = useState("");
   const [yukleniyor, setYukleniyor] = useState(false);
   const [adminKurulumGoster, setAdminKurulumGoster] = useState(false);
+  const [ikiFaktorToken, setIkiFaktorToken] = useState("");
+  const [ikiFaktorKodu, setIkiFaktorKodu] = useState("");
 
   useEffect(() => {
     if (rol !== "admin") return;
@@ -22,8 +24,18 @@ export default function Login({ onGirisBasarili }) {
     setYukleniyor(true);
     setHata("");
     try {
-      if (rol === "admin") await adminGiris(email, sifre);
-      else await personelGiris(email, sifre, rol);
+      if (ikiFaktorToken) {
+        await personelIkiFaktorGirisiniTamamla(ikiFaktorToken, ikiFaktorKodu, rol);
+      } else {
+        const sonuc = rol === "admin"
+          ? await adminGiris(email, sifre)
+          : await personelGiris(email, sifre, rol);
+        if (sonuc?.ikiFaktorGerekli) {
+          setIkiFaktorToken(sonuc.ikiFaktorToken);
+          setSifre("");
+          return;
+        }
+      }
       onGirisBasarili(rol);
     } catch (err) {
       setHata(err.message);
@@ -33,6 +45,22 @@ export default function Login({ onGirisBasarili }) {
       setYukleniyor(false);
     }
   };
+
+  if (ikiFaktorToken) {
+    return (
+      <div className="login">
+        <form className="login-kart" onSubmit={gonder}>
+          <div className="personel-login-ust"><img className="login-logo" src={logoFull} alt="Burger Plus" /><span>EKİP PORTALI</span></div>
+          <h1 className="login-baslik">Güvenlik Kodu</h1>
+          <p className="login-alt">Authenticator kodunu veya kurtarma kodunu gir</p>
+          <input className="login-input login-2fa-input" value={ikiFaktorKodu} onChange={(e) => { setIkiFaktorKodu(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 11)); setHata(""); }} autoComplete="one-time-code" inputMode="numeric" placeholder="123456" autoFocus />
+          {hata && <p className="login-hata">{hata}</p>}
+          <button type="submit" className="login-btn" disabled={!ikiFaktorKodu || yukleniyor}>{yukleniyor ? "Doğrulanıyor…" : "Kodu Doğrula"}</button>
+          <button type="button" className="login-kurulum-btn" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>Şifre ekranına dön</button>
+        </form>
+      </div>
+    );
+  }
 
   const ilkAdminiKur = async () => {
     setYukleniyor(true);

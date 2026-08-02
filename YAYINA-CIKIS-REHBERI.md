@@ -97,9 +97,24 @@ Aynısını `burger-plus-web` klasörü için de yap (adres kısmını değişti
    |---|---|
    | `DATABASE_URL` | Supabase'den aldığın tam adres (Adım 1.5) |
    | `JWT_SECRET` | Uzun ve rastgele bir metin yaz (örn: `bp-2026-gizli-anahtar-x7k9m2p4` ) |
+   | `MFA_ENCRYPTION_KEY` | 2FA sırlarını şifreleyen, JWT anahtarından farklı en az 32 karakterli rastgele anahtar |
+   | `IYZICO_API_KEY` | İyzico üye işyeri API anahtarı |
+   | `IYZICO_SECRET_KEY` | İyzico üye işyeri gizli anahtarı |
+   | `IYZICO_BASE_URL` | Testte `https://sandbox-api.iyzipay.com`, canlıda İyzico'nun verdiği adres |
+   | `PUBLIC_BACKEND_URL` | Render servis adresi (örn. `https://burger-plus-backend.onrender.com`) |
+   | `FRONTEND_URL` | Vercel müşteri uygulaması adresi |
+   | `IYZICO_DEFAULT_IDENTITY_NUMBER` | İyzico ile teyit edilmiş nihai tüketici değeri (varsayılan `11111111111`) |
+   | `IYZICO_DEFAULT_ADDRESS` | Restoranın gerçek açık adresi |
+   | `IYZICO_DEFAULT_CITY` | Restoranın bulunduğu il |
+   | `IYZICO_DEFAULT_ZIP_CODE` | Restoranın posta kodu |
 
    > **JWT_SECRET önemli:** Bu, kullanıcı oturumlarının güvenlik anahtarı.
    > Kimseyle paylaşma, tahmin edilebilir bir şey yazma.
+
+   > Müşteri ekranında T.C. kimlik ve adres sorulmaz. İyzico'nun zorunlu teknik
+   > alanları yukarıdaki işletme ayarlarından doldurulur; adres alanına rastgele
+   > veri yazma. Nihai tüketici kimlik değerini canlıya geçmeden önce İyzico ve
+   > mali müşavirinle teyit et.
 
 6. **Create Web Service** → kurulum başlar (2-5 dakika)
 

@@ -188,3 +188,17 @@
 .cikis-btn:active { transform: scale(0.99); }
 
 .destek-perde{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.68);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.destek-modal{width:min(390px,100%);padding:24px;border:1px solid var(--glass-border-strong);border-radius:var(--r-xl);background:rgba(25,25,25,.98);box-shadow:var(--shadow-modal)}.destek-modal>span{color:var(--primary-container);font-size:10px;font-weight:800;letter-spacing:.08em}.destek-modal h3{margin:8px 0;color:var(--on-surface);font-family:'Montserrat';font-size:20px}.destek-modal p{color:var(--on-surface-variant);font-size:14px;line-height:1.55}.destek-modal .destek-not{margin-top:12px;font-size:12px}.destek-modal a{display:block;margin:16px 0;color:var(--primary-container);font-weight:700;font-size:14px}.destek-modal button{width:100%;padding:13px;border-radius:var(--r-md);background:rgba(255,255,255,.1);border:1px solid var(--glass-border-strong);color:#fff;font-weight:700}
+
+.profil-2fa-ikon { font-size:20px; }
+.profil-2fa-durum { display:block;margin-top:3px;color:var(--outline);font-size:11px;font-weight:600; }
+.iki-faktor-modal { max-height:90vh;overflow:auto; }
+.iki-faktor-modal label { display:block;margin:14px 0 6px;color:var(--on-surface-variant);font-size:12px;font-weight:700; }
+.iki-faktor-modal input { width:100%;margin-top:6px;padding:13px;border:1px solid var(--glass-border-strong);border-radius:var(--r-md);background:rgba(255,255,255,.07);color:#fff;font-size:16px; }
+.iki-faktor-modal .iki-faktor-ana-btn { margin:14px 0 8px;background:linear-gradient(135deg,var(--primary-grad-start),var(--primary-grad-end));border:0; }
+.iki-faktor-modal .iki-faktor-tehlike-btn { margin:14px 0 8px;background:rgba(255,90,82,.15);border-color:rgba(255,90,82,.4);color:#ff8b84; }
+.iki-faktor-modal button:disabled { opacity:.45;cursor:not-allowed; }
+.iki-faktor-qr { display:block;width:220px;max-width:100%;margin:14px auto;border-radius:12px;background:#fff;padding:8px; }
+.iki-faktor-secret { display:block;padding:10px;border-radius:8px;background:rgba(255,255,255,.07);color:var(--primary-container);font-size:11px;text-align:center;overflow-wrap:anywhere;user-select:all; }
+.iki-faktor-kodlar { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0; }
+.iki-faktor-kodlar code { padding:9px 5px;border:1px solid var(--glass-border);border-radius:7px;background:rgba(255,255,255,.06);color:#fff;text-align:center;font-size:12px;user-select:all; }
+.iki-faktor-hata { color:#ff8b84 !important;font-weight:700; }

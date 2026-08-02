@@ -82,6 +82,7 @@
 .login-btn:not(:disabled):active { transform: scale(0.99); }
 .login-kurulum-btn { margin-top: 10px; padding: 11px; border: 1px solid var(--border); border-radius: var(--r-md); color: var(--primary); background: var(--primary-hafif); font-size: 12px; font-weight: 700; }
 .login-kurulum-btn:disabled { opacity: .45; cursor: not-allowed; }
+.login-2fa-input { text-align:center; font-size:24px; font-weight:800; letter-spacing:.16em; }
 
 /* Rol seçimi */
 .rol-secim {

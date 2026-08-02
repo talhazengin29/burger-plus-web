@@ -47,6 +47,30 @@ export async function girisYap(email, sifre) {
   return r.json();
 }
 
+export async function ikiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
+  const r = await fetch(`${BACKEND_URL}/api/giris/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ikiFaktorToken, kod }),
+  });
+  return r.json();
+}
+
+async function ikiFaktorIstegi(yol, veri) {
+  const r = await fetch(`${BACKEND_URL}/api/2fa/${yol}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...yetkiBasligi() },
+    body: JSON.stringify(veri),
+  });
+  const sonuc = await r.json();
+  if (!r.ok) throw new Error(sonuc.hata || "İki adımlı doğrulama işlemi tamamlanamadı.");
+  return sonuc;
+}
+
+export const ikiFaktorKurulumBaslat = (sifre) => ikiFaktorIstegi("kurulum-baslat", { sifre });
+export const ikiFaktorKurulumOnayla = (kod) => ikiFaktorIstegi("kurulum-onayla", { kod });
+export const ikiFaktorKapat = (sifre, kod) => ikiFaktorIstegi("kapat", { sifre, kod });
+
 // Sifremi unuttum: talep gonder (backend her zaman ayni mesajla doner)
 export async function sifirlamaTalep(email) {
   const r = await fetch(`${BACKEND_URL}/api/sifre-sifirlama-talep`, {

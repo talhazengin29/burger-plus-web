@@ -235,3 +235,6 @@
 .sifre-guc--orta .sifre-guc-cubuk::after { background: #f5a623; }
 .sifre-guc--guclu .sifre-guc-cubuk::after { background: var(--basari, #10b981); }
 .sifre-guc small { font-size: 11px; font-weight: 700; color: var(--on-surface-variant); white-space: nowrap; }
+
+.login-2fa-aciklama { margin: 0 0 20px; color: var(--on-surface-variant); font-size: 13px; line-height: 1.55; text-align: center; }
+.login-2fa-input { text-align: center; font-family: 'Montserrat'; font-size: 24px; font-weight: 700; letter-spacing: .18em; }

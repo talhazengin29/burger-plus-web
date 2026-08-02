@@ -19,6 +19,11 @@ export async function personelGiris(email, sifre, ekranRolu) {
   });
   const veri = await r.json();
   if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
+  if (veri.ikiFaktorGerekli) return veri;
+  return personelGirisiniTamamla(veri, ekranRolu);
+}
+
+function personelGirisiniTamamla(veri, ekranRolu) {
   const izinler = {
     admin: ["admin"],
     mutfak: ["mutfak", "admin"],
@@ -29,6 +34,17 @@ export async function personelGiris(email, sifre, ekranRolu) {
   }
   adminToken.kaydet(veri.token);
   return veri.kullanici;
+}
+
+export async function personelIkiFaktorGirisiniTamamla(ikiFaktorToken, kod, ekranRolu) {
+  const r = await fetch(`${BACKEND_URL}/api/giris/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ikiFaktorToken, kod }),
+  });
+  const veri = await r.json();
+  if (!r.ok) throw new Error(veri.hata || "Doğrulama kodu geçersiz.");
+  return personelGirisiniTamamla(veri, ekranRolu);
 }
 
 export async function ilkYerelAdminOlustur(email, sifre) {

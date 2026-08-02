@@ -19,10 +19,6 @@ const ODEME_SEMASI = {
   soyad: (deger) => kurallar.ad(deger, "Soyad"),
   email: kurallar.email,
   telefon: (deger) => kurallar.telefon(deger, true),
-  kimlikNo: kurallar.tcKimlik,
-  adres: kurallar.adres,
-  il: kurallar.il,
-  postaKodu: kurallar.postaKodu,
 };
 
 export default function Payment() {
@@ -39,7 +35,7 @@ export default function Payment() {
   const [alanHatalari, setAlanHatalari] = useState({});
   const [alici, setAlici] = useState(() => ({
     ad: kullanici?.ad || "", soyad: kullanici?.soyad || "", email: kullanici?.email || "",
-    telefon: kullanici?.telefon || "+905", kimlikNo: "", adres: "", il: "", postaKodu: "",
+    telefon: kullanici?.telefon || "+905",
   }));
 
   const aliciDegistir = (alan, deger) => {
@@ -135,10 +131,6 @@ export default function Payment() {
       soyad: temizMetin(alici.soyad, 60),
       email: emailTemizle(alici.email),
       telefon: telefonTemizle(alici.telefon),
-      kimlikNo: String(alici.kimlikNo),
-      adres: temizMetin(alici.adres, 300),
-      il: temizMetin(alici.il, 80),
-      postaKodu: String(alici.postaKodu || "").trim(),
     };
     setIslemde(true);
     try {
@@ -194,17 +186,13 @@ export default function Payment() {
         </section>
 
         <section className="secim-kutu odeme-bilgi-kutu">
-          <h3 className="secim-baslik">Fatura bilgileri</h3>
-          <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir.</p>
+          <h3 className="secim-baslik">İletişim bilgileri</h3>
+          <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir. Normal siparişte T.C. kimlik ve adres bilgisi istenmez.</p>
           <div className="odeme-bilgi-grid">
             <label>Ad<input value={alici.ad} onChange={(e) => aliciDegistir("ad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("ad")} autoComplete="given-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.ad)} />{alanHatalari.ad && <small className="alan-hata">{alanHatalari.ad}</small>}</label>
             <label>Soyad<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("soyad")} autoComplete="family-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.soyad)} />{alanHatalari.soyad && <small className="alan-hata">{alanHatalari.soyad}</small>}</label>
             <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value.slice(0, 254))} onBlur={() => alaniDogrula("email")} autoComplete="email" maxLength="254" required aria-invalid={Boolean(alanHatalari.email)} />{alanHatalari.email && <small className="alan-hata">{alanHatalari.email}</small>}</label>
             <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value.slice(0, 20))} onBlur={() => alaniDogrula("telefon")} autoComplete="tel" maxLength="20" required aria-invalid={Boolean(alanHatalari.telefon)} />{alanHatalari.telefon && <small className="alan-hata">{alanHatalari.telefon}</small>}</label>
-            <label className="tam-genislik">T.C. kimlik no<input inputMode="numeric" maxLength="11" value={alici.kimlikNo} onChange={(e) => aliciDegistir("kimlikNo", e.target.value.replace(/\D/g, "").slice(0, 11))} onBlur={() => alaniDogrula("kimlikNo")} required aria-invalid={Boolean(alanHatalari.kimlikNo)} />{alanHatalari.kimlikNo && <small className="alan-hata">{alanHatalari.kimlikNo}</small>}</label>
-            <label className="tam-genislik">Adres<textarea rows="2" value={alici.adres} onChange={(e) => aliciDegistir("adres", guvenliMetin(e.target.value, 300))} onBlur={() => alaniDogrula("adres")} autoComplete="street-address" maxLength="300" required aria-invalid={Boolean(alanHatalari.adres)} />{alanHatalari.adres && <small className="alan-hata">{alanHatalari.adres}</small>}</label>
-            <label>İl<input value={alici.il} onChange={(e) => aliciDegistir("il", guvenliMetin(e.target.value, 80))} onBlur={() => alaniDogrula("il")} autoComplete="address-level1" maxLength="80" required aria-invalid={Boolean(alanHatalari.il)} />{alanHatalari.il && <small className="alan-hata">{alanHatalari.il}</small>}</label>
-            <label>Posta kodu<input inputMode="numeric" value={alici.postaKodu} onChange={(e) => aliciDegistir("postaKodu", e.target.value.replace(/\D/g, "").slice(0, 5))} onBlur={() => alaniDogrula("postaKodu")} autoComplete="postal-code" maxLength="5" aria-invalid={Boolean(alanHatalari.postaKodu)} />{alanHatalari.postaKodu && <small className="alan-hata">{alanHatalari.postaKodu}</small>}</label>
           </div>
         </section>
 
