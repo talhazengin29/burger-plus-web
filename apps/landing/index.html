@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QR Menü Pro | Restoranın İçin Dijital Sipariş Sistemi</title>
+<link href="/src/tailwind.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind yapılandırması npm build akışındaki tailwind.config.js dosyasına taşındı.
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#313030",
+                        "surface": "#131313",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#00497b",
+                        "inverse-primary": "#a04100",
+                        "background": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#561f00",
+                        "error-container": "#93000a",
+                        "primary-container": "#ff6b00",
+                        "outline-variant": "#5a4136",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#d0e4ff",
+                        "on-surface-variant": "#e2bfb0",
+                        "surface-container": "#201f1f",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "tertiary": "#9ccaff",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "secondary": "#c6c6c7",
+                        "on-secondary": "#2f3131",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#003257",
+                        "on-tertiary-fixed": "#001d35",
+                        "surface-tint": "#ffb693",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary-container": "#003357",
+                        "secondary-container": "#454747",
+                        "outline": "#a98a7d",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#351000",
+                        "primary-fixed": "#ffdbcc",
+                        "secondary-fixed": "#e2e2e2",
+                        "primary": "#ffb693",
+                        "on-primary-container": "#572000",
+                        "tertiary-container": "#059eff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-container": "#b4b5b5",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "inverse-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "gutter": "20px",
+                        "container-max": "1200px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "title-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+-->
+<style>
+        body {
+            background-color: #0D0D0D;
+            scroll-behavior: smooth;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .btn-primary-glow {
+            background: linear-gradient(90deg, #FF6B00 0%, #FF8E3C 100%);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        .btn-primary-glow:hover {
+            box-shadow: 0 0 25px rgba(255, 107, 0, 0.8);
+            transform: translateY(-2px);
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(255, 107, 0, 0.6);
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0D0D0D; }
+        ::-webkit-scrollbar-thumb { background: #5a4136; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff6b00; }
+    </style>
+</head>
+<body class="text-on-surface antialiased overflow-x-hidden relative">
+<div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#FF6B00]/10 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+<div class="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-[#FF6B00]/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+<nav class="bg-surface/5 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/40 fixed top-0 w-full z-50">
+<div class="flex justify-between items-center max-w-container-max mx-auto px-gutter h-20">
+<a class="font-headline-lg text-headline-lg font-bold text-primary active:scale-95 transition-transform" href="#">
+                QR Menü Pro
+            </a>
+<div class="hidden md:flex gap-lg font-title-md text-title-md">
+<a class="text-on-surface hover:text-primary transition-colors hover:opacity-80 transition-all duration-300" href="#ozellikler">Özellikler</a>
+<a class="text-on-surface hover:text-primary transition-colors hover:opacity-80 transition-all duration-300" href="#nasil-calisir">Nasıl Çalışır</a>
+<a class="text-on-surface hover:text-primary transition-colors hover:opacity-80 transition-all duration-300" href="#fiyatlandirma">Fiyatlandırma</a>
+<a class="text-on-surface hover:text-primary transition-colors hover:opacity-80 transition-all duration-300" href="#giris">Giriş</a>
+</div>
+<div class="hidden md:flex gap-sm items-center font-title-md text-title-md">
+<a class="px-md py-xs rounded-lg glass-panel hover:bg-white/10 transition-colors text-on-surface" href="#">Demo İzle</a>
+<a class="px-md py-xs rounded-lg btn-primary-glow text-[#561f00] font-bold" href="#">Hemen Başla</a>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined" style="font-size: 32px;">menu</span>
+</button>
+</div>
+</nav>
+<header class="pt-32 pb-xl px-gutter relative min-h-[921px] flex items-center justify-center">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-2 gap-xl items-center w-full fade-in-up">
+<div class="flex flex-col gap-md z-10">
+<div class="glass-panel inline-flex items-center gap-xs px-sm py-base rounded-full w-fit">
+<span class="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">v2.0 Şimdi Yayında</span>
+</div>
+<h1 class="font-display-lg text-display-lg md:text-[64px] md:leading-[72px]">
+                    Restoranın İçin <br/>
+<span class="text-[#FF6B00] text-glow font-black">Dijital Sipariş</span><br/>
+                    Sistemi
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mt-xs">
+                    QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Operasyonunuzu hızlandırın, müşteri deneyimini mükemmelleştirin.
+                </p>
+<div class="flex flex-wrap gap-sm mt-sm font-title-md text-title-md">
+<a class="px-lg py-sm rounded-lg btn-primary-glow text-[#561f00] font-bold inline-flex items-center gap-xs" href="#fiyatlandirma">
+                        Ücretsiz Başla
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+<a class="px-lg py-sm rounded-lg glass-panel hover:bg-white/10 transition-colors text-on-surface inline-flex items-center gap-xs" href="#ozellikler">
+                        Demoyu İncele
+                    </a>
+</div>
+<div class="mt-md flex items-center gap-sm">
+<div class="flex -space-x-4">
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a modern restaurant owner smiling softly, shot in high contrast moody lighting with a subtle orange rim light, conveying trust and professionalism in a high-end dining context." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&amp;q=80'" src="/gorseller/kullanici-restoran.jpg"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a trendy barista in a dark cafe setting, illuminated by soft amber glowing lights, representing a satisfied software user in the hospitality industry." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&amp;q=80'" src="/gorseller/kullanici-kafe.jpg"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a professional chef in a premium modern kitchen, wearing a dark apron, sharp lighting emphasizing the high-tech digital environment of the restaurant." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&amp;q=80'" src="/gorseller/kullanici-sef.jpg"/>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant"><span class="text-white font-bold">1,000+</span> restoran zaten kullanıyor</p>
+</div>
+</div>
+<div class="relative w-full h-[500px] md:h-[600px] flex items-center justify-center">
+<div class="absolute inset-0 bg-[#FF6B00]/20 blur-[100px] rounded-full z-0"></div>
+<div class="relative z-10 glass-panel rounded-[32px] p-2 w-[280px] h-[580px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+<img class="w-full h-full object-cover rounded-[28px]" data-alt="A photorealistic smartphone mockup displaying a highly modern digital food menu app interface. The screen shows vibrant orange accents, deep black backgrounds, and appetizing food images. The phone is floating dynamically in a dark, high-end restaurant setting with cinematic lighting." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&amp;q=80'" src="/gorseller/hero-telefon.jpg"/>
+</div>
+<div class="absolute bottom-10 right-0 md:right-10 z-20 glass-panel p-sm rounded-xl flex items-center gap-sm shadow-[0_10px_30px_rgba(0,0,0,0.6)] animate-bounce" style="animation-duration: 3s;">
+<div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Yeni Sipariş</p>
+<p class="font-title-md text-title-md text-white">Masa 14 • ₺420</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<section class="py-xl px-gutter relative z-10" id="ozellikler">
+<div class="max-w-container-max mx-auto text-center mb-lg fade-in-up">
+<h2 class="font-headline-lg text-headline-lg md:text-[40px] text-white">Neler Sunuyoruz?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mt-sm">İşletmenizi bir üst seviyeye taşıyacak, modern ve güçlü araçlarla donatılmış dijital ekosistem.</p>
+</div>
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">qr_code_scanner</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">QR ile Sipariş</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Müşteri masadaki QR'ı okutur, telefonundan menüyü inceler ve saniyeler içinde garson beklemeden sipariş verir.</p>
+</div>
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">restaurant</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">Canlı Mutfak Paneli</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Siparişler anında mutfak ekranına düşer. Hazırlık durumu eş zamanlı olarak müşterinin telefonuna yansır.</p>
+</div>
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">loyalty</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">Sadakat Programı</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Otomatik puan biriktirme, dijital damga kartı sistemi ve kişiselleştirilmiş hediye kampanyaları oluşturun.</p>
+</div>
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">credit_score</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">Güvenli Ödeme</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">iyzico altyapısıyla masada kredi kartı ile güvenli ödeme alma. Alman usulü hesap bölüştürme kolaylığı.</p>
+</div>
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">bar_chart</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">Detaylı Raporlar</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Günlük, haftalık ciro takibi. Ürün bazlı satış analizleri ve personel performans raporlarına anında erişim.</p>
+</div>
+<div class="glass-panel p-md rounded-xl hover:bg-white/5 hover:border-[#FF6B00]/50 transition-all duration-300 group fade-in-up">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface group-hover:text-[#FF6B00] transition-colors" data-weight="fill">storefront</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">Kendi Markanız</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Logonuz, kendi renk paletiniz ve size özel menü tasarımı. Sistemi tamamen kendi markanıza uyarlayın.</p>
+</div>
+</div>
+</section>
+<section class="py-xl px-gutter relative z-10 bg-surface/30" id="nasil-calisir">
+<div class="max-w-container-max mx-auto fade-in-up">
+<h2 class="font-headline-lg text-headline-lg md:text-[40px] text-white text-center mb-xl">3 Adımda Başlayın</h2>
+<div class="relative flex flex-col md:flex-row items-start justify-between gap-lg">
+<div class="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-white/10 z-0">
+<div class="h-full bg-[#FF6B00] w-1/2"></div>
+</div>
+<div class="relative z-10 flex-1 flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full glass-panel flex items-center justify-center mb-sm group-hover:border-[#FF6B00] group-hover:shadow-[0_0_20px_rgba(255,107,0,0.3)] transition-all">
+<span class="material-symbols-outlined text-4xl text-[#FF6B00]">settings</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">1. Kurulum</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Menünüzü dijital ortama aktarın, fiyatları ve fotoğrafları yükleyin.</p>
+</div>
+<div class="relative z-10 flex-1 flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full glass-panel border-[#FF6B00] shadow-[0_0_15px_rgba(255,107,0,0.2)] flex items-center justify-center mb-sm bg-[#FF6B00]/10">
+<span class="material-symbols-outlined text-4xl text-[#FF6B00]">qr_code</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">2. QR Kodları Yerleştirin</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Sistemden otomatik oluşturulan özel QR kodlarını masalarınıza yapıştırın.</p>
+</div>
+<div class="relative z-10 flex-1 flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full glass-panel flex items-center justify-center mb-sm group-hover:border-[#FF6B00] group-hover:shadow-[0_0_20px_rgba(255,107,0,0.3)] transition-all">
+<span class="material-symbols-outlined text-4xl text-[#FF6B00]">receipt_long</span>
+</div>
+<h3 class="font-title-md text-title-md text-white mb-xs">3. Sipariş Almaya Başlayın</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Müşterileriniz anında sipariş versin, cirolarınız anında artışa geçsin.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-xl px-gutter relative z-10">
+<div class="max-w-container-max mx-auto text-center mb-lg fade-in-up">
+<h2 class="font-headline-lg text-headline-lg md:text-[40px] text-white">Her Konsepte Uygun</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mt-sm">İşletmenizin ruhunu dijitale yansıtın. Zengin görsel yeteneklerle iştah açan bir menü deneyimi.</p>
+</div>
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="relative h-[400px] rounded-xl overflow-hidden group fade-in-up">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A macro shot of a delicious, towering gourmet burger with melting cheese and crispy bacon, sitting on a dark slate surface in a modern, moody burger joint. Cinematic high-contrast lighting emphasizing texture, glowing ambient red and orange background lights." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=700&amp;q=80'" src="/gorseller/konsept-burger.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-md">
+<div class="glass-panel p-sm rounded-lg backdrop-blur-md">
+<h3 class="font-title-md text-title-md text-white mb-xs">Burger &amp; Fast Food</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Hızlı sipariş akışı ve cezbedici eklenti satışı (upsell) özellikleri.</p>
+</div>
+</div>
+</div>
+<div class="relative h-[400px] rounded-xl overflow-hidden group fade-in-up">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="An artisanal ceramic cup of coffee with intricate latte art on a dark wooden table in a sleek, dimly lit premium cafe. Soft amber lights glow warmly in the deeply blurred background, creating an intimate, modern atmosphere." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&amp;q=80'" src="/gorseller/konsept-kafe.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-md">
+<div class="glass-panel p-sm rounded-lg backdrop-blur-md">
+<h3 class="font-title-md text-title-md text-white mb-xs">Cafe &amp; Kahve Evi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Özelleştirilebilir seçenekler (süt türü, şurup vb.) ve dijital damga kartı.</p>
+</div>
+</div>
+</div>
+<div class="relative h-[400px] rounded-xl overflow-hidden group fade-in-up">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A wood-fired pizza with bubbling artisan cheese and fresh basil leaves, served in an upscale moody Italian restaurant. Warm, directional lighting highlighting the golden crust, with a sleek dark aesthetic and subtle orange glowing accents." onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&amp;q=80'" src="/gorseller/konsept-restoran.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-md">
+<div class="glass-panel p-sm rounded-lg backdrop-blur-md">
+<h3 class="font-title-md text-title-md text-white mb-xs">Restoran &amp; Fine Dining</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Şarap eşleşmeleri öneren, çok dilli zarif dijital menü tasarımı.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-xl px-gutter relative z-10 bg-surface/30" id="fiyatlandirma">
+<div class="max-w-container-max mx-auto text-center mb-lg fade-in-up">
+<h2 class="font-headline-lg text-headline-lg md:text-[40px] text-white">Şeffaf Fiyatlandırma</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mt-sm">Sürpriz komisyonlar yok. İşletmenizin boyutuna uygun sabit aylık ücretler.</p>
+</div>
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-md items-center">
+<div class="glass-panel p-lg rounded-xl flex flex-col fade-in-up">
+<h3 class="font-title-md text-title-md text-white mb-sm">Başlangıç</h3>
+<div class="flex items-baseline gap-xs mb-md">
+<span class="font-display-lg text-display-lg text-white">₺499</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ay</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg flex-1">
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Sınırsız QR Menü Görüntüleme
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Temel Tema Özelleştirme
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Çoklu Dil Desteği
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant text-surface-variant line-through">
+<span class="material-symbols-outlined text-sm">close</span>
+                        Masadan Sipariş Alma
+                    </li>
+</ul>
+<a class="w-full text-center px-md py-sm rounded-lg glass-panel hover:bg-white/10 transition-colors text-white font-title-md text-title-md" href="#">Seç</a>
+</div>
+<div class="glass-panel p-lg rounded-xl flex flex-col border-2 border-[#FF6B00] shadow-[0_0_30px_rgba(255,107,0,0.15)] transform md:scale-105 relative z-10 fade-in-up">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF6B00] text-[#561f00] font-label-sm text-label-sm px-sm py-1 rounded-full uppercase tracking-wider font-bold">Popüler Seçim</div>
+<h3 class="font-title-md text-title-md text-white mb-sm">Profesyonel</h3>
+<div class="flex items-baseline gap-xs mb-md">
+<span class="font-display-lg text-display-lg text-white">₺999</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ay</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg flex-1">
+<li class="flex items-center gap-xs font-body-md text-body-md text-white">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Başlangıç Paketindeki Her Şey
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-white">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Masadan Canlı Sipariş Alma
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-white">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Mutfak Paneli
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-white">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        iyzico Online Ödeme
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-white">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Gelişmiş Ciro Raporları
+                    </li>
+</ul>
+<a class="w-full text-center px-md py-sm rounded-lg btn-primary-glow text-[#561f00] font-bold font-title-md text-title-md" href="#">14 Gün Ücretsiz Dene</a>
+</div>
+<div class="glass-panel p-lg rounded-xl flex flex-col fade-in-up">
+<h3 class="font-title-md text-title-md text-white mb-sm">Kurumsal</h3>
+<div class="flex items-baseline gap-xs mb-md">
+<span class="font-headline-lg text-headline-lg text-white">Özel Fiyat</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg flex-1">
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Çoklu Şube Yönetimi
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        Özel Sadakat Programı
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        POS Entegrasyonu (Gelişmiş)
+                    </li>
+<li class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[#FF6B00] text-sm">check</span>
+                        7/24 Öncelikli Telefon Desteği
+                    </li>
+</ul>
+<a class="w-full text-center px-md py-sm rounded-lg glass-panel hover:bg-white/10 transition-colors text-white font-title-md text-title-md" href="#">Bize Ulaşın</a>
+</div>
+</div>
+</section>
+<section class="py-xl px-gutter relative z-10 mb-xl" id="giris">
+<div class="max-w-[800px] mx-auto glass-panel p-lg rounded-2xl text-center fade-in-up">
+<h2 class="font-headline-lg text-headline-lg md:text-[32px] text-white mb-md">Panele Giriş</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<a class="flex flex-col items-center justify-center p-lg rounded-xl bg-surface-container/50 border border-white/5 hover:border-[#FF6B00]/50 hover:bg-surface/20 transition-all group" href="/personel">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/10 transition-colors">
+<span class="material-symbols-outlined text-4xl text-on-surface group-hover:text-[#FF6B00] transition-colors">store</span>
+</div>
+<h3 class="font-title-md text-title-md text-white">İşletme Paneli</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Yönetici, Raporlar ve Ayarlar</p>
+</a>
+<a class="flex flex-col items-center justify-center p-lg rounded-xl bg-surface-container/50 border border-white/5 hover:border-[#FF6B00]/50 hover:bg-surface/20 transition-all group" href="/personel">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-sm group-hover:bg-[#FF6B00]/10 transition-colors">
+<span class="material-symbols-outlined text-4xl text-on-surface group-hover:text-[#FF6B00] transition-colors">cooking</span>
+</div>
+<h3 class="font-title-md text-title-md text-white">Personel Girişi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Mutfak ve Garson Ekranları</p>
+</a>
+</div>
+</div>
+</section>
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full pt-xl pb-md">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col gap-sm">
+<div class="font-title-md text-title-md font-black text-on-surface">QR Menü Pro</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Yeni nesil dijital restoran yönetim sistemi.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-title-md text-title-md text-white">Ürün</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#ozellikler">Özellikler</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#fiyatlandirma">Fiyatlandırma</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-title-md text-title-md text-white">Bağlantılar</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Kullanım Koşulları</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Gizlilik Politikası</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">İletişim</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Destek</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-title-md text-title-md text-white">Bizi Takip Edin</h4>
+<div class="flex gap-sm">
+<a class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-[#FF6B00]/20 hover:text-[#FF6B00] transition-all text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-[#FF6B00]/20 hover:text-[#FF6B00] transition-all text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter mt-lg pt-sm border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-center">
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">© 2024 QR Menü Pro. Tüm hakları saklıdır.</p>
+</div>
+</footer>
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body></html>

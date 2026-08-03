@@ -4,6 +4,10 @@
   "framework": null,
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
       "source": "/super-admin",
       "destination": "/super-admin/index.html"
     },
@@ -12,12 +16,20 @@
       "destination": "/super-admin/index.html"
     },
     {
+      "source": "/personel",
+      "destination": "/personel/index.html"
+    },
+    {
       "source": "/personel/:path((?!assets/).*)",
       "destination": "/personel/index.html"
     },
     {
-      "source": "/((?!assets/|personel|super-admin|.*\\.[a-zA-Z0-9]+$).*)",
-      "destination": "/index.html"
+      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller)[a-zA-Z0-9-]+)",
+      "destination": "/uygulama/index.html"
+    },
+    {
+      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller)[a-zA-Z0-9-]+)/:path((?!assets/).*)",
+      "destination": "/uygulama/index.html"
     }
   ]
 }

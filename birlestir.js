@@ -1,57 +1,38 @@
-// ============================================================================
-// İki uygulamanın build çıktısını tek klasörde birleştirir.
+// Dört uygulamanın build çıktısını tek Vercel dağıtım klasöründe birleştirir.
 //
-//   apps/musteri/dist   →  dist/            (kök: müşteri uygulaması)
-//   apps/personel/dist  →  dist/personel/   (alt yol: personel paneli)
-//   apps/superadmin/dist → dist/super-admin/ (platform yönetimi)
-//
-// Sonuç: tek Vercel projesi, tek adres.
-//   siteniz.vercel.app          → müşteri
-//   siteniz.vercel.app/personel → personel
-//   siteniz.vercel.app/super-admin → super admin
-// ============================================================================
+//   apps/landing/dist    → dist/             (ana tanıtım sayfası)
+//   apps/musteri/dist    → dist/uygulama/    (multi-tenant müşteri bundle'ı)
+//   apps/personel/dist   → dist/personel/     (işletme/personel paneli)
+//   apps/superadmin/dist → dist/super-admin/  (platform yönetimi)
 
 import { cp, rm, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 
 const KOK = "dist";
-const MUSTERI = "apps/musteri/dist";
-const PERSONEL = "apps/personel/dist";
-const SUPER_ADMIN = "apps/superadmin/dist";
+const UYGULAMALAR = [
+  { kaynak: "apps/landing/dist", hedef: KOK, ad: "Tanıtım sayfası" },
+  { kaynak: "apps/musteri/dist", hedef: `${KOK}/uygulama`, ad: "Müşteri uygulaması" },
+  { kaynak: "apps/personel/dist", hedef: `${KOK}/personel`, ad: "Personel uygulaması" },
+  { kaynak: "apps/superadmin/dist", hedef: `${KOK}/super-admin`, ad: "Super admin uygulaması" },
+];
 
 async function birlestir() {
-  // Eski çıktıyı temizle
   if (existsSync(KOK)) await rm(KOK, { recursive: true, force: true });
   await mkdir(KOK, { recursive: true });
 
-  // 1) Müşteri uygulaması → kök
-  if (!existsSync(MUSTERI)) {
-    console.error("HATA: Müşteri build'i bulunamadı:", MUSTERI);
-    process.exit(1);
+  for (const uygulama of UYGULAMALAR) {
+    if (!existsSync(uygulama.kaynak)) {
+      console.error(`HATA: ${uygulama.ad} build'i bulunamadı:`, uygulama.kaynak);
+      process.exit(1);
+    }
+    await cp(uygulama.kaynak, uygulama.hedef, { recursive: true });
+    console.log(`✓ ${uygulama.ad} → ${uygulama.hedef}/`);
   }
-  await cp(MUSTERI, KOK, { recursive: true });
-  console.log("✓ Müşteri uygulaması → dist/");
-
-  // 2) Personel uygulaması → dist/personel
-  if (!existsSync(PERSONEL)) {
-    console.error("HATA: Personel build'i bulunamadı:", PERSONEL);
-    process.exit(1);
-  }
-  await cp(PERSONEL, `${KOK}/personel`, { recursive: true });
-  console.log("✓ Personel uygulaması → dist/personel/");
-
-  // 3) Super admin uygulaması → dist/super-admin
-  if (!existsSync(SUPER_ADMIN)) {
-    console.error("HATA: Super admin build'i bulunamadı:", SUPER_ADMIN);
-    process.exit(1);
-  }
-  await cp(SUPER_ADMIN, `${KOK}/super-admin`, { recursive: true });
-  console.log("✓ Super admin uygulaması → dist/super-admin/");
 
   console.log("\nBirleştirme tamamlandı. Yayına hazır: dist/");
 }
 
-birlestir().catch((e) => {
-  console.error("Birleştirme hatası:", e);
+birlestir().catch((hata) => {
+  console.error("Birleştirme hatası:", hata);
   process.exit(1);
 });
