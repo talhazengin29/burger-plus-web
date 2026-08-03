@@ -29,14 +29,17 @@ export const adminToken = {
   sil: (slug) => sessionStorage.removeItem(adminTokenAnahtari(slug)),
 };
 
+// isletmeSlugu: URL'de henüz slug yokken (ör. tek panelden giriş akışının 2FA
+// adımı) hangi işletme için istek atıldığını açıkça belirtmek için kullanılır;
+// verilmezse mevcut davranış gibi aktif URL'deki slug kullanılır.
 async function istekAt(yol, secenekler = {}) {
-  const { isletmeBasligi = true, ...fetchSecenekleri } = secenekler;
+  const { isletmeBasligi = true, isletmeSlugu, ...fetchSecenekleri } = secenekler;
   const headers = new Headers(fetchSecenekleri.headers || {});
   if (isletmeBasligi) {
-    const slug = aktifIsletmeSlug();
+    const slug = isletmeSlugu || aktifIsletmeSlug();
     if (!slug) throw new Error("İşletme belirtilmedi.");
     headers.set("X-Isletme", slug);
-    const token = adminToken.al();
+    const token = adminToken.al(slug);
     if (token && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${token}`);
   }
   return fetch(`${BACKEND_URL}${yol}`, { ...fetchSecenekleri, headers });
@@ -73,8 +76,8 @@ export async function girisYap(email, sifre) {
   return girisiTamamla(veri);
 }
 
-function girisiTamamla(veri) {
-  adminToken.kaydet(veri.token);
+function girisiTamamla(veri, slug) {
+  adminToken.kaydet(veri.token, slug);
   return veri.kullanici;
 }
 
@@ -83,6 +86,35 @@ export async function personelIkiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "Doğrulama kodu geçersiz.");
   return girisiTamamla(veri);
+}
+
+// Tek panelden giriş: hangi işletmeye ait olduğu URL'den değil, girilen
+// e-postadan bulunur (backend: /api/giris-genel, isletmeMiddleware'i atlar).
+// Başarılı yanıt hangi işletmeye ait olduğunu (isletmeSlug) da içerir; GenelGiris.jsx
+// bunu görüp `/{isletmeSlug}`'a yönlendirir.
+export async function girisGenel(email, sifre) {
+  const r = await istekAt("/api/giris-genel", {
+    isletmeBasligi: false,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, sifre }),
+  });
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
+  if (veri.ikiFaktorGerekli) return veri;
+  return { kullanici: girisiTamamla(veri, veri.isletmeSlug), isletmeSlug: veri.isletmeSlug };
+}
+
+export async function ikiFaktorGirisiniTamamlaGenel(ikiFaktorToken, kod, isletmeSlug) {
+  const r = await istekAt("/api/giris/2fa", {
+    isletmeSlugu: isletmeSlug,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ikiFaktorToken, kod }),
+  });
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Doğrulama kodu geçersiz.");
+  return { kullanici: girisiTamamla(veri, isletmeSlug), isletmeSlug };
 }
 
 export async function ilkYerelAdminOlustur(email, sifre) {

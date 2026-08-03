@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Login from "./screens/Login";
+import GenelGiris from "./screens/GenelGiris";
 import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
@@ -8,6 +9,7 @@ import { adminToken, erisimTokeniniCoz, personelOturumunuDogrula } from "./lib/a
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
 import { useIsletmeNavigate } from "./hooks/useIsletmeNavigate";
+import { ROL_EKRANI } from "./lib/roller";
 import "./App.css";
 
 /*
@@ -20,25 +22,32 @@ import "./App.css";
 */
 
 const OTURUM = "burger-plus-personel";
-const ROL_EKRANI = { admin: "admin", mutfak: "mutfak", salon: "salon", kasiyer: "salon" };
 
-function ImpersonationYonlendir() {
+// Kök yol ("/"): impersonation bağlantısıysa (?erisim=...) doğru işletmenin
+// yönetim paneline yönlendirir; aksi halde (normal ziyaret) tek panelden
+// giriş ekranını (GenelGiris) gösterir — belirli bir işletmeye sabitlenmez,
+// çünkü bu platformda artık birden fazla işletme var.
+function KokEkrani() {
   const [arama] = useSearchParams();
   const token = arama.get("erisim") || "";
   const [hedef, setHedef] = useState(null);
+  const [kontrolEdildi, setKontrolEdildi] = useState(!token);
+
   useEffect(() => {
+    if (!token) { setKontrolEdildi(true); return; }
     const erisim = erisimTokeniniCoz(token);
-    if (!erisim) {
-      setHedef("/burger-plus");
-      return;
+    if (erisim) {
+      const slug = String(erisim.isletmeSlug).trim().toLowerCase();
+      adminToken.kaydet(token, slug);
+      sessionStorage.setItem(`${OTURUM}_${slug}`, "admin");
+      setHedef(`/${encodeURIComponent(slug)}/yonetim/genel-bakis`);
     }
-    const slug = String(erisim.isletmeSlug).trim().toLowerCase();
-    adminToken.kaydet(token, slug);
-    sessionStorage.setItem(`${OTURUM}_${slug}`, "admin");
-    setHedef(`/${encodeURIComponent(slug)}/yonetim/genel-bakis`);
+    setKontrolEdildi(true);
   }, [token]);
-  if (!hedef) return <main className="tenant-durum">Erişim doğrulanıyor…</main>;
-  return <Navigate to={hedef} replace />;
+
+  if (!kontrolEdildi) return <main className="tenant-durum">Erişim doğrulanıyor…</main>;
+  if (hedef) return <Navigate to={hedef} replace />;
+  return <GenelGiris />;
 }
 
 function PersonelPaneli() {
@@ -156,9 +165,9 @@ function PersonelPaneli() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<ImpersonationYonlendir />} />
+      <Route path="/" element={<KokEkrani />} />
       <Route path="/:isletmeSlug/*" element={<IsletmeSarici><PersonelPaneli /></IsletmeSarici>} />
-      <Route path="*" element={<Navigate to="/burger-plus" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

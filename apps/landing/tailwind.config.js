@@ -72,13 +72,13 @@ export default {
         base: "4px"
       },
       fontFamily: {
-        "headline-lg": ["Montserrat"],
-        "body-md": ["Plus Jakarta Sans"],
-        "title-md": ["Montserrat"],
-        "display-lg": ["Montserrat"],
-        "headline-lg-mobile": ["Montserrat"],
-        "label-sm": ["Plus Jakarta Sans"],
-        "body-lg": ["Plus Jakarta Sans"]
+        "headline-lg": ["Space Grotesk"],
+        "body-md": ["Inter"],
+        "title-md": ["Space Grotesk"],
+        "display-lg": ["Space Grotesk"],
+        "headline-lg-mobile": ["Space Grotesk"],
+        "label-sm": ["Inter"],
+        "body-lg": ["Inter"]
       },
       fontSize: {
         "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "700" }],
