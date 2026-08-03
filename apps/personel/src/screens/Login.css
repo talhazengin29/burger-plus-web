@@ -95,27 +95,4 @@
 .login-kurulum-btn:disabled { opacity: .45; cursor: not-allowed; }
 .login-2fa-input { text-align:center; font-size:24px; font-weight:800; letter-spacing:.16em; }
 
-/* Rol seçimi */
-.rol-secim {
-  display: flex;
-  gap: 7px;
-  margin-bottom: 22px;
-}
 .login-input--email { margin-bottom: 16px; text-align: left; letter-spacing: 0; font-size: 15px; }
-.rol-btn {
-  flex: 1;
-  padding: 12px 6px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--panel-2) 78%, transparent);
-  border: 1px solid var(--border);
-  color: var(--metin-soluk);
-  font-size: 13px;
-  font-weight: 700;
-  transition: all 0.15s;
-}
-.rol-btn--aktif {
-  background: color-mix(in srgb,var(--primary) 12.5%,transparent);
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--primary) 14.5%,transparent);
-}

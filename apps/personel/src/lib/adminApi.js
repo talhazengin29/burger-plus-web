@@ -62,28 +62,27 @@ export async function isletmeBilgisiniGetir(slug) {
   return { ...veri.isletme, tema: veri.tema };
 }
 
-export async function adminGiris(email, sifre) { return personelGiris(email, sifre, "admin"); }
-
-export async function personelGiris(email, sifre, ekranRolu) {
+// Tek giriş noktası: e-posta+şifre doğrulanır, ekran hesabın backend'deki
+// gerçek rolüne göre otomatik belirlenir (bkz. App.jsx#ROL_EKRANI) — burada
+// "hangi panel" diye bir seçim/karşılaştırma yapılmaz.
+export async function girisYap(email, sifre) {
   const r = await istekAt("/api/giris", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, sifre }) });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
   if (veri.ikiFaktorGerekli) return veri;
-  return personelGirisiniTamamla(veri, ekranRolu);
+  return girisiTamamla(veri);
 }
 
-function personelGirisiniTamamla(veri, ekranRolu) {
-  const izinler = { admin: ["admin"], mutfak: ["mutfak", "admin"], salon: ["salon", "kasiyer", "admin"] };
-  if (!izinler[ekranRolu]?.includes(veri.kullanici?.rol)) throw new Error("Bu hesabın seçilen bölüm için yetkisi yok.");
+function girisiTamamla(veri) {
   adminToken.kaydet(veri.token);
   return veri.kullanici;
 }
 
-export async function personelIkiFaktorGirisiniTamamla(ikiFaktorToken, kod, ekranRolu) {
+export async function personelIkiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
   const r = await istekAt("/api/giris/2fa", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ikiFaktorToken, kod }) });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "Doğrulama kodu geçersiz.");
-  return personelGirisiniTamamla(veri, ekranRolu);
+  return girisiTamamla(veri);
 }
 
 export async function ilkYerelAdminOlustur(email, sifre) {

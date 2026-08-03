@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adminGiris, personelGiris, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import { girisYap, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import { useIsletme } from "../context/IsletmeContext";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
@@ -22,7 +22,6 @@ function PersonelMarkasi() {
 
 export default function Login({ onGirisBasarili }) {
   const { isletme } = useIsletme();
-  const [rol, setRol] = useState("mutfak");
   const [sifre, setSifre] = useState("");
   const [sifreGorunur, setSifreGorunur] = useState(false);
   const [email, setEmail] = useState("");
@@ -33,32 +32,33 @@ export default function Login({ onGirisBasarili }) {
   const [ikiFaktorKodu, setIkiFaktorKodu] = useState("");
 
   useEffect(() => {
-    if (rol !== "admin") return;
     yerelAdminDurumu().then(setAdminKurulumGoster).catch(() => {});
-  }, [rol]);
+  }, []);
 
+  // Tek form: e-posta+şifre doğrulanır, hangi ekranın açılacağı (mutfak/salon/
+  // yönetim) hesabın backend'deki gerçek rolüne göre otomatik belirlenir —
+  // burada "hangi panele giriyorum" diye bir seçim yok.
   const gonder = async (e) => {
     e.preventDefault();
     setYukleniyor(true);
     setHata("");
     try {
+      let kullanici;
       if (ikiFaktorToken) {
-        await personelIkiFaktorGirisiniTamamla(ikiFaktorToken, ikiFaktorKodu, rol);
+        kullanici = await personelIkiFaktorGirisiniTamamla(ikiFaktorToken, ikiFaktorKodu);
       } else {
-        const sonuc = rol === "admin"
-          ? await adminGiris(email, sifre)
-          : await personelGiris(email, sifre, rol);
+        const sonuc = await girisYap(email, sifre);
         if (sonuc?.ikiFaktorGerekli) {
           setIkiFaktorToken(sonuc.ikiFaktorToken);
           setSifre("");
           return;
         }
+        kullanici = sonuc;
       }
-      onGirisBasarili(rol);
+      onGirisBasarili(kullanici.rol);
     } catch (err) {
       setHata(err.message);
       setSifre("");
-      if (rol === "admin") setAdminKurulumGoster(true);
     } finally {
       setYukleniyor(false);
     }
@@ -69,8 +69,8 @@ export default function Login({ onGirisBasarili }) {
     setHata("");
     try {
       await ilkYerelAdminOlustur(email, sifre);
-      await adminGiris(email, sifre);
-      onGirisBasarili("admin");
+      const kullanici = await girisYap(email, sifre);
+      onGirisBasarili(kullanici.rol);
     } catch (err) {
       setHata(err.message);
     } finally {
@@ -109,12 +109,6 @@ export default function Login({ onGirisBasarili }) {
         <h1 className="login-baslik">{isletme.ad}</h1>
         <p className="login-alt">Personel Girişi</p>
 
-        <div className="rol-secim">
-          <button type="button" className={`rol-btn ${rol === "mutfak" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("mutfak"); setHata(""); }}>Mutfak</button>
-          <button type="button" className={`rol-btn ${rol === "salon" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("salon"); setHata(""); }}>Salon</button>
-          <button type="button" className={`rol-btn ${rol === "admin" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("admin"); setHata(""); }}>Yönetim</button>
-        </div>
-
         <label className="login-etiket">E-posta</label>
         <input
           type="email"
@@ -122,19 +116,16 @@ export default function Login({ onGirisBasarili }) {
           value={email}
           onChange={(e) => { setEmail(e.target.value); setHata(""); }}
           autoFocus
-          placeholder={rol === "admin" ? "admin@isletme.com" : "personel@isletme.com"}
+          placeholder="personel@isletme.com"
         />
 
-        <label className="login-etiket">
-          {rol === "mutfak" ? "Mutfak Şifresi" : rol === "salon" ? "Salon Şifresi" : "Yönetici Şifresi"}
-        </label>
+        <label className="login-etiket">Şifre</label>
         <div className="sifre-alani">
           <input
             type={sifreGorunur ? "text" : "password"}
             className="login-input"
             value={sifre}
             onChange={(e) => { setSifre(e.target.value); setHata(""); }}
-            autoFocus={rol !== "admin"}
             placeholder="••••"
           />
           <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
@@ -146,7 +137,7 @@ export default function Login({ onGirisBasarili }) {
         <button type="submit" className="login-btn" disabled={!sifre || !email || yukleniyor}>
           {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}
         </button>
-        {rol === "admin" && adminKurulumGoster && (
+        {adminKurulumGoster && (
           <button type="button" className="login-kurulum-btn" onClick={ilkAdminiKur} disabled={!email || sifre.length < 8 || yukleniyor}>
             İlk yerel yöneticiyi oluştur
           </button>

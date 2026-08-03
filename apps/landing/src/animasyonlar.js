@@ -36,7 +36,6 @@ function baslat() {
   butonMikroEtkilesimleri();
   navKaydirmaEtkileri();
   imlecTakibi();
-  girisKartlari();
   footerGirisi();
   genelBolumGirisi();
 }
@@ -639,51 +638,6 @@ function imlecTakibi() {
     });
   });
   hero.addEventListener("mouseleave", () => { hale.style.opacity = "0"; });
-}
-
-/* ---------- 6. Giris kartlari ---------- */
-function girisKartlari() {
-  const kartlar = Array.from(document.querySelectorAll("#giris a"));
-  if (!kartlar.length) return;
-
-  kartlar.forEach((kart) => {
-    kart.style.opacity = "0";
-    kart.style.transform = "translateY(24px)";
-
-    const ikonKutusu = kart.querySelector(".rounded-full");
-    const ikonSpan = ikonKutusu?.querySelector("span.material-symbols-outlined");
-    if (ikonKutusu) {
-      ikonKutusu.style.position = "relative";
-      ikonKutusu.style.overflow = "hidden";
-      const dolgu = document.createElement("span");
-      dolgu.setAttribute("aria-hidden", "true");
-      dolgu.style.cssText =
-        "position:absolute;inset:0;background:#FF6B00;clip-path:inset(0 100% 0 0);transition:clip-path .45s ease;z-index:0;";
-      ikonKutusu.insertBefore(dolgu, ikonKutusu.firstChild);
-      if (ikonSpan) ikonSpan.style.position = "relative";
-
-      kart.addEventListener("mouseenter", () => {
-        animate(kart, { y: -6 }, { duration: 0.25, ease: "easeOut" });
-        dolgu.style.clipPath = "inset(0 0% 0 0)";
-        if (ikonSpan) animate(ikonSpan, { rotate: [0, -8, 8, 0] }, { duration: 0.5, ease: "easeInOut" });
-      });
-      kart.addEventListener("mouseleave", () => {
-        animate(kart, { y: 0 }, { duration: 0.3, ease: "easeOut" });
-        dolgu.style.clipPath = "inset(0 100% 0 0)";
-      });
-    }
-  });
-
-  const bolum = document.getElementById("giris");
-  if (bolum) {
-    inView(bolum, () => {
-      animate(
-        kartlar,
-        { opacity: [0, 1], y: [24, 0] },
-        { duration: 0.55, delay: stagger(0.1), ease: "easeOut" },
-      );
-    }, { amount: 0.3 });
-  }
 }
 
 /* ---------- 7. Footer ---------- */

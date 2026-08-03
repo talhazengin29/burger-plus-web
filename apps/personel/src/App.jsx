@@ -11,14 +11,16 @@ import { useIsletmeNavigate } from "./hooks/useIsletmeNavigate";
 import "./App.css";
 
 /*
-  Personel uygulaması. İki rol var:
+  Personel uygulaması. Açılacak ekran, giriş yapan hesabın backend'deki
+  gerçek rolüne göre otomatik belirlenir (ROL_EKRANI) — kullanıcı hangi
+  panele gireceğini seçmez:
    - mutfak: siparişleri hazırlar (Kitchen ekranı)
-   - salon: masaları yönetir, hesabı görür, masayı kapatır (Salon ekranı)
-  Giriş şifreye göre rolü belirler. Giriş sonrası iki sekme arası geçilebilir,
-  ama kişi hangi rolle girdiyse ona öncelik verilir.
+   - salon / kasiyer: masaları yönetir, hesabı görür, masayı kapatır (Salon ekranı)
+   - admin: yönetim panelini açar, ayrıca mutfak/salon sekmeleri arasında geçebilir
 */
 
 const OTURUM = "burger-plus-personel";
+const ROL_EKRANI = { admin: "admin", mutfak: "mutfak", salon: "salon", kasiyer: "salon" };
 
 function ImpersonationYonlendir() {
   const [arama] = useSearchParams();
@@ -49,18 +51,18 @@ function PersonelPaneli() {
   const [oturumYukleniyor, setOturumYukleniyor] = useState(true);
 
   useEffect(() => {
-    const kayitli = sessionStorage.getItem(oturumAnahtari);
     let iptal = false;
-    const izinler = { admin: ["admin"], mutfak: ["mutfak", "admin"], salon: ["salon", "kasiyer", "admin"] };
 
     async function oturumuYukle() {
       try {
-        const kullanici = kayitli && adminToken.al() ? await personelOturumunuDogrula() : null;
+        const kullanici = adminToken.al() ? await personelOturumunuDogrula() : null;
         if (iptal) return;
-        if (kullanici && izinler[kayitli]?.includes(kullanici.rol)) {
-          setRol(kayitli);
+        const ekran = kullanici ? ROL_EKRANI[kullanici.rol] : null;
+        if (ekran) {
+          sessionStorage.setItem(oturumAnahtari, ekran);
+          setRol(ekran);
           setImpersonation(kullanici.impersonation || null);
-          setAktifSekme(window.location.pathname.includes("salon") ? "salon" : kayitli === "admin" ? "mutfak" : kayitli);
+          setAktifSekme(window.location.pathname.includes("salon") ? "salon" : ekran === "admin" ? "mutfak" : ekran);
           personelSocketiniBagla();
         } else {
           sessionStorage.removeItem(oturumAnahtari);
@@ -83,12 +85,15 @@ function PersonelPaneli() {
     document.documentElement.setAttribute("data-tema", "koyu");
   }, []);
 
-  const girisBasarili = (girenRol) => {
-    sessionStorage.setItem(oturumAnahtari, girenRol);
-    setRol(girenRol);
-    setAktifSekme(girenRol);
+  // Login.jsx buraya hesabın backend'deki GERÇEK rolünü verir (bir "seçim" değil).
+  const girisBasarili = (gercekRol) => {
+    const ekran = ROL_EKRANI[gercekRol];
+    if (!ekran) return;
+    sessionStorage.setItem(oturumAnahtari, ekran);
+    setRol(ekran);
+    setAktifSekme(ekran);
     personelSocketiniBagla();
-    git(girenRol === "admin" ? "/yonetim/genel-bakis" : `/${girenRol}`);
+    git(ekran === "admin" ? "/yonetim/genel-bakis" : `/${ekran}`);
   };
 
   const cikis = () => {
