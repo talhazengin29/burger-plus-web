@@ -18,8 +18,10 @@
   mix-blend-mode: normal;
 }
 
-/* Orijinal logoyu korur; yalnızca koyu zeminde kaybolan BURGER yazısını açar. */
-.burger-plus-logo > .burger-plus-logo-acik-yazi {
-  clip-path: inset(24% 4% 44% 44%);
-  filter: brightness(0) invert(1);
+/* Login ekranıyla aynı görünüm için tüm ekranlarda (profil, açılış ekranı vb.)
+   logonun tamamına aynı filtre uygulanır. Seçici, tüketen ekranların kendi
+   "filter: none" sıfırlamalarını (ör. .brand-logo, .perde-merkez>img) ezecek
+   kadar spesifik tutulur. */
+.burger-plus-logo > .burger-plus-logo-taban {
+  filter: invert(1) hue-rotate(180deg);
 }
