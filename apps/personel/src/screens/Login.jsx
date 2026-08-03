@@ -1,9 +1,26 @@
 import { useEffect, useState } from "react";
 import { adminGiris, personelGiris, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import { useIsletme } from "../context/IsletmeContext";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
 
+function PersonelMarkasi() {
+  const { isletme, isletmeSlug } = useIsletme();
+  const yukluLogo = isletme.tema?.logoUrl || isletme.logoUrl || "";
+  const logoUrl = yukluLogo || (isletmeSlug === "burger-plus" ? logoFull : "");
+
+  return (
+    <div className="personel-login-ust">
+      {logoUrl
+        ? <img className={`login-logo ${yukluLogo ? "login-logo--yuklu" : ""}`} src={logoUrl} alt={isletme.ad} />
+        : <strong className="login-logo-metin">{isletme.ad}</strong>}
+      <span>EKİP PORTALI</span>
+    </div>
+  );
+}
+
 export default function Login({ onGirisBasarili }) {
+  const { isletme } = useIsletme();
   const [rol, setRol] = useState("mutfak");
   const [sifre, setSifre] = useState("");
   const [sifreGorunur, setSifreGorunur] = useState(false);
@@ -46,22 +63,6 @@ export default function Login({ onGirisBasarili }) {
     }
   };
 
-  if (ikiFaktorToken) {
-    return (
-      <div className="login">
-        <form className="login-kart" onSubmit={gonder}>
-          <div className="personel-login-ust"><img className="login-logo" src={logoFull} alt="Burger Plus" /><span>EKİP PORTALI</span></div>
-          <h1 className="login-baslik">Güvenlik Kodu</h1>
-          <p className="login-alt">Authenticator kodunu veya kurtarma kodunu gir</p>
-          <input className="login-input login-2fa-input" value={ikiFaktorKodu} onChange={(e) => { setIkiFaktorKodu(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 11)); setHata(""); }} autoComplete="one-time-code" inputMode="numeric" placeholder="123456" autoFocus />
-          {hata && <p className="login-hata">{hata}</p>}
-          <button type="submit" className="login-btn" disabled={!ikiFaktorKodu || yukleniyor}>{yukleniyor ? "Doğrulanıyor…" : "Kodu Doğrula"}</button>
-          <button type="button" className="login-kurulum-btn" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>Şifre ekranına dön</button>
-        </form>
-      </div>
-    );
-  }
-
   const ilkAdminiKur = async () => {
     setYukleniyor(true);
     setHata("");
@@ -76,49 +77,53 @@ export default function Login({ onGirisBasarili }) {
     }
   };
 
+  if (ikiFaktorToken) {
+    return (
+      <div className="login">
+        <form className="login-kart" onSubmit={gonder}>
+          <PersonelMarkasi />
+          <h1 className="login-baslik">Güvenlik Kodu</h1>
+          <p className="login-alt">Authenticator kodunu veya kurtarma kodunu gir</p>
+          <input
+            className="login-input login-2fa-input"
+            value={ikiFaktorKodu}
+            onChange={(e) => { setIkiFaktorKodu(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 11)); setHata(""); }}
+            autoComplete="one-time-code"
+            inputMode="numeric"
+            placeholder="123456"
+            autoFocus
+          />
+          {hata && <p className="login-hata">{hata}</p>}
+          <button type="submit" className="login-btn" disabled={!ikiFaktorKodu || yukleniyor}>{yukleniyor ? "Doğrulanıyor…" : "Kodu Doğrula"}</button>
+          <button type="button" className="login-kurulum-btn" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>Şifre ekranına dön</button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="login">
       <form className="login-kart" onSubmit={gonder}>
-        <div className="personel-login-ust"><img className="login-logo" src={logoFull} alt="Burger Plus" /><span>EKİP PORTALI</span></div>
-        <h1 className="login-baslik">Burger Plus</h1>
+        <PersonelMarkasi />
+        <h1 className="login-baslik">{isletme.ad}</h1>
         <p className="login-alt">Personel Girişi</p>
 
-        {/* Rol seçimi */}
         <div className="rol-secim">
-          <button
-            type="button"
-            className={"rol-btn " + (rol === "mutfak" ? "rol-btn--aktif" : "")}
-            onClick={() => { setRol("mutfak"); setHata(""); }}
-          >
-            Mutfak
-          </button>
-          <button
-            type="button"
-            className={"rol-btn " + (rol === "salon" ? "rol-btn--aktif" : "")}
-            onClick={() => { setRol("salon"); setHata(""); }}
-          >
-            Salon
-          </button>
-          <button
-            type="button"
-            className={"rol-btn " + (rol === "admin" ? "rol-btn--aktif" : "")}
-            onClick={() => { setRol("admin"); setHata(""); }}
-          >
-            Yönetim
-          </button>
+          <button type="button" className={`rol-btn ${rol === "mutfak" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("mutfak"); setHata(""); }}>Mutfak</button>
+          <button type="button" className={`rol-btn ${rol === "salon" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("salon"); setHata(""); }}>Salon</button>
+          <button type="button" className={`rol-btn ${rol === "admin" ? "rol-btn--aktif" : ""}`} onClick={() => { setRol("admin"); setHata(""); }}>Yönetim</button>
         </div>
 
-        <>
-            <label className="login-etiket">E-posta</label>
-            <input
-              type="email"
-              className="login-input login-input--email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setHata(""); }}
-              autoFocus
-              placeholder={rol === "admin" ? "admin@burgerplus.com" : "personel@burgerplus.com"}
-            />
-        </>
+        <label className="login-etiket">E-posta</label>
+        <input
+          type="email"
+          className="login-input login-input--email"
+          value={email}
+          onChange={(e) => { setEmail(e.target.value); setHata(""); }}
+          autoFocus
+          placeholder={rol === "admin" ? "admin@isletme.com" : "personel@isletme.com"}
+        />
+
         <label className="login-etiket">
           {rol === "mutfak" ? "Mutfak Şifresi" : rol === "salon" ? "Salon Şifresi" : "Yönetici Şifresi"}
         </label>

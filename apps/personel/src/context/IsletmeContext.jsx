@@ -4,6 +4,11 @@ import { isletmeBilgisiniGetir } from "../lib/adminApi";
 import { socket } from "../lib/socket";
 
 const IsletmeContext = createContext(null);
+const TEMA_DEGISKENLERI = [
+  "--bg", "--panel", "--panel-2", "--panel-3", "--border",
+  "--primary", "--primary-hafif", "--accent", "--accent-glow",
+  "--font-baslik", "--font-govde",
+];
 
 export function IsletmeSarici({ children }) {
   const { isletmeSlug } = useParams();
@@ -27,14 +32,37 @@ export function IsletmeSarici({ children }) {
   }, [isletmeSlug]);
 
   useLayoutEffect(() => {
-    const renkler = durum.isletme?.tema?.renkler;
-    if (!renkler) return;
     const kok = document.documentElement;
-    kok.style.setProperty("--primary", renkler.accent);
-    kok.style.setProperty("--primary-hafif", `color-mix(in srgb, ${renkler.accent} 20%, transparent)`);
-    kok.style.setProperty("--accent", renkler.accent);
-    kok.style.setProperty("--accent-glow", renkler.accentGlow);
-  }, [durum.isletme?.tema]);
+    const isletme = durum.isletme;
+    const renkler = isletme?.tema?.renkler;
+    if (!isletme || !renkler) return undefined;
+
+    const accent = renkler.accent || "#8B5CF6";
+    const bg = renkler.bgPrimary || "#0F1115";
+    const panel = renkler.bgCard || `color-mix(in srgb, ${bg} 88%, white)`;
+    const font = isletme.tema?.font || {};
+    const degiskenler = {
+      "--bg": bg,
+      "--panel": panel,
+      "--panel-2": `color-mix(in srgb, ${bg} 82%, white)`,
+      "--panel-3": `color-mix(in srgb, ${bg} 76%, white)`,
+      "--border": `color-mix(in srgb, ${bg} 68%, white)`,
+      "--primary": accent,
+      "--primary-hafif": `color-mix(in srgb, ${accent} 20%, transparent)`,
+      "--accent": accent,
+      "--accent-glow": renkler.accentGlow || `color-mix(in srgb, ${accent} 40%, transparent)`,
+      "--font-baslik": `"${font.baslik || "Montserrat"}", sans-serif`,
+      "--font-govde": `"${font.govde || "Plus Jakarta Sans"}", sans-serif`,
+    };
+    Object.entries(degiskenler).forEach(([ad, deger]) => kok.style.setProperty(ad, deger));
+    kok.dataset.konsept = isletme.tema?.konsept || "isletme";
+    document.title = `${isletme.ad} · Yönetim`;
+
+    return () => {
+      TEMA_DEGISKENLERI.forEach((ad) => kok.style.removeProperty(ad));
+      delete kok.dataset.konsept;
+    };
+  }, [durum.isletme]);
 
   const isletmeyiGuncelle = useCallback((isletme, tema) => {
     setDurum((onceki) => ({
@@ -49,7 +77,7 @@ export function IsletmeSarici({ children }) {
     tema: durum.isletme?.tema || null,
     isletmeyiGuncelle,
   }), [durum.isletme, isletmeSlug, isletmeyiGuncelle]);
-  if (durum.yukleniyor) return <main className="tenant-durum">İşletme yükleniyor…</main>;
+  if (durum.yukleniyor || (durum.isletme && durum.isletme.slug !== isletmeSlug)) return <main className="tenant-durum">İşletme yükleniyor…</main>;
   if (!durum.isletme) return <main className="tenant-durum"><h1>İşletme bulunamadı</h1><p>{durum.hata}</p></main>;
   return <IsletmeContext.Provider key={durum.isletme.slug} value={deger}>{children}</IsletmeContext.Provider>;
 }

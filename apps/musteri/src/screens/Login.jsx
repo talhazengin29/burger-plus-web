@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -24,11 +24,19 @@ export default function Login() {
   const [yukleniyor, setYukleniyor] = useState(false);
   const [ikiFaktorToken, setIkiFaktorToken] = useState("");
   const [ikiFaktorKodu, setIkiFaktorKodu] = useState("");
+  const girisGecisiRef = useRef(false);
 
   // Zaten giriş yapılmışsa ana sayfaya yönlendir (F5 sonrası oturum korunur)
   useEffect(() => {
-    if (authYuklendi && kullanici && !perdeAktif) git("/anasayfa", { replace: true });
+    if (authYuklendi && kullanici && !perdeAktif && !girisGecisiRef.current) git("/anasayfa", { replace: true });
   }, [authYuklendi, kullanici, perdeAktif, git]);
+
+  const basariliGirisiTamamla = (sonuc) => {
+    girisGecisiRef.current = true;
+    tokeniKaydet(sonuc.token, beniHatirla);
+    perdeIleGit(() => git("/anasayfa", { replace: true }), "normal");
+    girisiTamamla(sonuc.kullanici);
+  };
 
   const gonder = async (e) => {
     e.preventDefault();
@@ -44,9 +52,7 @@ export default function Login() {
         const sonuc = await ikiFaktorGirisiniTamamla(ikiFaktorToken, temizKod);
         if (sonuc.hata) setHata(sonuc.hata);
         else {
-          tokeniKaydet(sonuc.token, beniHatirla);
-          girisiTamamla(sonuc.kullanici);
-          perdeIleGit(() => git("/anasayfa"), "normal");
+          basariliGirisiTamamla(sonuc);
         }
       } catch {
         setHata("Sunucuya ulaşılamadı. Lütfen tekrar dene.");
@@ -73,9 +79,7 @@ export default function Login() {
         setIkiFaktorToken(sonuc.ikiFaktorToken);
         setSifre("");
       } else {
-        tokeniKaydet(sonuc.token, beniHatirla);
-        girisiTamamla(sonuc.kullanici);
-        perdeIleGit(() => git("/anasayfa"), "normal");
+        basariliGirisiTamamla(sonuc);
       }
     } catch {
       setHata("Sunucuya ulaşılamadı. Backend çalışıyor mu?");

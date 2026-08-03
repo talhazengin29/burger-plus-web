@@ -62,6 +62,7 @@ export function TemaSaglayici({ tema, isletme, children }) {
     ...aktifTema,
     logoUrl: aktifTema.logoUrl || isletme.logoUrl || null,
     isletmeAdi: isletme.ad,
+    isletmeSlug: isletme.slug,
   }), [aktifTema, isletme]);
 
   return <TemaContext.Provider value={deger}>{children}</TemaContext.Provider>;

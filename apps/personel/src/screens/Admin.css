@@ -2,7 +2,8 @@
 .admin-sidebar { width: 248px; position: fixed; inset: 0 auto 0 0; background: color-mix(in srgb, var(--panel) 94%, transparent); border-right: 1px solid var(--border); padding: 22px 16px; display: flex; flex-direction: column; z-index: 30; }
 .admin-marka { display: flex; align-items: flex-start; flex-direction: column; gap: 5px; font-size: 16px; font-weight: 800; padding: 0 8px 24px; }
 .admin-marka > img { width: 174px; height: 61px; display: block; object-fit: contain; object-position: left center; filter: invert(1) hue-rotate(180deg); }
-.admin-marka > img.admin-marka-logo-yuklu { filter: none; mix-blend-mode: screen; }
+.admin-marka > img.admin-marka-logo-yuklu { filter: none; }
+.admin-marka-metin { max-width: 100%; color: var(--metin); font-family: var(--font-baslik, inherit); font-size: 21px; font-weight: 850; line-height: 1.08; overflow-wrap: anywhere; }
 .admin-marka small { color: var(--metin-soluk); font-weight: 500; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
 .admin-sidebar nav { display: flex; flex-direction: column; gap: 6px; }
 .admin-sidebar nav button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 13px; border-radius: 10px; color: var(--metin-soluk); text-align: left; font-weight: 650; transition: .18s; }

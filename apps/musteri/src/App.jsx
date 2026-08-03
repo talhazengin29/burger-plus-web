@@ -22,7 +22,6 @@ import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { IsletmeSarici } from "./context/IsletmeContext";
 import { useIsletme } from "./context/IsletmeContext";
-import { PerdeSaglayici } from "./hooks/usePerde";
 import "./App.css";
 
 const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil", "/hediyelerim"];
@@ -55,11 +54,10 @@ function TelefonYerlesimi() {
 export default function App() {
   return (
     <BrowserRouter>
-      <PerdeSaglayici>
-        <Routes>
-          <Route path="/" element={<IsletmeSecim />} />
-          <Route path="/:isletmeSlug" element={<IsletmeSarici />}>
-            <Route element={<TelefonYerlesimi />}>
+      <Routes>
+        <Route path="/" element={<IsletmeSecim />} />
+        <Route path="/:isletmeSlug" element={<IsletmeSarici />}>
+          <Route element={<TelefonYerlesimi />}>
               <Route index element={<Login />} />
               <Route path="kayit" element={<Kayit />} />
               <Route path="sifremi-unuttum" element={<SifremiUnuttum />} />
@@ -79,11 +77,10 @@ export default function App() {
               <Route path="siparislerim" element={<Korumali><Orders /></Korumali>} />
               <Route path="urun/:id" element={<Korumali><UrunDetay /></Korumali>} />
               <Route path="qr-uret" element={<AdminKorumali><QrGenerator /></AdminKorumali>} />
-            </Route>
           </Route>
-          <Route path="*" element={<IsletmeSecim />} />
-        </Routes>
-      </PerdeSaglayici>
+        </Route>
+        <Route path="*" element={<IsletmeSecim />} />
+      </Routes>
     </BrowserRouter>
   );
 }

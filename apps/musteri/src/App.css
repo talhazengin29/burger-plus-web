@@ -53,7 +53,7 @@
   gap: 12px;
   padding: 24px;
   text-align: center;
-  background: var(--bg-page, #111);
+  background: var(--isletme-yukleme-bg, #0d0f14);
   color: #fff;
 }
 
@@ -71,6 +71,18 @@
   max-height: 96px;
   object-fit: contain;
   filter: invert(1) hue-rotate(180deg);
+}
+
+.isletme-splash-logo--yuklu { filter: none; }
+.isletme-splash-ad {
+  max-width: min(360px, 82vw);
+  color: #fff;
+  font-size: clamp(28px, 7vw, 48px);
+  font-weight: 850;
+  line-height: 1.05;
+}
+.isletme-durum .isletme-spinner {
+  border-top-color: var(--isletme-yukleme-accent, #8b5cf6);
 }
 
 @keyframes isletme-don { to { transform: rotate(360deg); } }

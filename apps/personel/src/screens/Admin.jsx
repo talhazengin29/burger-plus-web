@@ -437,7 +437,12 @@ export default function Admin({ onCikis }) {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-marka"><img className={isletme.logoUrl ? "admin-marka-logo-yuklu" : ""} src={isletme.logoUrl || logoFull} alt={isletme.ad} /><small>{isletme.ad} · Yönetim Merkezi</small></div>
+        <div className="admin-marka">
+          {(isletme.tema?.logoUrl || isletme.logoUrl) && <img className="admin-marka-logo-yuklu" src={isletme.tema?.logoUrl || isletme.logoUrl} alt={isletme.ad} />}
+          {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug === "burger-plus" && <img src={logoFull} alt={isletme.ad} />}
+          {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug !== "burger-plus" && <strong className="admin-marka-metin">{isletme.ad}</strong>}
+          <small>{isletme.ad} · Yönetim Merkezi</small>
+        </div>
         <nav aria-label="Yönetim bölümleri">
           <button type="button" className={`admin-nav-ana ${bolum === "genel" ? "aktif" : ""}`} onClick={() => git("/yonetim/genel-bakis")}><b>▦</b><span>Genel Bakış</span></button>
           {MENU_GRUPLARI.map((grup) => {
