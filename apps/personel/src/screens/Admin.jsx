@@ -80,16 +80,23 @@ const gramajVarsayilani = (urun) => {
 };
 
 const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], menuYapisi: { ...BOS_MENU } });
-const urunuFormaCevir = (urun) => ({
-  ...urun,
-  populer: urun.populer === true,
-  onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
-  malzemeler: (urun.malzemeler || []).join(", "),
-  alerjenler: (urun.alerjenler || []).join(", "),
-  gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
-  boyutSecenekleri: (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut })),
-  menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
-});
+const urunuFormaCevir = (urun) => {
+  const kayitliBoyutlar = (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut }));
+  return {
+    ...urun,
+    populer: urun.populer === true,
+    onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
+    malzemeler: (urun.malzemeler || []).join(", "),
+    alerjenler: (urun.alerjenler || []).join(", "),
+    gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
+    // Kurulum sihirbazıyla eklenen eski ürünlerde boyut_secenekleri boş kalabiliyor;
+    // boş geldiğinde düzenlenebilir bir varsayılan set sunuyoruz, yoksa kayıt asla geçemez.
+    boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urun.urunTipi) && !kayitliBoyutlar.length
+      ? BOS_BOYUTLAR(urun.urunTipi === "icecek" ? "ml" : "gr")
+      : kayitliBoyutlar,
+    menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
+  };
+};
 
 export default function Admin({ onCikis }) {
   const konum = useLocation();
