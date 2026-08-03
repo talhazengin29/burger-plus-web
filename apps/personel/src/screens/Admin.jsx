@@ -314,19 +314,22 @@ export default function Admin({ onCikis }) {
     })),
   }));
 
-  const urunGorseliSec = async (dosya) => {
+  const gorselSecici = (setForm) => async (dosya) => {
     if (!dosya) return;
     setGorselYukleniyor(true);
     setHata("");
     try {
       const { gorsel } = await gorselYukle(dosya);
-      setUrunForm((onceki) => onceki ? { ...onceki, gorsel } : onceki);
+      setForm((onceki) => onceki ? { ...onceki, gorsel } : onceki);
     } catch (err) {
       setHata(err.message);
     } finally {
       setGorselYukleniyor(false);
     }
   };
+  const urunGorseliSec = gorselSecici(setUrunForm);
+  const kategoriGorseliSec = gorselSecici(setKategoriForm);
+  const kampanyaGorseliSec = gorselSecici(setKampanyaForm);
 
   const gramajGuncelle = (alan, deger) => setUrunForm((onceki) => ({
     ...onceki,
@@ -801,7 +804,8 @@ export default function Admin({ onCikis }) {
               <div><small>UYGULAMA ÖNİZLEMESİ</small><strong>{kategoriForm.ad || "Kategori adı"}</strong><p>Ana sayfadaki kategori satırında bu şekilde görünür.</p></div>
             </div>
             <Alan etiket="Kategori adı"><input required minLength="2" maxLength="60" value={kategoriForm.ad} onChange={(e) => setKategoriForm({ ...kategoriForm, ad: e.target.value })} placeholder="Örn. Tatlılar" /></Alan>
-            <Alan etiket="Kategori görsel URL"><input required type="url" maxLength="1000" value={kategoriForm.gorsel || ""} onChange={(e) => setKategoriForm({ ...kategoriForm, gorsel: e.target.value })} placeholder="https://..." /></Alan>
+            <Alan etiket="Kategori görseli (en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input type="file" accept="image/*" onChange={(e) => kategoriGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : kategoriForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{kategoriForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
+            <Alan etiket="veya görsel URL'si yapıştır"><input required type="url" maxLength="1000" value={kategoriForm.gorsel || ""} onChange={(e) => setKategoriForm({ ...kategoriForm, gorsel: e.target.value })} placeholder="https://..." /></Alan>
             <Alan etiket="Menü sırası"><input required type="number" min="0" max="999" step="1" value={kategoriForm.sira} onChange={(e) => setKategoriForm({ ...kategoriForm, sira: e.target.value })} /></Alan>
             <FormAlt kapat={() => setKategoriForm(null)} />
           </form>
@@ -816,7 +820,8 @@ export default function Admin({ onCikis }) {
             </section>
             <Ikili><Alan etiket="Kısa etiket"><input required maxLength="80" value={kampanyaForm.etiket} onChange={(e) => setKampanyaForm({ ...kampanyaForm, etiket: e.target.value })} placeholder="Örn. HAFTA SONU" /></Alan><Alan etiket="Kampanya başlığı"><input required maxLength="120" value={kampanyaForm.baslik} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslik: e.target.value })} /></Alan></Ikili>
             <Alan etiket="Açıklama"><textarea required maxLength="600" value={kampanyaForm.aciklama} onChange={(e) => setKampanyaForm({ ...kampanyaForm, aciklama: e.target.value })} /></Alan>
-            <Alan etiket="Kampanya görsel URL"><input type="url" maxLength="1000" value={kampanyaForm.gorsel || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, gorsel: e.target.value })} placeholder="https://... (isteğe bağlı)" /></Alan>
+            <Alan etiket="Kampanya görseli (isteğe bağlı, en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input type="file" accept="image/*" onChange={(e) => kampanyaGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : kampanyaForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{kampanyaForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
+            <Alan etiket="veya görsel URL'si yapıştır"><input type="url" maxLength="1000" value={kampanyaForm.gorsel || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, gorsel: e.target.value })} placeholder="https://... (isteğe bağlı)" /></Alan>
             <Ikili><Alan etiket="Kampanya türü"><select value={kampanyaForm.kampanyaTipi} onChange={(e) => setKampanyaForm({ ...kampanyaForm, kampanyaTipi: e.target.value })}><option value="surekli">Sürekli</option><option value="saatli">Saat aralığı</option></select></Alan><Alan etiket="İndirim oranı (%)"><input required type="number" min="0" max="90" step="1" value={kampanyaForm.indirimYuzde} onChange={(e) => setKampanyaForm({ ...kampanyaForm, indirimYuzde: e.target.value })} /></Alan></Ikili>
             {kampanyaForm.kampanyaTipi === "saatli" && <Ikili><Alan etiket="Başlangıç saati"><input required type="number" min="0" max="23" step="1" value={kampanyaForm.baslangicSaat} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslangicSaat: e.target.value })} /></Alan><Alan etiket="Bitiş saati"><input required type="number" min="1" max="24" step="1" value={kampanyaForm.bitisSaat} onChange={(e) => setKampanyaForm({ ...kampanyaForm, bitisSaat: e.target.value })} /></Alan></Ikili>}
             <fieldset className="kampanya-kategori-secimi"><legend>İndirimin geçerli olduğu kategoriler</legend><p>İndirim oranı sıfırdan büyükse en az bir kategori seçin.</p><div>{kategoriler.filter((kategori) => kategori.aktif !== false).map((kategori) => <label key={kategori.id}><input type="checkbox" checked={(kampanyaForm.gecerliKategoriler || []).includes(kategori.ad)} onChange={() => kampanyaKategoriDegistir(kategori.ad)} /><span>{kategori.ad}</span></label>)}</div></fieldset>
