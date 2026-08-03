@@ -1,0 +1,19 @@
+<!-- ==========================================================================
+     Sık sorulan sorular — açılır/kapanır akordiyon (arayuz.js yönetir).
+     Erişilebilirlik: her soru <button aria-expanded/aria-controls>, her cevap
+     role="region" + aria-labelledby ile eşleştirilmiştir.
+     ========================================================================== -->
+<section class="relative px-6 py-20 md:py-24" id="sss">
+  <div class="mx-auto max-w-3xl">
+    <div class="bolum-basligi mb-14 text-center">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">{{ sssEtiket }}</p>
+      <h2 class="font-baslik text-3xl font-bold md:text-5xl">
+        {{ sssBaslik }} <span class="metin-gradyan">{{ sssVurgu }}</span>
+      </h2>
+    </div>
+
+    <div class="flex flex-col" id="sss-listesi">
+      {{ sorularHtml }}
+    </div>
+  </div>
+</section>

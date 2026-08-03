@@ -1,0 +1,28 @@
+<!-- ==========================================================================
+     Kapanış çağrısı.
+     Butonlar gerçek uygulamalara gider: personel/yönetim girişi ve
+     müşteri uygulamasının varsayılan işletmesi.
+     ========================================================================== -->
+<section class="relative px-6 py-20 md:py-24" id="basla">
+  <div class="mx-auto max-w-5xl">
+    <div class="relative overflow-hidden rounded-3xl border border-marka-cizgi bg-marka-kart p-8 text-center md:p-12">
+      <div class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-marka-turuncu-500/20 blur-[80px]"></div>
+      <div class="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-marka-turuncu-500/20 blur-[80px]"></div>
+
+      <h2 class="relative z-10 mb-6 font-baslik text-3xl font-bold md:text-5xl">
+        {{ ctaBaslik }} <span class="metin-gradyan">{{ ctaVurgu }}</span>
+      </h2>
+      <p class="relative z-10 mx-auto mb-8 max-w-xl text-sm leading-relaxed text-marka-gri-300 md:text-base">
+        {{ ctaAciklama }}
+      </p>
+      <div class="relative z-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a class="marka-buton inline-block rounded-full px-8 py-4 font-medium" href="{{ ROTALAR.personelGiris }}">
+          {{ ctaBirincilButon }}
+        </a>
+        <a class="inline-block rounded-full border border-marka-cizgi px-8 py-4 font-medium text-white transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="{{ ROTALAR.musteriDemo }}">
+          {{ ctaIkincilButon }}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

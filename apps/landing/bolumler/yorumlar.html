@@ -1,0 +1,19 @@
+<!-- ==========================================================================
+     Referanslar.
+     DİKKAT: Metinler temsilidir (bkz. src/icerik.js → YORUMLAR / TODO).
+     Gerçek müşteri referansı alındığında içerik dosyası güncellenmelidir.
+     ========================================================================== -->
+<section class="relative px-6 py-20 md:py-24" id="yorumlar">
+  <div class="mx-auto max-w-6xl">
+    <div class="bolum-basligi mb-14 text-center">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">{{ yorumlarEtiket }}</p>
+      <h2 class="font-baslik text-3xl font-bold md:text-5xl">
+        {{ yorumlarBaslik }}<br/><span class="metin-gradyan">{{ yorumlarVurgu }}</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {{ yorumKartlariHtml }}
+    </div>
+  </div>
+</section>

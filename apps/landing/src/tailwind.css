@@ -2,10 +2,196 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tasarım (Stitch) masaüstü genişliğinde %100 yakınlaştırmada gereğinden
-   büyük görünüyordu; masaüstünde tüm sayfayı ~%80 ölçeğe indiriyoruz. */
-@media (min-width: 1024px) {
-  html {
-    zoom: 0.8;
+/* ==========================================================================
+   Tanıtım sayfası tema değişkenleri.
+   Tasarımdaki (Stitch) sabit renk/efekt değerleri buraya toplandı; bölüm
+   dosyaları bunları doğrudan değil, aşağıdaki yeniden kullanılabilir
+   sınıflar üzerinden kullanır. Renkler ayrıca tailwind.config.js içinde
+   "marka-*" tokenları olarak da tanımlıdır.
+   ========================================================================== */
+@layer base {
+  :root {
+    --marka-zemin: #0f1015;
+    --marka-kart: #1a1b22;
+    --marka-cizgi: #2a2b32;
+    --marka-turuncu-400: #ff8a3d;
+    --marka-turuncu-500: #ff6b00;
+    --marka-turuncu-600: #e65c00;
+    --marka-gri-300: #a1a1aa;
+    --marka-gri-400: #71717a;
+
+    /* Efektler */
+    --cam-zemin: rgba(26, 27, 34, 0.7);
+    --cam-bulanik: 12px;
+    --cam-kenar: rgba(255, 255, 255, 0.05);
+    --izgara-cizgi: rgba(255, 255, 255, 0.02);
+    --izgara-adim: 40px;
+    --turuncu-parilti: 0 0 40px rgba(255, 107, 0, 0.4);
+    --ust-bar-yuksekligi: 4.5rem;
   }
+
+  html {
+    scroll-behavior: smooth;
+    /* Dekoratif katmanlar hiçbir koşulda yatay kaydırma açmasın.
+       "clip", "hidden"in aksine position:fixed öğeleri bozmaz. */
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--marka-zemin);
+    color: #ffffff;
+    font-family: theme("fontFamily.govde");
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: theme("fontFamily.baslik");
+  }
+
+  /* Sabit üst bar, bölüm başlıklarını kapatmasın. */
+  section[id],
+  header[id] {
+    scroll-margin-top: calc(var(--ust-bar-yuksekligi) + 1.5rem);
+  }
+
+  /* Klavye ile gezinmede odak her zaman görünür olsun. */
+  :focus-visible {
+    outline: 2px solid var(--marka-turuncu-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--marka-zemin);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--marka-cizgi);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--marka-turuncu-500);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Yeniden kullanılabilir bileşen sınıfları
+   ========================================================================== */
+@layer components {
+  /* Cam (glassmorphism) yüzey — üst bar, kartlar, rozetler. */
+  .cam-panel {
+    background: var(--cam-zemin);
+    backdrop-filter: blur(var(--cam-bulanik));
+    -webkit-backdrop-filter: blur(var(--cam-bulanik));
+    border: 1px solid var(--cam-kenar);
+  }
+
+  /* İnce ızgara arka planı (sayfanın en altındaki katman). */
+  .zemin-izgara {
+    background-size: var(--izgara-adim) var(--izgara-adim);
+    background-image:
+      linear-gradient(to right, var(--izgara-cizgi) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--izgara-cizgi) 1px, transparent 1px);
+  }
+
+  /* Turuncu ortam ışıkları (ambient glow). */
+  .hale {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(100px);
+    opacity: 0.5;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0) 70%);
+  }
+  .hale--ust-sol {
+    top: -10%;
+    left: -10%;
+    width: 40vw;
+    height: 40vw;
+  }
+  .hale--ust-sag {
+    top: 20%;
+    right: -5%;
+    width: 30vw;
+    height: 30vw;
+  }
+  .hale--orta {
+    top: 50%;
+    left: 30%;
+    width: 40vw;
+    height: 40vw;
+    background: radial-gradient(circle, rgba(255, 107, 0, 0.1) 0%, rgba(255, 107, 0, 0) 70%);
+  }
+  .hale--alt {
+    bottom: -10%;
+    right: 10%;
+    width: 50vw;
+    height: 50vw;
+  }
+
+  /* Başlıklardaki turuncu-beyaz akan gradyan. */
+  .metin-gradyan {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(90deg, var(--marka-turuncu-400), #ffffff, var(--marka-turuncu-500));
+    background-size: 200% auto;
+    animation: marka-akis 4s linear infinite;
+  }
+
+  /* Turuncu gradyanlı birincil buton. */
+  .marka-buton {
+    background-image: linear-gradient(to right, var(--marka-turuncu-400), var(--marka-turuncu-500));
+    box-shadow: var(--turuncu-parilti);
+    color: #ffffff;
+    transition:
+      background-image 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .marka-buton:hover {
+    background-image: linear-gradient(to right, var(--marka-turuncu-500), var(--marka-turuncu-600));
+  }
+
+  /* Sadece parıltı gerektiğinde. */
+  .parlak-turuncu {
+    box-shadow: var(--turuncu-parilti);
+  }
+}
+
+@keyframes marka-akis {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* SSS akordiyonu: açık öğede + ikonu × konumuna döner. */
+.sss-dugme[aria-expanded="true"] .sss-ikon {
+  transform: rotate(135deg);
 }

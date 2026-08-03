@@ -2,11 +2,29 @@ import forms from "@tailwindcss/forms";
 import containerQueries from "@tailwindcss/container-queries";
 
 export default {
-  content: ["./index.html"],
+  // Yerleşim artık bolumler/*.html parçalarına bölündü, tekrarlayan kartların
+  // sınıfları ise src/icerik.js içindeki şablon metinlerinde geçiyor.
+  content: ["./index.html", "./bolumler/**/*.html", "./src/**/*.js"],
   darkMode: "class",
   theme: {
     extend: {
       colors: {
+        // --- Tanıtım sayfası marka paleti (Stitch tasarımından) --------------
+        // Not: aşağıdaki M3 tokenları geriye dönük uyumluluk için korunuyor.
+        marka: {
+          zemin: "#0f1015",
+          kart: "#1a1b22",
+          cizgi: "#2a2b32",
+          turuncu: {
+            400: "#ff8a3d",
+            500: "#ff6b00",
+            600: "#e65c00",
+          },
+          gri: {
+            300: "#a1a1aa",
+            400: "#71717a",
+          },
+        },
         "inverse-on-surface": "#313030",
         surface: "#131313",
         "on-secondary-fixed-variant": "#454747",
@@ -72,6 +90,9 @@ export default {
         base: "4px"
       },
       fontFamily: {
+        // Tanıtım sayfası tipografisi: başlıklar Outfit, gövde Inter.
+        baslik: ["Outfit", "system-ui", "sans-serif"],
+        govde: ["Inter", "system-ui", "sans-serif"],
         "headline-lg": ["Space Grotesk"],
         "body-md": ["Inter"],
         "title-md": ["Space Grotesk"],

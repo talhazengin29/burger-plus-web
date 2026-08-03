@@ -1,0 +1,24 @@
+<!-- ==========================================================================
+     Hero — ana başlık ve birincil çağrı butonları.
+     ========================================================================== -->
+<section class="relative px-6 pb-16 pt-32 md:pt-40" id="ust">
+  <div class="mx-auto max-w-4xl text-center">
+    <h1 class="hero-baslik mb-6 text-balance font-baslik text-[2rem] font-bold leading-tight tracking-tight sm:text-5xl md:text-7xl">
+      {{ heroBaslikBir }} <span class="metin-gradyan">{{ heroVurguBir }}</span>,<br/>
+      {{ heroBaslikIki }} <span class="metin-gradyan">{{ heroVurguIki }}</span>.
+    </h1>
+
+    <p class="hero-aciklama mx-auto mb-10 max-w-2xl text-base leading-relaxed text-marka-gri-300 md:text-lg">
+      {{ heroAciklama }}
+    </p>
+
+    <div class="hero-butonlar flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <a class="marka-buton inline-block rounded-full px-8 py-4 text-base font-medium" href="#fiyatlandirma">
+        {{ heroBirincilButon }}
+      </a>
+      <a class="inline-block rounded-full border border-marka-cizgi px-8 py-4 text-base font-medium text-white transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="#ozellikler">
+        {{ heroIkincilButon }}
+      </a>
+    </div>
+  </div>
+</section>

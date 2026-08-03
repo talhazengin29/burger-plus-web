@@ -1,0 +1,52 @@
+<!-- ==========================================================================
+     Üst bar / navigasyon.
+     Masaüstünde yatay menü, mobilde açılır panel (arayuz.js yönetir).
+     ========================================================================== -->
+<header class="cam-panel fixed inset-x-0 top-0 z-50 border-x-0 border-t-0 border-b border-white/5">
+  <div class="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-6">
+    <a class="group flex items-center gap-2" href="#ust" aria-label="{{ markaAdi }} — sayfa başına dön">
+      <svg class="h-8 w-8 text-white transition-transform group-hover:scale-110" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" x2="12" y1="22.08" y2="12"/>
+      </svg>
+      <span class="font-baslik text-xl font-bold tracking-tight">{{ markaAdi }}</span>
+    </a>
+
+    <nav class="hidden items-center gap-8 md:flex" aria-label="Ana menü">
+      {{ navBaglantilariHtml }}
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a class="marka-buton hidden rounded-full px-6 py-2.5 text-sm font-medium md:inline-block" href="{{ ROTALAR.personelGiris }}">
+        Giriş
+      </a>
+
+      <button
+        class="flex h-10 w-10 items-center justify-center rounded-lg border border-marka-cizgi text-white transition-colors hover:bg-white/5 md:hidden"
+        id="mobil-menu-dugmesi"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobil-menu"
+        aria-label="Menüyü aç"
+      >
+        <svg class="mobil-menu-ikon-ac h-6 w-6" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg class="mobil-menu-ikon-kapat hidden h-6 w-6" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobil menü paneli -->
+  <div class="border-t border-white/5 bg-marka-zemin/95 px-6 pb-6 pt-2 backdrop-blur-md md:hidden" id="mobil-menu" hidden>
+    <nav class="flex flex-col gap-1" aria-label="Mobil menü">
+      {{ mobilNavBaglantilariHtml }}
+      <a class="marka-buton mt-3 rounded-full px-6 py-3 text-center text-sm font-medium" href="{{ ROTALAR.personelGiris }}">
+        Giriş
+      </a>
+    </nav>
+  </div>
+</header>

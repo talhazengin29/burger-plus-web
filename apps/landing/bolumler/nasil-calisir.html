@@ -1,0 +1,17 @@
+<!-- ==========================================================================
+     Nasıl çalışır — 3 adımlık kurulum akışı.
+     ========================================================================== -->
+<section class="relative bg-black/20 px-6 py-20 md:py-24" id="nasil-calisir">
+  <div class="mx-auto max-w-6xl">
+    <div class="bolum-basligi mb-14 text-center">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">{{ adimlarEtiket }}</p>
+      <h2 class="font-baslik text-3xl font-bold md:text-5xl">
+        {{ adimlarBaslik }} <span class="metin-gradyan">{{ adimlarVurgu }}</span>
+      </h2>
+    </div>
+
+    <ol class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {{ adimKartlariHtml }}
+    </ol>
+  </div>
+</section>

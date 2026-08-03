@@ -1,0 +1,20 @@
+<!-- ==========================================================================
+     Özellikler — projede gerçekten çalışan yetenekler.
+     ========================================================================== -->
+<section class="relative px-6 py-20 md:py-24" id="ozellikler">
+  <div class="mx-auto max-w-6xl">
+    <div class="bolum-basligi mb-14 text-center">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">{{ ozelliklerEtiket }}</p>
+      <h2 class="font-baslik text-3xl font-bold md:text-5xl">
+        {{ ozelliklerBaslik }}<br/><span class="metin-gradyan">{{ ozelliklerVurgu }}</span>
+      </h2>
+      <p class="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-marka-gri-300 md:text-base">
+        {{ ozelliklerAciklama }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{ ozellikKartlariHtml }}
+    </div>
+  </div>
+</section>
