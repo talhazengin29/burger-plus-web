@@ -6,7 +6,7 @@ function csvIndir(satirlar) {
   const kacis = (d) => `"${String(d ?? "").replace(/"/g, '""')}"`;
   const icerik = [["İşletme", "Ciro", "Sipariş", "Ortalama Sepet", "Yeni Kullanıcı"], ...satirlar.map((s) => [s.ad, s.ciro, s.siparis, s.ortalamaSepet, s.yeniKullanici])].map((s) => s.map(kacis).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob(["\uFEFF", icerik], { type: "text/csv;charset=utf-8" }));
-  const link = document.createElement("a"); link.href = url; link.download = `burger-plus-platform-raporu-${new Date().toISOString().slice(0, 10)}.csv`; link.click(); URL.revokeObjectURL(url);
+  const link = document.createElement("a"); link.href = url; link.download = `platform-raporu-${new Date().toISOString().slice(0, 10)}.csv`; link.click(); URL.revokeObjectURL(url);
 }
 
 export default function Raporlar() {

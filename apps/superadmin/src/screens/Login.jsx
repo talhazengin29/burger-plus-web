@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { superGiris, superIkiFaktor, superToken } from "../lib/superApi";
 import { Hata } from "../components/Ui";
-import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
+import PlatformAmblemi from "../components/PlatformAmblemi";
 
 function GozIkonu({ kapali }) {
   return kapali ? (
@@ -48,11 +48,11 @@ export default function Login({ onGiris }) {
       <section className="super-login-kabuk">
         <aside className="super-login-tanitim">
           <div className="super-login-marka">
-            <BurgerPlusLogosu className="super-login-logo" alt="Burger Plus" />
-            <span>MERKEZİ YÖNETİM</span>
+            <PlatformAmblemi className="super-login-logo" />
+            <span>SUPER ADMIN</span>
           </div>
           <div className="super-login-tanitim-metin">
-            <small>BURGER PLUS PLATFORM</small>
+            <small>MERKEZİ YÖNETİM PLATFORMU</small>
             <h1>Tüm işletmeler,<br /><em>tek merkezden.</em></h1>
             <p>İşletmeleri, abonelikleri, platform gelirini ve operasyon güvenliğini tek bir kontrol merkezinden yönetin.</p>
           </div>
@@ -108,7 +108,7 @@ export default function Login({ onGiris }) {
               <>
                 <label>
                   <span>E-posta adresi</span>
-                  <input type="email" autoComplete="username" required maxLength="254" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="yonetici@burgerplus.com" />
+                  <input type="email" autoComplete="username" required maxLength="254" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="yonetici@platform.com" />
                 </label>
                 <label>
                   <span>Şifre</span>

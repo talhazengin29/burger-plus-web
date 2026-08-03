@@ -24,7 +24,7 @@ body {
   overflow: hidden;
   padding: 34px;
   background:
-    radial-gradient(900px 600px at 15% 10%, rgba(255, 107, 0, 0.11), transparent 62%),
+    radial-gradient(900px 600px at 15% 10%, rgba(45, 212, 191, 0.09), transparent 62%),
     radial-gradient(850px 620px at 95% 90%, rgba(109, 93, 252, 0.17), transparent 60%),
     linear-gradient(145deg, #080a11, #0c0f19 55%, #090b13);
 }
@@ -38,7 +38,7 @@ body {
   filter: blur(100px);
   pointer-events: none;
 }
-.super-login-isik--bir { top: -180px; left: -120px; background: rgba(255, 107, 0, 0.18); }
+.super-login-isik--bir { top: -180px; left: -120px; background: rgba(45, 212, 191, 0.14); }
 .super-login-isik--iki { right: -160px; bottom: -190px; background: rgba(109, 93, 252, 0.22); }
 
 .super-login > section.super-login-kabuk {
@@ -62,7 +62,7 @@ body {
   overflow: hidden;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    linear-gradient(155deg, rgba(255, 107, 0, 0.08), transparent 34%),
+    linear-gradient(155deg, rgba(45, 212, 191, 0.07), transparent 34%),
     radial-gradient(480px 360px at 80% 72%, rgba(109, 93, 252, 0.16), transparent 68%),
     #0d1019;
 }
@@ -77,13 +77,16 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 0 36px rgba(147, 136, 255, 0.025), 0 0 0 72px rgba(147, 136, 255, 0.018);
 }
-.super-login-marka { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.super-login-marka .super-login-logo { width: 205px; height: 82px; }
-.super-login-marka span { color: #ff8a3d; font-size: 9px; font-weight: 850; letter-spacing: .2em; }
+.platform-amblem { display: grid; place-items: center; border: 1px solid rgba(147,136,255,.3); border-radius: 14px; background: linear-gradient(145deg, rgba(109,93,252,.22), rgba(45,212,191,.07)); color: #aaa2ff; box-shadow: inset 0 1px rgba(255,255,255,.08), 0 12px 28px rgba(31,28,74,.22); }
+.platform-amblem svg { width: 68%; height: 68%; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.platform-amblem svg circle { fill: rgba(147,136,255,.16); }
+.super-login-marka { position: relative; z-index: 1; display: flex; align-items: center; gap: 13px; }
+.super-login-marka .super-login-logo { width: 58px; height: 58px; }
+.super-login-marka span { color: #aaa2ff; font-size: 9px; font-weight: 850; letter-spacing: .2em; }
 .super-login-tanitim-metin { position: relative; z-index: 1; margin-top: 74px; }
 .super-login-tanitim-metin > small { color: var(--accent-2); font-size: 9px; font-weight: 850; letter-spacing: .2em; }
 .super-login-tanitim-metin h1 { margin: 13px 0 18px; font-size: clamp(35px, 4vw, 50px); line-height: 1.06; letter-spacing: -.045em; }
-.super-login-tanitim-metin h1 em { color: #ff7822; font-style: normal; }
+.super-login-tanitim-metin h1 em { color: #9388ff; font-style: normal; }
 .super-login-tanitim-metin p { max-width: 410px; color: #a2a8ba; font-size: 12px; line-height: 1.75; }
 .super-login-guvenlik-listesi { position: relative; z-index: 1; display: grid; gap: 13px; margin-top: 34px; list-style: none; }
 .super-login-guvenlik-listesi li { display: flex; align-items: center; gap: 11px; }
@@ -140,9 +143,9 @@ body {
 .platform { min-height: 100vh; background: radial-gradient(700px 430px at 88% 0%, rgba(109, 93, 252, .08), transparent 64%), var(--bg); }
 .platform > aside.platform-sidebar { width: 272px; border-right: 1px solid rgba(255,255,255,.08); background: rgba(13, 16, 25, .96); box-shadow: 18px 0 50px rgba(0,0,0,.12); backdrop-filter: blur(24px); }
 .platform-marka { min-height: 98px; gap: 13px; padding: 20px 22px; border-bottom-color: rgba(255,255,255,.07); }
-.platform-marka > .platform-logo { width: 112px; height: 45px; }
+.platform-marka > .platform-logo { width: 44px; height: 44px; flex: none; }
 .platform-marka b { font-size: 11px; white-space: nowrap; }
-.platform-marka small { margin-top: 4px; color: #ff8a3d; font-size: 7px; }
+.platform-marka small { margin-top: 4px; color: #9388ff; font-size: 7px; }
 .platform > aside nav { gap: 6px; padding: 24px 14px; }
 .platform-nav-etiket { margin: 0 10px 5px; color: #596175; font-size: 7px; font-weight: 850; letter-spacing: .18em; }
 .platform > aside nav a { min-height: 46px; gap: 12px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; color: #8e95a8; font-size: 10px; transition: background .18s, border-color .18s, color .18s, transform .18s; }
@@ -155,7 +158,7 @@ body {
 .platform > aside nav a.active em { color: #9d94ff; }
 .platform > aside footer { padding: 15px 16px 18px; border-top-color: rgba(255,255,255,.07); }
 .platform-kullanici { display: grid; grid-template-columns: 38px minmax(0,1fr); align-items: center; gap: 10px; margin-bottom: 11px; }
-.platform-kullanici > i, .platform-mini-avatar { display: grid; place-items: center; border: 1px solid rgba(255,138,61,.3); border-radius: 11px; background: rgba(255,107,0,.09); color: #ff9855; font-style: normal; font-weight: 850; }
+.platform-kullanici > i, .platform-mini-avatar { display: grid; place-items: center; border: 1px solid rgba(147,136,255,.3); border-radius: 11px; background: rgba(109,93,252,.1); color: #aaa2ff; font-style: normal; font-weight: 850; }
 .platform-kullanici > i { width: 38px; height: 38px; }
 .platform-kullanici span { min-width: 0; }
 .platform-kullanici b, .platform-kullanici small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -197,7 +200,7 @@ body {
   .platform > aside.platform-sidebar { width: 224px; }
   .platform > main { margin-left: 224px; }
   .platform-marka { padding-inline: 16px; }
-  .platform-marka > .platform-logo { width: 96px; }
+  .platform-marka > .platform-logo { width: 42px; height: 42px; }
   .platform-ust { padding-inline: 24px; }
   .platform-icerik { padding-inline: 24px; }
 }
@@ -206,8 +209,8 @@ body {
   .super-login { padding: 14px; place-items: center; overflow-y: auto; }
   .super-login > section.super-login-kabuk { min-height: 0; grid-template-columns: 1fr; border-radius: 22px; }
   .super-login-tanitim { min-height: 210px; padding: 28px 26px 24px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.08); }
-  .super-login-marka { flex-direction: row; align-items: center; justify-content: space-between; }
-  .super-login-marka .super-login-logo { width: 160px; height: 64px; }
+  .super-login-marka { flex-direction: row; align-items: center; justify-content: flex-start; }
+  .super-login-marka .super-login-logo { width: 52px; height: 52px; }
   .super-login-tanitim-metin { margin-top: 30px; }
   .super-login-tanitim-metin h1 { margin: 8px 0; font-size: 29px; }
   .super-login-tanitim-metin p, .super-login-guvenlik-listesi, .super-login-tanitim > footer { display: none; }
