@@ -75,6 +75,15 @@
   flex-shrink: 0;
   border: 1px solid var(--glass-border);
 }
+.siparis-urun-gorselsiz {
+  display: grid;
+  place-items: center;
+  background: var(--glass-bg-soft, rgba(255, 255, 255, 0.06));
+  color: var(--on-surface-variant);
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+}
 .siparis-urun-orta {
   flex: 1;
   display: flex;

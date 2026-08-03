@@ -41,7 +41,9 @@ function SiparisKart({ s, durum, gecmis }) {
       <div className="siparis-urunler">
         {s.urunler.map((u) => (
           <div key={u.sepetAnahtari || u.id} className="siparis-urun-satir">
-            <img className="siparis-urun-gorsel" src={u.gorsel} alt={u.ad} />
+            {u.gorsel
+              ? <img className="siparis-urun-gorsel" src={u.gorsel} alt={u.ad} />
+              : <span className="siparis-urun-gorsel siparis-urun-gorselsiz">{u.ad?.charAt(0) || "?"}</span>}
             <div className="siparis-urun-orta">
               <span className="siparis-urun-ad">{u.ad}</span>
               <span className="siparis-urun-birim">₺{u.fiyat.toFixed(2)}</span>
