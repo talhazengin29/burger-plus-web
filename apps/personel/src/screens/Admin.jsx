@@ -80,23 +80,17 @@ const gramajVarsayilani = (urun) => {
 };
 
 const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], menuYapisi: { ...BOS_MENU } });
-const urunuFormaCevir = (urun) => {
-  const kayitliBoyutlar = (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut }));
-  return {
-    ...urun,
-    populer: urun.populer === true,
-    onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
-    malzemeler: (urun.malzemeler || []).join(", "),
-    alerjenler: (urun.alerjenler || []).join(", "),
-    gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
-    // Kurulum sihirbazıyla eklenen eski ürünlerde boyut_secenekleri boş kalabiliyor;
-    // boş geldiğinde düzenlenebilir bir varsayılan set sunuyoruz, yoksa kayıt asla geçemez.
-    boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urun.urunTipi) && !kayitliBoyutlar.length
-      ? BOS_BOYUTLAR(urun.urunTipi === "icecek" ? "ml" : "gr")
-      : kayitliBoyutlar,
-    menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
-  };
-};
+const urunuFormaCevir = (urun) => ({
+  ...urun,
+  populer: urun.populer === true,
+  onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
+  malzemeler: (urun.malzemeler || []).join(", "),
+  alerjenler: (urun.alerjenler || []).join(", "),
+  gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
+  // Boyut seçenekleri isteğe bağlıdır: boş bırakılmışsa ürün standart/tek fiyatla satılır.
+  boyutSecenekleri: (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut })),
+  menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
+});
 
 export default function Admin({ onCikis }) {
   const konum = useLocation();
@@ -300,10 +294,16 @@ export default function Admin({ onCikis }) {
     urunTipi,
     temelMiktar: urunTipi === "burger" ? onceki.temelMiktar : "",
     gramajOpsiyonu: urunTipi === "burger" ? { ...BOS_GRAMAJ, ...onceki.gramajOpsiyonu } : null,
-    boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urunTipi)
-      ? (onceki.boyutSecenekleri?.length ? onceki.boyutSecenekleri : BOS_BOYUTLAR(urunTipi === "icecek" ? "ml" : "gr"))
-      : [],
+    // Boyutlandırma isteğe bağlıdır: tür değişince önceki boyutlar korunur, aksi halde standart (boyutsuz) kalır.
+    boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urunTipi) ? (onceki.boyutSecenekleri || []) : [],
     menuYapisi: urunTipi === "menu" ? { ...BOS_MENU, ...onceki.menuYapisi } : { ...BOS_MENU },
+  }));
+
+  const boyutlandirmaDegistir = (aktif) => setUrunForm((onceki) => ({
+    ...onceki,
+    boyutSecenekleri: aktif
+      ? (onceki.boyutSecenekleri?.length ? onceki.boyutSecenekleri : BOS_BOYUTLAR(onceki.urunTipi === "icecek" ? "ml" : "gr"))
+      : [],
   }));
 
   const boyutGuncelle = (index, alan, deger) => setUrunForm((onceki) => ({
@@ -747,18 +747,25 @@ export default function Admin({ onCikis }) {
             </section>}
 
             {["yan_lezzet", "icecek"].includes(urunForm.urunTipi) && (
-              <section className="boyut-editoru">
-                <header><div><b>Boyut seçenekleri</b><small>Miktar ve fiyat farklarını her ürün için ayrı belirle.</small></div></header>
-                <div className="boyut-editor-baslik"><span>Varsayılan</span><span>Boyut</span><span>Miktar</span><span>Birim</span><span>Fiyat farkı</span></div>
-                {urunForm.boyutSecenekleri.map((boyut, index) => (
-                  <div className="boyut-editor-satir" key={boyut.kod}>
-                    <input type="radio" name="varsayilan-boyut" checked={boyut.varsayilan === true} onChange={() => boyutGuncelle(index, "varsayilan", true)} aria-label={`${boyut.etiket} varsayılan`} />
-                    <input required maxLength="40" value={boyut.etiket} onChange={(e) => boyutGuncelle(index, "etiket", e.target.value)} />
-                    <input required type="number" min="1" max="10000" value={boyut.miktar} onChange={(e) => boyutGuncelle(index, "miktar", e.target.value)} />
-                    <select value={boyut.birim} onChange={(e) => boyutGuncelle(index, "birim", e.target.value)}><option value="gr">gr</option><option value="ml">ml</option><option value="adet">adet</option></select>
-                    <input required type="number" min="0" max="100000" step="0.01" value={boyut.fiyatFarki} onChange={(e) => boyutGuncelle(index, "fiyatFarki", e.target.value)} />
-                  </div>
-                ))}
+              <section className={`boyut-editoru ${urunForm.boyutSecenekleri.length ? "aktif" : ""}`}>
+                <header>
+                  <div><b>Boyut seçenekleri</b><small>İsteğe bağlıdır — kapalıysa ürün tek/standart fiyatla satılır.</small></div>
+                  <label className="admin-switch"><input type="checkbox" checked={urunForm.boyutSecenekleri.length > 0} onChange={(e) => boyutlandirmaDegistir(e.target.checked)} /><span /></label>
+                </header>
+                {urunForm.boyutSecenekleri.length > 0 && (
+                  <>
+                    <div className="boyut-editor-baslik"><span>Varsayılan</span><span>Boyut</span><span>Miktar</span><span>Birim</span><span>Fiyat farkı</span></div>
+                    {urunForm.boyutSecenekleri.map((boyut, index) => (
+                      <div className="boyut-editor-satir" key={boyut.kod}>
+                        <input type="radio" name="varsayilan-boyut" checked={boyut.varsayilan === true} onChange={() => boyutGuncelle(index, "varsayilan", true)} aria-label={`${boyut.etiket} varsayılan`} />
+                        <input required maxLength="40" value={boyut.etiket} onChange={(e) => boyutGuncelle(index, "etiket", e.target.value)} />
+                        <input required type="number" min="1" max="10000" value={boyut.miktar} onChange={(e) => boyutGuncelle(index, "miktar", e.target.value)} />
+                        <select value={boyut.birim} onChange={(e) => boyutGuncelle(index, "birim", e.target.value)}><option value="gr">gr</option><option value="ml">ml</option><option value="adet">adet</option></select>
+                        <input required type="number" min="0" max="100000" step="0.01" value={boyut.fiyatFarki} onChange={(e) => boyutGuncelle(index, "fiyatFarki", e.target.value)} />
+                      </div>
+                    ))}
+                  </>
+                )}
               </section>
             )}
 
