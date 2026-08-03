@@ -355,7 +355,7 @@ export function ozellikKartlariHtml() {
         <div class="ozellik-ikon mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-white/5 text-marka-gri-300 transition-colors group-hover:bg-marka-turuncu-500/15 group-hover:text-marka-turuncu-500">
           <svg class="h-7 w-7" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(ozellik.ikon)}</svg>
         </div>
-        <h3 class="mb-2 font-baslik text-lg font-semibold text-white">${kacis(ozellik.baslik)}</h3>
+        <h3 class="metin-akan metin-akan--yumusak mb-2 font-baslik text-lg font-semibold">${kacis(ozellik.baslik)}</h3>
         <p class="text-sm leading-relaxed text-marka-gri-300">${kacis(ozellik.metin)}</p>
       </article>`,
   ).join("");
@@ -366,7 +366,7 @@ export function adimKartlariHtml() {
     (adim) => `
       <li class="adim-kart cam-panel relative rounded-2xl p-6">
         <span class="font-baslik text-4xl font-extrabold text-marka-turuncu-500/30" aria-hidden="true">${kacis(adim.sira)}</span>
-        <h3 class="mb-2 mt-3 font-baslik text-lg font-semibold text-white">${kacis(adim.baslik)}</h3>
+        <h3 class="metin-akan metin-akan--yumusak mb-2 mt-3 font-baslik text-lg font-semibold">${kacis(adim.baslik)}</h3>
         <p class="text-sm leading-relaxed text-marka-gri-300">${kacis(adim.metin)}</p>
       </li>`,
   ).join("");
@@ -412,7 +412,7 @@ export function paketKartlariHtml() {
           : "border border-marka-cizgi bg-marka-kart"
       }">
         ${rozet}
-        <h3 class="mb-1 font-baslik text-xl font-bold text-white">${kacis(paket.ad)}</h3>
+        <h3 class="metin-akan metin-akan--yumusak mb-1 font-baslik text-xl font-bold">${kacis(paket.ad)}</h3>
         <p class="mb-6 text-sm text-marka-gri-400">${kacis(paket.hedefKitle)}</p>
         <p class="mb-8">
           <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot)}</span>
