@@ -39,6 +39,7 @@ export const ICERIK = {
   ogGorselAlt: "QR Menü Pro müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
+  heroRozet: "Sipariş, mutfak ve ödeme tek akışta",
   heroBaslikBir: "MASANIZ",
   heroVurguBir: "DİJİTAL",
   heroBaslikIki: "MUTFAĞINIZ",
@@ -340,7 +341,7 @@ export function mobilNavBaglantilariHtml() {
 export function konseptSeridiHtml() {
   return KONSEPTLER.map(
     (konsept) => `
-      <li class="flex items-center gap-3 font-baslik text-lg font-bold tracking-wide sm:text-xl">
+      <li class="konsept-oge flex items-center gap-3 font-baslik text-lg font-bold tracking-wide sm:text-xl">
         <svg class="h-6 w-6 shrink-0" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(konsept.ikon)}</svg>
         <span>${kacis(konsept.ad)}</span>
       </li>`,
@@ -350,7 +351,7 @@ export function konseptSeridiHtml() {
 export function ozellikKartlariHtml() {
   return OZELLIKLER.map(
     (ozellik) => `
-      <article class="ozellik-kart cam-panel group rounded-2xl p-6 transition-colors duration-300 hover:border-marka-turuncu-500/50">
+      <article class="ozellik-kart isik-kart cam-panel group rounded-2xl p-6 transition-colors duration-300 hover:border-marka-turuncu-500/50">
         <div class="ozellik-ikon mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-white/5 text-marka-gri-300 transition-colors group-hover:bg-marka-turuncu-500/15 group-hover:text-marka-turuncu-500">
           <svg class="h-7 w-7" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(ozellik.ikon)}</svg>
         </div>
@@ -374,7 +375,7 @@ export function adimKartlariHtml() {
 export function yorumKartlariHtml() {
   return YORUMLAR.map(
     (yorum) => `
-      <figure class="yorum-kart rounded-2xl border border-marka-cizgi bg-marka-kart p-8">
+      <figure class="yorum-kart isik-kart rounded-2xl border border-marka-cizgi bg-marka-kart p-8">
         <svg class="mb-6 h-8 w-8 text-marka-turuncu-500" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
         <blockquote class="mb-8 text-sm leading-relaxed text-marka-gri-300">${kacis(yorum.metin)}</blockquote>
         <figcaption class="flex items-center gap-3">
@@ -405,9 +406,9 @@ export function paketKartlariHtml() {
       : `<a class="block w-full rounded-xl border border-marka-cizgi py-3 text-center text-sm font-medium text-white transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="${BASLA_BAGLANTISI}">${kacis(paket.buton)}</a>`;
 
     return `
-      <article class="paket-kart relative flex flex-col rounded-2xl p-8 ${
+      <article class="paket-kart isik-kart relative flex flex-col rounded-2xl p-8 ${
         paket.populer
-          ? "border border-marka-turuncu-500/50 bg-marka-zemin shadow-[0_0_30px_rgba(255,107,0,0.12)]"
+          ? "nefes-hale border border-marka-turuncu-500/50 bg-marka-zemin"
           : "border border-marka-cizgi bg-marka-kart"
       }">
         ${rozet}

@@ -29,6 +29,9 @@ function baslat() {
   altbilgiGirisi();
   ozellikKartiEtkilesimi();
   butonMikroEtkilesimleri();
+  kartIsigiTakibi();
+  miknatisliButonlar();
+  ustBarKaydirmaDurumu();
 }
 
 /* ------------------------------------------------------------------ Üst bar */
@@ -94,6 +97,7 @@ function heroGirisi() {
   }
 
   const digerleri = [
+    document.querySelector(".hero-rozet"),
     document.querySelector(".hero-aciklama"),
     document.querySelector(".hero-butonlar"),
   ].filter(Boolean);
@@ -265,13 +269,8 @@ function paketKartlari() {
     { amount: 0.2 },
   );
 
-  // Öne çıkan paket hafifçe nefes alsın.
-  const populer = kartlar.find((kart) => kart.classList.contains("border-marka-turuncu-500/50")) || kartlar[1];
-  if (!populer) return;
-  inView(populer, () => {
-    const nabiz = animate(populer, { scale: [1, 1.015, 1] }, { duration: 3, repeat: Infinity, ease: "easeInOut" });
-    return () => nabiz.stop();
-  });
+  // Öne çıkan paketin nefes alan halesi CSS'te (.nefes-hale) — burada tekrar
+  // animasyon kurulmuyor ki iki efekt üst üste binmesin.
 }
 
 function sssGirisi() {
@@ -319,6 +318,73 @@ function ozellikKartiEtkilesimi() {
     kart.addEventListener("mouseleave", () => {
       animate(kart, { y: 0 }, { duration: 0.32, ease: "easeOut" });
     });
+  });
+}
+
+/* -------------------------------------------- İmleci takip eden kart ışığı */
+// CSS (.isik-kart::after) ışığı --fare-x/--fare-y değişkenlerinden okur;
+// burada yalnızca imleç konumunu yazıyoruz. Dokunmatik cihazlarda hover
+// olmadığı için hiç bağlanmıyoruz.
+function kartIsigiTakibi() {
+  if (!window.matchMedia("(hover: hover)").matches) return;
+  const kartlar = Array.from(document.querySelectorAll(".isik-kart"));
+  if (!kartlar.length) return;
+
+  kartlar.forEach((kart) => {
+    let bekliyor = false;
+    kart.addEventListener("pointermove", (olay) => {
+      if (bekliyor) return;
+      bekliyor = true;
+      requestAnimationFrame(() => {
+        bekliyor = false;
+        const kutu = kart.getBoundingClientRect();
+        kart.style.setProperty("--fare-x", `${olay.clientX - kutu.left}px`);
+        kart.style.setProperty("--fare-y", `${olay.clientY - kutu.top}px`);
+      });
+    });
+  });
+}
+
+/* ------------------------------------------------------ Mıknatıslı butonlar */
+// İmleç yaklaşınca buton hafifçe ona doğru kayar. Kayma 6 pikselle sınırlı:
+// fark edilir ama tıklama hedefini kaçırtacak kadar değil.
+//
+// Bilerek motion yerine CSS'in ayrı `translate` özelliği kullanılıyor:
+// butonun scale animasyonu `transform` üzerinden gidiyor, ikisi aynı
+// özelliği paylaşsaydı birbirini eziyor olurdu.
+function miknatisliButonlar() {
+  if (!masaustuMu() || !window.matchMedia("(hover: hover)").matches) return;
+  const EN_FAZLA = 6;
+
+  document.querySelectorAll("a.marka-buton").forEach((buton) => {
+    let bekliyor = false;
+    buton.addEventListener("pointermove", (olay) => {
+      if (bekliyor) return;
+      bekliyor = true;
+      requestAnimationFrame(() => {
+        bekliyor = false;
+        const kutu = buton.getBoundingClientRect();
+        const oranX = (olay.clientX - kutu.left) / kutu.width - 0.5;
+        const oranY = (olay.clientY - kutu.top) / kutu.height - 0.5;
+        buton.style.translate = `${(oranX * EN_FAZLA * 2).toFixed(2)}px ${(oranY * EN_FAZLA).toFixed(2)}px`;
+      });
+    });
+    buton.addEventListener("pointerleave", () => {
+      buton.style.translate = "0px 0px";
+    });
+  });
+}
+
+/* ------------------------------------------------ Üst barın kaydırma durumu */
+function ustBarKaydirmaDurumu() {
+  const ustBar = document.querySelector(".ustbar");
+  if (!ustBar) return;
+  let kaydirildi = false;
+  scroll((_ilerleme, bilgi) => {
+    const gerekli = bilgi.y.current > 40;
+    if (gerekli === kaydirildi) return;
+    kaydirildi = gerekli;
+    ustBar.classList.toggle("ustbar--kaydirildi", gerekli);
   });
 }
 

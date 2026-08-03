@@ -32,9 +32,10 @@
 
   html {
     scroll-behavior: smooth;
-    /* Dekoratif katmanlar hiçbir koşulda yatay kaydırma açmasın.
-       "clip", "hidden"in aksine position:fixed öğeleri bozmaz. */
-    overflow-x: clip;
+    /* Kök elemana overflow-x kuralı bilinçli olarak konulmadı: yatay taşmaya
+       karşı koruma zaten iki katmanda var — body'deki overflow-x-hidden ve
+       dekoratif ışıkları saran overflow-hidden'lı sabit katman
+       (bkz. index.html). Ölçümde 390px'te de yatay taşma çıkmıyor. */
   }
 
   body {
@@ -167,6 +168,7 @@
     transition:
       background-image 0.3s ease,
       transform 0.3s ease,
+      translate 0.35s ease,
       box-shadow 0.3s ease;
   }
   .marka-buton:hover {
@@ -194,4 +196,171 @@
 /* SSS akordiyonu: açık öğede + ikonu × konumuna döner. */
 .sss-dugme[aria-expanded="true"] .sss-ikon {
   transform: rotate(135deg);
+}
+
+/* ==========================================================================
+   Süsleme katmanı.
+   Hepsi bilinçli olarak DÜŞÜK kontrastlı ve YAVAŞ: sayfa canlı dursun ama
+   göz yormasın. Tümü prefers-reduced-motion altında durur (yukarıdaki
+   global kural animasyonları söndürür).
+   ========================================================================== */
+@layer components {
+  /* --- İnce film greni: düz koyu yüzeylere doku katar. -------------------- */
+  .doku-gren {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+  }
+
+  /* --- İmleci takip eden yumuşak kart ışığı. ------------------------------
+     ::after negatif z-index ile kartın zemininin ÜSTÜNE, metnin ALTINA
+     boyanır; isolation kartı kendi yığın bağlamına kapatır. */
+  .isik-kart {
+    position: relative;
+    isolation: isolate;
+  }
+  .isik-kart::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: radial-gradient(
+      320px circle at var(--fare-x, 50%) var(--fare-y, 0%),
+      rgba(255, 107, 0, 0.14),
+      transparent 62%
+    );
+  }
+  .isik-kart:hover::after,
+  .isik-kart:focus-within::after {
+    opacity: 1;
+  }
+
+  /* --- Bölümleri ayıran turuncuya çalan saç teli çizgi. ------------------- */
+  .ayirac {
+    height: 1px;
+    border: 0;
+    margin: 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 107, 0, 0.28) 35%,
+      rgba(255, 107, 0, 0.28) 65%,
+      transparent
+    );
+  }
+
+  /* --- Menü bağlantılarında alttan süzülen çizgi. ------------------------- */
+  .nav-baglanti {
+    position: relative;
+  }
+  .nav-baglanti::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--marka-turuncu-400), var(--marka-turuncu-500));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .nav-baglanti:hover::after,
+  .nav-baglanti[aria-current="true"]::after {
+    transform: scaleX(1);
+  }
+
+  /* --- Üst bar kaydırınca incelir ve alt kenarına ışık çizgisi gelir. ----- */
+  .ustbar {
+    transition:
+      background-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  .ustbar-ic {
+    transition: height 0.35s ease;
+  }
+  .ustbar--kaydirildi {
+    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.9);
+  }
+  .ustbar--kaydirildi .ustbar-ic {
+    height: 3.75rem;
+  }
+  .ustbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: linear-gradient(to right, transparent, rgba(255, 107, 0, 0.5), transparent);
+  }
+  .ustbar--kaydirildi::after {
+    opacity: 1;
+  }
+
+  /* --- Hero rozetindeki "canlı" nabzı. ----------------------------------- */
+  .nabiz-nokta {
+    position: relative;
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--marka-turuncu-500);
+  }
+  .nabiz-nokta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: marka-nabiz 2.6s ease-out infinite;
+  }
+
+  /* --- Öne çıkan paketin yavaş nefes alan halesi. ------------------------- */
+  .nefes-hale {
+    animation: marka-nefes 6s ease-in-out infinite;
+  }
+
+  /* --- Konsept şeridi öğeleri üzerine gelince hafifçe yükselir. ----------- */
+  .konsept-oge {
+    transition:
+      transform 0.3s ease,
+      color 0.3s ease;
+  }
+  .konsept-oge:hover {
+    transform: translateY(-3px);
+    color: #ffffff;
+  }
+}
+
+@keyframes marka-nabiz {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes marka-nefes {
+  0%,
+  100% {
+    box-shadow: 0 0 24px -6px rgba(255, 107, 0, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 46px -4px rgba(255, 107, 0, 0.5);
+  }
 }
