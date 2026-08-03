@@ -21,8 +21,7 @@
   height: auto;
   margin: 0 auto 12px;
   display: block;
-  /* Saydam logo: yalnızca koyu marka yazısını aydınlatır; arka planı yoktur. */
-  filter: invert(1) hue-rotate(180deg);
+  filter: none;
 }
 .login-logo.marka-logo-ozel { max-height: 104px; object-fit: contain; filter: none; }
 .login-logo.marka-logo-metin {

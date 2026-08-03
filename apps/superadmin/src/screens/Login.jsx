@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { superGiris, superIkiFaktor, superToken } from "../lib/superApi";
 import { Hata } from "../components/Ui";
-import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
+import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 
 function GozIkonu({ kapali }) {
   return kapali ? (
@@ -48,7 +48,7 @@ export default function Login({ onGiris }) {
       <section className="super-login-kabuk">
         <aside className="super-login-tanitim">
           <div className="super-login-marka">
-            <img src={logoFull} alt="Burger Plus" />
+            <BurgerPlusLogosu className="super-login-logo" alt="Burger Plus" />
             <span>MERKEZİ YÖNETİM</span>
           </div>
           <div className="super-login-tanitim-metin">

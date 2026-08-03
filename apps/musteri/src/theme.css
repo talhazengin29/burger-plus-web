@@ -181,7 +181,7 @@ input, textarea, select { color-scheme: dark; }
 }
 .marka-logo-yuklu {
   filter: none !important;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 /* Ortak form doğrulama durumları */
 input[aria-invalid="true"],

@@ -5,7 +5,7 @@ import { TemaSaglayici } from "./TemaContext";
 import { PerdeSaglayici } from "../hooks/usePerde";
 import { isletmeBilgisiniGetir } from "../lib/authApi";
 import { socket, socketIsletmesiniAyarla } from "../lib/socket";
-import varsayilanLogo from "../assets/logo-full-transparent.png";
+import BurgerPlusLogosu from "../components/BurgerPlusLogosu";
 
 const IsletmeContext = createContext(null);
 const ONIZLEME_ANAHTARI = "burger-plus-isletme-onizleme";
@@ -50,7 +50,7 @@ function slugBasligi(slug) {
 function IsletmeYukleniyor({ slug, onizleme }) {
   const [logoHatasi, setLogoHatasi] = useState(false);
   const burgerPlusMu = slug === "burger-plus";
-  const logoUrl = onizleme?.logoUrl || (burgerPlusMu ? varsayilanLogo : "");
+  const logoUrl = onizleme?.logoUrl || "";
   const isletmeAdi = onizleme?.ad || slugBasligi(slug);
   const stil = {
     "--isletme-yukleme-accent": onizleme?.accent || (burgerPlusMu ? "#FF6B00" : "#8B5CF6"),
@@ -62,8 +62,10 @@ function IsletmeYukleniyor({ slug, onizleme }) {
   return (
     <div className="isletme-durum" style={stil}>
       {logoUrl && !logoHatasi
-        ? <img className={`isletme-splash-logo ${onizleme?.logoUrl ? "isletme-splash-logo--yuklu" : ""}`} src={logoUrl} alt={isletmeAdi} onError={() => setLogoHatasi(true)} />
-        : <strong className="isletme-splash-ad">{isletmeAdi}</strong>}
+        ? <img className="isletme-splash-logo isletme-splash-logo--yuklu" src={logoUrl} alt={isletmeAdi} onError={() => setLogoHatasi(true)} />
+        : burgerPlusMu
+          ? <BurgerPlusLogosu className="isletme-splash-logo" alt={isletmeAdi} />
+          : <strong className="isletme-splash-ad">{isletmeAdi}</strong>}
       <div className="isletme-spinner" />
       <p>İşletme yükleniyor…</p>
     </div>

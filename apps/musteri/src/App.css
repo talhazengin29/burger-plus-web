@@ -68,9 +68,10 @@
 
 .isletme-splash-logo {
   width: min(220px, 65vw);
+  height: 88px;
   max-height: 96px;
   object-fit: contain;
-  filter: invert(1) hue-rotate(180deg);
+  filter: none;
 }
 
 .isletme-splash-logo--yuklu { filter: none; }

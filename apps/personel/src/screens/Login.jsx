@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { adminGiris, personelGiris, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import { useIsletme } from "../context/IsletmeContext";
-import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
+import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 import "./Login.css";
 
 function PersonelMarkasi() {
   const { isletme, isletmeSlug } = useIsletme();
   const yukluLogo = isletme.tema?.logoUrl || isletme.logoUrl || "";
-  const logoUrl = yukluLogo || (isletmeSlug === "burger-plus" ? logoFull : "");
 
   return (
     <div className="personel-login-ust">
-      {logoUrl
-        ? <img className={`login-logo ${yukluLogo ? "login-logo--yuklu" : ""}`} src={logoUrl} alt={isletme.ad} />
-        : <strong className="login-logo-metin">{isletme.ad}</strong>}
+      {yukluLogo
+        ? <img className="login-logo login-logo--yuklu" src={yukluLogo} alt={isletme.ad} />
+        : isletmeSlug === "burger-plus"
+          ? <BurgerPlusLogosu className="login-logo" alt={isletme.ad} />
+          : <strong className="login-logo-metin">{isletme.ad}</strong>}
       <span>EKİP PORTALI</span>
     </div>
   );

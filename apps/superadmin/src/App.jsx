@@ -7,7 +7,7 @@ import Raporlar from "./screens/Raporlar";
 import Abonelikler from "./screens/Abonelikler";
 import Kayitlar from "./screens/Kayitlar";
 import { Yukleme } from "./components/Ui";
-import logoFull from "../../musteri/src/assets/logo-full-transparent.png";
+import BurgerPlusLogosu from "../../musteri/src/components/BurgerPlusLogosu";
 
 const HAREKETSIZLIK = 30 * 60 * 1000;
 const NAV = [
@@ -52,7 +52,7 @@ function Panel({ superAdmin, cikis, yol, git }) {
     <div className="platform">
       <aside className="platform-sidebar">
         <div className="platform-marka">
-          <img src={logoFull} alt="Burger Plus" />
+          <BurgerPlusLogosu className="platform-logo" alt="Burger Plus" />
           <div><b>Platform Merkezi</b><small>SUPER ADMIN</small></div>
         </div>
 

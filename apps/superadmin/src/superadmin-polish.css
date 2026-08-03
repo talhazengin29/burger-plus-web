@@ -78,7 +78,7 @@ body {
   box-shadow: 0 0 0 36px rgba(147, 136, 255, 0.025), 0 0 0 72px rgba(147, 136, 255, 0.018);
 }
 .super-login-marka { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.super-login-marka img { width: 205px; max-height: 76px; object-fit: contain; object-position: left; filter: invert(1) hue-rotate(180deg); }
+.super-login-marka .super-login-logo { width: 205px; height: 82px; }
 .super-login-marka span { color: #ff8a3d; font-size: 9px; font-weight: 850; letter-spacing: .2em; }
 .super-login-tanitim-metin { position: relative; z-index: 1; margin-top: 74px; }
 .super-login-tanitim-metin > small { color: var(--accent-2); font-size: 9px; font-weight: 850; letter-spacing: .2em; }
@@ -140,7 +140,7 @@ body {
 .platform { min-height: 100vh; background: radial-gradient(700px 430px at 88% 0%, rgba(109, 93, 252, .08), transparent 64%), var(--bg); }
 .platform > aside.platform-sidebar { width: 272px; border-right: 1px solid rgba(255,255,255,.08); background: rgba(13, 16, 25, .96); box-shadow: 18px 0 50px rgba(0,0,0,.12); backdrop-filter: blur(24px); }
 .platform-marka { min-height: 98px; gap: 13px; padding: 20px 22px; border-bottom-color: rgba(255,255,255,.07); }
-.platform-marka > img { width: 86px; height: 48px; object-fit: contain; object-position: left; filter: invert(1) hue-rotate(180deg); }
+.platform-marka > .platform-logo { width: 112px; height: 45px; }
 .platform-marka b { font-size: 11px; white-space: nowrap; }
 .platform-marka small { margin-top: 4px; color: #ff8a3d; font-size: 7px; }
 .platform > aside nav { gap: 6px; padding: 24px 14px; }
@@ -197,7 +197,7 @@ body {
   .platform > aside.platform-sidebar { width: 224px; }
   .platform > main { margin-left: 224px; }
   .platform-marka { padding-inline: 16px; }
-  .platform-marka > img { width: 70px; }
+  .platform-marka > .platform-logo { width: 96px; }
   .platform-ust { padding-inline: 24px; }
   .platform-icerik { padding-inline: 24px; }
 }
@@ -207,7 +207,7 @@ body {
   .super-login > section.super-login-kabuk { min-height: 0; grid-template-columns: 1fr; border-radius: 22px; }
   .super-login-tanitim { min-height: 210px; padding: 28px 26px 24px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.08); }
   .super-login-marka { flex-direction: row; align-items: center; justify-content: space-between; }
-  .super-login-marka img { width: 150px; height: 52px; }
+  .super-login-marka .super-login-logo { width: 160px; height: 64px; }
   .super-login-tanitim-metin { margin-top: 30px; }
   .super-login-tanitim-metin h1 { margin: 8px 0; font-size: 29px; }
   .super-login-tanitim-metin p, .super-login-guvenlik-listesi, .super-login-tanitim > footer { display: none; }

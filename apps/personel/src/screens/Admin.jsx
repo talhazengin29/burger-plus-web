@@ -4,7 +4,7 @@ import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
 import { socket } from "../lib/socket";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useIsletme } from "../context/IsletmeContext";
-import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
+import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 import TemaYonetimi from "./admin/TemaYonetimi";
 import "./Admin.css";
 
@@ -439,7 +439,7 @@ export default function Admin({ onCikis }) {
       <aside className="admin-sidebar">
         <div className="admin-marka">
           {(isletme.tema?.logoUrl || isletme.logoUrl) && <img className="admin-marka-logo-yuklu" src={isletme.tema?.logoUrl || isletme.logoUrl} alt={isletme.ad} />}
-          {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug === "burger-plus" && <img src={logoFull} alt={isletme.ad} />}
+          {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug === "burger-plus" && <BurgerPlusLogosu className="admin-marka-logo" alt={isletme.ad} />}
           {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug !== "burger-plus" && <strong className="admin-marka-metin">{isletme.ad}</strong>}
           <small>{isletme.ad} · Yönetim Merkezi</small>
         </div>
