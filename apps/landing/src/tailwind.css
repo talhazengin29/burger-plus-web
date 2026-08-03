@@ -149,30 +149,25 @@
     height: 50vw;
   }
 
-  /* Beyaz başlık metinleri için akan açık renk gradyanı.
-     Palet bilerek açık tonlarda tutuldu (beyaz → sıcak şeftali → beyaz →
-     soğuk açık gri): renk sürekli değişir ama kontrast düşmediği için
-     okunurluk bozulmaz. Turuncu vurgu için .metin-gradyan kullanılır. */
+  /* Beyaz başlık metinleri için akan gradyan.
+     .metin-gradyan'ın AYNASI: orada turuncu metnin içinden beyaz bir bant
+     geçer, burada beyaz metnin içinden turuncu bant geçer. Aynı 3 duraklı
+     yapı ve aynı süre kullanıldığı için geçiş belirgin/keskin durur —
+     çok duraklı açık paletlerde geçiş bulanıklaşıyordu. */
   .metin-akan {
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(
-      90deg,
-      #ffffff 0%,
-      #ffd9bd 22%,
-      #ffffff 45%,
-      #d7dde8 68%,
-      #ffffff 100%
-    );
-    background-size: 220% auto;
-    animation: marka-akis 7s linear infinite;
+    background-image: linear-gradient(90deg, #ffffff, #ff8a3d, #ffffff);
+    background-size: 200% auto;
+    animation: marka-akis 4s linear infinite;
   }
 
-  /* Küçük başlıklarda döngü daha da yavaş olsun ki metin "titremesin". */
+  /* Küçük başlıklarda aynı keskinlik, sadece daha yavaş: altı kart aynı anda
+     hızlı hızlı dönünce sayfa huzursuz görünüyor. */
   .metin-akan--yumusak {
-    animation-duration: 11s;
+    animation-duration: 7s;
   }
 
   /* Başlıklardaki turuncu-beyaz akan gradyan. */
