@@ -8,10 +8,11 @@ import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama"
 import { usePerde } from "../hooks/usePerde";
 import MarkaLogosu from "../components/MarkaLogosu";
 import { useTema } from "../context/TemaContext";
+import logoFull from "../assets/logo-full-transparent.png";
 import "./Login.css";
 
 export default function Login() {
-  const { metinler } = useTema();
+  const { metinler, isletmeSlug } = useTema();
   const git = useIsletmeNavigate();
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
   const { perdeAktif, perdeIleGit } = usePerde();
@@ -97,8 +98,10 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <MarkaLogosu className="login-logo" />
-        <p className="login-slogan">{metinler.slogan}</p>
+        {isletmeSlug === "burger-plus"
+          ? <img className="login-logo login-logo--burger-plus" src={logoFull} alt="Burger Plus" />
+          : <MarkaLogosu className="login-logo" />}
+        <p className="login-slogan">{isletmeSlug === "burger-plus" ? "Lezzet ve puanlar seni bekliyor" : metinler.slogan}</p>
       </motion.div>
 
       {/* Form — aşağıdan yukarı kayarak gelir */}

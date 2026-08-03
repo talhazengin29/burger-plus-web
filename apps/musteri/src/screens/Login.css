@@ -23,6 +23,9 @@
   display: block;
   filter: none;
 }
+.login-logo--burger-plus {
+  filter: invert(1) hue-rotate(180deg);
+}
 .login-logo.marka-logo-ozel { max-height: 104px; object-fit: contain; filter: none; }
 .login-logo.marka-logo-metin {
   width: auto;
@@ -57,7 +60,7 @@
   flex-direction: column;
   /* Cam yerine opak yüzey: mobil GPU'da görünen katman ayrışmalarını önler. */
   background: #15110f;
-  border: 1px solid var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--r-xl);
   padding: 24px 20px;
   box-shadow: var(--glass-shadow);

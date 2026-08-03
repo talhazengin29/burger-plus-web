@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminGiris, personelGiris, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import { useIsletme } from "../context/IsletmeContext";
-import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
+import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
 
 function PersonelMarkasi() {
@@ -13,7 +13,7 @@ function PersonelMarkasi() {
       {yukluLogo
         ? <img className="login-logo login-logo--yuklu" src={yukluLogo} alt={isletme.ad} />
         : isletmeSlug === "burger-plus"
-          ? <BurgerPlusLogosu className="login-logo" alt={isletme.ad} />
+          ? <img className="login-logo login-logo--burger-plus" src={logoFull} alt={isletme.ad} />
           : <strong className="login-logo-metin">{isletme.ad}</strong>}
       <span>EKİP PORTALI</span>
     </div>
