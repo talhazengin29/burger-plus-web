@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<noscript><style>.fade-in-up{opacity:1!important;transform:none!important}</style></noscript>
 <!-- Tailwind yapılandırması npm build akışındaki tailwind.config.js dosyasına taşındı.
         tailwind.config = {
             darkMode: "class",
@@ -482,26 +483,5 @@
 <p class="font-body-md text-body-md text-on-surface-variant text-sm">© 2024 QR Menü Pro. Tüm hakları saklıdır.</p>
 </div>
 </footer>
-<script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            document.querySelectorAll('.fade-in-up').forEach(el => {
-                observer.observe(el);
-            });
-        });
-    </script>
+<script type="module" src="/src/animasyonlar.js"></script>
 </body></html>
