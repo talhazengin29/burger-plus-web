@@ -245,3 +245,15 @@ body {
   .super-login-guvenlik-notu { display: none; }
   .super-login-kart form { padding-top: 22px; }
 }
+
+/* Yazı boyutları index.css'te sabit piksel değerlerle (7-11px) tanımlı ve
+   yalnızca küçük ekranlara doğru daralıyordu; büyük/harici monitörlerde
+   (dizüstüne göre daha büyük fiziksel piksel veya daha yüksek çözünürlük)
+   metinler okunamayacak kadar küçük kalıyordu. Geniş ekranlarda tüm paneli
+   orantılı olarak büyütüyoruz. */
+@media (min-width: 1440px) {
+  html { zoom: 1.15; }
+}
+@media (min-width: 1920px) {
+  html { zoom: 1.3; }
+}
