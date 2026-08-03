@@ -12,8 +12,13 @@
       </h2>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-      {{ yorumKartlariHtml }}
+    <!-- Kesintisiz kayan şerit. Üzerine gelince veya klavye odağı içine
+         girince durur; hareket azaltma tercihinde hiç akmaz. -->
+    <div class="yorum-serit">
+      <div class="yorum-akis">
+        {{ yorumKartlariHtml }}
+        {{ yorumKartlariKopyasiHtml }}
+      </div>
     </div>
   </div>
 </section>

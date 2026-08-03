@@ -442,6 +442,13 @@ export function adimKartlariHtml() {
   ).join("");
 }
 
+// Şerit kesintisiz dönebilmek için kart listesi iki kez basılır. İkinci küme
+// yalnızca görseldir; ekran okuyucular metni iki kez okumasın diye
+// yorumKartlariKopyasiHtml() her kartı aria-hidden ile işaretler.
+export function yorumKartlariKopyasiHtml() {
+  return yorumKartlariHtml().replace(/<figure class="/g, '<figure aria-hidden="true" class="');
+}
+
 export function yorumKartlariHtml() {
   return YORUMLAR.map(
     (yorum) => `

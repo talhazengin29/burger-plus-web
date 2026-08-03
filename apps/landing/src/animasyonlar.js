@@ -23,7 +23,9 @@ function baslat() {
   bolumBasliklari();
   kartlariCanlandir(".ozellik-kart", "#ozellikler");
   kartlariCanlandir(".adim-kart", "#nasil-calisir");
-  kartlariCanlandir(".yorum-kart", "#yorumlar");
+  // Yorum kartları kayan şeritte; giriş animasyonu uygulanmıyor. Aksi halde
+  // kartlar opacity 0'a alınıp tek tek belirirken şerit çoktan akmaya başlıyor
+  // ve kopya küme ile asıl küme farklı zamanlarda görünüyordu.
   paketKartlari();
   sssGirisi();
   altbilgiGirisi();

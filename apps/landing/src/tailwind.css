@@ -427,6 +427,41 @@
     }
   }
 
+  /* --- Kayan referans şeridi. --------------------------------------------
+     Kartlar iki kez basıldığı için -50% eksi yarım boşluk kadar kaydırmak
+     dizinin başına kusursuz döner. */
+  .yorum-serit {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  }
+  .yorum-akis {
+    display: flex;
+    align-items: stretch;
+    gap: 1.5rem;
+    width: max-content;
+    animation: yorum-kay 48s linear infinite;
+  }
+  .yorum-akis > figure {
+    flex: none;
+    width: min(360px, 80vw);
+  }
+  .yorum-serit:hover .yorum-akis,
+  .yorum-serit:focus-within .yorum-akis {
+    animation-play-state: paused;
+  }
+
+  /* --- Özellik kartlarında hafif süzülme. --------------------------------
+     Bilerek `translate` özelliği kullanılıyor: kartın hover animasyonu
+     motion üzerinden `transform`u sürüyor, ikisi aynı özelliği paylaşsaydı
+     birbirini ezerdi. */
+  .ozellik-kart {
+    animation: kart-suzul 7s ease-in-out infinite;
+  }
+  .ozellik-kart:nth-child(3n + 2) { animation-delay: -2.4s; }
+  .ozellik-kart:nth-child(3n) { animation-delay: -4.8s; }
+
   /* --- Konsept şeridi öğeleri üzerine gelince hafifçe yükselir. ----------- */
   .konsept-oge {
     transition:
@@ -452,6 +487,18 @@
     transform: scale(2.6);
     opacity: 0;
   }
+}
+
+@keyframes yorum-kay {
+  from { transform: translateX(0); }
+  /* Yarım boşluk (gap 1.5rem / 2) düşülmezse ikinci kümeye geçişte zıplar. */
+  to { transform: translateX(calc(-50% - 0.75rem)); }
+}
+
+@keyframes kart-suzul {
+  0%,
+  100% { translate: 0 0; }
+  50% { translate: 0 -7px; }
 }
 
 @keyframes whatsapp-nabiz {
