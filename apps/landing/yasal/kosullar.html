@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<!-- parca: yasal-head -->
+<title>Kullanım Koşulları | {{ markaAdi }}</title>
+<meta name="description" content="{{ markaAdi }} kullanım koşulları: hizmet kapsamı, hesap sorumlulukları, abonelik ve ödeme şartları, fikri mülkiyet ve sorumluluk sınırları."/>
+<meta name="robots" content="index, follow"/>
+<!-- Yerel varlik: parcadan degil, bu dosyadan (bkz. bolumler/yasal-head.html notu). -->
+<link href="/src/tailwind.css" rel="stylesheet"/>
+</head>
+
+<body class="relative overflow-x-hidden font-govde antialiased">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="zemin-izgara absolute inset-0"></div>
+</div>
+
+<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-marka-turuncu-500 focus:px-4 focus:py-2 focus:text-white" href="#icerik">
+  İçeriğe geç
+</a>
+
+<!-- parca: yasal-ustbar -->
+
+<main class="mx-auto max-w-4xl px-6 pb-20 pt-32" id="icerik">
+  <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">Yasal</p>
+  <h1 class="mb-4 font-baslik text-3xl font-bold md:text-4xl">
+    <span class="metin-akan">Kullanım</span> <span class="metin-gradyan">Koşulları</span>
+  </h1>
+  <p class="mb-8 text-sm text-marka-gri-400">Son güncelleme: {{ yasalSonGuncelleme }}</p>
+
+  <div class="yasal-uyari">
+    <strong>Not:</strong> Bu metin bir taslaktır. Özellikle abonelik ücretleri, fesih koşulları,
+    hizmet seviyesi taahhütleri ve sorumluluk sınırları ticari kararlarınıza göre değişir.
+    Yayına almadan önce köşeli parantezli alanları doldurun ve bir hukuk danışmanına inceletin.
+  </div>
+
+  <div class="yasal-kunye">
+    <dl>
+      <dt>Hizmet sağlayıcı</dt><dd>{{ yasalUnvan }}</dd>
+      <dt>Adres</dt><dd>{{ yasalAdres }}</dd>
+      <dt>Vergi dairesi / no</dt><dd>{{ yasalVergiDairesi }} / {{ yasalVergiNo }}</dd>
+      <dt>MERSİS no</dt><dd>{{ yasalMersis }}</dd>
+      <dt>E-posta</dt><dd>{{ yasalEposta }}</dd>
+      <dt>Telefon</dt><dd>{{ yasalTelefon }}</dd>
+    </dl>
+  </div>
+
+  <div class="yasal-govde">
+    <h2 id="taraflar">1. Taraflar ve konu</h2>
+    <p>
+      Bu Kullanım Koşulları ("Sözleşme"), yukarıda künyesi verilen {{ yasalUnvan }} ("Hizmet Sağlayıcı")
+      ile {{ markaAdi }} platformunu kullanan gerçek veya tüzel kişi ("Kullanıcı") arasındaki ilişkiyi düzenler.
+    </p>
+    <p>
+      Platformu kullanmaya başlamanız, bu koşulları okuduğunuz ve kabul ettiğiniz anlamına gelir.
+      Koşulları kabul etmiyorsanız platformu kullanmamalısınız.
+    </p>
+
+    <h2 id="tanimlar">2. Tanımlar</h2>
+    <ul>
+      <li><strong>Platform:</strong> {{ markaAdi }} adı altında sunulan tanıtım sayfası, sipariş uygulaması, personel/yönetim paneli ve platform yönetim panelinin tamamı.</li>
+      <li><strong>İşletme:</strong> Platformu abonelik kapsamında kullanan restoran, kafe veya benzeri ticari işletme.</li>
+      <li><strong>Son Müşteri:</strong> Bir İşletmenin masasındaki QR kodu okutarak sipariş veren tüketici.</li>
+      <li><strong>Abonelik:</strong> İşletmenin platformu kullanma hakkını veren, süreli ve ücretli kullanım paketi.</li>
+    </ul>
+
+    <h2 id="hizmet">3. Hizmetin kapsamı</h2>
+    <p>Platform, İşletmelere aşağıdaki işlevleri sunar:</p>
+    <ul>
+      <li>QR kod ile masadan dijital menü görüntüleme ve sipariş alma,</li>
+      <li>Siparişlerin mutfak ve salon ekranlarına canlı iletilmesi,</li>
+      <li>Ödeme kuruluşu entegrasyonu üzerinden online ödeme alma,</li>
+      <li>Puan, damga ve hediye tabanlı sadakat programı,</li>
+      <li>Ürün, kategori, kampanya ve duyuru yönetimi,</li>
+      <li>Satış, ürün ve personel raporları,</li>
+      <li>Logo ve renk paleti ile marka özelleştirmesi.</li>
+    </ul>
+    <p>
+      Hizmet Sağlayıcı, platformun işlevlerini geliştirme, değiştirme veya sonlandırma hakkını saklı tutar.
+      İşlevlerde esaslı bir azalma olması hâlinde İşletme makul süre önce bilgilendirilir.
+    </p>
+
+    <h2 id="hesap">4. Hesap oluşturma ve güvenlik</h2>
+    <ul>
+      <li>Kayıt sırasında verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz.</li>
+      <li>Hesap şifrenizin ve iki adımlı doğrulama kurtarma kodlarınızın gizliliğinden siz sorumlusunuz.</li>
+      <li>Hesabınız üzerinden yapılan tüm işlemler size ait sayılır.</li>
+      <li>Yetkisiz bir erişim fark ederseniz gecikmeksizin bize bildirmelisiniz.</li>
+      <li>İşletme hesapları, İşletmenin kendi personeline verdiği yetkilerden sorumludur.</li>
+      <li>Platform 18 yaşından küçüklerin kullanımına yönelik değildir.</li>
+    </ul>
+
+    <h2 id="abonelik">5. Abonelik, ücretlendirme ve fesih</h2>
+    <h3>5.1. Paketler ve ücretler</h3>
+    <p>
+      Güncel paketler ve ücretler tanıtım sayfasının fiyatlandırma bölümünde yayımlanır.
+      Belirtilen ücretlere [KDV DAHİL / HARİÇ — BELİRTİN]. Ciro üzerinden komisyon alınmaz.
+    </p>
+
+    <h3>5.2. Deneme süresi</h3>
+    <p>
+      Yeni İşletmelere {{ DENEME.gunSayisi }} günlük ücretsiz deneme sunulur. Deneme süresi sonunda
+      devam edilmemesi hâlinde ücret tahsil edilmez ve hesap pasife alınır.
+    </p>
+
+    <h3>5.3. Ödeme ve yenileme</h3>
+    <ul>
+      <li>Abonelik ücreti [ÖDEME PERİYODU — aylık/yıllık] olarak peşin tahsil edilir.</li>
+      <li>Abonelik, taraflardan biri feshetmediği sürece aynı koşullarla yenilenir.</li>
+      <li>Ücret değişiklikleri yürürlüğe girmeden en az [BİLDİRİM SÜRESİ — ör. 30 gün] önce bildirilir.</li>
+      <li>Ödemenin gecikmesi hâlinde hizmet [GECİKME SÜRESİ] sonunda askıya alınabilir.</li>
+    </ul>
+
+    <h3>5.4. Fesih ve veri iadesi</h3>
+    <ul>
+      <li>İşletme, aboneliği dilediği zaman [FESİH BİLDİRİM SÜRESİ — ör. 30 gün] önceden bildirerek feshedebilir.</li>
+      <li>Fesih hâlinde peşin ödenen dönemin kalan kısmı için iade [YAPILIR / YAPILMAZ — BELİRTİN].</li>
+      <li>Hizmet Sağlayıcı, bu Sözleşmenin esaslı ihlali hâlinde aboneliği askıya alabilir veya feshedebilir.</li>
+      <li>Fesihten sonra İşletme verileri [VERİ SAKLAMA SÜRESİ — ör. 30 gün] boyunca dışa aktarım için erişilebilir tutulur; bu sürenin sonunda yasal saklama yükümlülükleri saklı kalmak üzere silinir.</li>
+    </ul>
+
+    <h2 id="odeme">6. Son müşteri ödemeleri</h2>
+    <p>
+      Son Müşterilerin siparişleri için yaptığı ödemeler, ödeme kuruluşu (iyzico) altyapısı üzerinden alınır.
+      Kart bilgileri Hizmet Sağlayıcı sistemlerinde saklanmaz. Sipariş tutarı istemci tarafında değil sunucuda
+      hesaplanır ve ödeme sonucu ödeme kuruluşundan ayrıca doğrulanır.
+    </p>
+    <p>
+      <strong>Siparişin konusu mal ve hizmetin satıcısı ilgili İşletmedir.</strong> Ürünün hazırlanması,
+      içeriği, kalitesi, teslimi, iadesi ve faturalandırılmasından İşletme sorumludur. Hizmet Sağlayıcı
+      bu ilişkide yalnızca teknik altyapı sağlayıcısıdır ve satışın tarafı değildir.
+    </p>
+
+    <h2 id="yukumlulukler">7. Kullanıcı yükümlülükleri</h2>
+    <p>Platformu kullanırken şunları yapmamayı kabul edersiniz:</p>
+    <ul>
+      <li>Yürürlükteki mevzuata aykırı içerik yüklemek veya işlem yapmak,</li>
+      <li>Başkasının fikri mülkiyet haklarını ihlal eden görsel veya metin yüklemek,</li>
+      <li>Platformun güvenlik önlemlerini aşmaya çalışmak, tersine mühendislik yapmak,</li>
+      <li>Otomatik araçlarla sistemi aşırı yüklemek veya hizmeti aksatmak,</li>
+      <li>Başka bir kullanıcının hesabına izinsiz erişmek,</li>
+      <li>Platformu Hizmet Sağlayıcının yazılı izni olmadan üçüncü kişilere yeniden satmak.</li>
+    </ul>
+
+    <h2 id="icerik">8. İşletme içeriği</h2>
+    <p>
+      İşletmenin yüklediği menü, ürün görselleri, logo, kampanya ve duyuru içerikleri İşletmeye aittir.
+      İşletme, bu içerikleri yükleyerek Hizmet Sağlayıcıya, hizmetin sunulması amacıyla sınırlı,
+      dünya çapında, telifsiz bir kullanım lisansı verir. İçeriğin doğruluğu, güncelliği ve
+      hukuka uygunluğundan İşletme sorumludur.
+    </p>
+
+    <h2 id="fikri-mulkiyet">9. Fikri mülkiyet</h2>
+    <p>
+      {{ markaAdi }} markası, yazılımı, arayüz tasarımı ve kaynak kodu üzerindeki tüm haklar
+      Hizmet Sağlayıcıya aittir. Abonelik, Kullanıcıya yalnızca <strong>kullanım hakkı</strong> verir;
+      mülkiyet veya kaynak koda erişim hakkı vermez.
+    </p>
+
+    <h2 id="hizmet-seviyesi">10. Hizmet sürekliliği</h2>
+    <p>
+      Hizmet Sağlayıcı platformun kesintisiz çalışması için makul çabayı gösterir ancak
+      %100 erişilebilirlik taahhüt etmez. Planlı bakımlar mümkün olduğunca yoğun olmayan saatlerde
+      yapılır ve önceden duyurulur. Üçüncü taraf sağlayıcılardan (barındırma, ödeme kuruluşu,
+      internet servis sağlayıcısı) kaynaklanan kesintilerden Hizmet Sağlayıcı sorumlu tutulamaz.
+    </p>
+    <p>Hedeflenen erişilebilirlik oranı: [HİZMET SEVİYESİ — ör. aylık %99].</p>
+
+    <h2 id="sorumluluk">11. Sorumluluğun sınırlandırılması</h2>
+    <p>
+      Hizmet Sağlayıcının bu Sözleşmeden doğan toplam sorumluluğu, ilgili İşletmenin talebin doğduğu
+      tarihten önceki [SÜRE — ör. 12 ay] içinde ödediği abonelik bedeli ile sınırlıdır.
+    </p>
+    <p>
+      Hizmet Sağlayıcı; kâr kaybı, iş kaybı, itibar zararı gibi dolaylı zararlardan sorumlu değildir.
+      Bu sınırlamalar, Hizmet Sağlayıcının kastından veya ağır kusurundan doğan zararlar ile
+      tüketici mevzuatının emredici hükümleri bakımından uygulanmaz.
+    </p>
+
+    <h2 id="kisisel-veri">12. Kişisel verilerin korunması</h2>
+    <p>
+      Kişisel verilerin işlenmesine ilişkin esaslar
+      <a href="{{ YASAL_SAYFALAR.kvkk }}">KVKK Aydınlatma Metni</a> ve
+      <a href="{{ YASAL_SAYFALAR.gizlilik }}">Gizlilik Politikası</a>'nda düzenlenmiştir ve
+      bu Sözleşmenin ayrılmaz parçasıdır.
+    </p>
+    <p>
+      Son Müşteri verileri bakımından İşletme ve Hizmet Sağlayıcı, KVKK kapsamındaki rollerini
+      [VERİ İŞLEME SÖZLEŞMESİ REFERANSI] ile ayrıca düzenler.
+    </p>
+
+    <h2 id="degisiklik">13. Koşullardaki değişiklikler</h2>
+    <p>
+      Hizmet Sağlayıcı bu koşulları güncelleyebilir. Esaslı değişiklikler yürürlüğe girmeden
+      en az [BİLDİRİM SÜRESİ — ör. 15 gün] önce e-posta veya uygulama içi bildirimle duyurulur.
+      Değişiklikten sonra platformu kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.
+    </p>
+
+    <h2 id="uyusmazlik">14. Uygulanacak hukuk ve yetkili mahkeme</h2>
+    <p>
+      Bu Sözleşmeye Türkiye Cumhuriyeti hukuku uygulanır. Uyuşmazlıkların çözümünde
+      [YETKİLİ MAHKEME VE İCRA DAİRELERİ — ör. İstanbul Merkez (Çağlayan)] yetkilidir.
+    </p>
+    <p>
+      Tüketici sıfatını taşıyan Son Müşteriler bakımından, tüketici mevzuatının öngördüğü
+      tüketici hakem heyetleri ve tüketici mahkemelerinin yetkisi saklıdır.
+    </p>
+
+    <h2 id="iletisim">15. İletişim</h2>
+    <p>
+      Sorularınız için: <a href="mailto:{{ ILETISIM.eposta }}">{{ yasalEposta }}</a><br/>
+      {{ yasalUnvan }} — {{ yasalAdres }}
+    </p>
+  </div>
+</main>
+
+<!-- parca: yasal-altbilgi -->
+
+<script type="module" src="/src/arayuz.js"></script>
+</body>
+</html>

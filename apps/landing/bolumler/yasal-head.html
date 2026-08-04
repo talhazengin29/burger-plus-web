@@ -1,0 +1,32 @@
+<!-- ==========================================================================
+     Yasal sayfaların ortak <head> parçası.
+     Sayfaya özel olan <title> ve description her dosyada ayrı yazılır.
+
+     ⚠️ Buraya YEREL varlık bağlantısı (örn. /src/tailwind.css) KOYMAYIN.
+     Vite'ın HTML varlık dönüşümü (vite:build-html) .html dosyasını transform
+     aşamasında tarar; bu eklentinin parça enjeksiyonu ise render aşamasında
+     çalışır. Yani parçadan gelen yerel bağlantılar hash'li çıktı adresine
+     ÇEVRİLMEZ ve yayında 404 olur. Yerel varlıklar her sayfanın kendi
+     dosyasında, doğrudan yazılmalıdır. Buradaki dış (https://) bağlantılar
+     dönüştürülmediği için sorunsuzdur.
+     ========================================================================== -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="theme-color" content="#0f1015"/>
+
+<!-- Tema tercihini boyamadan ÖNCE uygula (ana sayfayla aynı anahtar). -->
+<script>
+  (function () {
+    try {
+      var kayitli = localStorage.getItem("bp-landing-tema");
+      var koyu = kayitli ? kayitli === "dark" : true;
+      document.documentElement.classList.toggle("dark", koyu);
+    } catch (e) {
+      document.documentElement.classList.add("dark");
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Outfit:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>

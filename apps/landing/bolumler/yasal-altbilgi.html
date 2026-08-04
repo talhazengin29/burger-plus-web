@@ -1,0 +1,15 @@
+<!-- ==========================================================================
+     Yasal sayfaların alt bilgisi — diğer yasal metinlere çapraz bağlantı.
+     ========================================================================== -->
+<footer class="border-t border-marka-cizgi bg-marka-zemin px-6 py-10">
+  <div class="mx-auto max-w-4xl">
+    <nav class="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-marka-gri-400" aria-label="Yasal metinler">
+      <a class="transition-colors hover:text-marka-metin" href="{{ YASAL_SAYFALAR.kosullar }}">Kullanım Koşulları</a>
+      <a class="transition-colors hover:text-marka-metin" href="{{ YASAL_SAYFALAR.gizlilik }}">Gizlilik Politikası</a>
+      <a class="transition-colors hover:text-marka-metin" href="{{ YASAL_SAYFALAR.kvkk }}">KVKK Aydınlatma Metni</a>
+      <a class="transition-colors hover:text-marka-metin" href="{{ YASAL_SAYFALAR.cerez }}">Çerez Politikası</a>
+      <a class="transition-colors hover:text-marka-metin" href="/">Ana Sayfa</a>
+    </nav>
+    <p class="text-center text-sm text-marka-gri-400">{{ telifSatiri }}</p>
+  </div>
+</footer>

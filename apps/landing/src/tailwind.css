@@ -530,6 +530,302 @@
     transform: translateY(-3px);
     color: #ffffff;
   }
+
+  /* ======================================================================
+     Talep formu (bkz. bolumler/iletisim.html, src/arayuz.js#talepFormu)
+     ====================================================================== */
+  .talep-form {
+    border: 1px solid var(--marka-cizgi);
+    background: var(--marka-kart);
+    border-radius: 1rem;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .talep-form {
+      padding: 2.25rem;
+    }
+  }
+
+  .talep-izgara {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .talep-izgara {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .talep-alan {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .talep-alan--genis {
+    grid-column: 1 / -1;
+  }
+
+  .talep-etiket {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--marka-metin);
+  }
+
+  /* @tailwindcss/forms eklentisi girdileri sıfırlıyor; görsel dili buradan
+     kuruyoruz ki koyu/aydınlık temanın ikisinde de tutarlı olsun. */
+  .talep-girdi {
+    width: 100%;
+    border: 1px solid var(--marka-cizgi);
+    border-radius: 0.625rem;
+    background: var(--marka-zemin);
+    color: var(--marka-metin);
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .talep-girdi::placeholder {
+    color: var(--marka-gri-400);
+  }
+
+  .talep-girdi:focus {
+    outline: none;
+    border-color: var(--marka-turuncu-500);
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.18);
+  }
+
+  .talep-girdi--metin {
+    resize: vertical;
+    min-height: 5.5rem;
+  }
+
+  .talep-girdi--hatali {
+    border-color: #ef4444;
+  }
+
+  .talep-girdi--hatali:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+  }
+
+  .talep-hata {
+    font-size: 0.8125rem;
+    color: #ef4444;
+    margin: 0;
+  }
+
+  .talep-onay {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--marka-gri-300);
+    cursor: pointer;
+  }
+
+  .talep-onay input[type="checkbox"] {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--marka-cizgi);
+    accent-color: var(--marka-turuncu-500);
+    cursor: pointer;
+  }
+
+  .talep-yasal-baglanti {
+    color: var(--marka-turuncu-500);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .talep-yasal-baglanti:hover {
+    color: var(--marka-turuncu-400);
+  }
+
+  .talep-gonder {
+    align-self: flex-start;
+    border-radius: 9999px;
+    padding: 0.85rem 2rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .talep-durum {
+    font-size: 0.8125rem;
+    color: var(--marka-gri-300);
+    margin: 0;
+    min-height: 1.2rem;
+  }
+
+  .talep-yedek,
+  .talep-yedek-baglanti {
+    font-size: 0.8125rem;
+    color: var(--marka-gri-300);
+  }
+
+  .talep-yedek-baglanti {
+    color: var(--marka-turuncu-500);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ======================================================================
+     Yasal sayfalar (yasal/*.html)
+     Uzun okuma metni: ölçülü satır uzunluğu ve net başlık hiyerarşisi.
+     ====================================================================== */
+  .yasal-govde {
+    color: var(--marka-gri-300);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+  }
+
+  .yasal-govde h2 {
+    color: var(--marka-metin);
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-top: 2.75rem;
+    margin-bottom: 0.85rem;
+    scroll-margin-top: calc(var(--ust-bar-yuksekligi) + 1.5rem);
+  }
+
+  .yasal-govde h3 {
+    color: var(--marka-metin);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .yasal-govde p {
+    margin-bottom: 1rem;
+  }
+
+  .yasal-govde ul,
+  .yasal-govde ol {
+    margin: 0 0 1.25rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .yasal-govde ul {
+    list-style: disc;
+  }
+
+  .yasal-govde ol {
+    list-style: decimal;
+  }
+
+  .yasal-govde a {
+    color: var(--marka-turuncu-500);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .yasal-govde strong {
+    color: var(--marka-metin);
+    font-weight: 600;
+  }
+
+  .yasal-govde table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .yasal-govde th,
+  .yasal-govde td {
+    border: 1px solid var(--marka-cizgi);
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .yasal-govde th {
+    color: var(--marka-metin);
+    font-weight: 600;
+    background: var(--marka-kart);
+  }
+
+  /* Geniş tablolar mobilde sayfayı yatay kaydırmasın. */
+  .yasal-tablo-sarici {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .yasal-tablo-sarici table {
+    margin-bottom: 0;
+    min-width: 34rem;
+  }
+
+  /* Doldurulmamış künye alanları: [KÖŞELİ] yer tutucular göze çarpsın ki
+     yayına eksik bilgiyle çıkılmasın. */
+  .yasal-yer-tutucu {
+    background: rgba(255, 107, 0, 0.14);
+    color: var(--marka-turuncu-500);
+    border-radius: 0.25rem;
+    padding: 0.05em 0.35em;
+    font-weight: 600;
+  }
+
+  .yasal-uyari {
+    border: 1px solid var(--marka-turuncu-500);
+    background: rgba(255, 107, 0, 0.08);
+    border-radius: 0.75rem;
+    padding: 1rem 1.15rem;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--marka-gri-300);
+  }
+
+  .yasal-kunye {
+    border: 1px solid var(--marka-cizgi);
+    background: var(--marka-kart);
+    border-radius: 0.75rem;
+    padding: 1.15rem 1.35rem;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+    line-height: 1.8;
+  }
+
+  .yasal-kunye dl {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  @media (min-width: 640px) {
+    .yasal-kunye dl {
+      grid-template-columns: 11rem 1fr;
+      gap: 0.5rem 1rem;
+    }
+  }
+
+  .yasal-kunye dt {
+    color: var(--marka-metin);
+    font-weight: 600;
+  }
+
+  .yasal-kunye dd {
+    margin: 0;
+  }
 }
 
 @keyframes marka-nabiz {

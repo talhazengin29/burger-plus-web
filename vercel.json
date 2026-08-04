@@ -24,11 +24,11 @@
       "destination": "/personel/index.html"
     },
     {
-      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller)[a-zA-Z0-9-]+)",
+      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller|yasal)[a-zA-Z0-9-]+)",
       "destination": "/uygulama/index.html"
     },
     {
-      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller)[a-zA-Z0-9-]+)/:path((?!assets/).*)",
+      "source": "/:isletmeSlug((?!personel|super-admin|uygulama|assets|gorseller|yasal)[a-zA-Z0-9-]+)/:path((?!assets/).*)",
       "destination": "/uygulama/index.html"
     }
   ]

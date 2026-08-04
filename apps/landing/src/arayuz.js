@@ -222,9 +222,174 @@ function aktifBolumIsaretle() {
   eslesme.forEach((_baglanti, hedef) => gozlemci.observe(hedef));
 }
 
+/* ------------------------------------------------------------- Talep formu */
+// Form gönderimi tamamen istemci tarafındadır: alanlar doğrulanır, tek bir
+// mesaja çevrilir ve WhatsApp'a (yoksa e-postaya) aktarılır. Hiçbir veri
+// saklanmaz veya üçüncü bir sunucuya iletilmez — bu yüzden formun backend'e
+// ihtiyacı yoktur.
+function talepFormu() {
+  const form = document.getElementById("talep-formu");
+  if (!form) return; // İletişim kanalı tanımlı değilse form basılmamıştır.
+
+  const durum = document.getElementById("talep-durum");
+  const kanal = form.dataset.kanal || "whatsapp";
+  const hedef = form.dataset.hedef || "";
+
+  const hataKutusu = (ad) => document.getElementById(`talep-${ad}-hata`);
+
+  function hataGoster(ad, mesaj) {
+    const kutu = hataKutusu(ad);
+    const girdi = form.elements[ad];
+    if (kutu) {
+      kutu.textContent = mesaj;
+      kutu.hidden = false;
+    }
+    if (girdi) {
+      girdi.setAttribute("aria-invalid", "true");
+      girdi.classList.add("talep-girdi--hatali");
+    }
+  }
+
+  function hatayiTemizle(ad) {
+    const kutu = hataKutusu(ad);
+    const girdi = form.elements[ad];
+    if (kutu) {
+      kutu.textContent = "";
+      kutu.hidden = true;
+    }
+    if (girdi) {
+      girdi.removeAttribute("aria-invalid");
+      girdi.classList.remove("talep-girdi--hatali");
+    }
+  }
+
+  // Türkiye cep/sabit hat: 10 hane (başında 0 veya +90 olabilir).
+  function telefonGecerliMi(deger) {
+    const rakamlar = String(deger).replace(/\D/g, "");
+    return /^(90)?0?\d{10}$/.test(rakamlar);
+  }
+
+  function epostaGecerliMi(deger) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(deger).trim());
+  }
+
+  function dogrula() {
+    const hatalar = [];
+    ["ad", "isletme", "telefon"].forEach((ad) => {
+      const deger = String(form.elements[ad]?.value || "").trim();
+      if (!deger) {
+        hataGoster(ad, "Bu alan zorunludur.");
+        hatalar.push(ad);
+      } else {
+        hatayiTemizle(ad);
+      }
+    });
+
+    const telefon = String(form.elements.telefon?.value || "").trim();
+    if (telefon && !telefonGecerliMi(telefon)) {
+      hataGoster("telefon", "Geçerli bir telefon numarası girin (örn. 0532 111 22 33).");
+      if (!hatalar.includes("telefon")) hatalar.push("telefon");
+    }
+
+    const eposta = String(form.elements.eposta?.value || "").trim();
+    if (eposta && !epostaGecerliMi(eposta)) {
+      hataGoster("eposta", "Geçerli bir e-posta adresi girin.");
+      hatalar.push("eposta");
+    } else if (eposta) {
+      hatayiTemizle("eposta");
+    }
+
+    // E-posta kanalında dönüş adresi olmadan talep işe yaramaz.
+    if (kanal === "eposta" && !eposta) {
+      hataGoster("eposta", "E-posta ile gönderimde bu alan zorunludur.");
+      hatalar.push("eposta");
+    }
+
+    const kvkk = form.elements.kvkk;
+    const kvkkHatasi = document.getElementById("talep-kvkk-hata");
+    if (kvkk && !kvkk.checked) {
+      if (kvkkHatasi) {
+        kvkkHatasi.textContent = "Devam etmek için aydınlatma metnini onaylayın.";
+        kvkkHatasi.hidden = false;
+      }
+      kvkk.setAttribute("aria-invalid", "true");
+      hatalar.push("kvkk");
+    } else if (kvkkHatasi) {
+      kvkkHatasi.textContent = "";
+      kvkkHatasi.hidden = true;
+      kvkk?.removeAttribute("aria-invalid");
+    }
+
+    return hatalar;
+  }
+
+  function mesajiKur() {
+    const oku = (ad) => String(form.elements[ad]?.value || "").trim();
+    const satirlar = [
+      "Merhaba, QR Menü Pro için kurulum talebim var.",
+      "",
+      `Ad Soyad: ${oku("ad")}`,
+      `İşletme: ${oku("isletme")}`,
+      `Telefon: ${oku("telefon")}`,
+    ];
+    if (oku("eposta")) satirlar.push(`E-posta: ${oku("eposta")}`);
+    if (oku("masaSayisi")) satirlar.push(`Masa sayısı: ${oku("masaSayisi")}`);
+    if (oku("paket")) satirlar.push(`İlgilenilen paket: ${oku("paket")}`);
+    if (oku("mesaj")) satirlar.push("", `Not: ${oku("mesaj")}`);
+    return satirlar.join("\n");
+  }
+
+  form.addEventListener("submit", (olay) => {
+    olay.preventDefault();
+    const hatalar = dogrula();
+
+    if (hatalar.length) {
+      if (durum) durum.textContent = "Lütfen işaretli alanları kontrol edin.";
+      const ilk = form.elements[hatalar[0]];
+      ilk?.focus();
+      return;
+    }
+
+    const mesaj = mesajiKur();
+    const adres =
+      kanal === "whatsapp"
+        ? `https://wa.me/${hedef}?text=${encodeURIComponent(mesaj)}`
+        : `mailto:${hedef}?subject=${encodeURIComponent("QR Menü Pro — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
+
+    if (durum) {
+      durum.textContent =
+        kanal === "whatsapp"
+          ? "WhatsApp açılıyor — mesajı göndermeyi unutmayın."
+          : "E-posta uygulamanız açılıyor — mesajı göndermeyi unutmayın.";
+    }
+
+    // WhatsApp yeni sekmede, mailto aynı sekmede açılır (mailto yeni sekmede
+    // boş bir pencere bırakır).
+    if (kanal === "whatsapp") window.open(adres, "_blank", "noopener,noreferrer");
+    else window.location.href = adres;
+  });
+
+  // Kullanıcı düzeltmeye başlayınca hata mesajı kaybolsun.
+  ["ad", "isletme", "telefon", "eposta"].forEach((ad) => {
+    form.elements[ad]?.addEventListener("input", () => hatayiTemizle(ad));
+  });
+
+  // Fiyat kartlarındaki butonlar tıklanan paketi formda önceden seçtirir.
+  document.querySelectorAll("a[data-paket]").forEach((baglanti) => {
+    baglanti.addEventListener("click", () => {
+      const secim = form.elements.paket;
+      if (!secim) return;
+      const istenen = baglanti.dataset.paket;
+      const uygun = Array.from(secim.options).some((secenek) => secenek.value === istenen);
+      if (uygun) secim.value = istenen;
+    });
+  });
+}
+
 /* ------------------------------------------------------------------ Başlangıç */
 mobilMenu();
 sssAkordiyonu();
 temaAnahtari();
 fiyatAnahtari();
 aktifBolumIsaretle();
+talepFormu();

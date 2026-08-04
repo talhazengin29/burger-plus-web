@@ -17,23 +17,99 @@ export const ROTALAR = {
   musteriDemo: "/burger-plus", // apps/musteri → varsayılan işletme
 };
 
+// ============================================================================
+// ⚙️ KURULUM — YAYINA ÇIKMADAN ÖNCE DOLDURULACAK TEK YER
+//
+// Aşağıdaki İLETİŞİM ve YASAL blokları sayfanın "canlıya hazır" olup olmadığını
+// belirler. İkisi de boşken sayfa yine sorunsuz çalışır, ama:
+//   • İLETİŞİM boşsa  → talep formu ve WhatsApp butonu HİÇ render edilmez,
+//                        dönüşüm butonları kapanış bölümüne kaydırır.
+//   • YASAL boşsa     → yasal sayfalar yayında [KÖŞELİ] yer tutucularla çıkar.
+// ============================================================================
+
+// --- İletişim kanalları ------------------------------------------------------
+//
+// ⚠️ UYDURMA DEĞER YAZILMADI. Yanlış bir numara/e-posta yayına çıkarsa
+// müşteri adayları alakasız birine ulaşır. En az BİRİ doldurulduğunda talep
+// formu otomatik görünür hale gelir (bkz. iletisimKanaliVarMi).
+//
+// whatsapp → ülke kodu + numara, yalnızca rakam. Türkiye için 90 ile başlar.
+//            Örnek: "905321112233"
+// eposta   → formun WhatsApp yoksa kullanacağı yedek kanal ve yasal metinlerde
+//            görünen başvuru adresi. Örnek: "iletisim@ornek.com"
+// telefon  → altbilgide görünen, insanın okuyacağı biçim. Örnek: "0532 111 22 33"
+export const ILETISIM = {
+  whatsapp: "",
+  eposta: "",
+  telefon: "",
+};
+
+// --- Yasal / künye bilgileri -------------------------------------------------
+//
+// yasal/*.html sayfaları bu değerleri kullanır. Boş bırakılan her alan
+// sayfada köşeli parantezli yer tutucu olarak görünür — böylece eksik bilgi
+// gözden kaçmaz, uydurma bir künye de yayına çıkmaz.
+export const YASAL = {
+  sirketUnvani: "",       // "Örnek Yazılım Ticaret Limited Şirketi"
+  adres: "",              // Tam tebligat adresi
+  vergiDairesi: "",
+  vergiNo: "",
+  mersisNo: "",
+  kepAdresi: "",          // varsa
+  veriSorumlusu: "",      // genelde şirket ünvanının aynısı
+  sonGuncelleme: "",      // "4 Ağustos 2026"
+};
+
+// Dolu alan olduğu gibi basılır; boş alan gözle görülür bir yer tutucuya
+// dönüşür (bkz. .yasal-yer-tutucu) — eksik künye yayında fark edilsin diye.
+function yerTutucu(deger, etiket) {
+  const temiz = String(deger || "").trim();
+  return temiz ? kacis(temiz) : `<span class="yasal-yer-tutucu">[${etiket}]</span>`;
+}
+
+// Yasal metinlerde kullanılan, boşsa yer tutucuya düşen alanlar.
+export const yasalUnvan = () => yerTutucu(YASAL.sirketUnvani, "ŞİRKET ÜNVANI");
+export const yasalAdres = () => yerTutucu(YASAL.adres, "AÇIK ADRES");
+export const yasalVergiDairesi = () => yerTutucu(YASAL.vergiDairesi, "VERGİ DAİRESİ");
+export const yasalVergiNo = () => yerTutucu(YASAL.vergiNo, "VERGİ NUMARASI");
+export const yasalMersis = () => yerTutucu(YASAL.mersisNo, "MERSİS NUMARASI");
+export const yasalKep = () => yerTutucu(YASAL.kepAdresi, "KEP ADRESİ");
+export const yasalVeriSorumlusu = () => yerTutucu(YASAL.veriSorumlusu || YASAL.sirketUnvani, "VERİ SORUMLUSU ÜNVANI");
+export const yasalEposta = () => yerTutucu(ILETISIM.eposta, "İLETİŞİM E-POSTASI");
+export const yasalTelefon = () => yerTutucu(ILETISIM.telefon, "TELEFON");
+export const yasalSonGuncelleme = () => yerTutucu(YASAL.sonGuncelleme, "GÜNCELLEME TARİHİ");
+
+// --- Yasal sayfa adresleri ---------------------------------------------------
+// .html uzantısı bilinçli: Vercel'de cleanUrls kapalı ve kök seviyedeki
+// slug rewrite'ı uzantısız yolları müşteri uygulamasına yönlendirirdi
+// (bkz. vercel.json → "yasal" hariç tutma kuralı).
+export const YASAL_SAYFALAR = {
+  kvkk: "/yasal/kvkk.html",
+  gizlilik: "/yasal/gizlilik.html",
+  kosullar: "/yasal/kosullar.html",
+  cerez: "/yasal/cerez.html",
+};
+
 // TODO(kayit-akisi): Platformda self-servis işletme kaydı YOK. Yeni işletme
 // kurulumu yalnızca super admin panelinden yapılıyor (POST /api/super/isletmeler/kurulum,
-// apps/superadmin → KurulumSihirbazi). Gerçek bir kayıt/deneme uçu eklendiğinde
-// yalnızca aşağıdaki sabit değiştirilmelidir; tüm dönüşüm butonları bunu kullanır.
-export const BASLA_BAGLANTISI = "#basla";
+// apps/superadmin → KurulumSihirbazi). Talep formu bu boşluğu kapatır: gelen
+// talep WhatsApp/e-posta ile ekibe düşer, kurulum sihirbazına elle işlenir.
+// Gerçek bir kayıt/deneme uçu eklendiğinde formun action'ı değiştirilmelidir.
+
+// Dönüşüm butonlarının hedefi. İletişim kanalı tanımlıysa talep formuna,
+// değilse (form render edilmediği için) kapanış bölümüne gider.
+export function baslaBaglantisi() {
+  return iletisimKanaliVarMi() ? "#iletisim" : "#basla";
+}
 
 // --- WhatsApp iletişim butonu ------------------------------------------------
 //
 // ⚠️ NUMARA GİRİLMEDEN BUTON GÖRÜNMEZ.
-// Buraya uydurma bir numara yazılmadı: yanlış bir numara yayına çıkarsa
-// müşteriler alakasız birine mesaj atar. `numara` boş bırakıldığı sürece
-// yüzen buton hiç render edilmez.
-//
-// Biçim: ülke kodu + numara, sadece rakam. Türkiye için 90 ile başlar.
-// Örnek: "905321112233"
+// Numara artık ILETISIM.whatsapp içinde tutuluyor (tek kaynak).
 export const WHATSAPP = {
-  numara: "",
+  get numara() {
+    return ILETISIM.whatsapp;
+  },
   // Sohbet açıldığında mesaj kutusuna hazır gelen metin.
   hazirMesaj: "Merhaba, QR Menü Pro hakkında bilgi almak istiyorum.",
   etiket: "WhatsApp'tan yazın",
@@ -48,6 +124,37 @@ export const DENEME = {
   baslik: "Tüm paketlerde 14 gün ücretsiz deneme",
   aciklama: "Kurulumu ve menü aktarımını ekibimiz yapar. Deneme sonunda devam etmezseniz ücret alınmaz.",
   buton: "14 Gün Ücretsiz Dene",
+};
+
+// --- Talep formu -------------------------------------------------------------
+// Self-servis kayıt olmadığı için dönüşüm bu formdan geçer: ziyaretçi
+// bilgilerini bırakır, form içeriği tek mesaja dönüşüp WhatsApp'a (yoksa
+// e-postaya) aktarılır. Gönderim tamamen istemci tarafındadır; hiçbir veri
+// bu sayfada saklanmaz veya üçüncü bir sunucuya iletilmez.
+export const TALEP_FORMU = {
+  etiket: "İletişim",
+  baslik: "KURULUM İÇİN",
+  vurgu: "BİZE YAZIN",
+  aciklama:
+    "Menünüzü ve masa sayınızı iletin; kurulumu ekibimiz yapsın. Formu doldurduğunuzda bilgiler hazır bir mesaja dönüşür, gönderme kararı sizde kalır.",
+  buton: "Talebi Gönder",
+  butonEposta: "E-posta ile Gönder",
+  gizlilikNotu: "Formu göndererek {kvkkBaglantisi} okuduğunuzu kabul edersiniz. Bilgileriniz yalnızca size dönüş yapmak için kullanılır.",
+  kvkkBaglantiMetni: "KVKK Aydınlatma Metni'ni",
+  alanlar: {
+    ad: { etiket: "Ad Soyad", tutucu: "Adınız ve soyadınız", zorunlu: true },
+    isletme: { etiket: "İşletme Adı", tutucu: "Örn. Lezzet Durağı", zorunlu: true },
+    telefon: { etiket: "Telefon", tutucu: "05XX XXX XX XX", zorunlu: true },
+    eposta: { etiket: "E-posta", tutucu: "ornek@isletmeniz.com", zorunlu: false },
+    masaSayisi: { etiket: "Masa Sayısı", tutucu: "Örn. 12", zorunlu: false },
+    mesaj: { etiket: "Eklemek istedikleriniz", tutucu: "Konseptiniz, sorularınız…", zorunlu: false },
+  },
+  paketEtiketi: "İlgilendiğiniz paket",
+  hatalar: {
+    zorunlu: "Bu alan zorunludur.",
+    telefon: "Geçerli bir telefon numarası girin (örn. 0532 111 22 33).",
+    eposta: "Geçerli bir e-posta adresi girin.",
+  },
 };
 
 const YIL = new Date().getFullYear();
@@ -315,12 +422,12 @@ export const ALTBILGI_KOLONLARI = [
     ],
   },
   {
-    // TODO(yasal-sayfalar): Kullanım koşulları / gizlilik politikası sayfaları
-    // projede henüz yok. Sayfalar yayına alındığında hedefler güncellenmeli.
     baslik: "Yasal",
     baglantilar: [
-      { ad: "Kullanım Koşulları", hedef: "#", yakinda: true },
-      { ad: "Gizlilik Politikası", hedef: "#", yakinda: true },
+      { ad: "Kullanım Koşulları", hedef: YASAL_SAYFALAR.kosullar },
+      { ad: "Gizlilik Politikası", hedef: YASAL_SAYFALAR.gizlilik },
+      { ad: "KVKK Aydınlatma Metni", hedef: YASAL_SAYFALAR.kvkk },
+      { ad: "Çerez Politikası", hedef: YASAL_SAYFALAR.cerez },
     ],
   },
 ];
@@ -362,9 +469,15 @@ export function whatsappAdresi() {
   return `https://wa.me/${rakamlar}?text=${encodeURIComponent(WHATSAPP.hazirMesaj)}`;
 }
 
-// Deneme talebi nereye gitsin: WhatsApp varsa oraya, yoksa iletişim bölümüne.
+// Form gönderimi için en az bir kanal tanımlı mı? İkisi de boşsa form hiç
+// basılmaz — çalışmayan bir form, hiç form olmamasından daha kötüdür.
+export function iletisimKanaliVarMi() {
+  return Boolean(String(ILETISIM.whatsapp || "").replace(/\D/g, "") || String(ILETISIM.eposta || "").trim());
+}
+
+// Tüm dönüşüm butonları buraya gider (form varsa forma, yoksa kapanışa).
 export function denemeBaglantisi() {
-  return whatsappAdresi() || BASLA_BAGLANTISI;
+  return baslaBaglantisi();
 }
 
 export function whatsappButonuHtml() {
@@ -383,29 +496,32 @@ export function whatsappButonuHtml() {
 }
 
 export function denemeSeridiHtml() {
-  const adres = denemeBaglantisi();
-  const disKaynak = adres.startsWith("http");
   return `
     <div class="deneme-serit isik-kart mb-12 flex flex-col items-center gap-4 rounded-2xl border border-marka-turuncu-500/40 bg-marka-turuncu-500/[0.06] px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
       <div>
         <p class="font-baslik text-lg font-bold text-marka-metin">${kacis(DENEME.baslik)}</p>
         <p class="mt-1 text-sm leading-relaxed text-marka-gri-300">${kacis(DENEME.aciklama)}</p>
       </div>
-      <a class="marka-buton shrink-0 whitespace-nowrap rounded-full px-7 py-3 text-sm font-medium" href="${adres}"${
-        disKaynak ? ' target="_blank" rel="noopener noreferrer"' : ""
-      }>${kacis(DENEME.buton)}</a>
+      <a class="marka-buton shrink-0 whitespace-nowrap rounded-full px-7 py-3 text-sm font-medium" href="${baslaBaglantisi()}" data-paket="Profesyonel">${kacis(DENEME.buton)}</a>
     </div>`;
 }
 
+// Talep formu render edilmişse menüye "İletişim" de eklenir.
+function navBaglantilari() {
+  return iletisimKanaliVarMi()
+    ? [...NAV_BAGLANTILARI, { ad: "İletişim", hedef: "#iletisim" }]
+    : NAV_BAGLANTILARI;
+}
+
 export function navBaglantilariHtml() {
-  return NAV_BAGLANTILARI.map(
+  return navBaglantilari().map(
     (baglanti) => `
       <a class="nav-baglanti text-sm text-marka-gri-300 transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
   ).join("");
 }
 
 export function mobilNavBaglantilariHtml() {
-  return NAV_BAGLANTILARI.map(
+  return navBaglantilari().map(
     (baglanti) => `
       <a class="rounded-lg px-3 py-3 text-base text-marka-gri-300 transition-colors hover:bg-white/5 hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
   ).join("");
@@ -513,12 +629,13 @@ export function paketKartlariHtml() {
       ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-marka-turuncu-500 px-3 py-1 text-[11px] font-bold tracking-wide text-white">${kacis(paket.rozet || "")}</span>`
       : "";
 
-    // Deneme butonu WhatsApp'a (tanımlıysa) gider; diğerleri iletişim bölümüne.
-    const hedef = paket.deneme ? denemeBaglantisi() : BASLA_BAGLANTISI;
-    const disKaynak = hedef.startsWith("http") ? ' target="_blank" rel="noopener noreferrer"' : "";
+    // Tüm paket butonları talep formuna gider. data-paket, forma tıklanan
+    // paketi önceden seçtirir (bkz. arayuz.js#talepFormu).
+    const hedef = baslaBaglantisi();
+    const paketVerisi = ` data-paket="${kacis(paket.ad)}"`;
     const buton = paket.populer
-      ? `<a class="marka-buton block w-full rounded-xl py-3 text-center text-sm font-medium" href="${hedef}"${disKaynak}>${kacis(paket.buton)}</a>`
-      : `<a class="block w-full rounded-xl border border-marka-cizgi py-3 text-center text-sm font-medium text-marka-metin transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="${hedef}"${disKaynak}>${kacis(paket.buton)}</a>`;
+      ? `<a class="marka-buton block w-full rounded-xl py-3 text-center text-sm font-medium" href="${hedef}"${paketVerisi}>${kacis(paket.buton)}</a>`
+      : `<a class="block w-full rounded-xl border border-marka-cizgi py-3 text-center text-sm font-medium text-marka-metin transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="${hedef}"${paketVerisi}>${kacis(paket.buton)}</a>`;
 
     return `
       <article class="paket-kart isik-kart relative flex flex-col rounded-2xl p-8 ${
@@ -562,6 +679,112 @@ export function sorularHtml() {
   }).join("");
 }
 
+// --- Talep formu -------------------------------------------------------------
+// Hiçbir iletişim kanalı tanımlı değilse form basılmaz: gönderilemeyen bir
+// form, ziyaretçiyi formu doldurttuktan sonra hüsrana uğratır.
+export function talepFormuHtml() {
+  if (!iletisimKanaliVarMi()) {
+    return `<!-- Talep formu: src/icerik.js icindeki ILETISIM.whatsapp ve ILETISIM.eposta
+     bos oldugu icin render edilmedi. Birini doldurunca form otomatik gorunur. -->`;
+  }
+
+  const A = TALEP_FORMU.alanlar;
+  const zorunluIsareti = '<span class="text-marka-turuncu-500" aria-hidden="true">*</span>';
+
+  const alan = (ad, tanim, tur = "text", ekAttr = "") => `
+        <div class="talep-alan">
+          <label class="talep-etiket" for="talep-${ad}">
+            ${kacis(tanim.etiket)}${tanim.zorunlu ? ` ${zorunluIsareti}` : ""}
+          </label>
+          <input class="talep-girdi" id="talep-${ad}" name="${ad}" type="${tur}"
+                 placeholder="${kacis(tanim.tutucu)}"${tanim.zorunlu ? " required" : ""}
+                 aria-describedby="talep-${ad}-hata"${ekAttr}/>
+          <p class="talep-hata" id="talep-${ad}-hata" role="alert" hidden></p>
+        </div>`;
+
+  const paketSecenekleri = PAKETLER.map(
+    (paket) => `<option value="${kacis(paket.ad)}">${kacis(paket.ad)}</option>`,
+  ).join("");
+
+  const gizlilikNotu = TALEP_FORMU.gizlilikNotu.replace(
+    "{kvkkBaglantisi}",
+    `<a class="talep-yasal-baglanti" href="${YASAL_SAYFALAR.kvkk}">${kacis(TALEP_FORMU.kvkkBaglantiMetni)}</a>`,
+  );
+
+  // JavaScript çalışmazsa form gönderilemez; bu yüzden doğrudan kanallar
+  // yedek olarak gösterilir (aşamalı geliştirme).
+  const wa = whatsappAdresi();
+  const eposta = String(ILETISIM.eposta || "").trim();
+  const yedekBaglantilar = [
+    wa ? `<a class="talep-yedek-baglanti" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp'tan yazın</a>` : "",
+    eposta ? `<a class="talep-yedek-baglanti" href="mailto:${kacis(eposta)}">${kacis(eposta)}</a>` : "",
+  ].filter(Boolean).join(" · ");
+
+  // Kanal ve hedef HTML'e gömülür; arayuz.js bunları okuyup gönderim adresini
+  // kurar (icerik.js build sırasında çalışır, tarayıcıya taşınmaz).
+  const waRakamlari = String(ILETISIM.whatsapp || "").replace(/\D/g, "");
+  const kanal = waRakamlari ? "whatsapp" : "eposta";
+  const kanalHedefi = waRakamlari || eposta;
+
+  return `
+      <form class="talep-form isik-kart" id="talep-formu" novalidate
+            data-kanal="${kanal}" data-hedef="${kacis(kanalHedefi)}">
+        <div class="talep-izgara">
+          ${alan("ad", A.ad, "text", ' autocomplete="name"')}
+          ${alan("isletme", A.isletme, "text", ' autocomplete="organization"')}
+          ${alan("telefon", A.telefon, "tel", ' autocomplete="tel" inputmode="tel"')}
+          ${alan("eposta", A.eposta, "email", ' autocomplete="email"')}
+          ${alan("masaSayisi", A.masaSayisi, "number", ' min="1" max="999" inputmode="numeric"')}
+          <div class="talep-alan">
+            <label class="talep-etiket" for="talep-paket">${kacis(TALEP_FORMU.paketEtiketi)}</label>
+            <select class="talep-girdi" id="talep-paket" name="paket">
+              ${paketSecenekleri}
+              <option value="Kararsızım">Kararsızım</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="talep-alan talep-alan--genis">
+          <label class="talep-etiket" for="talep-mesaj">${kacis(A.mesaj.etiket)}</label>
+          <textarea class="talep-girdi talep-girdi--metin" id="talep-mesaj" name="mesaj" rows="3"
+                    placeholder="${kacis(A.mesaj.tutucu)}"></textarea>
+        </div>
+
+        <label class="talep-onay">
+          <input type="checkbox" id="talep-kvkk" name="kvkk" required/>
+          <span>${gizlilikNotu}</span>
+        </label>
+        <p class="talep-hata" id="talep-kvkk-hata" role="alert" hidden></p>
+
+        <button class="marka-buton talep-gonder" type="submit">${kacis(wa ? TALEP_FORMU.buton : TALEP_FORMU.butonEposta)}</button>
+
+        <p class="talep-durum" id="talep-durum" role="status" aria-live="polite"></p>
+
+        <noscript>
+          <p class="talep-yedek">Formu göndermek için JavaScript gerekir. Doğrudan ulaşın: ${yedekBaglantilar}</p>
+        </noscript>
+      </form>`;
+}
+
+// Altbilgide görünen iletişim bilgileri. Tanımlı olan alanlar basılır.
+export function altbilgiIletisimHtml() {
+  const satirlar = [];
+  const eposta = String(ILETISIM.eposta || "").trim();
+  const telefon = String(ILETISIM.telefon || "").trim();
+  if (eposta) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="mailto:${kacis(eposta)}">${kacis(eposta)}</a></li>`);
+  if (telefon) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="tel:${telefon.replace(/[^\d+]/g, "")}">${kacis(telefon)}</a></li>`);
+  const wa = whatsappAdresi();
+  if (wa) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>`);
+  if (!satirlar.length) return "<!-- Altbilgi iletisim: ILETISIM alanlari bos. -->";
+
+  return `
+      <div>
+        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-marka-metin">İletişim</h3>
+        <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${satirlar.join("")}
+        </ul>
+      </div>`;
+}
+
 export function altbilgiKolonlariHtml() {
   return ALTBILGI_KOLONLARI.map(
     (kolon) => `
@@ -570,9 +793,7 @@ export function altbilgiKolonlariHtml() {
         <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${kolon.baglantilar
           .map(
             (baglanti) => `
-          <li><a class="transition-colors hover:text-marka-metin" href="${baglanti.hedef}"${
-            baglanti.yakinda ? ' data-durum="yakinda"' : ""
-          }>${kacis(baglanti.ad)}</a></li>`,
+          <li><a class="transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a></li>`,
           )
           .join("")}
         </ul>

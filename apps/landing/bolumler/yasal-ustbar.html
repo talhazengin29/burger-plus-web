@@ -1,0 +1,38 @@
+<!-- ==========================================================================
+     Yasal sayfaların üst barı.
+     Ana sayfanın ustbar'ından ayrıdır: bölüm çıpaları (#ozellikler gibi)
+     burada çalışmayacağı için menü yerine ana sayfaya dönüş bağlantısı var.
+     ========================================================================== -->
+<header class="ustbar cam-panel fixed inset-x-0 top-0 z-50 border-x-0 border-t-0 border-b border-marka-kenar-hafif">
+  <div class="mx-auto flex h-[4.5rem] max-w-4xl items-center justify-between px-6">
+    <a class="group flex items-center gap-2" href="/" aria-label="{{ markaAdi }} ana sayfasına dön">
+      <svg class="h-8 w-8 text-marka-metin transition-transform group-hover:scale-110" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" x2="12" y1="22.08" y2="12"/>
+      </svg>
+      <span class="font-baslik text-xl font-bold tracking-tight">{{ markaAdi }}</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <a class="hidden text-sm text-marka-gri-300 transition-colors hover:text-marka-metin sm:inline-block" href="/">
+        ← Ana sayfa
+      </a>
+
+      <button
+        class="flex h-10 w-10 items-center justify-center rounded-lg border border-marka-cizgi text-marka-metin transition-colors hover:bg-white/5"
+        id="tema-anahtari-dugmesi"
+        type="button"
+        aria-label="Aydınlık temaya geç"
+      >
+        <svg class="tema-ikon-ay h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="tema-ikon-gunes hidden h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>

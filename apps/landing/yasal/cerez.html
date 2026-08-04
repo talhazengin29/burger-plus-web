@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<!-- parca: yasal-head -->
+<title>Çerez Politikası | {{ markaAdi }}</title>
+<meta name="description" content="{{ markaAdi }} çerez politikası: hangi çerez ve yerel depolama teknolojilerini neden kullanıyoruz, hangilerini kullanmıyoruz."/>
+<meta name="robots" content="index, follow"/>
+<!-- Yerel varlik: parcadan degil, bu dosyadan (bkz. bolumler/yasal-head.html notu). -->
+<link href="/src/tailwind.css" rel="stylesheet"/>
+</head>
+
+<body class="relative overflow-x-hidden font-govde antialiased">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="zemin-izgara absolute inset-0"></div>
+</div>
+
+<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-marka-turuncu-500 focus:px-4 focus:py-2 focus:text-white" href="#icerik">
+  İçeriğe geç
+</a>
+
+<!-- parca: yasal-ustbar -->
+
+<main class="mx-auto max-w-4xl px-6 pb-20 pt-32" id="icerik">
+  <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">Yasal</p>
+  <h1 class="mb-4 font-baslik text-3xl font-bold md:text-4xl">
+    <span class="metin-akan">Çerez</span> <span class="metin-gradyan">Politikası</span>
+  </h1>
+  <p class="mb-8 text-sm text-marka-gri-400">Son güncelleme: {{ yasalSonGuncelleme }}</p>
+
+  <div class="yasal-uyari">
+    <strong>Not:</strong> Bu metin platformun mevcut teknik davranışını yansıtır.
+    İleride analitik veya reklam aracı eklerseniz bu sayfa güncellenmeli ve
+    <strong>onay (consent) mekanizması</strong> eklenmelidir.
+  </div>
+
+  <div class="yasal-govde">
+    <h2 id="ozet">1. Kısa özet</h2>
+    <p>
+      {{ markaAdi }}, <strong>reklam veya analitik çerezi kullanmaz.</strong> Kullandığımız tek şey,
+      hizmetin çalışması için zorunlu olan yerel depolama kayıtlarıdır. Bu nedenle sayfayı ilk açtığınızda
+      bir çerez onay penceresi göstermiyoruz.
+    </p>
+
+    <h2 id="nedir">2. Çerez ve yerel depolama nedir?</h2>
+    <p>
+      Çerezler, ziyaret ettiğiniz sitelerin cihazınıza kaydettiği küçük metin dosyalarıdır.
+      <em>localStorage</em> ve <em>sessionStorage</em> ise tarayıcının benzer amaçla kullandığı,
+      sunucuya otomatik gönderilmeyen yerel depolama alanlarıdır. {{ markaAdi }} ağırlıklı olarak
+      <strong>yerel depolama</strong> kullanır; klasik çerez kullanımı yoktur.
+    </p>
+
+    <h2 id="kullandiklarimiz">3. Kullandığımız kayıtlar</h2>
+
+    <h3>3.1. Tanıtım sayfası</h3>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Ad</th><th>Tür</th><th>Amaç</th><th>Süre</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>bp-landing-tema</code></td>
+            <td>localStorage</td>
+            <td>Koyu/aydınlık tema tercihinizi hatırlar</td>
+            <td>Siz silene kadar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Tanıtım sayfasında bunun dışında hiçbir kayıt oluşturulmaz.</p>
+
+    <h3>3.2. Sipariş uygulaması ve paneller</h3>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Ad</th><th>Tür</th><th>Amaç</th><th>Süre</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>bp_token_&lt;işletme&gt;</code></td>
+            <td>localStorage / sessionStorage</td>
+            <td>Oturum jetonunuzu saklar; her sayfa yenilemesinde tekrar giriş yapmanızı önler. "Beni hatırla" seçilmezse yalnızca sekme kapanana kadar tutulur.</td>
+            <td>Jeton süresi: 7 gün</td>
+          </tr>
+          <tr>
+            <td><code>burger-plus-isletme-onizleme:&lt;işletme&gt;</code></td>
+            <td>localStorage</td>
+            <td>İşletmenin logosu ve ana rengini önbelleğe alır; uygulama açılırken boş beyaz ekran yerine doğru marka görünür.</td>
+            <td>Siz silene kadar</td>
+          </tr>
+          <tr>
+            <td><code>burger-plus-personel_&lt;işletme&gt;</code></td>
+            <td>sessionStorage</td>
+            <td>Personel panelinde hangi ekranın açılacağını (mutfak/salon/yönetim) hatırlar.</td>
+            <td>Sekme kapanana kadar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Bu kayıtların tamamı <strong>zorunlu (işlevsel)</strong> niteliktedir: olmadan giriş yapılamaz
+      veya uygulama kullanılamaz. Bu nedenle mevzuat uyarınca ayrıca açık rıza gerektirmezler.
+    </p>
+
+    <h2 id="kullanmadiklarimiz">4. Kullanmadıklarımız</h2>
+    <ul>
+      <li><strong>Analitik araçlar</strong> (Google Analytics vb.) — kullanılmıyor.</li>
+      <li><strong>Reklam ve yeniden hedefleme pikselleri</strong> (Meta Pixel, Google Ads vb.) — kullanılmıyor.</li>
+      <li><strong>Sosyal medya takip eklentileri</strong> — kullanılmıyor.</li>
+      <li><strong>Üçüncü taraf çerezleri</strong> — kullanılmıyor.</li>
+    </ul>
+
+    <h2 id="ucuncu-taraf">5. Üçüncü taraf içerikleri</h2>
+    <p>
+      Sayfa yazı tiplerini <strong>Google Fonts</strong> üzerinden yükler. Bu istek sırasında
+      tarayıcınızın IP adresi ilgili sağlayıcıya ulaşır. Google Fonts bu istek için çerez oluşturmaz,
+      ancak veri yurt dışına aktarılmış olur.
+    </p>
+    <p>
+      Ödeme adımında ödeme kuruluşunun (iyzico) sayfasına yönlendirilirsiniz. O sayfada oluşan çerezler
+      ilgili kuruluşun kendi politikasına tabidir.
+    </p>
+    <p>
+      Talep formunu WhatsApp üzerinden göndermeyi seçerseniz, ilgili mesajlaşma hizmetinin
+      web sitesine yönlendirilirsiniz ve o sitenin çerez politikası geçerli olur.
+    </p>
+
+    <h2 id="yonetim">6. Kayıtları nasıl silersiniz?</h2>
+    <p>
+      Tarayıcınızın ayarlarından site verilerini temizleyerek tüm kayıtları silebilirsiniz.
+      Silme sonrasında tema tercihiniz varsayılana döner ve açık oturumlarınız kapanır.
+    </p>
+    <ul>
+      <li><strong>Chrome:</strong> Ayarlar → Gizlilik ve güvenlik → Tarama verilerini temizle</li>
+      <li><strong>Safari:</strong> Ayarlar → Safari → Geçmişi ve Web Sitesi Verilerini Sil</li>
+      <li><strong>Firefox:</strong> Ayarlar → Gizlilik ve Güvenlik → Çerezler ve Site Verileri</li>
+      <li><strong>Edge:</strong> Ayarlar → Gizlilik, arama ve hizmetler → Tarama verilerini temizle</li>
+    </ul>
+
+    <h2 id="degisiklik">7. Politikadaki değişiklikler</h2>
+    <p>
+      Yeni bir araç eklediğimizde bu sayfayı güncelleriz. Onay gerektiren bir teknoloji eklenirse,
+      kullanmadan önce sizden açık rıza isteriz.
+    </p>
+
+    <h2 id="iletisim">8. İletişim</h2>
+    <p>
+      Sorularınız için: <a href="mailto:{{ ILETISIM.eposta }}">{{ yasalEposta }}</a><br/>
+      Ayrıca <a href="{{ YASAL_SAYFALAR.gizlilik }}">Gizlilik Politikası</a> ve
+      <a href="{{ YASAL_SAYFALAR.kvkk }}">KVKK Aydınlatma Metni</a> sayfalarına bakabilirsiniz.
+    </p>
+  </div>
+</main>
+
+<!-- parca: yasal-altbilgi -->
+
+<script type="module" src="/src/arayuz.js"></script>
+</body>
+</html>

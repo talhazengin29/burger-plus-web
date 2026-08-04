@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<!-- parca: yasal-head -->
+<title>Gizlilik Politikası | {{ markaAdi }}</title>
+<meta name="description" content="{{ markaAdi }} gizlilik politikası: hangi verileri neden topluyoruz, nasıl koruyoruz, kimlerle paylaşıyoruz ve ne kadar süre saklıyoruz."/>
+<meta name="robots" content="index, follow"/>
+<!-- Yerel varlik: parcadan degil, bu dosyadan (bkz. bolumler/yasal-head.html notu). -->
+<link href="/src/tailwind.css" rel="stylesheet"/>
+</head>
+
+<body class="relative overflow-x-hidden font-govde antialiased">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="zemin-izgara absolute inset-0"></div>
+</div>
+
+<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-marka-turuncu-500 focus:px-4 focus:py-2 focus:text-white" href="#icerik">
+  İçeriğe geç
+</a>
+
+<!-- parca: yasal-ustbar -->
+
+<main class="mx-auto max-w-4xl px-6 pb-20 pt-32" id="icerik">
+  <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">Yasal</p>
+  <h1 class="mb-4 font-baslik text-3xl font-bold md:text-4xl">
+    <span class="metin-akan">Gizlilik</span> <span class="metin-gradyan">Politikası</span>
+  </h1>
+  <p class="mb-8 text-sm text-marka-gri-400">Son güncelleme: {{ yasalSonGuncelleme }}</p>
+
+  <div class="yasal-uyari">
+    <strong>Not:</strong> Bu metin platformun fiilî çalışma biçimine göre hazırlanmış bir taslaktır.
+    Yayına almadan önce köşeli parantezli alanları doldurun ve bir hukuk danışmanına inceletin.
+  </div>
+
+  <div class="yasal-govde">
+    <h2 id="ozet">1. Kısa özet</h2>
+    <p>Uzun metni okumak istemiyorsanız, özü şudur:</p>
+    <ul>
+      <li>Yalnızca hizmeti sunmak için gereken verileri topluyoruz.</li>
+      <li>Verilerinizi <strong>satmıyoruz</strong>, reklam amacıyla paylaşmıyoruz.</li>
+      <li>Tanıtım sayfamızda analitik veya reklam takibi <strong>yok</strong>.</li>
+      <li>Kredi kartı bilgileriniz bizim sunucularımıza <strong>hiç ulaşmıyor</strong>.</li>
+      <li>Şifreniz geri döndürülemez biçimde (bcrypt) saklanıyor; biz de göremiyoruz.</li>
+      <li>Hesabınızı ve verilerinizi silme hakkınız var.</li>
+    </ul>
+
+    <h2 id="kim">2. Bu politika kimi kapsar?</h2>
+    <p>
+      Bu politika {{ yasalVeriSorumlusu }} tarafından işletilen {{ markaAdi }} platformunu kapsar:
+      tanıtım sayfası, masadan sipariş uygulaması, personel/yönetim paneli ve platform yönetim paneli.
+    </p>
+    <p>
+      {{ markaAdi }} platformu restoran ve kafelere hizmet verir. Bir restoranın müşterisi olarak
+      sipariş verdiğinizde, hem <strong>biz</strong> (platform sağlayıcı) hem de <strong>sipariş verdiğiniz
+      işletme</strong> verilerinize erişir. İşletmenin verilerinizi kendi amaçlarıyla nasıl kullandığından
+      ilgili işletme sorumludur.
+    </p>
+
+    <h2 id="toplananlar">3. Topladığımız veriler</h2>
+
+    <h3>3.1. Bize doğrudan verdikleriniz</h3>
+    <ul>
+      <li><strong>Üyelik:</strong> ad, soyad, cinsiyet, e-posta, telefon, şifre.</li>
+      <li><strong>Sipariş:</strong> seçtiğiniz ürünler, porsiyon/malzeme tercihleri, masa numarası, sipariş notları.</li>
+      <li><strong>Talep formu:</strong> ad, işletme adı, telefon, e-posta, masa sayısı ve mesajınız.</li>
+    </ul>
+
+    <h3>3.2. Kullanım sırasında otomatik oluşanlar</h3>
+    <ul>
+      <li>Sipariş ve ödeme geçmişi, puan/damga bakiyesi, kazanılan ve kullanılan hediyeler.</li>
+      <li>Oturum jetonu (JWT) ve üretim zamanı — şifrenizi değiştirdiğinizde eski oturumlar geçersiz kılınır.</li>
+      <li>IP adresi — yalnızca istek sınırlama (kaba kuvvet saldırısı önleme) ve güvenlik denetimi için.</li>
+      <li>Yönetim panelinde yapılan değişikliklerin denetim kaydı (kim, ne zaman, hangi kaydı değiştirdi).</li>
+    </ul>
+
+    <h3>3.3. Toplamadıklarımız</h3>
+    <ul>
+      <li><strong>Kart bilgileri.</strong> Ödeme ekranı ödeme kuruluşu tarafından sunulur; kart numarası, CVV ve son kullanma tarihi bizim sistemimize hiç girmez.</li>
+      <li><strong>Konum verisi.</strong> Cihazınızın konumunu istemiyoruz.</li>
+      <li><strong>Reklam tanımlayıcıları ve takip pikselleri.</strong> Kullanmıyoruz.</li>
+      <li><strong>Açık şifreniz.</strong> Yalnızca geri döndürülemez özeti saklanır.</li>
+    </ul>
+
+    <h2 id="neden">4. Verileri neden işliyoruz?</h2>
+    <ul>
+      <li>Hesabınızı oluşturmak ve oturumunuzu güvenli tutmak.</li>
+      <li>Siparişinizi almak, mutfağa iletmek ve durumunu size canlı göstermek.</li>
+      <li>Ödemeyi güvenli biçimde tahsil etmek ve doğrulamak.</li>
+      <li>Puan, damga ve hediye programını yürütmek.</li>
+      <li>Yasal olarak saklamak zorunda olduğumuz mali kayıtları tutmak.</li>
+      <li>Hesabınızı yetkisiz erişime karşı korumak.</li>
+      <li>Bize ilettiğiniz talep ve şikâyetleri yanıtlamak.</li>
+    </ul>
+    <p>
+      Hukuki dayanaklar için <a href="{{ YASAL_SAYFALAR.kvkk }}">KVKK Aydınlatma Metni</a>'ne bakın.
+    </p>
+
+    <h2 id="paylasim">5. Kimlerle paylaşıyoruz?</h2>
+    <ul>
+      <li><strong>Sipariş verdiğiniz işletme:</strong> siparişi hazırlayabilmesi için adınız, sipariş içeriğiniz ve masa numaranız.</li>
+      <li><strong>Ödeme kuruluşu (iyzico):</strong> ödemenin alınması için gereken işlem bilgileri.</li>
+      <li><strong>Altyapı sağlayıcıları:</strong> veritabanı, uygulama sunucusu, statik site barındırma ve e-posta gönderimi. Bu sağlayıcıların bir kısmı yurt dışındadır.</li>
+      <li><strong>Yetkili kamu kurumları:</strong> yalnızca kanunen zorunlu hâllerde.</li>
+    </ul>
+    <p><strong>Verilerinizi hiçbir koşulda satmıyoruz veya reklam amacıyla paylaşmıyoruz.</strong></p>
+
+    <h2 id="guvenlik">6. Verileri nasıl koruyoruz?</h2>
+    <p>Uyguladığımız başlıca teknik tedbirler:</p>
+    <ul>
+      <li>Şifreler <strong>bcrypt</strong> ile geri döndürülemez biçimde saklanır.</li>
+      <li>Oturumlar süreli imzalı jetonlarla (JWT) yürütülür; şifre değişiminde eski jetonlar geçersizleşir.</li>
+      <li>Yönetici hesapları için <strong>iki adımlı doğrulama (2FA)</strong> desteklenir; platform yöneticilerinde zorunludur. 2FA anahtarları veritabanında şifrelenerek saklanır.</li>
+      <li>Her işletmenin verisi ayrı tutulur; bir işletmenin oturumu diğerinin verisine erişemez.</li>
+      <li>Giriş, şifre sıfırlama ve 2FA uçlarında <strong>istek sınırlama</strong> uygulanır.</li>
+      <li>Tüm trafik <strong>HTTPS</strong> üzerinden şifrelenir.</li>
+      <li>Yönetim panelindeki değişiklikler denetim kaydına yazılır; kayıtlarda şifre ve jeton alanları maskelenir.</li>
+      <li>Ödeme tutarı istemciden değil sunucuda hesaplanır ve ödeme kuruluşundan ayrıca doğrulanır.</li>
+    </ul>
+    <p>
+      Hiçbir sistem %100 güvenli değildir. Bir veri ihlali yaşanması hâlinde, mevzuatın öngördüğü süre
+      içinde Kişisel Verileri Koruma Kurulu'na ve etkilenen kişilere bildirimde bulunuruz.
+    </p>
+
+    <h2 id="sure">7. Ne kadar süre saklıyoruz?</h2>
+    <ul>
+      <li><strong>Hesap verileri:</strong> üyeliğiniz sürdüğü sürece.</li>
+      <li><strong>Sipariş ve ödeme kayıtları:</strong> mali mevzuat gereği 10 yıl.</li>
+      <li><strong>Güvenlik ve denetim kayıtları:</strong> [SAKLAMA SÜRESİ — ör. 2 yıl].</li>
+      <li><strong>Talep formu içerikleri:</strong> talebin sonuçlanmasından itibaren [SAKLAMA SÜRESİ — ör. 1 yıl].</li>
+    </ul>
+
+    <h2 id="haklariniz">8. Haklarınız</h2>
+    <p>
+      Verilerinize erişme, düzeltme, silme ve işlemeye itiraz etme haklarınız vardır. Hakların tam listesi ve
+      başvuru yöntemi için <a href="{{ YASAL_SAYFALAR.kvkk }}">KVKK Aydınlatma Metni</a>'ne bakın.
+      Başvurularınızı <a href="mailto:{{ ILETISIM.eposta }}">{{ yasalEposta }}</a> adresine iletebilirsiniz.
+    </p>
+
+    <h2 id="cocuklar">9. Çocukların verileri</h2>
+    <p>
+      {{ markaAdi }} 18 yaşından küçüklere yönelik değildir ve bilerek çocuklardan kişisel veri toplamayız.
+      Bir çocuğa ait veri işlediğimizi fark edersek gecikmeksizin sileriz.
+    </p>
+
+    <h2 id="cerezler">10. Çerezler ve yerel depolama</h2>
+    <p>
+      Reklam veya analitik çerezi kullanmıyoruz. Kullandığımız teknolojiler ve amaçları için
+      <a href="{{ YASAL_SAYFALAR.cerez }}">Çerez Politikası</a>'na bakın.
+    </p>
+
+    <h2 id="degisiklik">11. Politikadaki değişiklikler</h2>
+    <p>
+      Bu politikayı zaman zaman güncelleyebiliriz. Esaslı bir değişiklik olması hâlinde uygulama içinde
+      veya e-posta ile bilgilendirme yaparız. Güncel sürüm daima bu sayfada yayımlanır.
+    </p>
+
+    <h2 id="iletisim">12. İletişim</h2>
+    <p>
+      Gizlilikle ilgili sorularınız için: <a href="mailto:{{ ILETISIM.eposta }}">{{ yasalEposta }}</a><br/>
+      {{ yasalVeriSorumlusu }} — {{ yasalAdres }}
+    </p>
+  </div>
+</main>
+
+<!-- parca: yasal-altbilgi -->
+
+<script type="module" src="/src/arayuz.js"></script>
+</body>
+</html>

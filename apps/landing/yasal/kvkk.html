@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<!-- parca: yasal-head -->
+<title>KVKK Aydınlatma Metni | {{ markaAdi }}</title>
+<meta name="description" content="{{ markaAdi }} kişisel verilerin korunması kanunu kapsamında aydınlatma metni: işlenen veriler, işleme amaçları, aktarım ve ilgili kişi hakları."/>
+<meta name="robots" content="index, follow"/>
+<!-- Yerel varlik: parcadan degil, bu dosyadan (bkz. bolumler/yasal-head.html notu). -->
+<link href="/src/tailwind.css" rel="stylesheet"/>
+</head>
+
+<body class="relative overflow-x-hidden font-govde antialiased">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="zemin-izgara absolute inset-0"></div>
+</div>
+
+<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-marka-turuncu-500 focus:px-4 focus:py-2 focus:text-white" href="#icerik">
+  İçeriğe geç
+</a>
+
+<!-- parca: yasal-ustbar -->
+
+<main class="mx-auto max-w-4xl px-6 pb-20 pt-32" id="icerik">
+  <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">Yasal</p>
+  <h1 class="mb-4 font-baslik text-3xl font-bold md:text-4xl">
+    <span class="metin-akan">KVKK</span> <span class="metin-gradyan">Aydınlatma Metni</span>
+  </h1>
+  <p class="mb-8 text-sm text-marka-gri-400">Son güncelleme: {{ yasalSonGuncelleme }}</p>
+
+  <div class="yasal-uyari">
+    <strong>Not:</strong> Bu metin, {{ markaAdi }} platformunun fiilî veri akışlarına göre hazırlanmış bir taslaktır.
+    Yayına almadan önce köşeli parantezli alanları doldurun ve metni bir hukuk danışmanına inceletin.
+  </div>
+
+  <div class="yasal-kunye">
+    <dl>
+      <dt>Veri sorumlusu</dt><dd>{{ yasalVeriSorumlusu }}</dd>
+      <dt>Adres</dt><dd>{{ yasalAdres }}</dd>
+      <dt>Vergi dairesi / no</dt><dd>{{ yasalVergiDairesi }} / {{ yasalVergiNo }}</dd>
+      <dt>MERSİS no</dt><dd>{{ yasalMersis }}</dd>
+      <dt>KEP adresi</dt><dd>{{ yasalKep }}</dd>
+      <dt>E-posta</dt><dd>{{ yasalEposta }}</dd>
+      <dt>Telefon</dt><dd>{{ yasalTelefon }}</dd>
+    </dl>
+  </div>
+
+  <div class="yasal-govde">
+    <h2 id="giris">1. Giriş</h2>
+    <p>
+      6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri sorumlusu sıfatıyla
+      {{ yasalVeriSorumlusu }} tarafından kişisel verilerinizin hangi kapsamda işlendiğini bu metinle açıklıyoruz.
+    </p>
+    <p>
+      {{ markaAdi }}, restoran ve kafelere yönelik bir dijital sipariş ve sadakat platformudur. Platform üç farklı
+      kullanıcı grubuna hizmet verir ve her grup için işlenen veriler farklıdır:
+      <strong>son müşteriler</strong> (masadan sipariş verenler), <strong>işletme personeli</strong>
+      (mutfak, salon, yönetici) ve <strong>tanıtım sayfası ziyaretçileri</strong>.
+    </p>
+
+    <h2 id="islenen-veriler">2. İşlenen kişisel veriler</h2>
+
+    <h3>2.1. Son müşteriler (sipariş uygulaması)</h3>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Veri kategorisi</th><th>Veriler</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Kimlik</td><td>Ad, soyad, cinsiyet</td></tr>
+          <tr><td>İletişim</td><td>E-posta adresi, cep telefonu numarası</td></tr>
+          <tr><td>Müşteri işlem</td><td>Sipariş geçmişi, sipariş içerikleri, masa numarası, ödeme tutarı ve durumu, puan ve damga bakiyesi, kazanılan/kullanılan hediyeler, davet kodu ve davet ilişkileri</td></tr>
+          <tr><td>İşlem güvenliği</td><td>Şifrenin geri döndürülemez özeti (bcrypt), oturum jetonu üretim zamanı, iki adımlı doğrulama anahtarı (şifreli saklanır) ve kurtarma kodlarının özetleri, IP adresi</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      <strong>Şifreniz açık biçimde saklanmaz;</strong> yalnızca bcrypt algoritmasıyla üretilmiş, geri
+      döndürülemez özeti tutulur. Kredi kartı bilgileriniz hiçbir aşamada platform sunucularına ulaşmaz;
+      ödeme ekranı ödeme kuruluşu tarafından sunulur (bkz. bölüm 4).
+    </p>
+
+    <h3>2.2. İşletme personeli ve yöneticiler</h3>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Veri kategorisi</th><th>Veriler</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Kimlik ve iletişim</td><td>Ad, soyad, e-posta adresi, telefon</td></tr>
+          <tr><td>Özlük / çalışma</td><td>Görev rolü (mutfak, salon, kasiyer, yönetici), vardiya giriş-çıkış kayıtları</td></tr>
+          <tr><td>İşlem güvenliği</td><td>Şifre özeti, iki adımlı doğrulama anahtarı, yönetim panelinde yapılan değişikliklerin denetim kayıtları (kim, ne zaman, hangi kaydı değiştirdi), IP adresi</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2.3. Tanıtım sayfası ziyaretçileri</h3>
+    <p>
+      Bu sayfada <strong>analitik veya reklam takibi yapılmaz</strong> ve ziyaretiniz sunucumuzda bir hesapla
+      ilişkilendirilmez. Talep formunu doldurmanız hâlinde ilettiğiniz ad, işletme adı, telefon,
+      e-posta ve varsa mesajınız işlenir. Form içeriği bu sayfada saklanmaz; seçtiğiniz kanal
+      (WhatsApp veya e-posta) üzerinden doğrudan bize iletilir ve gönderme kararı size aittir.
+    </p>
+
+    <h2 id="amaclar">3. İşleme amaçları ve hukuki sebepleri</h2>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Amaç</th><th>Hukuki sebep (KVKK m. 5)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Üyelik hesabının oluşturulması ve oturum yönetimi</td><td>Sözleşmenin kurulması ve ifası (m. 5/2-c)</td></tr>
+          <tr><td>Siparişin alınması, mutfağa iletilmesi ve teslimi</td><td>Sözleşmenin ifası (m. 5/2-c)</td></tr>
+          <tr><td>Ödemenin alınması ve doğrulanması</td><td>Sözleşmenin ifası (m. 5/2-c), hukuki yükümlülük (m. 5/2-ç)</td></tr>
+          <tr><td>Puan, damga ve hediye programının yürütülmesi</td><td>Sözleşmenin ifası (m. 5/2-c), meşru menfaat (m. 5/2-f)</td></tr>
+          <tr><td>Hesap güvenliği, yetkisiz erişimin önlenmesi, denetim kayıtları</td><td>Meşru menfaat (m. 5/2-f), hukuki yükümlülük (m. 5/2-ç)</td></tr>
+          <tr><td>Talep ve şikâyetlerin karşılanması</td><td>Meşru menfaat (m. 5/2-f)</td></tr>
+          <tr><td>Mali kayıtların tutulması ve saklanması</td><td>Hukuki yükümlülük (m. 5/2-ç)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Pazarlama amaçlı elektronik ileti gönderilmesi ancak <strong>ayrıca ve açıkça onay vermeniz hâlinde</strong>
+      söz konusu olur; bu onayı dilediğiniz an geri çekebilirsiniz.
+    </p>
+
+    <h2 id="aktarim">4. Kişisel verilerin aktarımı</h2>
+    <p>
+      Verileriniz, hizmetin sunulabilmesi için aşağıdaki hizmet sağlayıcılarla paylaşılır. Bu sağlayıcıların
+      bir kısmının sunucuları <strong>yurt dışında</strong> bulunmaktadır; bu nedenle aktarım KVKK m. 9
+      kapsamında değerlendirilir.
+    </p>
+    <div class="yasal-tablo-sarici">
+      <table>
+        <thead>
+          <tr><th>Alıcı</th><th>Amaç</th><th>Konum</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ödeme kuruluşu (iyzico)</td><td>Ödemenin alınması ve doğrulanması</td><td>Türkiye</td></tr>
+          <tr><td>Veritabanı barındırma sağlayıcısı</td><td>Verilerin saklanması</td><td>[SUNUCU BÖLGESİ — ör. AB / Frankfurt]</td></tr>
+          <tr><td>Uygulama sunucusu sağlayıcısı</td><td>Uygulamanın çalıştırılması</td><td>[SUNUCU BÖLGESİ]</td></tr>
+          <tr><td>Statik site barındırma sağlayıcısı</td><td>Arayüzün sunulması</td><td>[SUNUCU BÖLGESİ]</td></tr>
+          <tr><td>E-posta gönderim sağlayıcısı</td><td>Şifre sıfırlama ve bilgilendirme e-postaları</td><td>[SUNUCU BÖLGESİ]</td></tr>
+          <tr><td>Yetkili kamu kurum ve kuruluşları</td><td>Kanunen zorunlu hâllerde</td><td>Türkiye</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Talep formunu WhatsApp üzerinden göndermeyi seçerseniz, mesajınız ilgili mesajlaşma hizmeti
+      sağlayıcısının altyapısı üzerinden iletilir ve o sağlayıcının kendi gizlilik politikasına tabi olur.
+    </p>
+    <p>
+      Verileriniz <strong>reklam, profilleme veya veri satışı amacıyla üçüncü taraflara aktarılmaz.</strong>
+    </p>
+
+    <h2 id="toplama-yontemi">5. Toplama yöntemi</h2>
+    <p>
+      Kişisel verileriniz; üyelik ve giriş formları, masadaki QR kodun okutulmasıyla açılan sipariş ekranı,
+      ödeme akışı, yönetim paneli üzerinden yapılan kayıtlar ve tanıtım sayfasındaki talep formu aracılığıyla
+      <strong>elektronik ortamda</strong> ve otomatik yollarla toplanır.
+    </p>
+
+    <h2 id="saklama">6. Saklama süresi</h2>
+    <ul>
+      <li><strong>Hesap verileri:</strong> Üyeliğiniz sürdüğü müddetçe; hesabınızı sildirmeniz hâlinde yasal saklama yükümlülükleri saklı kalmak üzere silinir veya anonim hâle getirilir.</li>
+      <li><strong>Sipariş ve ödeme kayıtları:</strong> Vergi ve ticaret mevzuatı uyarınca <strong>10 yıl</strong>.</li>
+      <li><strong>Güvenlik ve denetim kayıtları:</strong> [SAKLAMA SÜRESİ — ör. 2 yıl].</li>
+      <li><strong>Talep formu içerikleri:</strong> Talebin sonuçlanmasından itibaren [SAKLAMA SÜRESİ — ör. 1 yıl].</li>
+    </ul>
+
+    <h2 id="haklar">7. KVKK m. 11 kapsamındaki haklarınız</h2>
+    <p>Veri sahibi olarak aşağıdaki haklara sahipsiniz:</p>
+    <ul>
+      <li>Kişisel verinizin işlenip işlenmediğini öğrenme,</li>
+      <li>İşlenmişse buna ilişkin bilgi talep etme,</li>
+      <li>İşlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme,</li>
+      <li>Yurt içinde veya yurt dışında verilerin aktarıldığı üçüncü kişileri bilme,</li>
+      <li>Eksik veya yanlış işlenmiş verilerin düzeltilmesini isteme,</li>
+      <li>KVKK m. 7'deki şartlar çerçevesinde silinmesini veya yok edilmesini isteme,</li>
+      <li>Düzeltme, silme ve yok etme işlemlerinin verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme,</li>
+      <li>Münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhinize bir sonuç ortaya çıkmasına itiraz etme,</li>
+      <li>Kanuna aykırı işlenme sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme.</li>
+    </ul>
+
+    <h2 id="basvuru">8. Başvuru yolu</h2>
+    <p>
+      Taleplerinizi <a href="mailto:{{ ILETISIM.eposta }}">{{ yasalEposta }}</a> adresine e-posta ile veya
+      {{ yasalAdres }} adresine yazılı olarak iletebilirsiniz. Başvurunuz, talebin niteliğine göre
+      <strong>en geç otuz gün içinde</strong> sonuçlandırılır. Başvurunun ayrıca bir maliyet gerektirmesi
+      hâlinde Kişisel Verileri Koruma Kurulu'nca belirlenen tarifedeki ücret alınabilir.
+    </p>
+    <p>
+      Başvurunuzun reddedilmesi veya otuz gün içinde yanıt verilmemesi hâlinde Kişisel Verileri Koruma
+      Kurulu'na şikâyette bulunma hakkınız saklıdır.
+    </p>
+
+    <h2 id="degisiklik">9. Metindeki değişiklikler</h2>
+    <p>
+      Bu aydınlatma metni, mevzuat değişiklikleri veya hizmetteki güncellemeler nedeniyle revize edilebilir.
+      Güncel sürüm daima bu sayfada yayımlanır ve yukarıdaki "son güncelleme" tarihi yenilenir.
+    </p>
+  </div>
+</main>
+
+<!-- parca: yasal-altbilgi -->
+
+<script type="module" src="/src/arayuz.js"></script>
+</body>
+</html>
