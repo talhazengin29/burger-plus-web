@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBag } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
@@ -23,7 +24,7 @@ function tarihGoster(iso) {
 }
 
 // Tek bir sipariş kartı
-function SiparisKart({ s, durum, gecmis }) {
+function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
   return (
     <article className={"siparis-kart" + (gecmis ? " siparis-kart--gecmis" : "")}>
       <div className="siparis-kart-ust">
@@ -67,13 +68,43 @@ function SiparisKart({ s, durum, gecmis }) {
         )}
       </div>
       <p className="siparis-not siparis-not--odendi">✓ Ödeme tamamlandı</p>
+      <button className="siparis-tekrar-btn" onClick={() => onTekrarSiparisVer(s)}>
+        🔁 Tekrar Sipariş Ver
+      </button>
     </article>
   );
 }
 
 export default function Orders() {
   const git = useIsletmeNavigate();
-  const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo } = useApp();
+  const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo, sepeteEkle, urunler } = useApp();
+
+  const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
+  useEffect(() => {
+    if (!mesaj) return;
+    const t = setTimeout(() => setMesaj(null), 2500);
+    return () => clearTimeout(t);
+  }, [mesaj]);
+
+  const tekrarSiparisVer = (s) => {
+    let eklenen = 0, eksik = 0;
+    for (const kalem of s.urunler) {
+      const guncelUrun = urunler.find((u) => Number(u.id) === Number(kalem.id));
+      if (!guncelUrun) { eksik++; continue; }
+      for (let i = 0; i < (kalem.adet || 1); i++) sepeteEkle(guncelUrun);
+      eklenen++;
+    }
+    if (eklenen === 0) {
+      setMesaj({ tip: "hata", metin: "Bu siparişteki ürünler artık mevcut değil." });
+      return;
+    }
+    if (eksik > 0) {
+      setMesaj({ tip: "hata", metin: `${eksik} ürün artık mevcut değil, eklenemedi.` });
+      setTimeout(() => git("/sepet"), 1200);
+      return;
+    }
+    git("/sepet");
+  };
 
   useEffect(() => {
     siparisleriYenile().catch(() => {});
@@ -157,6 +188,19 @@ export default function Orders() {
       <div className="orders-govde">
         <h1 className="orders-baslik">Siparişlerim</h1>
 
+        <AnimatePresence>
+          {mesaj && (
+            <motion.div
+              className={"orders-toast orders-toast--" + mesaj.tip}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              {mesaj.metin}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {siparislerim.length === 0 ? (
           <div className="orders-bos">
             <IconBag className="orders-bos-ikon" />
@@ -178,7 +222,7 @@ export default function Orders() {
                 <h2 className="orders-bolum-baslik">Aktif Siparişler</h2>
                 <div className="orders-liste">
                   {aktifler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} onTekrarSiparisVer={tekrarSiparisVer} />
                   ))}
                 </div>
               </section>
@@ -190,7 +234,7 @@ export default function Orders() {
                 <h2 className="orders-bolum-baslik">Geçmiş Siparişler</h2>
                 <div className="orders-liste">
                   {gecmisler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} onTekrarSiparisVer={tekrarSiparisVer} />
                   ))}
                 </div>
               </section>
