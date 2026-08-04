@@ -30,8 +30,8 @@ function googleFontParametresi(aile) {
   return String(aile || "").trim().replace(/\s+/g, "+");
 }
 
-function googleFontAgirliklari(aile) {
-  return aile === "Bebas Neue" ? "400" : "400;500;600;700;800";
+function googleFontAgirliklari() {
+  return "400;500;600;700;800";
 }
 
 export function TemaSaglayici({ tema, isletme, children }) {
@@ -54,7 +54,7 @@ export function TemaSaglayici({ tema, isletme, children }) {
       fontLink.rel = "stylesheet";
       document.head.appendChild(fontLink);
     }
-    fontLink.href = `https://fonts.googleapis.com/css2?${aileler.map((aile) => `family=${googleFontParametresi(aile)}:wght@${googleFontAgirliklari(aile)}`).join("&")}&display=swap`;
+    fontLink.href = `https://fonts.googleapis.com/css2?${aileler.map((aile) => `family=${googleFontParametresi(aile)}:wght@${googleFontAgirliklari()}`).join("&")}&display=swap`;
     document.title = isletme.ad;
   }, [aktifTema, isletme.ad]);
 

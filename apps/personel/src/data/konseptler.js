@@ -22,7 +22,7 @@ export const KONSEPTLER = {
   pizza: {
     ad: "Pizza",
     renkler: { accent: "#E63946", accentGlow: "rgba(230,57,70,0.4)", bgPrimary: "#0D0A0A", bgCard: "rgba(255,255,255,0.06)" },
-    font: { baslik: "Bebas Neue", govde: "Plus Jakarta Sans" },
+    font: { baslik: "Baloo 2", govde: "Plus Jakarta Sans" },
     metinler: {
       slogan: "Taş Fırından Sofrana", sloganVurgu: "Sofrana", kampanyaBaslik: "Ye Kazan",
       damgaMetni: "{hedef} Pizza Ye, 1 Pizza HEDİYE!", damgaBirim: "Pizza", sepetBos: "Sepetin şu an boş",
