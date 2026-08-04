@@ -105,14 +105,17 @@ export function AppProvider({ children }) {
   }, [isletmeSlug]);
 
   // İşletme "Tümü" rozeti için kendi görselini ayarladıysa (yönetim panelinden),
-  // konseptin genel varsayılan görselinin önüne geçer. Tema canlı güncellenince
-  // (socket) de anında yansısın diye kategori listesinden ayrı tutulur.
-  useEffect(() => {
-    if (tema?.tumuGorseli === undefined) return;
-    setMenuKategorileri((mevcut) => mevcut.map((kategori) =>
+  // konseptin genel varsayılan görselinin önüne geçer. State üzerinde değil
+  // her render'da türetilir: /api/kategoriler'in gecikmeli yanıtı ya da
+  // urunler-guncellendi soketi menuKategorileri'ni değiştirdiğinde bile
+  // (kategorileriBirlestir tumuGorseli'nden habersiz olduğundan) üzerine
+  // yazılmadan hep en güncel değeri gösterir.
+  const gosterilenKategoriler = useMemo(() => {
+    if (tema?.tumuGorseli === undefined) return menuKategorileri;
+    return menuKategorileri.map((kategori) =>
       kategori.ad === "Tümü" ? { ...kategori, gorsel: tema.tumuGorseli ?? kategori.gorsel } : kategori
-    ));
-  }, [tema?.tumuGorseli]);
+    );
+  }, [menuKategorileri, tema?.tumuGorseli]);
 
   useEffect(() => {
     const katalogGuncelle = (uzakUrunler) => {
@@ -507,7 +510,7 @@ export function AppProvider({ children }) {
     indirimliFiyat,
     // Backend tarafından yönetilen dinamik ürün kataloğu
     urunler,
-    kategoriler: menuKategorileri,
+    kategoriler: gosterilenKategoriler,
     // sepet (yerel/kişisel)
     sepet: aktifSepet,
     sepeteEkle,
