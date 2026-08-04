@@ -93,6 +93,9 @@
 .login-btn:not(:disabled):active { transform: scale(0.99); }
 .login-kurulum-btn { margin-top: 10px; padding: 11px; border: 1px solid var(--border); border-radius: var(--r-md); color: var(--primary); background: var(--primary-hafif); font-size: 12px; font-weight: 700; }
 .login-kurulum-btn:disabled { opacity: .45; cursor: not-allowed; }
+.login-sifremi-unuttum { margin-top: 12px; color: var(--metin-soluk); font-size: 12px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; align-self: center; }
+.login-sifremi-unuttum:hover { color: var(--primary); }
+.login-bilgi { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--panel-2); color: var(--metin-soluk); font-size: 11px; line-height: 1.5; }
 .login-2fa-input { text-align:center; font-size:24px; font-weight:800; letter-spacing:.16em; }
 
 .login-input--email { margin-bottom: 16px; text-align: left; letter-spacing: 0; font-size: 15px; }

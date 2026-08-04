@@ -33,6 +33,7 @@ export default function Login({ onGirisBasarili }) {
   const [gecisToken, setGecisToken] = useState("");
   const [yeniSifre, setYeniSifre] = useState("");
   const [yeniSifreTekrar, setYeniSifreTekrar] = useState("");
+  const [sifremiUnuttumGoster, setSifremiUnuttumGoster] = useState(false);
 
   useEffect(() => {
     yerelAdminDurumu().then(setAdminKurulumGoster).catch(() => {});
@@ -179,6 +180,11 @@ export default function Login({ onGirisBasarili }) {
           </button>
         </div>
         {hata && <p className="login-hata">{hata}</p>}
+
+        <button type="button" className="login-sifremi-unuttum" onClick={() => setSifremiUnuttumGoster((onceki) => !onceki)}>Şifremi unuttum</button>
+        {sifremiUnuttumGoster && (
+          <p className="login-bilgi">Personel hesaplarının şifresi yöneticin tarafından belirlenir; sana e-posta ile sıfırlama bağlantısı gönderemiyoruz. Şifreni unuttuysan işletme yöneticinden Personel ekranından yeni bir geçici şifre görüntülemesini ya da tanımlamasını iste.</p>
+        )}
 
         <button type="submit" className="login-btn" disabled={!sifre || !email || yukleniyor}>
           {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}

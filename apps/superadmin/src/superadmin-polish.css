@@ -368,6 +368,11 @@ body { min-height: var(--ekran-yuksekligi); }
 .admin-listesi b { display: block; font-size: 12px; }
 .admin-listesi small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
 .admin-listesi em { flex: none; color: var(--muted); font-size: 10px; font-style: normal; }
+.gecici-sifre { display: flex; align-items: center; gap: 8px; flex: none; padding: 5px 8px; border: 1px solid rgba(251,191,36,.28); border-radius: 8px; background: rgba(251,191,36,.08); }
+.gecici-sifre small { margin: 0 !important; color: var(--warning) !important; font-size: 7px !important; font-weight: 850; letter-spacing: .08em; }
+.gecici-sifre code { color: #fde68a; font-size: 11px; letter-spacing: .02em; }
+.gecici-sifre button { padding: 3px 7px; border: 1px solid rgba(255,255,255,.12); border-radius: 5px; background: transparent; color: var(--muted); font-size: 8px; }
+.gecici-sifre button:hover { border-color: var(--warning); color: #fde68a; }
 
 @media (max-width: 1100px) {
   .detay-panel { width: 100%; }

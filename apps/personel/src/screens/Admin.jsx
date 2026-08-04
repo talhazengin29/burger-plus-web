@@ -683,7 +683,7 @@ export default function Admin({ onCikis }) {
             {bolum === "personel" && <>
               <BolumBaslik baslik="Ekip ve vardiyalar" aciklama="Giriş–çıkış saatleri, çalışma süresi ve tahmini ücret takibi." buton="+ Personel ekle" onClick={() => setPersonelForm({ ...BOS_PERSONEL })} />
               <div className="admin-personel-grid">{personeller.map((p) => (
-                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div><button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><div className="personel-kart-islemleri"><button onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret, sifre: "" })}>Düzenle</button><button className="tehlike" onClick={() => { if (window.confirm(`${p.ad} ${p.soyad} ekipten çıkarılsın mı? Açık vardiyası kapatılır ve personel girişi devre dışı kalır.`)) islem(() => adminIstek(`/personeller/${p.id}`, { method: "DELETE" }), "Personel güvenli biçimde arşivlendi."); }}>Sil</button></div></article>
+                <article className="admin-personel" key={p.id}><div className="personel-avatar">{p.ad[0]}{p.soyad[0]}</div><div className="personel-bilgi"><h3>{p.ad} {p.soyad}</h3><span>{p.rol}</span><small>{p.acik_vardiya_id ? `Giriş: ${tarihSaat(p.vardiya_giris)}` : "Vardiyada değil"}</small></div><div className="personel-saat"><b>{p.aylik_saat.toFixed(1)} sa</b><small>{para(p.aylik_saat * p.saatlik_ucret)}</small></div>{p.sifre_degistirmeli && p.sifre_gecici_metin && <GeciciSifre deger={p.sifre_gecici_metin} />}<button className={p.acik_vardiya_id ? "vardiya-cikis" : "vardiya-giris"} onClick={() => islem(() => adminIstek(`/personeller/${p.id}/vardiya`, jsonGonder("POST", { islem: p.acik_vardiya_id ? "cikis" : "giris" })), p.acik_vardiya_id ? "Çıkış kaydedildi." : "Giriş kaydedildi.")}>{p.acik_vardiya_id ? "Çıkış yap" : "Giriş yap"}</button><div className="personel-kart-islemleri"><button onClick={() => setPersonelForm({ id: p.id, ad: p.ad, soyad: p.soyad, rol: p.rol, email: p.email || "", telefon: p.telefon || "", saatlikUcret: p.saatlik_ucret, sifre: "" })}>Düzenle</button><button className="tehlike" onClick={() => { if (window.confirm(`${p.ad} ${p.soyad} ekipten çıkarılsın mı? Açık vardiyası kapatılır ve personel girişi devre dışı kalır.`)) islem(() => adminIstek(`/personeller/${p.id}`, { method: "DELETE" }), "Personel güvenli biçimde arşivlendi."); }}>Sil</button></div></article>
               ))}</div>
             </>}
 
@@ -876,6 +876,20 @@ export default function Admin({ onCikis }) {
 }
 
 function yuzdeDegisim(simdi, once) { return once > 0 ? ((simdi - once) / once) * 100 : null; }
+
+// Personel kendi şifresini belirleyene kadar (sifre_degistirmeli), yönetici
+// oluşturma/düzenleme sırasında tek seferlik gösterilen şifreyi kaçırmışsa
+// burada tekrar görüp kopyalayabilir.
+function GeciciSifre({ deger }) {
+  const [kopyalandi, setKopyalandi] = useState(false);
+  return (
+    <div className="personel-gecici-sifre">
+      <small>GEÇİCİ ŞİFRE</small>
+      <code>{deger}</code>
+      <button type="button" onClick={() => navigator.clipboard.writeText(deger).then(() => { setKopyalandi(true); setTimeout(() => setKopyalandi(false), 1500); })}>{kopyalandi ? "Kopyalandı" : "Kopyala"}</button>
+    </div>
+  );
+}
 
 function Metrik({ ad, deger, alt, renk, trend, spark }) {
   return (
