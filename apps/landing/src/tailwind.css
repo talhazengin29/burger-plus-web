@@ -200,6 +200,38 @@
   .parlak-turuncu {
     box-shadow: var(--turuncu-parilti);
   }
+
+  /* --- Fiyatlandırma: aylık/yıllık anahtarı. ------------------------------ */
+  .fiyat-anahtar-dugme {
+    position: relative;
+    border-radius: 9999px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--marka-gri-300);
+    transition:
+      color 0.25s ease,
+      background-image 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .fiyat-anahtar-dugme--aktif {
+    background-image: linear-gradient(to right, var(--marka-turuncu-400), var(--marka-turuncu-500));
+    color: #ffffff;
+    box-shadow: var(--turuncu-parilti);
+  }
+  .fiyat-anahtar-rozet {
+    margin-left: 0.45rem;
+    border-radius: 9999px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.18);
+    color: inherit;
+  }
+  .fiyat-anahtar-dugme:not(.fiyat-anahtar-dugme--aktif) .fiyat-anahtar-rozet {
+    background: rgba(255, 107, 0, 0.15);
+    color: var(--marka-turuncu-400);
+  }
 }
 
 @keyframes marka-akis {

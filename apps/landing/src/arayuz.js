@@ -130,6 +130,27 @@ function sssAkordiyonu() {
   });
 }
 
+/* --------------------------------------------------- Fiyat anahtarı (aylık/yıllık) */
+function fiyatAnahtari() {
+  const grup = document.getElementById("fiyat-anahtari");
+  if (!grup) return;
+
+  const dugmeler = Array.from(grup.querySelectorAll(".fiyat-anahtar-dugme"));
+  if (!dugmeler.length) return;
+
+  function uygula(periyot) {
+    dugmeler.forEach((dugme) => {
+      const aktif = dugme.dataset.periyot === periyot;
+      dugme.setAttribute("aria-pressed", String(aktif));
+      dugme.classList.toggle("fiyat-anahtar-dugme--aktif", aktif);
+    });
+    document.querySelectorAll(".fiyat-aylik-blok").forEach((el) => el.classList.toggle("hidden", periyot !== "aylik"));
+    document.querySelectorAll(".fiyat-yillik-blok").forEach((el) => el.classList.toggle("hidden", periyot !== "yillik"));
+  }
+
+  dugmeler.forEach((dugme) => dugme.addEventListener("click", () => uygula(dugme.dataset.periyot)));
+}
+
 /* --------------------------------------------- Menüde aktif bölümü işaretleme */
 function aktifBolumIsaretle() {
   const baglantilar = Array.from(document.querySelectorAll(".nav-baglanti"));
@@ -170,4 +191,5 @@ function aktifBolumIsaretle() {
 /* ------------------------------------------------------------------ Başlangıç */
 mobilMenu();
 sssAkordiyonu();
+fiyatAnahtari();
 aktifBolumIsaretle();

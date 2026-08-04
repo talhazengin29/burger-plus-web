@@ -15,6 +15,15 @@
 
     {{ denemeSeridiHtml }}
 
+    <div class="mb-10 flex justify-center">
+      <div id="fiyat-anahtari" class="cam-panel inline-flex items-center gap-1 rounded-full p-1" role="group" aria-label="Ödeme periyodu">
+        <button type="button" class="fiyat-anahtar-dugme fiyat-anahtar-dugme--aktif" data-periyot="aylik" aria-pressed="true">Aylık</button>
+        <button type="button" class="fiyat-anahtar-dugme" data-periyot="yillik" aria-pressed="false">
+          Yıllık<span class="fiyat-anahtar-rozet">{{ YILLIK_BEDAVA_AY }} Ay Hediye</span>
+        </button>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-start">
       {{ paketKartlariHtml }}
     </div>

@@ -215,12 +215,16 @@ export const YORUMLAR = [
 ];
 
 // --- Paketler ----------------------------------------------------------------
+// Yıllık fiyat, aylık ücretin tek kaynağından (fiyatAylik) türetilir — bkz.
+// YILLIK_BEDAVA_AY ve paketKartlariHtml. Kurumsal'da fiyatAylik yok, o yüzden
+// aylık/yıllık anahtarından etkilenmeden hep "Özel Fiyat" gösterir.
+export const YILLIK_BEDAVA_AY = 2;
+
 export const PAKETLER = [
   {
     ad: "Başlangıç",
     hedefKitle: "Tek şubeli küçük işletmeler",
-    fiyat: "₺499",
-    periyot: "/ay",
+    fiyatAylik: 499,
     ozellikler: [
       "Sınırsız QR menü görüntüleme",
       "Temel tema özelleştirme",
@@ -233,8 +237,7 @@ export const PAKETLER = [
   {
     ad: "Profesyonel",
     hedefKitle: "Masadan sipariş alan işletmeler",
-    fiyat: "₺999",
-    periyot: "/ay",
+    fiyatAylik: 999,
     ozellikler: [
       "Başlangıç paketindeki her şey",
       "Masadan canlı sipariş alma",
@@ -466,6 +469,38 @@ export function yorumKartlariHtml() {
   ).join("");
 }
 
+function paraFormatla(sayi) {
+  return `₺${Math.round(sayi).toLocaleString("tr-TR")}`;
+}
+
+// Aylık/yıllık anahtarına göre görünürlüğü arayuz.js değiştirir (bkz.
+// fiyatAnahtari()); JS çalışmazsa aylık blok zaten varsayılan görünür kalır.
+function fiyatBlokHtml(paket) {
+  if (paket.fiyatAylik == null) {
+    return `
+        <p class="mb-8">
+          <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot || "")}</span>
+        </p>`;
+  }
+
+  const aylik = paket.fiyatAylik;
+  const yillikToplam = aylik * (12 - YILLIK_BEDAVA_AY);
+  const yillikAylikEsdeger = yillikToplam / 12;
+  const tasarruf = aylik * 12 - yillikToplam;
+
+  return `
+        <p class="mb-1">
+          <span class="fiyat-aylik-blok">
+            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(aylik)}</span><span class="text-marka-gri-400">/ay</span>
+          </span>
+          <span class="fiyat-yillik-blok hidden">
+            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(yillikAylikEsdeger)}</span><span class="text-marka-gri-400">/ay</span>
+          </span>
+        </p>
+        <p class="fiyat-aylik-blok mb-8 text-xs text-marka-gri-500">Yıllık ödemede ${YILLIK_BEDAVA_AY} ay hediye</p>
+        <p class="fiyat-yillik-blok hidden mb-8 text-xs font-semibold text-marka-turuncu-400">${paraFormatla(yillikToplam)}/yıl toplam · ${paraFormatla(tasarruf)} tasarruf</p>`;
+}
+
 export function paketKartlariHtml() {
   return PAKETLER.map((paket) => {
     const madde = (metin) => `
@@ -494,9 +529,7 @@ export function paketKartlariHtml() {
         ${rozet}
         <h3 class="metin-akan metin-akan--yumusak mb-1 font-baslik text-xl font-bold">${kacis(paket.ad)}</h3>
         <p class="mb-6 text-sm text-marka-gri-400">${kacis(paket.hedefKitle)}</p>
-        <p class="mb-8">
-          <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot)}</span>
-        </p>
+        ${fiyatBlokHtml(paket)}
         <ul class="mb-8 flex flex-1 flex-col gap-4 text-sm text-marka-gri-300">${paket.ozellikler.map(madde).join("")}
         </ul>
         ${buton}
