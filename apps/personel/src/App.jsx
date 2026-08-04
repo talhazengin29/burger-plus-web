@@ -109,6 +109,15 @@ function PersonelPaneli() {
     sessionStorage.removeItem(oturumAnahtari);
     adminToken.sil();
     personelSocketiniKes();
+    // Impersonation ile girilmiş bir oturumdan çıkış, bu uygulamanın kendi
+    // giriş ekranına değil, super admini geldiği super admin paneline geri
+    // götürmeli (bkz. superadmin/src/lib/superApi.js#personelPanelineGit —
+    // buradaki VITE_PERSONEL_URL'nin aynası).
+    if (impersonation) {
+      const temel = String(import.meta.env.VITE_SUPERADMIN_URL || `${window.location.origin}/super-admin`).replace(/\/$/, "");
+      window.location.assign(temel);
+      return;
+    }
     setRol(null);
     setImpersonation(null);
     git("/");
