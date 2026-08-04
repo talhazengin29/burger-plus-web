@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { girisYap, personelIkiFaktorGirisiniTamamla, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
+import { girisYap, personelIkiFaktorGirisiniTamamla, ilkSifreBelirle, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import { useIsletme } from "../context/IsletmeContext";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
 import "./Login.css";
@@ -30,6 +30,9 @@ export default function Login({ onGirisBasarili }) {
   const [adminKurulumGoster, setAdminKurulumGoster] = useState(false);
   const [ikiFaktorToken, setIkiFaktorToken] = useState("");
   const [ikiFaktorKodu, setIkiFaktorKodu] = useState("");
+  const [gecisToken, setGecisToken] = useState("");
+  const [yeniSifre, setYeniSifre] = useState("");
+  const [yeniSifreTekrar, setYeniSifreTekrar] = useState("");
 
   useEffect(() => {
     yerelAdminDurumu().then(setAdminKurulumGoster).catch(() => {});
@@ -44,10 +47,19 @@ export default function Login({ onGirisBasarili }) {
     setHata("");
     try {
       let kullanici;
-      if (ikiFaktorToken) {
+      if (gecisToken) {
+        if (yeniSifre.length < 8) { setHata("Yeni şifre en az 8 karakter olmalıdır."); return; }
+        if (yeniSifre !== yeniSifreTekrar) { setHata("Şifreler uyuşmuyor."); return; }
+        kullanici = await ilkSifreBelirle(gecisToken, yeniSifre);
+      } else if (ikiFaktorToken) {
         kullanici = await personelIkiFaktorGirisiniTamamla(ikiFaktorToken, ikiFaktorKodu);
       } else {
         const sonuc = await girisYap(email, sifre);
+        if (sonuc?.sifreDegisimGerekli) {
+          setGecisToken(sonuc.gecisToken);
+          setSifre("");
+          return;
+        }
         if (sonuc?.ikiFaktorGerekli) {
           setIkiFaktorToken(sonuc.ikiFaktorToken);
           setSifre("");
@@ -77,6 +89,40 @@ export default function Login({ onGirisBasarili }) {
       setYukleniyor(false);
     }
   };
+
+  if (gecisToken) {
+    return (
+      <div className="login">
+        <form className="login-kart" onSubmit={gonder}>
+          <PersonelMarkasi />
+          <h1 className="login-baslik">Yeni Şifre Belirle</h1>
+          <p className="login-alt">Bu hesap için geçici bir şifreyle giriş yaptın. Devam etmeden önce kendi şifreni belirle.</p>
+
+          <label className="login-etiket">Yeni şifre</label>
+          <input
+            type="password"
+            className="login-input"
+            value={yeniSifre}
+            onChange={(e) => { setYeniSifre(e.target.value); setHata(""); }}
+            placeholder="En az 8 karakter"
+            autoFocus
+          />
+
+          <label className="login-etiket">Yeni şifre (tekrar)</label>
+          <input
+            type="password"
+            className="login-input"
+            value={yeniSifreTekrar}
+            onChange={(e) => { setYeniSifreTekrar(e.target.value); setHata(""); }}
+            placeholder="Tekrar gir"
+          />
+          {hata && <p className="login-hata">{hata}</p>}
+          <button type="submit" className="login-btn" disabled={yeniSifre.length < 8 || !yeniSifreTekrar || yukleniyor}>{yukleniyor ? "Kaydediliyor…" : "Şifreyi Belirle ve Giriş Yap"}</button>
+          <button type="button" className="login-kurulum-btn" onClick={() => { setGecisToken(""); setYeniSifre(""); setYeniSifreTekrar(""); setHata(""); }}>Şifre ekranına dön</button>
+        </form>
+      </div>
+    );
+  }
 
   if (ikiFaktorToken) {
     return (

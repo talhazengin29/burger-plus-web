@@ -87,7 +87,7 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
 
     <section className="detay-bolum">
       <h3>İşletme yöneticisi</h3>
-      <p className="bolum-ipucu">Buradan tanımladığınız e-posta ve şifreyle işletme sahibi kendi paneline giriş yapar. Var olan bir e-postayı tekrar girerseniz o hesabın şifresi yenilenir ve açık oturumları kapanır.</p>
+      <p className="bolum-ipucu">Buradan tanımladığınız e-posta ve şifreyle işletme sahibi kendi paneline giriş yapar. Var olan bir e-postayı tekrar girerseniz o hesabın şifresi yenilenir ve açık oturumları kapanır. Girilen şifre geçicidir; ilk girişte kendi şifresini belirlemesi istenir.</p>
       {adminler.length
         ? <ul className="admin-listesi">{adminler.map((admin) => <li key={admin.id}><span><b>{admin.ad} {admin.soyad}</b><small>{admin.email}</small></span><em>{admin.ikiFaktorAktif ? "2FA açık" : "2FA kapalı"}</em></li>)}</ul>
         : <p className="bolum-ipucu uyari">Bu işletmenin tanımlı bir yöneticisi yok; sahibi panele giriş yapamaz.</p>}

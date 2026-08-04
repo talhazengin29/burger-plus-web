@@ -72,7 +72,7 @@ export async function girisYap(email, sifre) {
   const r = await istekAt("/api/giris", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, sifre }) });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
-  if (veri.ikiFaktorGerekli) return veri;
+  if (veri.ikiFaktorGerekli || veri.sifreDegisimGerekli) return veri;
   return girisiTamamla(veri);
 }
 
@@ -88,6 +88,20 @@ export async function personelIkiFaktorGirisiniTamamla(ikiFaktorToken, kod) {
   return girisiTamamla(veri);
 }
 
+// Geçici şifreyle giren admin/personel zorunlu olarak kendi şifresini
+// belirler (bkz. backend auth.js#girisYap sifreDegisimGerekli dalı).
+export async function ilkSifreBelirle(gecisToken, yeniSifre, isletmeSlugu) {
+  const r = await istekAt("/api/giris/ilk-sifre", {
+    isletmeSlugu,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ gecisToken, yeniSifre }),
+  });
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Şifre belirlenemedi.");
+  return girisiTamamla(veri, isletmeSlugu);
+}
+
 // Tek panelden giriş: hangi işletmeye ait olduğu URL'den değil, girilen
 // e-postadan bulunur (backend: /api/giris-genel, isletmeMiddleware'i atlar).
 // Başarılı yanıt hangi işletmeye ait olduğunu (isletmeSlug) da içerir; GenelGiris.jsx
@@ -101,7 +115,7 @@ export async function girisGenel(email, sifre) {
   });
   const veri = await jsonOku(r);
   if (!r.ok) throw new Error(veri.hata || "Giriş yapılamadı.");
-  if (veri.ikiFaktorGerekli) return veri;
+  if (veri.ikiFaktorGerekli || veri.sifreDegisimGerekli) return veri;
   return { kullanici: girisiTamamla(veri, veri.isletmeSlug), isletmeSlug: veri.isletmeSlug };
 }
 

@@ -89,7 +89,7 @@ function Panel({ superAdmin, cikis, yol, git }) {
           </div>
           <div className="platform-ust-durum">
             <span className="platform-canli"><i /> Sistemler çalışıyor</span>
-            <span className="yetki-rozeti">Yüksek yetkili · 4 saat</span>
+            <span className="yetki-rozeti">Yüksek yetkili · 24 saat</span>
             <span className="platform-mini-avatar">{kullaniciHarfi}</span>
           </div>
         </header>
