@@ -271,9 +271,8 @@
 }
 .kategori-daire {
   width: 64px; height: 64px;
+  display: block;
   position: relative;
-  display: grid;
-  place-items: center;
   border-radius: var(--r-full);
   isolation: isolate;
   overflow: visible;
@@ -293,7 +292,16 @@
   filter: blur(1.5px);
   transition: opacity 0.2s, transform 0.2s;
 }
-.kategori-gorsel { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+/* .kategori-daire'nin kendisi overflow:visible (::before parıltısı dışarı
+   taşsın diye); bu yüzden görsel boyutunu SINIRLAMAK için ayrı, kendi
+   overflow:hidden'ı olan bir kırpma katmanı gerekiyor. Aksi halde bir flex
+   öğesinin "otomatik minimum boyutu" devreye girip (özellikle dikey/portre
+   veya çok geniş görsellerde) daireyi görselin en-boy oranına göre gerip
+   oval/dikdörtgen gösteriyordu — width/height:100% ya da inset:0 tek başına
+   yetmiyordu. Yeni işletme/kategori görseli eklenen her yerde bu iki katmanlı
+   yapıyı (kırpma sarmalayıcı + img, ikisi de inset:0) kullanın. */
+.kategori-gorsel-kirp { position: absolute; inset: 0; z-index: 1; overflow: hidden; border-radius: inherit; }
+.kategori-gorsel { position: absolute; inset: 0; object-fit: cover; border-radius: inherit; }
 .kategori-ad {
   position: relative;
   z-index: 1;

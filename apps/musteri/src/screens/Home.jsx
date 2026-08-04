@@ -136,7 +136,9 @@ export default function Home() {
             >
               <span className="kategori-daire">
                 {kategori.gorsel && (
-                  <img className="kategori-gorsel" src={kategori.gorsel} alt="" loading="lazy" />
+                  <span className="kategori-gorsel-kirp">
+                    <img className="kategori-gorsel" src={kategori.gorsel} alt="" loading="lazy" />
+                  </span>
                 )}
               </span>
               <span className="kategori-ad">{k}</span>
