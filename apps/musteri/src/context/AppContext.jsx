@@ -69,7 +69,7 @@ function kategorileriUrunlerdenTamamla(mevcut, urunler) {
 }
 
 export function AppProvider({ children }) {
-  const { isletmeSlug } = useIsletme();
+  const { isletmeSlug, tema } = useIsletme();
   const depoAnahtari = useCallback((anahtar) => tenantDepoAnahtari(anahtar, isletmeSlug), [isletmeSlug]);
   const [puan, setPuan] = useState(0);
   const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
@@ -103,6 +103,16 @@ export function AppProvider({ children }) {
       })
       .catch(() => {});
   }, [isletmeSlug]);
+
+  // İşletme "Tümü" rozeti için kendi görselini ayarladıysa (yönetim panelinden),
+  // konseptin genel varsayılan görselinin önüne geçer. Tema canlı güncellenince
+  // (socket) de anında yansısın diye kategori listesinden ayrı tutulur.
+  useEffect(() => {
+    if (tema?.tumuGorseli === undefined) return;
+    setMenuKategorileri((mevcut) => mevcut.map((kategori) =>
+      kategori.ad === "Tümü" ? { ...kategori, gorsel: tema.tumuGorseli ?? kategori.gorsel } : kategori
+    ));
+  }, [tema?.tumuGorseli]);
 
   useEffect(() => {
     const katalogGuncelle = (uzakUrunler) => {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { adminIstek, gorselYukle, jsonGonder } from "../lib/adminApi";
+import { adminIstek, gorselYukle, jsonGonder, temaKaydet } from "../lib/adminApi";
 import { socket } from "../lib/socket";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useIsletme } from "../context/IsletmeContext";
@@ -95,7 +95,7 @@ const urunuFormaCevir = (urun) => ({
 export default function Admin({ onCikis }) {
   const konum = useLocation();
   const git = useIsletmeNavigate();
-  const { isletme } = useIsletme();
+  const { isletme, isletmeyiGuncelle } = useIsletme();
   const yolParcasi = konum.pathname.split("/").filter(Boolean).at(-1) || "genel-bakis";
   const bolum = BOLUMLER.find(([, , , yol]) => yol === yolParcasi)?.[0] || "genel";
   const [dashboard, setDashboard] = useState(null);
@@ -331,6 +331,24 @@ export default function Admin({ onCikis }) {
   const kategoriGorseliSec = gorselSecici(setKategoriForm);
   const kampanyaGorseliSec = gorselSecici(setKampanyaForm);
 
+  const [tumuYukleniyor, setTumuYukleniyor] = useState(false);
+  const tumuGorseliRef = useRef(null);
+  const tumuGorseliSec = async (dosya) => {
+    if (!dosya) return;
+    setTumuYukleniyor(true);
+    setHata("");
+    try {
+      const { gorsel } = await gorselYukle(dosya);
+      const yanit = await temaKaydet({ tumuGorseli: gorsel });
+      isletmeyiGuncelle(yanit.isletme, yanit.tema);
+      setBildirim('"Tümü" görseli güncellendi ve müşteri uygulamasına yansıtıldı.');
+    } catch (err) {
+      setHata(err.message);
+    } finally {
+      setTumuYukleniyor(false);
+    }
+  };
+
   const gramajGuncelle = (alan, deger) => setUrunForm((onceki) => ({
     ...onceki,
     gramajOpsiyonu: { ...onceki.gramajOpsiyonu, [alan]: deger },
@@ -523,6 +541,14 @@ export default function Admin({ onCikis }) {
               <section className="kategori-yonetim-karti">
                 <header><div><span>UYGULAMA MENÜSÜ</span><h3>Kategoriler</h3><p>Buradaki sıralama ve görseller müşteri uygulamasına anında yansır.</p></div><button type="button" onClick={() => setKategoriForm({ ...BOS_KATEGORI, sira: (kategoriler.at(-1)?.sira || 0) + 10 })}>+ Kategori ekle</button></header>
                 <div className="kategori-yonetim-listesi">
+                  <article className="kategori-yonetim-sabit">
+                    <button type="button" className="kategori-duzenle" disabled={tumuYukleniyor} onClick={() => tumuGorseliRef.current?.click()}>
+                      <span className="kategori-yonetim-gorsel">{isletme.tema?.tumuGorseli ? <img src={isletme.tema.tumuGorseli} alt="" /> : <b>T</b>}</span>
+                      <span><b>Tümü</b><small>Müşteri uygulamasındaki "Tümü" sekmesi{tumuYukleniyor ? " · yükleniyor…" : ""}</small></span>
+                      <em>{tumuYukleniyor ? "…" : "Görsel değiştir"}</em>
+                    </button>
+                    <input ref={tumuGorseliRef} type="file" hidden accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" onChange={(e) => { const dosya = e.target.files?.[0]; e.target.value = ""; tumuGorseliSec(dosya); }} />
+                  </article>
                   {kategoriler.map((kategori) => (
                     <article className={!kategori.aktif ? "pasif" : ""} key={kategori.id}>
                       <button type="button" className="kategori-duzenle" onClick={() => setKategoriForm({ ...kategori })}>
