@@ -10,20 +10,26 @@ export default {
     extend: {
       colors: {
         // --- Tanıtım sayfası marka paleti (Stitch tasarımından) --------------
+        // Değerler artık CSS değişkeni: koyu/aydınlık tema anahtarı bu
+        // değişkenleri src/tailwind.css'te ikişer kez tanımlar (:root =
+        // aydınlık, .dark = koyu), böylece tüm marka-* sınıfları otomatik
+        // temalanır — Tailwind sınıflarını dark: ile ikiye katlamaya gerek yok.
         // Not: aşağıdaki M3 tokenları geriye dönük uyumluluk için korunuyor.
         marka: {
-          zemin: "#0f1015",
-          kart: "#1a1b22",
-          cizgi: "#2a2b32",
+          zemin: "var(--marka-zemin)",
+          kart: "var(--marka-kart)",
+          cizgi: "var(--marka-cizgi)",
           turuncu: {
-            400: "#ff8a3d",
-            500: "#ff6b00",
-            600: "#e65c00",
+            400: "var(--marka-turuncu-400)",
+            500: "var(--marka-turuncu-500)",
+            600: "var(--marka-turuncu-600)",
           },
           gri: {
-            300: "#a1a1aa",
-            400: "#71717a",
+            300: "var(--marka-gri-300)",
+            400: "var(--marka-gri-400)",
           },
+          metin: "var(--marka-metin)",
+          "kenar-hafif": "var(--marka-kenar-hafif)",
         },
         "inverse-on-surface": "#313030",
         surface: "#131313",

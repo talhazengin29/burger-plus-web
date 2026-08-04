@@ -1,9 +1,23 @@
 <!DOCTYPE html>
-<html class="dark" lang="tr">
+<html lang="tr">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta name="theme-color" content="#0f1015"/>
+
+<!-- Tema tercihini CSS/boya işleminden ÖNCE uygula — aksi halde bir anlık
+     yanlış tema (FOUC) görülür. Varsayılan koyu (mevcut davranış). -->
+<script>
+  (function () {
+    try {
+      var kayitli = localStorage.getItem("bp-landing-tema");
+      var koyu = kayitli ? kayitli === "dark" : true;
+      document.documentElement.classList.toggle("dark", koyu);
+    } catch (e) {
+      document.documentElement.classList.add("dark");
+    }
+  })();
+</script>
 
 <!-- SEO -->
 <title>{{ sayfaBasligi }}</title>

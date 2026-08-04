@@ -10,7 +10,34 @@
    "marka-*" tokenları olarak da tanımlıdır.
    ========================================================================== */
 @layer base {
+  /* Aydınlık tema — class'sız kök (Tailwind'in darkMode:"class" kuralıyla
+     tutarlı: .dark yoksa aydınlık). */
   :root {
+    --marka-zemin: #f7f7f8;
+    --marka-kart: #ffffff;
+    --marka-cizgi: #e4e4e7;
+    --marka-turuncu-400: #ff8a3d;
+    --marka-turuncu-500: #ff6b00;
+    --marka-turuncu-600: #e65c00;
+    --marka-gri-300: #52525b;
+    --marka-gri-400: #71717a;
+    --marka-metin: #18181b;
+    --marka-kenar-hafif: rgba(0, 0, 0, 0.06);
+
+    /* Efektler */
+    --cam-zemin: rgba(255, 255, 255, 0.7);
+    --cam-bulanik: 12px;
+    --cam-kenar: rgba(0, 0, 0, 0.06);
+    --izgara-cizgi: rgba(0, 0, 0, 0.035);
+    --izgara-adim: 40px;
+    --turuncu-parilti: 0 0 40px rgba(255, 107, 0, 0.4);
+    --ust-bar-yuksekligi: 4.5rem;
+    --hale-opaklik: 0.28;
+  }
+
+  /* Koyu tema (varsayılan davranış — index.html başlangıç scripti .dark'ı
+     tercih yoksa otomatik ekler). */
+  .dark {
     --marka-zemin: #0f1015;
     --marka-kart: #1a1b22;
     --marka-cizgi: #2a2b32;
@@ -19,15 +46,13 @@
     --marka-turuncu-600: #e65c00;
     --marka-gri-300: #a1a1aa;
     --marka-gri-400: #71717a;
+    --marka-metin: #ffffff;
+    --marka-kenar-hafif: rgba(255, 255, 255, 0.05);
 
-    /* Efektler */
     --cam-zemin: rgba(26, 27, 34, 0.7);
-    --cam-bulanik: 12px;
     --cam-kenar: rgba(255, 255, 255, 0.05);
     --izgara-cizgi: rgba(255, 255, 255, 0.02);
-    --izgara-adim: 40px;
-    --turuncu-parilti: 0 0 40px rgba(255, 107, 0, 0.4);
-    --ust-bar-yuksekligi: 4.5rem;
+    --hale-opaklik: 0.5;
   }
 
   html {
@@ -40,8 +65,9 @@
 
   body {
     background-color: var(--marka-zemin);
-    color: #ffffff;
+    color: var(--marka-metin);
     font-family: theme("fontFamily.govde");
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   h1,
@@ -98,6 +124,21 @@
    Yeniden kullanılabilir bileşen sınıfları
    ========================================================================== */
 @layer components {
+  /* Panel önizleme (yönetim paneli maketi) — gerçek ürün UI'ı sabit koyu
+     temaya oturtulduğu için bu maket de tanıtım sayfasının kendi aydınlık/
+     koyu anahtarından ETKİLENMEMELİ. Değişkenleri burada yerelde yeniden
+     tanımlamak, alt ağaçtaki tüm marka-* sınıflarını (bg-marka-kart,
+     border-marka-cizgi, text-marka-gri-* ...) ata (.dark/:root) ne olursa
+     olsun koyu değerlere sabitler. */
+  .panel-maket {
+    --marka-zemin: #0f1015;
+    --marka-kart: #1a1b22;
+    --marka-cizgi: #2a2b32;
+    --marka-gri-300: #a1a1aa;
+    --marka-gri-400: #71717a;
+    --marka-metin: #ffffff;
+  }
+
   /* Cam (glassmorphism) yüzey — üst bar, kartlar, rozetler. */
   .cam-panel {
     background: var(--cam-zemin);
@@ -119,7 +160,7 @@
     position: absolute;
     border-radius: 9999px;
     filter: blur(100px);
-    opacity: 0.5;
+    opacity: var(--hale-opaklik);
     pointer-events: none;
     background: radial-gradient(circle, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0) 70%);
   }
@@ -159,7 +200,7 @@
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(90deg, #ffffff, #ff8a3d, #ffffff);
+    background-image: linear-gradient(90deg, var(--marka-metin), #ff8a3d, var(--marka-metin));
     background-size: 200% auto;
     animation: marka-akis 4s linear infinite;
   }
@@ -176,7 +217,7 @@
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(90deg, var(--marka-turuncu-400), #ffffff, var(--marka-turuncu-500));
+    background-image: linear-gradient(90deg, var(--marka-turuncu-400), var(--marka-metin), var(--marka-turuncu-500));
     background-size: 200% auto;
     animation: marka-akis 4s linear infinite;
   }

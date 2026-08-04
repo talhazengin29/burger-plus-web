@@ -130,6 +130,40 @@ function sssAkordiyonu() {
   });
 }
 
+/* --------------------------------------------------------- Tema anahtarı (koyu/aydınlık) */
+const TEMA_ANAHTARI = "bp-landing-tema";
+
+function temaAnahtari() {
+  const dugme = document.getElementById("tema-anahtari-dugmesi");
+  if (!dugme) return;
+
+  const ayIkon = dugme.querySelector(".tema-ikon-ay");
+  const gunesIkon = dugme.querySelector(".tema-ikon-gunes");
+  const metaRenk = document.querySelector('meta[name="theme-color"]');
+
+  function uygula(koyu) {
+    document.documentElement.classList.toggle("dark", koyu);
+    ayIkon?.classList.toggle("hidden", !koyu);
+    gunesIkon?.classList.toggle("hidden", koyu);
+    dugme.setAttribute("aria-label", koyu ? "Aydınlık temaya geç" : "Koyu temaya geç");
+    if (metaRenk) metaRenk.setAttribute("content", koyu ? "#0f1015" : "#f7f7f8");
+  }
+
+  // Sayfa index.html'deki başlangıç scriptiyle zaten doğru class'ta açılıyor;
+  // burada sadece ikon/aria durumunu ona eşitliyoruz.
+  uygula(document.documentElement.classList.contains("dark"));
+
+  dugme.addEventListener("click", () => {
+    const yeniKoyu = !document.documentElement.classList.contains("dark");
+    uygula(yeniKoyu);
+    try {
+      localStorage.setItem(TEMA_ANAHTARI, yeniKoyu ? "dark" : "light");
+    } catch {
+      /* localStorage erişilemiyor (gizli sekme vb.) — sessizce geç */
+    }
+  });
+}
+
 /* --------------------------------------------------- Fiyat anahtarı (aylık/yıllık) */
 function fiyatAnahtari() {
   const grup = document.getElementById("fiyat-anahtari");
@@ -168,7 +202,7 @@ function aktifBolumIsaretle() {
   function isaretle(aktifBaglanti) {
     baglantilar.forEach((baglanti) => {
       const aktif = baglanti === aktifBaglanti;
-      baglanti.classList.toggle("text-white", aktif);
+      baglanti.classList.toggle("text-marka-metin", aktif);
       baglanti.classList.toggle("text-marka-gri-300", !aktif);
       if (aktif) baglanti.setAttribute("aria-current", "true");
       else baglanti.removeAttribute("aria-current");
@@ -191,5 +225,6 @@ function aktifBolumIsaretle() {
 /* ------------------------------------------------------------------ Başlangıç */
 mobilMenu();
 sssAkordiyonu();
+temaAnahtari();
 fiyatAnahtari();
 aktifBolumIsaretle();

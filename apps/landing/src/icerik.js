@@ -388,7 +388,7 @@ export function denemeSeridiHtml() {
   return `
     <div class="deneme-serit isik-kart mb-12 flex flex-col items-center gap-4 rounded-2xl border border-marka-turuncu-500/40 bg-marka-turuncu-500/[0.06] px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
       <div>
-        <p class="font-baslik text-lg font-bold text-white">${kacis(DENEME.baslik)}</p>
+        <p class="font-baslik text-lg font-bold text-marka-metin">${kacis(DENEME.baslik)}</p>
         <p class="mt-1 text-sm leading-relaxed text-marka-gri-300">${kacis(DENEME.aciklama)}</p>
       </div>
       <a class="marka-buton shrink-0 whitespace-nowrap rounded-full px-7 py-3 text-sm font-medium" href="${adres}"${
@@ -400,14 +400,14 @@ export function denemeSeridiHtml() {
 export function navBaglantilariHtml() {
   return NAV_BAGLANTILARI.map(
     (baglanti) => `
-      <a class="nav-baglanti text-sm text-marka-gri-300 transition-colors hover:text-white" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
+      <a class="nav-baglanti text-sm text-marka-gri-300 transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
   ).join("");
 }
 
 export function mobilNavBaglantilariHtml() {
   return NAV_BAGLANTILARI.map(
     (baglanti) => `
-      <a class="rounded-lg px-3 py-3 text-base text-marka-gri-300 transition-colors hover:bg-white/5 hover:text-white" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
+      <a class="rounded-lg px-3 py-3 text-base text-marka-gri-300 transition-colors hover:bg-white/5 hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a>`,
   ).join("");
 }
 
@@ -461,7 +461,7 @@ export function yorumKartlariHtml() {
         <figcaption class="flex items-center gap-3">
           <img class="h-10 w-10 rounded-full border border-marka-cizgi object-cover" src="${yorum.gorsel}" alt="${kacis(yorum.gorselAlt)}" width="40" height="40" loading="lazy" decoding="async"/>
           <span class="block">
-            <span class="block text-sm font-semibold text-white">${kacis(yorum.kisi)}</span>
+            <span class="block text-sm font-semibold text-marka-metin">${kacis(yorum.kisi)}</span>
             <span class="block text-xs text-marka-gri-400">${kacis(yorum.rol)}</span>
           </span>
         </figcaption>
@@ -518,7 +518,7 @@ export function paketKartlariHtml() {
     const disKaynak = hedef.startsWith("http") ? ' target="_blank" rel="noopener noreferrer"' : "";
     const buton = paket.populer
       ? `<a class="marka-buton block w-full rounded-xl py-3 text-center text-sm font-medium" href="${hedef}"${disKaynak}>${kacis(paket.buton)}</a>`
-      : `<a class="block w-full rounded-xl border border-marka-cizgi py-3 text-center text-sm font-medium text-white transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="${hedef}"${disKaynak}>${kacis(paket.buton)}</a>`;
+      : `<a class="block w-full rounded-xl border border-marka-cizgi py-3 text-center text-sm font-medium text-marka-metin transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="${hedef}"${disKaynak}>${kacis(paket.buton)}</a>`;
 
     return `
       <article class="paket-kart isik-kart relative flex flex-col rounded-2xl p-8 ${
@@ -547,7 +547,7 @@ export function sorularHtml() {
     return `
       <div class="border-b border-marka-cizgi">
         <h3>
-          <button class="sss-dugme flex w-full items-center justify-between gap-4 py-5 text-left font-baslik text-base font-medium text-white transition-colors hover:text-marka-turuncu-500 md:text-lg"
+          <button class="sss-dugme flex w-full items-center justify-between gap-4 py-5 text-left font-baslik text-base font-medium text-marka-metin transition-colors hover:text-marka-turuncu-500 md:text-lg"
                   id="${dugmeId}" type="button" aria-expanded="true" aria-controls="${panelId}">
             <span>${kacis(oge.soru)}</span>
             <svg class="sss-ikon h-5 w-5 shrink-0 text-marka-gri-400 transition-transform duration-300" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -566,11 +566,11 @@ export function altbilgiKolonlariHtml() {
   return ALTBILGI_KOLONLARI.map(
     (kolon) => `
       <div>
-        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-white">${kacis(kolon.baslik)}</h3>
+        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-marka-metin">${kacis(kolon.baslik)}</h3>
         <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${kolon.baglantilar
           .map(
             (baglanti) => `
-          <li><a class="transition-colors hover:text-white" href="${baglanti.hedef}"${
+          <li><a class="transition-colors hover:text-marka-metin" href="${baglanti.hedef}"${
             baglanti.yakinda ? ' data-durum="yakinda"' : ""
           }>${kacis(baglanti.ad)}</a></li>`,
           )
