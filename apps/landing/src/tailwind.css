@@ -124,21 +124,6 @@
    Yeniden kullanılabilir bileşen sınıfları
    ========================================================================== */
 @layer components {
-  /* Panel önizleme (yönetim paneli maketi) — gerçek ürün UI'ı sabit koyu
-     temaya oturtulduğu için bu maket de tanıtım sayfasının kendi aydınlık/
-     koyu anahtarından ETKİLENMEMELİ. Değişkenleri burada yerelde yeniden
-     tanımlamak, alt ağaçtaki tüm marka-* sınıflarını (bg-marka-kart,
-     border-marka-cizgi, text-marka-gri-* ...) ata (.dark/:root) ne olursa
-     olsun koyu değerlere sabitler. */
-  .panel-maket {
-    --marka-zemin: #0f1015;
-    --marka-kart: #1a1b22;
-    --marka-cizgi: #2a2b32;
-    --marka-gri-300: #a1a1aa;
-    --marka-gri-400: #71717a;
-    --marka-metin: #ffffff;
-  }
-
   /* Cam (glassmorphism) yüzey — üst bar, kartlar, rozetler. */
   .cam-panel {
     background: var(--cam-zemin);
