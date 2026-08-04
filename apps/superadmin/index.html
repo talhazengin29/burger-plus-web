@@ -13,6 +13,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap" rel="stylesheet" />
     <title>Platform Yönetimi</title>
+
+    <!-- Tema tercihini CSS/boya işleminden ÖNCE uygula — aksi halde bir anlık
+         yanlış tema (FOUC) görülür. Varsayılan koyu (mevcut davranış). -->
+    <script>
+      (function () {
+        try {
+          var kayitli = localStorage.getItem("bp-superadmin-tema");
+          var koyu = kayitli ? kayitli === "dark" : true;
+          document.documentElement.classList.toggle("dark", koyu);
+        } catch (e) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

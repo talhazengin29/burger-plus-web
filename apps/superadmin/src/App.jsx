@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { superBen, superCikis, superToken } from "./lib/superApi";
+import { useTema } from "./hooks/useTema";
 import Login from "./screens/Login";
 import Dashboard from "./screens/Dashboard";
 import Isletmeler from "./screens/Isletmeler";
@@ -8,6 +9,29 @@ import Abonelikler from "./screens/Abonelikler";
 import Kayitlar from "./screens/Kayitlar";
 import { Yukleme } from "./components/Ui";
 import PlatformAmblemi from "./components/PlatformAmblemi";
+
+function TemaDugmesi({ koyu, degistir }) {
+  return (
+    <button
+      type="button"
+      className="tema-dugmesi"
+      onClick={degistir}
+      aria-label={koyu ? "Aydınlık temaya geç" : "Koyu temaya geç"}
+      title={koyu ? "Aydınlık temaya geç" : "Koyu temaya geç"}
+    >
+      {koyu ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 const HAREKETSIZLIK = 30 * 60 * 1000;
 const NAV = [
@@ -102,6 +126,7 @@ function Panel({ superAdmin, cikis, yol, git }) {
 export default function App() {
   const [yol, setYol] = useState(yoluOku);
   const [durum, setDurum] = useState({ yukleniyor: Boolean(superToken.al()), superAdmin: null });
+  const [koyu, temaDegistir] = useTema();
   const git = useCallback((hedef = "/", { replace = false } = {}) => {
     const temiz = NAV.some((oge) => oge.yol === hedef) ? hedef : "/";
     const adres = `${TEMEL}${temiz === "/" ? "/" : temiz}`;
@@ -144,7 +169,16 @@ export default function App() {
     return () => { clearTimeout(zamanlayici); olaylar.forEach((olay) => window.removeEventListener(olay, yenile)); };
   }, [cikis, durum.superAdmin]);
 
-  if (durum.yukleniyor) return <Yukleme yazi="Yüksek yetkili oturum doğrulanıyor…" />;
-  if (!durum.superAdmin) return <Login onGiris={(superAdmin) => setDurum({ yukleniyor: false, superAdmin })} />;
-  return <Panel superAdmin={durum.superAdmin} cikis={cikis} yol={yol} git={git} />;
+  const icerik = durum.yukleniyor
+    ? <Yukleme yazi="Yüksek yetkili oturum doğrulanıyor…" />
+    : !durum.superAdmin
+      ? <Login onGiris={(superAdmin) => setDurum({ yukleniyor: false, superAdmin })} />
+      : <Panel superAdmin={durum.superAdmin} cikis={cikis} yol={yol} git={git} />;
+
+  return (
+    <>
+      <TemaDugmesi koyu={koyu} degistir={temaDegistir} />
+      {icerik}
+    </>
+  );
 }
