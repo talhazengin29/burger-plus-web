@@ -10,11 +10,11 @@ import Kayitlar from "./screens/Kayitlar";
 import { Yukleme } from "./components/Ui";
 import PlatformAmblemi from "./components/PlatformAmblemi";
 
-function TemaDugmesi({ koyu, degistir }) {
+function TemaDugmesi({ koyu, degistir, sabit }) {
   return (
     <button
       type="button"
-      className="tema-dugmesi"
+      className={"tema-dugmesi" + (sabit ? " tema-dugmesi--sabit" : "")}
       onClick={degistir}
       aria-label={koyu ? "Aydınlık temaya geç" : "Koyu temaya geç"}
       title={koyu ? "Aydınlık temaya geç" : "Koyu temaya geç"}
@@ -61,7 +61,7 @@ function yoluOku() {
   return NAV.some((oge) => oge.yol === temiz) ? temiz : "/";
 }
 
-function Panel({ superAdmin, cikis, yol, git }) {
+function Panel({ superAdmin, cikis, yol, git, koyu, temaDegistir }) {
   const ekranlar = {
     "/": <Dashboard />,
     "/isletmeler": <Isletmeler />,
@@ -114,6 +114,7 @@ function Panel({ superAdmin, cikis, yol, git }) {
           <div className="platform-ust-durum">
             <span className="platform-canli"><i /> Sistemler çalışıyor</span>
             <span className="yetki-rozeti">Yüksek yetkili · 24 saat</span>
+            <TemaDugmesi koyu={koyu} degistir={temaDegistir} />
             <span className="platform-mini-avatar">{kullaniciHarfi}</span>
           </div>
         </header>
@@ -169,16 +170,10 @@ export default function App() {
     return () => { clearTimeout(zamanlayici); olaylar.forEach((olay) => window.removeEventListener(olay, yenile)); };
   }, [cikis, durum.superAdmin]);
 
-  const icerik = durum.yukleniyor
-    ? <Yukleme yazi="Yüksek yetkili oturum doğrulanıyor…" />
-    : !durum.superAdmin
-      ? <Login onGiris={(superAdmin) => setDurum({ yukleniyor: false, superAdmin })} />
-      : <Panel superAdmin={durum.superAdmin} cikis={cikis} yol={yol} git={git} />;
-
-  return (
-    <>
-      <TemaDugmesi koyu={koyu} degistir={temaDegistir} />
-      {icerik}
-    </>
-  );
+  // Panel kendi başlığının içine gömülü bir tema düğmesi taşıyor (header'ın
+  // flex akışının gerçek bir parçası); henüz header yokken (yükleniyor/giriş)
+  // sabit konumlu bir tane gösteriyoruz ki her ekranda erişilebilir olsun.
+  if (durum.yukleniyor) return <><TemaDugmesi koyu={koyu} degistir={temaDegistir} sabit /><Yukleme yazi="Yüksek yetkili oturum doğrulanıyor…" /></>;
+  if (!durum.superAdmin) return <><TemaDugmesi koyu={koyu} degistir={temaDegistir} sabit /><Login onGiris={(superAdmin) => setDurum({ yukleniyor: false, superAdmin })} /></>;
+  return <Panel superAdmin={durum.superAdmin} cikis={cikis} yol={yol} git={git} koyu={koyu} temaDegistir={temaDegistir} />;
 }
