@@ -393,8 +393,20 @@ export function AppProvider({ children }) {
   const [sonOdeme, setSonOdeme] = useState(null);
 
   // --- Siparişlerim ve sadakat ---
-  // Bu iki kayıt için tek doğruluk kaynağı backend'dir. Tarayıcı yalnızca gösterir.
+  // Üye kullanıcı için tek doğruluk kaynağı backend'dir. Misafirin hesabı
+  // olmadığından backend'de kalıcı bir siparişi yoktur — bu yüzden misafirin
+  // kendi siparişleri, aynı cihaz/tarayıcıda görünmeye devam etsin diye
+  // işletmeye özel localStorage'da ayrıca tutulur (bkz. misafirSiparisiKaydet).
   const [siparislerim, setSiparislerim] = useState([]);
+  const [misafirSiparisleri, setMisafirSiparisleri] = useState(() => {
+    try {
+      const ham = localStorage.getItem(tenantDepoAnahtari("bp_misafirSiparisler", isletmeSlug));
+      const liste = ham ? JSON.parse(ham) : [];
+      return Array.isArray(liste) ? liste : [];
+    } catch {
+      return [];
+    }
+  });
 
   const siparisleriYenile = useCallback(async () => {
     if (!kullanici?.id) {
@@ -405,6 +417,19 @@ export function AppProvider({ children }) {
     setSiparislerim(liste);
     return liste;
   }, [kullanici?.id]);
+
+  // Misafir olarak tamamlanan bir siparişi cihazda kalıcı hale getirir; aynı
+  // siparişin (siparisNo) tekrar eklenmesini engeller, listeyi son 20 ile sınırlar.
+  const misafirSiparisiKaydet = useCallback((ozet) => {
+    setMisafirSiparisleri((onceki) => {
+      const digerleri = onceki.filter((s) => s.siparisNo !== ozet.siparisNo);
+      const guncel = [ozet, ...digerleri].slice(0, 20);
+      try {
+        localStorage.setItem(depoAnahtari("bp_misafirSiparisler"), JSON.stringify(guncel));
+      } catch { /* depolama dolu/erişilemez olabilir, sessizce geç */ }
+      return guncel;
+    });
+  }, [depoAnahtari]);
 
   const sadakatiYenile = useCallback(async () => {
     if (!kullanici?.id) return null;
@@ -486,6 +511,8 @@ export function AppProvider({ children }) {
     if (kullanici?.id) {
       siparisleriYenile().catch(() => {});
       sadakatiYenile().catch(() => {});
+    } else {
+      misafirSiparisiKaydet(ozet);
     }
     sepetiBosalt();
     setAktifMasa(null);
@@ -524,8 +551,8 @@ export function AppProvider({ children }) {
     // ödeme
     sonOdeme,
     odemeyiTamamla,
-    // siparişlerim (kalıcı liste)
-    siparislerim,
+    // siparişlerim (üye için backend'den, misafir için bu cihazda kalıcı liste)
+    siparislerim: kullanici?.id ? siparislerim : misafirSiparisleri,
     siparisleriYenile,
     // burger damga sayacı (5 al 1 bedava)
     burgerDamga,
