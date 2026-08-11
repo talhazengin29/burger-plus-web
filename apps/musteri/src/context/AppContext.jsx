@@ -320,6 +320,7 @@ export function AppProvider({ children }) {
   // Ortak masa sepeti YOK. Herkes kendi sepetini oluşturur, kendi öder.
   // Backend'e gönderim ödeme anında olur (aşağıda odemeyiTamamla).
   const sepeteEkle = (urun) => {
+    if (urun?.stokta === false) return false;
     // Aktif kampanya varsa ürün sepete indirimli fiyatla girer — ödeme akışı
     // (sepetToplam, odemeyiTamamla) hiç değişmeden bu fiyatı kullanır.
     const indirim = indirimliFiyat(urun);
@@ -337,6 +338,7 @@ export function AppProvider({ children }) {
       }
       return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1 }];
     });
+    return true;
   };
 
   const avatarGuncelle = (gorsel) => {

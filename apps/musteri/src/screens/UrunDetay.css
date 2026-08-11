@@ -323,3 +323,5 @@
 }
 .urun-detay-sepet-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .urun-detay-sepet-btn:active { transform: scale(0.99); }
+.urun-detay-sepet-btn:disabled{cursor:not-allowed;opacity:.55;filter:saturate(.25)}
+.adet-kontrol button:disabled{cursor:not-allowed;opacity:.35}

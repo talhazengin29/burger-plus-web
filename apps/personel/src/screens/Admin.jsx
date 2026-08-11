@@ -15,7 +15,7 @@ const BOS_BOYUTLAR = (birim = "gr") => [
   { kod: "buyuk", etiket: "Büyük Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
 ];
 const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
+const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -83,6 +83,8 @@ const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gram
 const urunuFormaCevir = (urun) => ({
   ...urun,
   populer: urun.populer === true,
+  stokTakibi: urun.stokTakibi === true,
+  stokAdedi: Number(urun.stokAdedi || 0),
   onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
   malzemeler: (urun.malzemeler || []).join(", "),
   alerjenler: (urun.alerjenler || []).join(", "),
@@ -282,6 +284,8 @@ export default function Admin({ onCikis }) {
         icecekUrunId: Number(urunForm.menuYapisi.icecekUrunId),
       } : null,
       populer: urunForm.populer === true,
+      stokTakibi: urunForm.stokTakibi === true,
+      stokAdedi: urunForm.stokTakibi ? Number(urunForm.stokAdedi) : 0,
       onerilenUrunler: [...new Set((urunForm.onerilenUrunler || []).map(Number).filter(Number.isInteger))].slice(0, 5),
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
@@ -572,8 +576,8 @@ export default function Admin({ onCikis }) {
               <div className="admin-kart-grid">{filtreliUrunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
                   {u.gorsel ? <img src={u.gorsel} alt="" /> : <div className="admin-urun-gorselsiz">Görsel</div>}
-                  <div><span className="admin-rozet">{u.kategori} · {TIP_ETIKETLERI[u.urunTipi] || "Ürün"}</span><h3>{u.ad}</h3>{u.urunTipi === "burger" && <p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}<strong>{para(u.fiyat)}</strong></div>
-                  <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button><button onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button><button className="tehlike" onClick={() => { if (window.confirm(`${u.ad} katalogdan silinsin mi? Geçmiş siparişler korunacak.`)) islem(() => adminIstek(`/urunler/${u.id}`, { method: "DELETE" }), "Ürün katalogdan silindi."); }}>Sil</button></footer>
+                  <div><span className="admin-rozet">{u.kategori} · {TIP_ETIKETLERI[u.urunTipi] || "Ürün"}</span><h3>{u.ad}</h3>{u.urunTipi === "burger" && <p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}{u.stokTakibi && <small className={`admin-stok-ozet ${u.stokAdedi <= 5 ? "kritik" : ""}`}>{u.stokAdedi > 0 ? `${u.stokAdedi} adet stokta` : "Stok tükendi"}</small>}{!u.stokTakibi && u.stokta === false && <small className="admin-stok-ozet kritik">Menü bileşeni tükendi</small>}<strong>{para(u.fiyat)}</strong></div>
+                  <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button>{u.stokTakibi && <button onClick={() => islem(() => adminIstek("/urunler", jsonGonder("POST", { ...u, stokAdedi: Number(u.stokAdedi || 0) + 10 })), "Stoğa 10 adet eklendi.")}>+10 stok</button>}<button onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button><button className="tehlike" onClick={() => { if (window.confirm(`${u.ad} katalogdan silinsin mi? Geçmiş siparişler korunacak.`)) islem(() => adminIstek(`/urunler/${u.id}`, { method: "DELETE" }), "Ürün katalogdan silindi."); }}>Sil</button></footer>
               </article>
               ))}{filtreliUrunler.length === 0 && <Bos yazi={urunler.length ? "Filtreye uygun ürün bulunamadı." : "Katalog boş. İlk ürünü yönetim panelinden ekleyebilirsin."} />}</div>
             </>}
@@ -733,6 +737,14 @@ export default function Admin({ onCikis }) {
                 <div><b>Popüler ürün vitrini</b><small>Açıksa müşteri ana sayfasında bu kategorinin popüler ürünleri arasında gösterilir.</small></div>
                 <label className="admin-switch"><input type="checkbox" checked={urunForm.populer === true} onChange={(e) => setUrunForm({ ...urunForm, populer: e.target.checked })} /><span /></label>
               </header>
+            </section>
+
+            <section className={`urun-stok-karti ${urunForm.stokTakibi ? "aktif" : ""}`}>
+              <header>
+                <div><b>Paketli ürün stok takibi</b><small>Kola, su ve ayran gibi adetle sayılan hazır ürünlerde kullanın.</small></div>
+                <label className="admin-switch"><input type="checkbox" checked={urunForm.stokTakibi === true} onChange={(e) => setUrunForm({ ...urunForm, stokTakibi: e.target.checked, stokAdedi: e.target.checked ? urunForm.stokAdedi : 0 })} /><span /></label>
+              </header>
+              {urunForm.stokTakibi && <Alan etiket="Mevcut stok (adet)"><input required type="number" min="0" max="1000000" step="1" value={urunForm.stokAdedi} onChange={(e) => setUrunForm({ ...urunForm, stokAdedi: e.target.value })} /></Alan>}
             </section>
 
             <section className="urun-oneri-editoru">

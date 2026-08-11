@@ -32,6 +32,7 @@ export default function UrunDetay() {
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
+  const stoktaYok = urun.stokta === false;
   const urunOnerileri = (urun.onerilenUrunler || [])
     .map((onerilenId) => urunler.find((aday) => Number(aday.id) === Number(onerilenId)))
     .filter((aday) => aday && Number(aday.id) !== Number(urun.id))
@@ -76,6 +77,7 @@ export default function UrunDetay() {
   };
 
   const sepeteEkleyeBas = () => {
+    if (stoktaYok) return;
     const dahilMalzemeler = malzemeListesi.filter((m) => !haricMalzemeler.includes(m));
     const secimler = {
       dahilMalzemeler,
@@ -108,8 +110,9 @@ export default function UrunDetay() {
   };
 
   const oneriyiSepeteEkle = (onerilen) => {
-    sepeteEkle(varsayilanSecimliUrunHazirla(onerilen, urunler));
-    setEklenenOneriIdleri((onceki) => [...onceki, Number(onerilen.id)]);
+    if (sepeteEkle(varsayilanSecimliUrunHazirla(onerilen, urunler))) {
+      setEklenenOneriIdleri((onceki) => [...onceki, Number(onerilen.id)]);
+    }
   };
 
   return (
@@ -313,18 +316,19 @@ export default function UrunDetay() {
             <IconMinus />
           </button>
           <span className="adet-sayi">{adet}</span>
-          <button onClick={() => setAdet((a) => a + 1)} aria-label="Artır">
+          <button disabled={stoktaYok} onClick={() => setAdet((a) => a + 1)} aria-label="Artır">
             <IconPlus />
           </button>
         </div>
         <motion.button
           type="button"
           className="urun-detay-sepet-btn"
+          disabled={stoktaYok}
           onClick={sepeteEkleyeBas}
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          {`Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
+          {stoktaYok ? "Stokta yok" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
         </motion.button>
       </div>
     </div>

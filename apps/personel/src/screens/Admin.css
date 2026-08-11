@@ -209,3 +209,12 @@
 .mutfak-sure-akisi span{position:relative;z-index:1;min-width:0;padding-right:8px;background:var(--panel)}
 .kayit-tablosu tbody tr:nth-child(even) .mutfak-sure-akisi span{background:color-mix(in srgb,var(--panel) 97%,white)}
 .mutfak-sure-akisi b,.mutfak-sure-akisi small,.mutfak-sure-akisi em{display:block}.mutfak-sure-akisi b{font-size:8px;white-space:nowrap}.mutfak-sure-akisi small{margin-top:2px;color:var(--metin-soluk);font-size:7px}.mutfak-sure-akisi em{margin-top:3px;color:var(--primary);font-size:7px;font-style:normal;font-weight:750}.mutfak-sure-akisi .bekliyor{opacity:.55}
+/* Paketli urun stok kontrolleri */
+.urun-stok-karti{margin:2px 0 16px;padding:15px;border:1px solid var(--border);border-radius:8px;background:color-mix(in srgb,var(--panel-2) 72%,transparent)}
+.urun-stok-karti.aktif{border-color:#10b98166;background:#10b9810a}
+.urun-stok-karti>header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.urun-stok-karti>header div{display:flex;flex-direction:column;gap:3px}
+.urun-stok-karti>header b{font-size:12px}.urun-stok-karti>header small{color:var(--metin-soluk);font-size:9px}
+.urun-stok-karti>.admin-alan{margin:14px 0 0;padding-top:14px;border-top:1px solid var(--border)}
+.admin-stok-ozet{display:block;width:max-content;margin-top:7px;padding:4px 7px;border-radius:6px;background:#10b98116;color:#10b981;font-size:9px;font-weight:800}
+.admin-stok-ozet.kritik{background:#ef444418;color:#ef4444}

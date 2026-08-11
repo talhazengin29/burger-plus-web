@@ -1,18 +1,21 @@
-/* Alt menü — koyu cam, üstte ince ışık çizgisi */
+/* Alt menü — ekran kenarlarından ayrılmış yüzen cam panel */
 .bottom-nav {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  left: 10px;
+  right: 10px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: rgba(13, 13, 13, 0.6);
+  min-height: 64px;
+  overflow: hidden;
+  background: rgba(21, 21, 21, 0.84);
   -webkit-backdrop-filter: var(--glass-blur-lg);
   backdrop-filter: var(--glass-blur-lg);
-  padding: 10px 4px calc(10px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--glass-border);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--bg-card);
+  padding: 8px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .nav-item {
@@ -58,7 +61,7 @@
 .nav-item--aktif::after {
   content: "";
   position: absolute;
-  bottom: -8px;
+  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
   width: 28px;
