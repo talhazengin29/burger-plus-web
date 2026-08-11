@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
-import { IconBack, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
+import { IconBack, IconCard, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
-import { iyzicoOdemesiniBaslat, odemeTaslagiOlustur } from "../lib/authApi";
+import { iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
+import { socket } from "../lib/socket";
 import { emailTemizle, formuDogrula, guvenliMetin, ilkHata, kurallar, telefonTemizle, temizMetin } from "../lib/dogrulama";
 import "./Payment.css";
 
@@ -27,17 +28,76 @@ export default function Payment() {
   const [params] = useSearchParams();
   const masaNo = params.get("masa");
   const masaModu = !!masaNo;
-  const { sepet, sepetToplam, kullanici, misafir } = useApp();
+  const { sepet, sepetToplam, kullanici, misafir, sepetiBosalt } = useApp();
 
+  const [odemeTipi, setOdemeTipi] = useState("kart");
   const [yontem, setYontem] = useState("tam");
   const [kisiSayisi, setKisiSayisi] = useState(2);
   const [islemde, setIslemde] = useState(false);
   const [odemeHatasi, setOdemeHatasi] = useState("");
   const [alanHatalari, setAlanHatalari] = useState({});
+  const [nakitMasa, setNakitMasa] = useState({ yukleniyor: masaModu, nakitAcik: false });
+  const [nakitSiparis, setNakitSiparis] = useState(null);
+  const [seciliAdetler, setSeciliAdetler] = useState({});
   const [alici, setAlici] = useState(() => ({
     ad: kullanici?.ad || "", soyad: kullanici?.soyad || "", email: kullanici?.email || "",
     telefon: kullanici?.telefon || "+905",
   }));
+
+  const nakitMasaDurumunuYenile = useCallback(async () => {
+    if (!masaNo) {
+      setNakitMasa({ yukleniyor: false, nakitAcik: false });
+      return;
+    }
+    try {
+      const durum = await nakitMasaDurumunuGetir(masaNo);
+      setNakitMasa({ ...durum, yukleniyor: false });
+    } catch {
+      setNakitMasa({ yukleniyor: false, nakitAcik: false });
+    }
+  }, [masaNo]);
+
+  useEffect(() => {
+    nakitMasaDurumunuYenile();
+    if (!masaNo) return undefined;
+    socket.emit("masaya-katil", masaNo);
+    const guncellendi = (veri) => {
+      if (String(veri?.masaNo) !== String(masaNo)) return;
+      if (veri.siparis) {
+        setNakitSiparis((mevcut) => mevcut?.id === veri.siparis.id ? { ...mevcut, ...veri.siparis } : mevcut);
+      }
+      nakitMasaDurumunuYenile();
+    };
+    socket.on("nakit-masa-guncellendi", guncellendi);
+    return () => socket.off("nakit-masa-guncellendi", guncellendi);
+  }, [masaNo, nakitMasaDurumunuYenile]);
+
+  if (nakitSiparis) {
+    const onaylandi = nakitSiparis.durum === "nakit_bekliyor" || nakitSiparis.durum === "basarili";
+    const reddedildi = nakitSiparis.durum === "reddedildi";
+    return (
+      <div className="ekran payment nakit-sonuc">
+        <div className="nakit-sonuc-icerik">
+          <span className={"nakit-sonuc-ikon " + (reddedildi ? "nakit-sonuc-ikon--hata" : onaylandi ? "nakit-sonuc-ikon--tamam" : "") }>
+            {reddedildi ? "×" : onaylandi ? "✓" : <span className="durum-spinner" />}
+          </span>
+          <small>Masa {nakitSiparis.masaNo}</small>
+          <h1>{reddedildi ? "Sipariş Onaylanmadı" : onaylandi ? "Sipariş Mutfağa İletildi" : "Personel Onayı Bekleniyor"}</h1>
+          <p>{reddedildi
+            ? "Sipariş personel tarafından reddedildi. Detay için personelden yardım isteyebilirsin."
+            : onaylandi
+              ? "Siparişin hazırlanıyor. Nakit ödemeyi yemeğin sonunda personele yapabilirsin."
+              : "Personel siparişini kontrol ediyor. Onaylanmadan mutfağa iletilmeyecek."}</p>
+          <div className="nakit-sonuc-ozet">
+            <span>Sipariş no</span><strong>{nakitSiparis.siparisNo}</strong>
+            <span>Masada ödenecek</span><strong>₺{Number(nakitSiparis.tutar).toFixed(2)}</strong>
+          </div>
+          {onaylandi && <button className="ode-btn" onClick={() => git("/anasayfa")}>Menüye Dön</button>}
+          {reddedildi && <button className="ode-btn" onClick={() => { setNakitSiparis(null); git("/anasayfa"); }}>Menüye Dön</button>}
+        </div>
+      </div>
+    );
+  }
 
   const aliciDegistir = (alan, deger) => {
     setAlici((onceki) => ({ ...onceki, [alan]: deger }));
@@ -48,10 +108,6 @@ export default function Payment() {
   const alaniDogrula = (alan) => {
     setAlanHatalari((onceki) => ({ ...onceki, [alan]: ODEME_SEMASI[alan](alici[alan]) }));
   };
-
-  // Ürüne göre ödeme: her ürün için kaç adet ödeneceğini tutan obje
-  // { urunId: adet }  (0 = seçilmemiş, 1+ = o kadar adet ödeniyor)
-  const [seciliAdetler, setSeciliAdetler] = useState({});
 
   if (sepet.length === 0) {
     return (
@@ -115,12 +171,41 @@ export default function Payment() {
     odenenUrunler = seciliUrunListesi;
   }
 
+  if (odemeTipi === "nakit") {
+    odenecek = sepetToplam;
+    odenenUrunler = sepet;
+  }
   const kazanilacakPuan = puanHesapla(odenecek);
-  const odemeAktif = yontem !== "urun" || seciliUrunListesi.length > 0;
+  const nakitKullanilabilir = masaModu && nakitMasa.nakitAcik;
+  const odemeAktif = odemeTipi === "nakit"
+    ? nakitKullanilabilir
+    : yontem !== "urun" || seciliUrunListesi.length > 0;
 
   const odeyVeBitir = async () => {
     if (!odemeAktif || islemde) return;
     setOdemeHatasi("");
+    if (odemeTipi === "nakit") {
+      setIslemde(true);
+      try {
+        const siparis = await nakitSiparisGonder({
+          masaNo,
+          urunler: sepet.map((u) => ({
+            id: u.id,
+            adet: u.adet,
+            secimler: u.secimler || {},
+            haricMalzemeler: u.haricMalzemeler || [],
+          })),
+        });
+        sepetiBosalt();
+        setNakitSiparis(siparis);
+      } catch (e) {
+        setOdemeHatasi(e.message || "Nakit sipariş gönderilemedi. Lütfen tekrar dene.");
+        nakitMasaDurumunuYenile();
+      } finally {
+        setIslemde(false);
+      }
+      return;
+    }
     const hatalar = formuDogrula(alici, ODEME_SEMASI);
     setAlanHatalari(hatalar);
     if (ilkHata(hatalar)) {
@@ -186,7 +271,31 @@ export default function Payment() {
           ))}
         </section>
 
-        <section className="secim-kutu odeme-bilgi-kutu">
+        <h2 className="odeme-bolum-baslik">Ödeme türü</h2>
+        <div className="odeme-tipi-grid">
+          <button
+            type="button"
+            className={"odeme-tipi-kart" + (odemeTipi === "kart" ? " odeme-tipi-kart--aktif" : "")}
+            onClick={() => setOdemeTipi("kart")}
+          >
+            <IconCard />
+            <span><b>Online ödeme</b><small>Şimdi güvenle öde</small></span>
+          </button>
+          <button
+            type="button"
+            className={"odeme-tipi-kart" + (odemeTipi === "nakit" ? " odeme-tipi-kart--aktif" : "")}
+            onClick={() => nakitKullanilabilir && setOdemeTipi("nakit")}
+            disabled={!nakitKullanilabilir}
+          >
+            <IconWallet />
+            <span><b>Nakit ödeme</b><small>{!masaModu ? "Yalnızca masada" : nakitMasa.yukleniyor ? "Masa kontrol ediliyor" : nakitMasa.nakitAcik ? "Yemek sonunda öde" : "Personelin masayı açması gerekli"}</small></span>
+          </button>
+        </div>
+        {masaModu && !nakitMasa.yukleniyor && !nakitMasa.nakitAcik && (
+          <p className="nakit-masa-uyari">Nakit sipariş için personelden Masa {masaNo}'yi açmasını iste.</p>
+        )}
+
+        {odemeTipi === "kart" && <section className="secim-kutu odeme-bilgi-kutu">
           <h3 className="secim-baslik">İletişim bilgileri</h3>
           <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir. Normal siparişte T.C. kimlik ve adres bilgisi istenmez.</p>
           <div className="odeme-bilgi-grid">
@@ -195,10 +304,10 @@ export default function Payment() {
             <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value.slice(0, 254))} onBlur={() => alaniDogrula("email")} autoComplete="email" maxLength="254" required aria-invalid={Boolean(alanHatalari.email)} />{alanHatalari.email && <small className="alan-hata">{alanHatalari.email}</small>}</label>
             <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value.slice(0, 20))} onBlur={() => alaniDogrula("telefon")} autoComplete="tel" maxLength="20" required aria-invalid={Boolean(alanHatalari.telefon)} />{alanHatalari.telefon && <small className="alan-hata">{alanHatalari.telefon}</small>}</label>
           </div>
-        </section>
+        </section>}
 
         {/* Yöntem seçimi — misafir sadece tamamını öder */}
-        {!misafir && (
+        {odemeTipi === "kart" && !misafir && (
           <>
             <h2 className="odeme-bolum-baslik">Nasıl ödemek istersin?</h2>
             <div className="yontem-grid">
@@ -219,7 +328,7 @@ export default function Payment() {
         )}
 
         {/* Eşit böl: kişi sayısı */}
-        {!misafir && yontem === "esit" && (
+        {odemeTipi === "kart" && !misafir && yontem === "esit" && (
           <section className="secim-kutu">
             <h3 className="secim-baslik">Kaç kişi paylaşıyor?</h3>
             <div className="kisi-secici">
@@ -232,7 +341,7 @@ export default function Payment() {
         )}
 
         {/* Ürüne göre: adet bazlı seçim */}
-        {!misafir && yontem === "urun" && (
+        {odemeTipi === "kart" && !misafir && yontem === "urun" && (
           <section className="secim-kutu">
             <h3 className="secim-baslik">Ödeyeceğin ürünleri seç</h3>
             <div className="urun-sec-liste">
@@ -296,7 +405,7 @@ export default function Payment() {
         {!misafir && (
           <div className="puan-bilgi">
             <span className="puan-bilgi-ikon">⭐</span>
-            <span>Bu ödemeden <strong>{kazanilacakPuan} puan</strong> kazanacaksın</span>
+            <span>{odemeTipi === "nakit" ? "Nakit tahsil edildiğinde" : "Bu ödemeden"} <strong>{kazanilacakPuan} puan</strong> kazanacaksın</span>
           </div>
         )}
         {odemeHatasi && <p className="odeme-hata" role="alert">{odemeHatasi}</p>}
@@ -313,7 +422,9 @@ export default function Payment() {
           onClick={odeyVeBitir}
           disabled={!odemeAktif || islemde}
         >
-          {islemde ? "Güvenli ödeme hazırlanıyor…" : "Ödeme Yap"}
+          {islemde
+            ? odemeTipi === "nakit" ? "Sipariş gönderiliyor…" : "Güvenli ödeme hazırlanıyor…"
+            : odemeTipi === "nakit" ? "Personel Onayına Gönder" : "Ödeme Yap"}
         </button>
       </div>
     </div>

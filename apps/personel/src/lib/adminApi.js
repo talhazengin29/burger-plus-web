@@ -54,6 +54,19 @@ async function jsonOku(r) {
   return r.json();
 }
 
+async function nakitIstegi(yol, secenekler = {}) {
+  const r = await istekAt(`/api/nakit${yol}`, secenekler);
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Nakit işlemi tamamlanamadı.");
+  return veri;
+}
+
+export const nakitMasalariniGetir = async () => (await nakitIstegi("/masalar")).masalar;
+export const nakitMasasiniAc = async (masaNo) => (await nakitIstegi(`/masalar/${encodeURIComponent(masaNo)}/ac`, { method: "POST" })).masa;
+export const nakitSiparisiOnayla = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/onayla`, { method: "POST" })).siparis;
+export const nakitSiparisiReddet = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/reddet`, { method: "POST" })).siparis;
+export const nakitSiparisiTahsilEt = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/tahsil`, { method: "POST" })).siparis;
+
 export async function isletmeBilgisiniGetir(slug) {
   const erisimTokeni = adminToken.al(slug);
   const r = await istekAt(`/api/isletme/${encodeURIComponent(String(slug || "").trim().toLowerCase())}`, {

@@ -189,6 +189,18 @@ export async function odemeTaslagiOlustur(veri) {
   return (await jsonIstegi("/api/odeme/taslak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Ödeme taslağı oluşturulamadı.")).odeme;
 }
 
+export async function nakitMasaDurumunuGetir(masaNo) {
+  return jsonIstegi(`/api/nakit/masa/${encodeURIComponent(masaNo)}/durum`, {}, "Masa durumu alınamadı.");
+}
+
+export async function nakitSiparisGonder(veri) {
+  return (await jsonIstegi("/api/nakit/siparis", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(veri),
+  }, "Nakit sipariş gönderilemedi.")).siparis;
+}
+
 export async function iyzicoOdemesiniBaslat(odemeId, alici) {
   return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alici }) }, "İyzico ödeme formu başlatılamadı.")).paymentPageUrl;
 }
