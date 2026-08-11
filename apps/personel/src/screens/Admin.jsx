@@ -31,6 +31,7 @@ const BOLUMLER = [
   ["genel", "Genel Bakış", "▦", "genel-bakis"],
   ["tema", "Tema", "◐", "tema"],
   ["urunler", "Ürünler", "◆", "urunler"],
+  ["stok", "Stok Takibi", "▤", "stok-takibi"],
   ["kampanyalar", "Kampanyalar", "%", "kampanyalar"],
   ["oduller", "Puan Marketi", "★", "puan-marketi"],
   ["duyurular", "Duyurular", "●", "duyurular"],
@@ -45,7 +46,7 @@ const BOLUMLER = [
 ];
 
 const MENU_GRUPLARI = [
-  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "kampanyalar", "oduller", "duyurular"] },
+  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "duyurular"] },
   { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
@@ -198,6 +199,7 @@ export default function Admin({ onCikis }) {
       setCanliSatislar((onceki) => [satis, ...onceki.filter((kayit) => kayit.siparis_no !== satis.siparisNo)].slice(0, 100));
       setCanliBildirim(`${satis.kisiAdi || "Yeni müşteri"} · ${para(satis.tutar)}`);
       adminIstek("/dashboard").then(setDashboard).catch(() => {});
+      adminIstek("/urunler").then((veri) => setUrunler(veri.urunler || [])).catch(() => {});
     };
     const satislarGeldi = (satislar) => setCanliSatislar(satislar || []);
     const operasyonGuncellendi = () => {
@@ -291,6 +293,22 @@ export default function Admin({ onCikis }) {
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
     if (await islem(() => adminIstek("/urunler", jsonGonder("POST", veri)), "Ürün kataloğu güncellendi.")) setUrunForm(null);
+  };
+
+  const stokAdediniDegistir = (urun, fark) => {
+    const yeniAdet = Math.max(0, Math.min(1000000, Number(urun.stokAdedi || 0) + fark));
+    return islem(
+      () => adminIstek("/urunler", jsonGonder("POST", { ...urun, stokTakibi: true, stokAdedi: yeniAdet })),
+      `${urun.ad} stoku ${yeniAdet} adet olarak güncellendi.`
+    );
+  };
+
+  const stokTakibiniKapat = (urun) => {
+    if (!window.confirm(`${urun.ad} için stok takibi kapatılsın mı? Ürün stok sınırı olmadan satışta kalır.`)) return;
+    islem(
+      () => adminIstek("/urunler", jsonGonder("POST", { ...urun, stokTakibi: false, stokAdedi: 0 })),
+      `${urun.ad} için stok takibi kapatıldı.`
+    );
   };
 
   const urunTipiniDegistir = (urunTipi) => setUrunForm((onceki) => ({
@@ -538,6 +556,44 @@ export default function Admin({ onCikis }) {
               <Panel baslik="Canlı satış akışı" alt="Yeni ödemeler otomatik görünür">
                 <div className="dashboard-canli-akis">{canliSatislar.slice(0, 5).map((satis, index) => <button type="button" key={`${satis.siparisNo || satis.siparis_no}-${index}`} onClick={() => git("/yonetim/satislar")}><i /><span><b>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</b><small>{(Array.isArray(satis.urunler) ? satis.urunler : []).map((urun) => `${urun.ad} x${urun.adet}`).join(", ") || `${satis.urunAdedi || satis.urun_adedi || 0} ürün`}</small></span><em>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</em><strong>{para(satis.tutar)}</strong><time>{tarihSaat(satis.olusturma)}</time></button>)}{!canliSatislar.length && <Bos yazi="Henüz satış kaydı yok." />}</div>
               </Panel>
+            </>}
+
+            {bolum === "stok" && <>
+              <BolumBaslik baslik="Paketli ürün stok takibi" aciklama="Adetle sayılan hazır ürünleri tek ekrandan izleyin ve güncelleyin." />
+              <section className="stok-ozet-grid">
+                <article><span>Takip edilen</span><strong>{urunler.filter((urun) => urun.stokTakibi).length}</strong><small>paketli ürün</small></article>
+                <article className="uyari"><span>Kritik stok</span><strong>{urunler.filter((urun) => urun.stokTakibi && urun.stokAdedi > 0 && urun.stokAdedi <= 5).length}</strong><small>5 adet veya altı</small></article>
+                <article className="tehlike"><span>Tükenen</span><strong>{urunler.filter((urun) => urun.stokTakibi && urun.stokAdedi <= 0).length}</strong><small>satışa kapalı</small></article>
+              </section>
+              <section className="stok-yonetim-paneli">
+                <header><div><span>AKTİF TAKİP</span><h3>Stoklu ürünler</h3></div><small>{urunler.filter((urun) => urun.stokTakibi).length} ürün</small></header>
+                <div className="stok-urun-listesi">
+                  {urunler.filter((urun) => urun.stokTakibi).map((urun) => (
+                    <article className={urun.stokAdedi <= 0 ? "tukendi" : urun.stokAdedi <= 5 ? "kritik" : ""} key={urun.id}>
+                      {urun.gorsel ? <img src={urun.gorsel} alt="" /> : <span className="stok-gorselsiz">BP</span>}
+                      <div className="stok-urun-bilgi"><b>{urun.ad}</b><small>{urun.kategori} · {TIP_ETIKETLERI[urun.urunTipi] || "Ürün"}</small></div>
+                      <div className="stok-adet"><strong>{urun.stokAdedi}</strong><small>adet</small></div>
+                      <div className="stok-hizli-islem">
+                        <button type="button" onClick={() => stokAdediniDegistir(urun, -10)} disabled={urun.stokAdedi <= 0}>-10</button>
+                        <button type="button" onClick={() => stokAdediniDegistir(urun, -1)} disabled={urun.stokAdedi <= 0}>-1</button>
+                        <button type="button" className="arti" onClick={() => stokAdediniDegistir(urun, 1)}>+1</button>
+                        <button type="button" className="arti" onClick={() => stokAdediniDegistir(urun, 10)}>+10</button>
+                      </div>
+                      <button type="button" className="stok-duzenle" onClick={() => setUrunForm(urunuFormaCevir(urun))}>Düzenle</button>
+                      <button type="button" className="stok-kapat" onClick={() => stokTakibiniKapat(urun)}>Takibi kapat</button>
+                    </article>
+                  ))}
+                  {!urunler.some((urun) => urun.stokTakibi) && <Bos yazi="Henüz stok takibine alınmış ürün yok." />}
+                </div>
+              </section>
+              <section className="stok-aday-paneli">
+                <header><div><span>TAKİBE AL</span><h3>Diğer ürünler</h3><p>Paketli olarak sattığınız ürünü seçip başlangıç adedini girin.</p></div></header>
+                <div>{urunler.filter((urun) => !urun.stokTakibi && urun.urunTipi !== "menu").map((urun) => (
+                  <button type="button" key={urun.id} onClick={() => setUrunForm({ ...urunuFormaCevir(urun), stokTakibi: true, stokAdedi: 0 })}>
+                    {urun.gorsel ? <img src={urun.gorsel} alt="" /> : <span>BP</span>}<b>{urun.ad}</b><small>{urun.kategori}</small><em>Takibe al</em>
+                  </button>
+                ))}</div>
+              </section>
             </>}
 
             {bolum === "urunler" && <>
