@@ -22,7 +22,7 @@ function baslangicFormu(isletme, tema) {
   };
 }
 
-export default function TemaYonetimi() {
+export default function TemaYonetimi({ urunler = [], kategoriler = [], damgaKarti = null }) {
   const { isletme, tema, isletmeyiGuncelle } = useIsletme();
   const [form, setForm] = useState(() => baslangicFormu(isletme, tema));
   const [logoOnizleme, setLogoOnizleme] = useState(isletme.logoUrl || tema?.logoUrl || "");
@@ -50,6 +50,14 @@ export default function TemaYonetimi() {
       ...Object.fromEntries(Object.entries(form.metinler).filter(([, deger]) => deger.trim())),
     },
   }), [form, varsayilan]);
+  const sloganVurguIndex = onizleme.metinler.slogan.lastIndexOf(onizleme.metinler.sloganVurgu);
+  const sloganBaslangici = sloganVurguIndex >= 0
+    ? onizleme.metinler.slogan.slice(0, sloganVurguIndex).trim()
+    : onizleme.metinler.slogan;
+  const onizlemeKategorileri = kategoriler.filter((kategori) => kategori.aktif !== false).slice(0, 4);
+  const onizlemeUrunleri = urunler.filter((urun) => urun.aktif !== false).slice(0, 2);
+  const damgaHedefi = Math.min(6, Math.max(3, Number(damgaKarti?.hedefAdet) || 5));
+  const doluDamga = Math.min(2, damgaHedefi);
 
   const konseptSec = (konsept) => setForm({
     konsept,
@@ -174,11 +182,31 @@ export default function TemaYonetimi() {
         </fieldset>
       </section>
 
-      <aside className={`tema-canli ${form.gorunum === "acik" ? "acik" : "koyu"}`} style={{ "--onizleme-accent": onizleme.renkler.accent, "--onizleme-bg": form.gorunum === "acik" ? "#F5F4F1" : onizleme.renkler.bgPrimary, "--onizleme-card": form.gorunum === "acik" ? "rgba(255,255,255,.72)" : onizleme.renkler.bgCard }}>
-        <div className="tema-telefon">
-          <header>{logoOnizleme ? <img style={{ transform: `scale(${form.logoOlcegi / 100})` }} src={logoOnizleme} alt="" /> : <b>{isletme.ad}</b>}<i /></header>
-          <main><small>Merhaba 👋</small><h2>{onizleme.metinler.slogan}</h2><span>{onizleme.metinler.kampanyaBaslik}</span><article><b>{onizleme.metinler.damgaMetni.replace("{hedef}", "5")}</b><div><i /><i /><i /><i /><i /></div></article><h3>{varsayilan.metinler.urunBolumBaslik}</h3><section><i /><i /></section></main>
-          <footer><i /><i /><i /></footer>
+      <aside className={`tema-canli ${form.gorunum === "acik" ? "acik" : "koyu"}`} style={{ "--onizleme-accent": onizleme.renkler.accent, "--onizleme-bg": form.gorunum === "acik" ? "#F5F4F1" : onizleme.renkler.bgPrimary, "--onizleme-card": form.gorunum === "acik" ? "rgba(255,255,255,.72)" : onizleme.renkler.bgCard, "--onizleme-baslik-font": varsayilan.font.baslik, "--onizleme-govde-font": varsayilan.font.govde }}>
+        <div className="tema-telefon" aria-label="Müşteri uygulaması ana sayfa önizlemesi">
+          <div className="onizleme-uygulama">
+            <header className="onizleme-header">
+              <div><small>Merhaba,</small><b>Misafir <span>👋</span></b></div>
+              <nav aria-hidden="true"><i>♧</i><i>▢</i><i>?</i></nav>
+            </header>
+            <main className="onizleme-icerik">
+              <h1>{sloganBaslangici}{sloganVurguIndex >= 0 && <><br /><em>{onizleme.metinler.sloganVurgu}</em></>}</h1>
+              <article className="onizleme-damga">
+                <header><div><span>{damgaKarti?.kartEtiketi || onizleme.metinler.kampanyaBaslik}</span><h2>{damgaKarti?.baslik || onizleme.metinler.damgaMetni.replace("{hedef}", String(damgaHedefi))}</h2><p>{damgaKarti?.aciklama || "Her siparişinde damga kazan, ödülüne yaklaş."}</p></div><strong>{doluDamga}<small>/{damgaHedefi}</small><i>TAMAMLANDI</i></strong></header>
+                <div className="onizleme-damgalar" style={{ gridTemplateColumns: `repeat(${damgaHedefi}, 1fr)` }}>{Array.from({ length: damgaHedefi }, (_, index) => <i key={index} className={index < doluDamga ? "dolu" : index === doluDamga ? "siradaki" : ""}>{index < doluDamga ? (damgaKarti?.ikon || "★") : index + 1}{(index < doluDamga || index === damgaHedefi - 1) && <small>{index < doluDamga ? "Damga" : "Hediye"}</small>}</i>)}</div>
+                <footer><div><small>SIRADAKİ ÖDÜL</small><b>{damgaKarti?.odulMetni || `Ücretsiz ${onizleme.metinler.damgaBirim}`}</b></div><span><b>{damgaHedefi - doluDamga}</b> daha</span></footer>
+              </article>
+              <section className="onizleme-kategoriler" aria-hidden="true">
+                {(onizlemeKategorileri.length ? onizlemeKategorileri : [{ ad: 'Tümü' }, { ad: 'Burgerler' }, { ad: 'Menüler' }, { ad: 'İçecekler' }]).map((kategori, index) => <div className={index === 0 ? "aktif" : ""} key={kategori.id || kategori.ad}><i>{kategori.gorsel ? <img src={kategori.gorsel} alt="" /> : index === 0 ? 'T' : index === 1 ? '🍔' : index === 2 ? '🍟' : '🥤'}</i><span>{kategori.ad}</span></div>)}
+              </section>
+              <div className="onizleme-arama"><i>⌕</i><span>{onizleme.metinler.aramaPlaceholder}</span><b>≡</b></div>
+              <h3>{onizleme.metinler.urunBolumBaslik}</h3>
+              <section className="onizleme-urunler" aria-hidden="true">
+                {(onizlemeUrunleri.length ? onizlemeUrunleri : [{ id: 'ornek-1', ad: `Klasik ${onizleme.metinler.damgaBirim}`, fiyat: 249, gorsel: '' }, { id: 'ornek-2', ad: 'Avantaj Menü', fiyat: 319, gorsel: '' }]).map((urun, index) => <article key={urun.id || index}><div>{urun.gorsel ? <img src={urun.gorsel} alt="" /> : index ? '🍟' : '🍔'}</div><h4>{urun.ad}</h4><footer><b>₺{Number(urun.fiyat || 0).toLocaleString('tr-TR')}</b><i>+</i></footer></article>)}
+              </section>
+            </main>
+            <footer className="onizleme-alt-nav" aria-hidden="true"><i className="aktif">⌂<small>Ana Sayfa</small></i><i>◇<small>Kampanyalar</small></i><i>♧<small>Sipariş</small></i><i>☆<small>Puanlarım</small></i><i>○<small>Profil</small></i></footer>
+          </div>
         </div>
         <p>Canlı önizleme</p><small>Kaydetmeden önce görünümü burada kontrol edebilirsin.</small>
       </aside>

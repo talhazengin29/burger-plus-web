@@ -555,7 +555,7 @@ export default function Admin({ onCikis }) {
         {yukleniyor && !dashboard ? <div className="admin-yukleniyor">Veriler hazırlanıyor…</div> : (
           <div className="admin-icerik">
             {KAYIT_BOLUMLERI.includes(bolum) && <KayitGezgini aktif={bolum} sayilar={kayitSayilari} git={git} />}
-            {bolum === "tema" && <TemaYonetimi />}
+            {bolum === "tema" && <TemaYonetimi urunler={urunler} kategoriler={kategoriler} damgaKarti={damgaKarti} />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
