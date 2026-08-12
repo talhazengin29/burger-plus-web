@@ -30,6 +30,7 @@ function isletmeOnizlemesiniKaydet(isletme) {
       ad: isletme.ad,
       logoUrl: isletme.tema?.logoUrl || isletme.logoUrl || null,
       accent: isletme.tema?.renkler?.accent || null,
+      logoOlcegi: isletme.tema?.logoOlcegi || 100,
     };
     localStorage.setItem(onizlemeAnahtari(isletme.slug), JSON.stringify(onizleme));
     return onizleme;
@@ -53,6 +54,7 @@ function IsletmeYukleniyor({ slug, onizleme }) {
   const isletmeAdi = onizleme?.ad || slugBasligi(slug);
   const stil = {
     "--isletme-yukleme-accent": onizleme?.accent || (burgerPlusMu ? "#FF6B00" : "#8B5CF6"),
+    "--logo-olcegi": String(Math.min(180, Math.max(60, Number(onizleme?.logoOlcegi) || 100)) / 100),
   };
 
   useEffect(() => setLogoHatasi(false), [logoUrl]);

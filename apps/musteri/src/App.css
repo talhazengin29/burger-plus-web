@@ -74,7 +74,7 @@
   filter: none;
 }
 
-.isletme-splash-logo--yuklu { filter: none; }
+.isletme-splash-logo--yuklu { filter: none; transform: scale(var(--logo-olcegi, 1)); transform-origin: center; }
 .isletme-splash-ad {
   max-width: min(360px, 82vw);
   color: #fff;

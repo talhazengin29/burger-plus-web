@@ -7,7 +7,7 @@ const IsletmeContext = createContext(null);
 const TEMA_DEGISKENLERI = [
   "--bg", "--panel", "--panel-2", "--panel-3", "--border",
   "--primary", "--primary-hafif", "--accent", "--accent-glow",
-  "--font-baslik", "--font-govde",
+  "--font-baslik", "--font-govde", "--logo-olcegi",
 ];
 
 export function IsletmeSarici({ children }) {
@@ -51,6 +51,7 @@ export function IsletmeSarici({ children }) {
       "--primary-hafif": `color-mix(in srgb, ${accent} 20%, transparent)`,
       "--accent": accent,
       "--accent-glow": renkler.accentGlow || `color-mix(in srgb, ${accent} 40%, transparent)`,
+      "--logo-olcegi": String(Math.min(180, Math.max(60, Number(isletme.tema?.logoOlcegi) || 100)) / 100),
       "--font-baslik": `"${font.baslik || "Montserrat"}", sans-serif`,
       "--font-govde": `"${font.govde || "Plus Jakarta Sans"}", sans-serif`,
     };

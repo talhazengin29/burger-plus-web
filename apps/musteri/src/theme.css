@@ -183,6 +183,10 @@ input, textarea, select { color-scheme: dark; }
   filter: none !important;
   mix-blend-mode: normal;
 }
+.marka-logo-ozel {
+  transform: scale(var(--logo-olcegi, 1));
+  transform-origin: center;
+}
 /* Ortak form doğrulama durumları */
 input[aria-invalid="true"],
 textarea[aria-invalid="true"] {
