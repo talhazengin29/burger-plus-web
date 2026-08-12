@@ -59,6 +59,8 @@ export const masaErisimTokenlariniGetir = (id, masaSayisi) => superIstek(
 );
 export const isletmeAdminleriniGetir = (id) => superIstek(`/isletmeler/${id}/admin`);
 export const isletmeAdminiKaydet = (id, veri) => superIstek(`/isletmeler/${id}/admin`, json("POST", veri));
+export const isletmeAdminiGuncelle = (id, adminId, veri) => superIstek(`/isletmeler/${id}/admin/${adminId}`, json("PUT", veri));
+export const isletmeAdminiSil = (id, adminId) => superIstek(`/isletmeler/${id}/admin/${adminId}`, { method: "DELETE" });
 function raporSorgusu(aralik = 30) {
   const sorgu = new URLSearchParams();
   if (typeof aralik === "object" && aralik) {

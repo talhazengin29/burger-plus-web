@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { abonelikGuncelle, abonelikOlustur, erisimTokeniOlustur, isletmeAdminiKaydet, isletmeAdminleriniGetir, isletmeDurumuDegistir, isletmeGetir, isletmeGuncelle, isletmeSil, masaErisimTokenlariniGetir, personelPanelineGit } from "../lib/superApi";
+import { abonelikGuncelle, abonelikOlustur, erisimTokeniOlustur, isletmeAdminiGuncelle, isletmeAdminiKaydet, isletmeAdminleriniGetir, isletmeAdminiSil, isletmeDurumuDegistir, isletmeGetir, isletmeGuncelle, isletmeSil, masaErisimTokenlariniGetir, personelPanelineGit } from "../lib/superApi";
 import { qrPdfIndir } from "../lib/qrPdf";
 import { Basari, DurumRozeti, Hata, Metrik, para, sayi, Yukleme } from "../components/Ui";
 
@@ -31,6 +31,7 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
   const [onay, setOnay] = useState("");
   const [adminler, setAdminler] = useState([]);
   const [adminForm, setAdminForm] = useState({ ad: "", soyad: "", email: "", sifre: "" });
+  const [duzenlenenAdminId, setDuzenlenenAdminId] = useState(null);
   const panelRef = useRef(null);
 
   const adminleriYukle = () => isletmeAdminleriniGetir(id)
@@ -47,6 +48,7 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
   useEffect(() => {
     setVeri(null); setHata(""); setAdminler([]);
     setAdminForm({ ad: "", soyad: "", email: "", sifre: "" });
+    setDuzenlenenAdminId(null);
     yukle(); adminleriYukle();
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -62,13 +64,37 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
   const adminKaydet = async () => {
     setIslemde(true); setHata(""); setMesaj("");
     try {
-      const sonuc = await isletmeAdminiKaydet(id, adminForm);
-      setMesaj(sonuc.olusturuldu
+      const sonuc = duzenlenenAdminId
+        ? await isletmeAdminiGuncelle(id, duzenlenenAdminId, adminForm)
+        : await isletmeAdminiKaydet(id, adminForm);
+      setMesaj(duzenlenenAdminId
+        ? `${sonuc.admin.email} yöneticisi güncellendi.${sonuc.sifreYenilendi ? " Yeni geçici şifre atandı ve açık oturumları kapatıldı." : " Açık oturumları kapatıldı."}`
+        : sonuc.olusturuldu
         ? `Yönetici hesabı oluşturuldu: ${sonuc.admin.email}`
         : sonuc.oncekiRol && sonuc.oncekiRol !== "admin"
           ? `${sonuc.admin.email} hesabı "${sonuc.oncekiRol}" rolünden yöneticiliğe yükseltildi ve şifresi yenilendi.`
           : `${sonuc.admin.email} hesabının şifresi yenilendi. Açık oturumları kapandı.`);
       setAdminForm({ ad: "", soyad: "", email: "", sifre: "" });
+      setDuzenlenenAdminId(null);
+      await adminleriYukle();
+    } catch (err) { setHata(err.message); } finally { setIslemde(false); }
+  };
+  const adminDuzenle = (admin) => {
+    setDuzenlenenAdminId(admin.id);
+    setAdminForm({ ad: admin.ad || "", soyad: admin.soyad || "", email: admin.email || "", sifre: "" });
+    setHata(""); setMesaj("");
+  };
+  const adminDuzenlemeyiIptalEt = () => {
+    setDuzenlenenAdminId(null);
+    setAdminForm({ ad: "", soyad: "", email: "", sifre: "" });
+  };
+  const adminSil = async (admin) => {
+    if (!window.confirm(`${admin.ad} ${admin.soyad} yöneticisinin panel erişimi kaldırılacak ve açık oturumları kapatılacak. Devam edilsin mi?`)) return;
+    setIslemde(true); setHata(""); setMesaj("");
+    try {
+      await isletmeAdminiSil(id, admin.id);
+      if (duzenlenenAdminId === admin.id) adminDuzenlemeyiIptalEt();
+      setMesaj(`${admin.email} yöneticisi silindi ve panel erişimi kaldırıldı.`);
       await adminleriYukle();
     } catch (err) { setHata(err.message); } finally { setIslemde(false); }
   };
@@ -108,17 +134,18 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
 
     <section className="detay-bolum">
       <h3>İşletme yöneticisi</h3>
-      <p className="bolum-ipucu">Buradan tanımladığınız e-posta ve şifreyle işletme sahibi kendi paneline giriş yapar. Var olan bir e-postayı tekrar girerseniz o hesabın şifresi yenilenir ve açık oturumları kapanır. Girilen şifre geçicidir; ilk girişte kendi şifresini belirlemesi istenir.</p>
+      <p className="bolum-ipucu">Yöneticileri buradan oluşturabilir, düzenleyebilir veya erişimlerini kaldırabilirsiniz. Yeni hesaplarda şifre zorunludur; düzenlemede boş bırakırsanız mevcut şifre korunur.</p>
       {adminler.length
-        ? <ul className="admin-listesi">{adminler.map((admin) => <li key={admin.id}><span><b>{admin.ad} {admin.soyad}</b><small>{admin.email}</small></span>{admin.sifreDegistirmeli && admin.sifreGeciciMetin && <GeciciSifre deger={admin.sifreGeciciMetin} />}<em>{admin.ikiFaktorAktif ? "2FA açık" : "2FA kapalı"}</em></li>)}</ul>
+        ? <ul className="admin-listesi">{adminler.map((admin) => <li key={admin.id} className={duzenlenenAdminId === admin.id ? "secili" : ""}><span><b>{admin.ad} {admin.soyad}</b><small>{admin.email}</small></span>{admin.sifreDegistirmeli && admin.sifreGeciciMetin && <GeciciSifre deger={admin.sifreGeciciMetin} />}<em>{admin.ikiFaktorAktif ? "2FA açık" : "2FA kapalı"}</em><span className="admin-islemleri"><button type="button" disabled={islemde} onClick={() => adminDuzenle(admin)}>Düzenle</button><button type="button" className="sil" disabled={islemde} onClick={() => adminSil(admin)}>Sil</button></span></li>)}</ul>
         : <p className="bolum-ipucu uyari">Bu işletmenin tanımlı bir yöneticisi yok; sahibi panele giriş yapamaz.</p>}
+      {duzenlenenAdminId && <div className="duzenleme-bildirimi"><span>Seçili yöneticiyi düzenliyorsunuz</span><button type="button" onClick={adminDuzenlemeyiIptalEt}>İptal</button></div>}
       <div className="form-grid">
         <label><span>Ad</span><input value={adminForm.ad} onChange={(e) => setAdminForm({ ...adminForm, ad: e.target.value })} /></label>
         <label><span>Soyad</span><input value={adminForm.soyad} onChange={(e) => setAdminForm({ ...adminForm, soyad: e.target.value })} /></label>
         <label><span>E-posta</span><input type="email" autoComplete="off" value={adminForm.email} onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })} /></label>
-        <label><span>Şifre (en az 8 karakter)</span><input type="text" autoComplete="new-password" value={adminForm.sifre} onChange={(e) => setAdminForm({ ...adminForm, sifre: e.target.value })} /></label>
+        <label><span>{duzenlenenAdminId ? "Yeni şifre (değişmeyecekse boş bırakın)" : "Şifre (en az 8 karakter)"}</span><input type="text" autoComplete="new-password" value={adminForm.sifre} onChange={(e) => setAdminForm({ ...adminForm, sifre: e.target.value })} /></label>
       </div>
-      <button disabled={islemde} onClick={adminKaydet}>Yöneticiyi Kaydet</button>
+      <button disabled={islemde} onClick={adminKaydet}>{duzenlenenAdminId ? "Değişiklikleri Kaydet" : "Yönetici Oluştur"}</button>
     </section>
 
     <section className="detay-bolum"><h3>Tema önizlemesi</h3><div className="tema-serit" style={{ "--isletme-accent": tema.renkler.accent, "--isletme-bg": tema.renkler.bgPrimary, "--isletme-card": tema.renkler.bgCard }}><div>{isletme.logoUrl ? <img src={isletme.logoUrl} alt="" /> : <b>{isletme.ad}</b>}<h4>{tema.metinler.slogan}</h4><span>{tema.metinler.kampanyaBaslik}</span></div><code>{tema.renkler.accent} · {tema.font.baslik}</code></div></section>
