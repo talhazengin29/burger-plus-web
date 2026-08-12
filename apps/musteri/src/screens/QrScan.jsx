@@ -2,20 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import QrScanner from "qr-scanner";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
+import { useApp } from "../context/AppContext";
 import { IconBack } from "../components/Icons";
 import "./QrScan.css";
 
 /*
   QR okutma ekranı — gerçek kamera + QR çözümleme (qr-scanner).
-  Masa QR'ları "{origin}/{slug}/masa?no=N" biçiminde bir URL taşır (bkz.
-  QrGenerator.jsx, superadmin/lib/qrPdf.js); burada sadece "no" parametresi
-  ayıklanıyor. Düz bir sayı okutulursa (ör. test amaçlı) da kabul edilir.
+  Masa QR'ları "{origin}/{slug}/masa?no=N#token=..." biçiminde güvenli bir URL
+  taşır (bkz. QrGenerator.jsx, superadmin/lib/qrPdf.js). Masa numarası ile imzalı
+  erişim anahtarı birlikte doğrulanır; düz masa numarası kabul edilmez.
 
   ?mod=algotur  → okutunca ödeme ekranına git
   ?mod=masa     → okutunca masa siparişi ekranına git (QR'dan gelen masa no ile)
 */
 export default function QrScan() {
   const git = useIsletmeNavigate();
+  const { setAktifMasa } = useApp();
   const [params] = useSearchParams();
   const mod = params.get("mod") || "algotur";
   const masaModu = mod === "masa";
@@ -30,12 +32,13 @@ export default function QrScan() {
     const videoOgesi = videoRef.current;
     if (!videoOgesi) return undefined;
 
-    const masaNosuGetir = (metin) => {
+    const masaBilgisiGetir = (metin) => {
       try {
-        return new URL(metin).searchParams.get("no");
+        const url = new URL(metin);
+        const hash = new URLSearchParams(url.hash.slice(1));
+        return { masaNo: url.searchParams.get("no"), masaToken: hash.get("token") || url.searchParams.get("token") };
       } catch {
-        const eslesme = String(metin || "").match(/\d+/);
-        return eslesme ? eslesme[0] : null;
+        return { masaNo: null, masaToken: null };
       }
     };
 
@@ -46,8 +49,13 @@ export default function QrScan() {
         iptalEdildi = true;
         tarayici.stop();
         if (masaModu) {
-          const masaNo = masaNosuGetir(sonuc.data);
-          git(masaNo ? `/odeme?masa=${masaNo}` : "/odeme");
+          const { masaNo, masaToken } = masaBilgisiGetir(sonuc.data);
+          if (!masaNo || !masaToken) {
+            setDurum("gecersiz-qr");
+            return;
+          }
+          setAktifMasa(masaNo, masaToken);
+          git(`/odeme?masa=${encodeURIComponent(masaNo)}`);
         } else {
           git("/odeme");
         }
@@ -68,13 +76,13 @@ export default function QrScan() {
       tarayici.stop();
       tarayici.destroy();
     };
-  }, [git, masaModu]);
+  }, [git, masaModu, setAktifMasa]);
 
   const manuelGonder = (e) => {
     e.preventDefault();
     const no = manuelNo.trim();
     if (masaModu) {
-      git(no ? `/odeme?masa=${no}` : "/odeme");
+      return;
     } else {
       git("/odeme");
     }
@@ -112,14 +120,15 @@ export default function QrScan() {
 
         {durum === "baslatiliyor" && <p className="qrscan-not">Kamera açılıyor…</p>}
         {durum === "tariyor" && <p className="qrscan-not">QR kodu çerçeve içine hizala</p>}
+        {durum === "gecersiz-qr" && <p className="qrscan-not qrscan-not--hata">Bu QR güvenli bir masa erişim anahtarı içermiyor. Masadaki güncel QR kodunu okut.</p>}
         {durum === "izin-yok" && (
           <p className="qrscan-not qrscan-not--hata">Kamera izni verilmedi. Tarayıcı ayarlarından bu sayfa için kameraya izin verip yeniden dene.</p>
         )}
         {durum === "kamera-yok" && (
-          <p className="qrscan-not qrscan-not--hata">Kameraya erişilemedi. Aşağıdan masa numarasını elle girebilirsin.</p>
+          <p className="qrscan-not qrscan-not--hata">Kameraya erişilemedi. Güvenli masa erişimi için masadaki QR kodunun okutulması gerekir.</p>
         )}
 
-        {kameraSorunuVar && (
+        {kameraSorunuVar && !masaModu && (
           <form className="qrscan-manuel" onSubmit={manuelGonder}>
             {masaModu && (
               <input

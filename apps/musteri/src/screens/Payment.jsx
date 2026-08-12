@@ -5,7 +5,7 @@ import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
 import { IconBack, IconCard, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
-import { iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
+import { cuzdanlaOdemeyiOnayla, cuzdanOzetiniGetir, iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import { emailTemizle, formuDogrula, guvenliMetin, ilkHata, kurallar, telefonTemizle, temizMetin } from "../lib/dogrulama";
 import "./Payment.css";
@@ -28,7 +28,7 @@ export default function Payment() {
   const [params] = useSearchParams();
   const masaNo = params.get("masa");
   const masaModu = !!masaNo;
-  const { sepet, sepetToplam, kullanici, misafir, sepetiBosalt } = useApp();
+  const { sepet, sepetToplam, kullanici, misafir, sepetiBosalt, aktifMasaTokeni, odemeyiTamamla } = useApp();
 
   const [odemeTipi, setOdemeTipi] = useState("kart");
   const [yontem, setYontem] = useState("tam");
@@ -38,6 +38,7 @@ export default function Payment() {
   const [alanHatalari, setAlanHatalari] = useState({});
   const [nakitMasa, setNakitMasa] = useState({ yukleniyor: masaModu, nakitAcik: false });
   const [nakitSiparis, setNakitSiparis] = useState(null);
+  const [cuzdan, setCuzdan] = useState(null);
   const [seciliAdetler, setSeciliAdetler] = useState({});
   const [alici, setAlici] = useState(() => ({
     ad: kullanici?.ad || "", soyad: kullanici?.soyad || "", email: kullanici?.email || "",
@@ -50,17 +51,18 @@ export default function Payment() {
       return;
     }
     try {
-      const durum = await nakitMasaDurumunuGetir(masaNo);
+      const durum = await nakitMasaDurumunuGetir(masaNo, aktifMasaTokeni);
       setNakitMasa({ ...durum, yukleniyor: false });
     } catch {
       setNakitMasa({ yukleniyor: false, nakitAcik: false });
     }
-  }, [masaNo]);
+  }, [masaNo, aktifMasaTokeni]);
 
   useEffect(() => {
     nakitMasaDurumunuYenile();
     if (!masaNo) return undefined;
-    socket.emit("masaya-katil", masaNo);
+    const masayaKatil = () => socket.emit("masaya-katil", { masaNo, masaToken: aktifMasaTokeni });
+    masayaKatil();
     const guncellendi = (veri) => {
       if (String(veri?.masaNo) !== String(masaNo)) return;
       if (veri.siparis) {
@@ -69,8 +71,17 @@ export default function Payment() {
       nakitMasaDurumunuYenile();
     };
     socket.on("nakit-masa-guncellendi", guncellendi);
-    return () => socket.off("nakit-masa-guncellendi", guncellendi);
-  }, [masaNo, nakitMasaDurumunuYenile]);
+    socket.on("connect", masayaKatil);
+    return () => {
+      socket.off("nakit-masa-guncellendi", guncellendi);
+      socket.off("connect", masayaKatil);
+    };
+  }, [masaNo, aktifMasaTokeni, nakitMasaDurumunuYenile]);
+
+  useEffect(() => {
+    if (!kullanici?.id) return;
+    cuzdanOzetiniGetir().then(setCuzdan).catch(() => setCuzdan(null));
+  }, [kullanici?.id]);
 
   if (nakitSiparis) {
     const onaylandi = nakitSiparis.durum === "nakit_bekliyor" || nakitSiparis.durum === "basarili";
@@ -179,6 +190,8 @@ export default function Payment() {
   const nakitKullanilabilir = masaModu && nakitMasa.nakitAcik;
   const odemeAktif = odemeTipi === "nakit"
     ? nakitKullanilabilir
+    : odemeTipi === "cuzdan"
+      ? Boolean(kullanici?.id && cuzdan?.ayar?.aktif && Number(cuzdan?.bakiye || 0) >= odenecek)
     : yontem !== "urun" || seciliUrunListesi.length > 0;
 
   const odeyVeBitir = async () => {
@@ -206,18 +219,19 @@ export default function Payment() {
       }
       return;
     }
-    const hatalar = formuDogrula(alici, ODEME_SEMASI);
-    setAlanHatalari(hatalar);
-    if (ilkHata(hatalar)) {
-      setOdemeHatasi("Ödeme için işaretli fatura bilgilerini kontrol et.");
-      return;
+    let dogrulanmisAlici = null;
+    if (odemeTipi === "kart") {
+      const hatalar = formuDogrula(alici, ODEME_SEMASI);
+      setAlanHatalari(hatalar);
+      if (ilkHata(hatalar)) {
+        setOdemeHatasi("Ödeme için işaretli fatura bilgilerini kontrol et.");
+        return;
+      }
+      dogrulanmisAlici = {
+        ad: temizMetin(alici.ad, 60), soyad: temizMetin(alici.soyad, 60),
+        email: emailTemizle(alici.email), telefon: telefonTemizle(alici.telefon),
+      };
     }
-    const dogrulanmisAlici = {
-      ad: temizMetin(alici.ad, 60),
-      soyad: temizMetin(alici.soyad, 60),
-      email: emailTemizle(alici.email),
-      telefon: telefonTemizle(alici.telefon),
-    };
     setIslemde(true);
     try {
       const taslak = await odemeTaslagiOlustur({
@@ -231,8 +245,15 @@ export default function Payment() {
         })),
       });
 
-      const paymentPageUrl = await iyzicoOdemesiniBaslat(taslak.id, dogrulanmisAlici);
-      window.location.assign(paymentPageUrl);
+      if (odemeTipi === "cuzdan") {
+        const sonuc = await cuzdanlaOdemeyiOnayla(taslak.id);
+        odemeyiTamamla(sonuc.odeme);
+        setCuzdan(sonuc.cuzdan);
+        git("/odeme-basarili");
+      } else {
+        const paymentPageUrl = await iyzicoOdemesiniBaslat(taslak.id, dogrulanmisAlici);
+        window.location.assign(paymentPageUrl);
+      }
     } catch (e) {
       setOdemeHatasi(e.message || "Ödeme başlatılamadı. Lütfen tekrar dene.");
     } finally {
@@ -283,6 +304,15 @@ export default function Payment() {
           </button>
           <button
             type="button"
+            className={"odeme-tipi-kart" + (odemeTipi === "cuzdan" ? " odeme-tipi-kart--aktif" : "")}
+            onClick={() => kullanici?.id && cuzdan?.ayar?.aktif && setOdemeTipi("cuzdan")}
+            disabled={!kullanici?.id || !cuzdan?.ayar?.aktif}
+          >
+            <IconWallet />
+            <span><b>Cüzdan bakiyesi</b><small>{!kullanici?.id ? "Üye girişi gerekli" : !cuzdan?.ayar?.aktif ? "Şu anda kullanılamıyor" : `${Number(cuzdan?.bakiye || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL kullanılabilir`}</small></span>
+          </button>
+          <button
+            type="button"
             className={"odeme-tipi-kart" + (odemeTipi === "nakit" ? " odeme-tipi-kart--aktif" : "")}
             onClick={() => nakitKullanilabilir && setOdemeTipi("nakit")}
             disabled={!nakitKullanilabilir}
@@ -307,7 +337,7 @@ export default function Payment() {
         </section>}
 
         {/* Yöntem seçimi — misafir sadece tamamını öder */}
-        {odemeTipi === "kart" && !misafir && (
+        {(odemeTipi === "kart" || odemeTipi === "cuzdan") && !misafir && (
           <>
             <h2 className="odeme-bolum-baslik">Nasıl ödemek istersin?</h2>
             <div className="yontem-grid">
@@ -325,6 +355,9 @@ export default function Payment() {
               ))}
             </div>
           </>
+        )}
+        {odemeTipi === "cuzdan" && Number(cuzdan?.bakiye || 0) < odenecek && (
+          <p className="nakit-masa-uyari">Cüzdan bakiyen bu sipariş için yetersiz. Kasadan nakit yükleme yapabilirsin.</p>
         )}
 
         {/* Eşit böl: kişi sayısı */}

@@ -1,3 +1,5 @@
+import { masaErisimTokenlariniGetir } from "./superApi";
+
 function guvenliDosyaAdi(deger) {
   return String(deger || "isletme").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "isletme";
 }
@@ -8,8 +10,14 @@ function pdfMetni(deger) {
     .replace(/[öÖ]/g, "o").replace(/[şŞ]/g, "s").replace(/[üÜ]/g, "u");
 }
 
-export async function qrPdfIndir({ slug, ad, masaSayisi = 10 }) {
+export async function qrPdfIndir({ id, slug, ad, masaSayisi = 10, masaTokenlari = [] }) {
   const adet = Math.min(500, Math.max(1, Number(masaSayisi) || 10));
+  let gecerliTokenlar = masaTokenlari;
+  if (!gecerliTokenlar.length) {
+    if (!id) throw new Error("QR anahtarları için işletme kimliği bulunamadı.");
+    gecerliTokenlar = (await masaErisimTokenlariniGetir(id, adet)).tokenlar || [];
+  }
+  const tokenlar = new Map(gecerliTokenlar.map((kayit) => [String(kayit.masaNo), kayit.token]));
   const [{ default: QRCode }, { jsPDF }] = await Promise.all([import("qrcode"), import("jspdf")]);
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
   const kartlar = [[15, 17], [110, 17], [15, 151], [110, 151]];
@@ -19,7 +27,9 @@ export async function qrPdfIndir({ slug, ad, masaSayisi = 10 }) {
     const sayfaIndeksi = (masa - 1) % kartlar.length;
     if (masa > 1 && sayfaIndeksi === 0) pdf.addPage();
     const [x, y] = kartlar[sayfaIndeksi];
-    const url = `${musteriTemeli}/${encodeURIComponent(slug)}/masa?no=${masa}`;
+    const masaToken = tokenlar.get(String(masa));
+    if (!masaToken) throw new Error(`Masa ${masa} için QR erişim anahtarı alınamadı.`);
+    const url = `${musteriTemeli}/${encodeURIComponent(slug)}/masa?no=${masa}#token=${encodeURIComponent(masaToken)}`;
     const qr = await QRCode.toDataURL(url, { width: 700, margin: 1, errorCorrectionLevel: "H" });
     pdf.setDrawColor(48, 48, 74);
     pdf.roundedRect(x, y, 85, 120, 3, 3);

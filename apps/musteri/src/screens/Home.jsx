@@ -6,7 +6,7 @@ import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
 import { IconPlus, IconSearch, IconFilter } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
-import { siraliKonteyner, siraliOge, barDolumu, asagiAcilma } from "../lib/animasyonlar";
+import { siraliKonteyner, siraliOge, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
 import { useTema } from "../context/TemaContext";
 import "./Home.css";
@@ -34,7 +34,7 @@ export default function Home() {
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, misafir, indirimliFiyat, urunler, kategoriler } = useApp();
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, damgaKarti, misafir, indirimliFiyat, urunler, kategoriler } = useApp();
   const git = useIsletmeNavigate();
   const chipRef = useSuruklenebilir();
 
@@ -56,14 +56,13 @@ export default function Home() {
     return liste;
   }, [aktifKategori, arama, siralama, urunler]);
 
-  const damgaYuzde = (burgerDamga / burgerDamgaHedef) * 100;
+  const gorunenDamga = Math.min(burgerDamga, burgerDamgaHedef);
+  const kalanDamga = Math.max(burgerDamgaHedef - burgerDamga, 0);
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
   const sloganVurguIndex = metinler.slogan.lastIndexOf(metinler.sloganVurgu);
   const sloganBaslangici = sloganVurguIndex >= 0 ? metinler.slogan.slice(0, sloganVurguIndex).trim() : metinler.slogan;
-  const damgaMetni = metinler.damgaMetni.replace("{hedef}", burgerDamgaHedef);
-  const [damgaBaslangici, ...damgaVurgusu] = damgaMetni.split(/,\s*/);
 
   return (
     <div className="ekran home">
@@ -82,7 +81,7 @@ export default function Home() {
         </motion.h1>
 
         {/* Ye Kazan damga kartı */}
-        <motion.section
+        {damgaKarti.aktif && <motion.section
           className="damga-kart"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -90,35 +89,29 @@ export default function Home() {
         >
           <div className="damga-ust">
             <div>
-              <span className="damga-rozet">{metinler.kampanyaBaslik}</span>
-              <h2 className="damga-baslik">
-                {damgaBaslangici}{damgaVurgusu.length > 0 && <>, <span className="vurgu">{damgaVurgusu.join(", ")}</span></>}
-              </h2>
+              <span className="damga-rozet">{damgaKarti.kartEtiketi}</span>
+              <h2 className="damga-baslik">{damgaKarti.baslik}</h2>
+              <p className="damga-aciklama">{damgaKarti.aciklama}</p>
             </div>
             {!misafir && (
-              <span className="damga-sayac">
-                {burgerDamga}
-                <span className="damga-sayac-hedef">/{burgerDamgaHedef}</span>
-              </span>
+              <div className="damga-sayac"><strong>{gorunenDamga}</strong><span>/{burgerDamgaHedef}</span><small>TAMAMLANDI</small></div>
             )}
           </div>
 
+          <div className="damga-noktalar" style={{ "--damga-sutun": Math.min(burgerDamgaHedef, 6) }}>
+            {Array.from({ length: burgerDamgaHedef }, (_, indeks) => {
+              const dolu = !misafir && indeks < gorunenDamga;
+              const siradaki = !misafir && indeks === gorunenDamga;
+              return <motion.span key={indeks} className={`${dolu ? "dolu" : ""} ${siradaki ? "siradaki" : ""}`} initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .08 + indeks * .035 }}><i>{dolu ? damgaKarti.ikon : indeks + 1}</i><small>{dolu ? "Damga" : indeks + 1 === burgerDamgaHedef ? "Hediye" : ""}</small></motion.span>;
+            })}
+          </div>
+
           {misafir ? (
-            <p className="damga-misafir-not">
-              Giriş yap veya üye ol, bu kampanyaya dahil ol!
-            </p>
+            <div className="damga-misafir-not"><span>Üyelere özel</span><p>Giriş yap veya üye ol; {damgaKarti.kategori} kategorisindeki alışverişlerinle damga biriktir.</p></div>
           ) : (
-            <>
-              <div className="ilerleme-ray">
-                {/* Bar dolumu animasyonu — açılışta 0'dan yüzdeye kadar dolar */}
-                <motion.div className="ilerleme-dolgu" {...barDolumu(damgaYuzde)} />
-              </div>
-              <span className="damga-durum">
-                {burgerDamgaHedef - burgerDamga} {metinler.damgaBirim.toLocaleLowerCase("tr")} sonra hediyen hazır
-              </span>
-            </>
+            <div className="damga-alt"><div><small>SIRADAKİ ÖDÜL</small><strong>{damgaKarti.odulMetni}</strong></div><p>{kalanDamga === 0 ? damgaKarti.tamamlanmaMetni : <><b>{kalanDamga}</b> {damgaKarti.damgaBirimi} daha</>}</p></div>
           )}
-        </motion.section>
+        </motion.section>}
 
         {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
         <div className="kategori-satir" ref={chipRef}>

@@ -177,6 +177,15 @@ export async function sadakatOzetiniGetir() {
   return (await jsonIstegi("/api/sadakat", {}, "Sadakat bilgileri alınamadı.")).sadakat;
 }
 
+export async function damgaKartiAyariniGetir() {
+  return (await jsonIstegi("/api/sadakat-ayari", {}, "Damga kartı ayarı alınamadı.")).damgaKarti;
+}
+
+export async function cuzdanOzetiniGetir() {
+  if (!tokeniAl()) return null;
+  return (await jsonIstegi("/api/cuzdan", {}, "Cüzdan bilgileri alınamadı.")).cuzdan;
+}
+
 export async function puanlaOdulSatinAl(odulId, istekAnahtari) {
   return (await jsonIstegi(`/api/sadakat/oduller/${encodeURIComponent(odulId)}/satin-al`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ istekAnahtari }) }, "Ödül alınamadı.")).sadakat;
 }
@@ -189,8 +198,10 @@ export async function odemeTaslagiOlustur(veri) {
   return (await jsonIstegi("/api/odeme/taslak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Ödeme taslağı oluşturulamadı.")).odeme;
 }
 
-export async function nakitMasaDurumunuGetir(masaNo) {
-  return jsonIstegi(`/api/nakit/masa/${encodeURIComponent(masaNo)}/durum`, {}, "Masa durumu alınamadı.");
+export async function nakitMasaDurumunuGetir(masaNo, masaToken) {
+  return jsonIstegi(`/api/nakit/masa/${encodeURIComponent(masaNo)}/durum`, {
+    headers: { "X-Masa-Token": masaToken || "" },
+  }, "Masa durumu alınamadı.");
 }
 
 export async function nakitSiparisGonder(veri) {
@@ -211,4 +222,8 @@ export async function iyzicoOdemesiniDogrula(odemeId) {
 
 export async function odemeSonucunuGetir(odemeId) {
   return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/sonuc`, {}, "Ödeme sonucu alınamadı.")).odeme;
+}
+
+export async function cuzdanlaOdemeyiOnayla(odemeId) {
+  return jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/cuzdan-onay`, { method: "POST" }, "Cüzdan ödemesi tamamlanamadı.");
 }

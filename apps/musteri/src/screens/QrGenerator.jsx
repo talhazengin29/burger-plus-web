@@ -8,7 +8,7 @@ import "./QrGenerator.css";
 
 /*
   İşletme için QR üretme ekranı (işletme paneli başlangıcı).
-  Masa sayısı girilir, her masa için /masa?no=X adresini içeren QR üretilir.
+  Masa sayısı girilir, her masa için numara + imzalı erişim anahtarı içeren QR üretilir.
   Yazdırılıp masalara konur. Müşteri okutunca TableWelcome ekranı açılır.
 */
 export default function QrGenerator() {
@@ -16,15 +16,29 @@ export default function QrGenerator() {
   const { isletme, isletmeSlug } = useIsletme();
   const [masaSayisi, setMasaSayisi] = useState(10);
   const [qrler, setQrler] = useState([]); // { no, dataUrl }
+  const [hata, setHata] = useState("");
 
   // Uygulamanın kök adresi (gerçek sitede otomatik doğru gelir)
   const kokAdres = window.location.origin;
 
   const uret = async (istenenAdet = masaSayisi) => {
-    const adet = Math.min(500, Math.max(1, Number(istenenAdet) || 10));
+    const hamAdet = typeof istenenAdet === "number" ? istenenAdet : masaSayisi;
+    const adet = Math.min(500, Math.max(1, Number(hamAdet) || 10));
+    setHata("");
+    setQrler([]);
+    const yanit = await istekAt("/api/admin/masa-erisim-tokenlari", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ masaSayisi: adet }),
+    });
+    const veri = await yanit.json();
+    if (!yanit.ok) throw new Error(veri.hata || "Masa QR anahtarları alınamadı.");
+    const tokenlar = new Map((veri.tokenlar || []).map((kayit) => [String(kayit.masaNo), kayit.token]));
     const sonuc = [];
     for (let i = 1; i <= adet; i++) {
-      const url = `${kokAdres}/${isletmeSlug}/masa?no=${i}`;
+      const token = tokenlar.get(String(i));
+      if (!token) throw new Error(`Masa ${i} için QR erişim anahtarı alınamadı.`);
+      const url = `${kokAdres}/${isletmeSlug}/masa?no=${i}#token=${encodeURIComponent(token)}`;
       const dataUrl = await QRCode.toDataURL(url, {
         width: 300,
         margin: 2,
@@ -47,7 +61,7 @@ export default function QrGenerator() {
         setMasaSayisi(adet);
         await uret(adet);
       })
-      .catch(() => { if (!iptal) uret(10); });
+      .catch((err) => { if (!iptal) setHata(err.message || "QR kodları oluşturulamadı."); });
     return () => { iptal = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -71,7 +85,8 @@ export default function QrGenerator() {
             <span className="qr-gen-sayi">{masaSayisi}</span>
             <button onClick={() => setMasaSayisi((s) => Math.min(500, s + 1))}>+</button>
           </div>
-          <button className="qr-gen-uret-btn" onClick={uret}>QR'ları Oluştur</button>
+          <button className="qr-gen-uret-btn" onClick={() => uret().catch((err) => setHata(err.message))}>QR'ları Oluştur</button>
+          {hata && <p className="qr-gen-bilgi">{hata}</p>}
           {qrler.length > 0 && (
             <button className="qr-gen-yazdir-btn" onClick={yazdir}>🖨️ Yazdır</button>
           )}

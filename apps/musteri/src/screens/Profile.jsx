@@ -3,7 +3,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import QRCode from "qrcode";
 import { useApp } from "../context/AppContext";
 import {
-  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift, IconWallet,
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
@@ -12,6 +12,7 @@ import { davetOzetiniGetir, ikiFaktorKurulumBaslat, ikiFaktorKurulumOnayla, ikiF
 import "./Profile.css";
 
 const menuSatirlari = [
+  { ad: "Cüzdanım", Ikon: IconWallet, yol: "/cuzdanim" },
   { ad: "Kişisel Bilgiler", Ikon: IconUser, yol: "/profil-duzenle" },
   { ad: "Hediyelerim", Ikon: IconGift, yol: "/hediyelerim" },
   { ad: "Sipariş Geçmişi", Ikon: IconReceipt, yol: "/siparislerim" },

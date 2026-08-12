@@ -6,7 +6,7 @@ import { usePerde } from "../hooks/usePerde";
 import "./TableWelcome.css";
 
 /*
-  Masa karşılama ekranı. Masadaki QR okutulunca buraya gelinir: /masa?no=3
+  Masa karşılama ekranı. Masadaki QR okutulunca /masa?no=3#token=... açılır.
   Masa numarasını context'e yazar (aktifMasa). Kullanıcıya iki seçenek sunar:
    - Misafir olarak devam et: tek oturumluk, puan yok, doğrudan menüye.
    - Giriş yap: daimi müşteri, puan kazanır. (Giriş şimdilik sahte.)
@@ -16,16 +16,26 @@ export default function TableWelcome() {
   const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("no");
-  const { setAktifMasa, setMisafir } = useApp();
+  const qrMasaTokeni = new URLSearchParams(window.location.hash.slice(1)).get("token") || params.get("token");
+  const { aktifMasa, aktifMasaTokeni, setAktifMasa, setMisafir } = useApp();
+  const masaToken = qrMasaTokeni || (String(aktifMasa) === String(masaNo) ? aktifMasaTokeni : null);
   const { perdeIleGit } = usePerde();
 
   // Masa numarasını hemen kaydet
   useEffect(() => {
-    if (masaNo) setAktifMasa(masaNo);
-  }, [masaNo, setAktifMasa]);
+    if (masaNo && masaToken) {
+      setAktifMasa(masaNo, masaToken);
+      if (qrMasaTokeni) {
+        const temizUrl = new URL(window.location.href);
+        temizUrl.searchParams.delete("token");
+        temizUrl.hash = "";
+        window.history.replaceState({}, "", temizUrl);
+      }
+    }
+  }, [masaNo, masaToken, qrMasaTokeni, setAktifMasa]);
 
   // Geçersiz QR (masa numarası yok)
-  if (!masaNo) {
+  if (!masaNo || !masaToken) {
     return (
       <div className="ekran table-welcome">
         <div className="tw-icerik">

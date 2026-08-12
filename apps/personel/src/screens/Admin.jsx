@@ -21,6 +21,8 @@ const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "",
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", ikon: "🎯", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
 const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
+const BOS_DAMGA_KARTI = { aktif: true, hedefAdet: 5, kategori: "Burgerler", odulUrunId: "", odulMetni: "1 Burger Hediye", kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun", aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.", damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★" };
+const BOS_CUZDAN_AYARI = { aktif: true, bonusAktif: true, bonusYuzde: 5, minYukleme: 100, maxYukleme: 10000, kampanyaBasligi: "Nakit yüklemene ekstra bakiye", kampanyaAciklamasi: "Kasadan nakit yükle, bonus bakiyeni anında kullan." };
 const KAMPANYA_IKONLARI = [
   ["🎯", "Fırsat"], ["🕒", "Saat"], ["🎓", "Öğrenci"], ["🎁", "Hediye"],
   ["🔥", "Popüler"], ["🍔", "Burger"], ["🥤", "İçecek"], ["👥", "Davet"],
@@ -34,6 +36,7 @@ const BOLUMLER = [
   ["stok", "Stok Takibi", "▤", "stok-takibi"],
   ["kampanyalar", "Kampanyalar", "%", "kampanyalar"],
   ["oduller", "Puan Marketi", "★", "puan-marketi"],
+  ["cuzdan", "Uygulama Cüzdanı", "₺", "cuzdan"],
   ["duyurular", "Duyurular", "●", "duyurular"],
   ["satislar", "Canlı Satışlar", "◉", "satislar"],
   ["gecmis-siparisler", "Geçmiş Siparişler", "◷", "gecmis-siparisler"],
@@ -46,7 +49,7 @@ const BOLUMLER = [
 ];
 
 const MENU_GRUPLARI = [
-  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "duyurular"] },
+  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular"] },
   { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
@@ -108,6 +111,9 @@ export default function Admin({ onCikis }) {
   const [duyurular, setDuyurular] = useState([]);
   const [kampanyalar, setKampanyalar] = useState([]);
   const [oduller, setOduller] = useState([]);
+  const [damgaKarti, setDamgaKarti] = useState(BOS_DAMGA_KARTI);
+  const [cuzdanAyari, setCuzdanAyari] = useState(BOS_CUZDAN_AYARI);
+  const [cuzdanRaporu, setCuzdanRaporu] = useState({ toplamNakit: 0, toplamBonus: 0, bugunNakit: 0, yuklemeYapanMusteri: 0, dolasimdakiBakiye: 0 });
   const [rapor, setRapor] = useState({
     gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [],
     ozet: { ciro: 0, adet: 0, siparis: 0 }, oncekiOzet: { ciro: 0, adet: 0, siparis: 0 },
@@ -149,7 +155,7 @@ export default function Admin({ onCikis }) {
       const istekler = [
         ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
         ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
-        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"],
+        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"], ["Damga kartı", "/sadakat-ayari"], ["Cüzdan", "/cuzdan-ayari"], ["Cüzdan raporu", "/cuzdan-raporu"],
       ];
       const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
       const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -160,7 +166,7 @@ export default function Admin({ onCikis }) {
         return;
       }
 
-      const [d, u, p, r, duy, k, kamp, od] = sonuclar.map((sonuc) =>
+      const [d, u, p, r, duy, k, kamp, od, sadakatAyari, cuzdanVerisi, cuzdanRaporVerisi] = sonuclar.map((sonuc) =>
         sonuc.status === "fulfilled" ? sonuc.value : null
       );
       if (d) setDashboard(d);
@@ -172,6 +178,9 @@ export default function Admin({ onCikis }) {
       else if (u) setKategoriler(Array.from(new Set((u.urunler || []).map((urun) => urun.kategori))).map((ad, index) => ({ id: `urun-${ad}`, ad, gorsel: (u.urunler || []).find((urun) => urun.kategori === ad)?.gorsel || null, sira: (index + 1) * 10, aktif: true })));
       if (kamp) setKampanyalar(kamp.kampanyalar || []);
       if (od) setOduller(od.oduller || []);
+      if (sadakatAyari?.damgaKarti) setDamgaKarti({ ...BOS_DAMGA_KARTI, ...sadakatAyari.damgaKarti });
+      if (cuzdanVerisi?.cuzdanAyari) setCuzdanAyari({ ...BOS_CUZDAN_AYARI, ...cuzdanVerisi.cuzdanAyari });
+      if (cuzdanRaporVerisi?.cuzdanRaporu) setCuzdanRaporu(cuzdanRaporVerisi.cuzdanRaporu);
 
       const hatalar = sonuclar.flatMap((sonuc, index) =>
         sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -418,6 +427,23 @@ export default function Admin({ onCikis }) {
     if (await islem(() => adminIstek("/oduller", jsonGonder("POST", veri)), "Puan marketi güncellendi.")) setOdulForm(null);
   };
 
+  const damgaKartiniKaydet = async (e) => {
+    e.preventDefault();
+    const veri = { ...damgaKarti, hedefAdet: Number(damgaKarti.hedefAdet), odulUrunId: Number(damgaKarti.odulUrunId) };
+    const basarili = await islem(
+      () => adminIstek("/sadakat-ayari", jsonGonder("PUT", veri)),
+      "Damga kartı ayarları müşteri uygulamasına yansıtıldı."
+    );
+    if (basarili) setDamgaKarti((onceki) => ({ ...onceki, hedefAdet: veri.hedefAdet, odulUrunId: veri.odulUrunId }));
+  };
+
+  const cuzdanAyariniKaydet = async (e) => {
+    e.preventDefault();
+    const veri = { ...cuzdanAyari, bonusYuzde: Number(cuzdanAyari.bonusYuzde), minYukleme: Number(cuzdanAyari.minYukleme), maxYukleme: Number(cuzdanAyari.maxYukleme) };
+    const basarili = await islem(() => adminIstek("/cuzdan-ayari", jsonGonder("PUT", veri)), "Cüzdan ve nakit bonus ayarları uygulamaya yansıtıldı.");
+    if (basarili) setCuzdanAyari(veri);
+  };
+
   const kampanyaKategoriDegistir = (kategori) => setKampanyaForm((onceki) => ({
     ...onceki,
     gecerliKategoriler: onceki.gecerliKategoriler.includes(kategori)
@@ -659,7 +685,71 @@ export default function Admin({ onCikis }) {
               )) : <Bos yazi="Henüz kampanya tanımlanmamış." />}</div>
             </>}
 
+            {bolum === "cuzdan" && <>
+              <BolumBaslik baslik="Uygulama cüzdanı" aciklama="Kasadan nakit yükleme, hediye bakiye kampanyası ve işlem limitlerini yönetin." />
+              <section className="admin-metrikler cuzdan-metrikleri">
+                <Metrik ad="Bugünkü nakit" deger={para(cuzdanRaporu.bugunNakit)} alt="Kasadan cüzdana yüklenen" renk="yesil" />
+                <Metrik ad="Toplam nakit girişi" deger={para(cuzdanRaporu.toplamNakit)} alt={`${cuzdanRaporu.yuklemeYapanMusteri} müşteri yükleme yaptı`} renk="mavi" />
+                <Metrik ad="Verilen bonus" deger={para(cuzdanRaporu.toplamBonus)} alt="Hediye bakiye maliyeti" renk="mor" />
+                <Metrik ad="Dolaşımdaki bakiye" deger={para(cuzdanRaporu.dolasimdakiBakiye)} alt="Müşterilerin kullanılabilir toplamı" renk="turuncu" />
+              </section>
+              <section className={`cuzdan-admin-paneli ${cuzdanAyari.aktif ? "aktif" : "pasif"}`}>
+                <header className="cuzdan-admin-baslik">
+                  <div><span>ÖN ÖDEMELİ BAKİYE</span><h2>Nakit akışını sadakate dönüştür</h2><p>Müşteri kasada nakit ödeme yapar; personel tutarı hesabına yükler. Tanımladığınız hediye oranı otomatik eklenir.</p></div>
+                  <label className="admin-switch"><input type="checkbox" checked={cuzdanAyari.aktif === true} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, aktif: e.target.checked })} /><span /></label>
+                </header>
+                <div className="cuzdan-admin-yerlesim">
+                  <form className="cuzdan-admin-form" onSubmit={cuzdanAyariniKaydet}>
+                    <label className="cuzdan-bonus-switch"><span><b>Hediye bakiye kampanyası</b><small>Nakit yüklemeye ek bakiye ver</small></span><input type="checkbox" checked={cuzdanAyari.bonusAktif === true} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, bonusAktif: e.target.checked })} /></label>
+                    <div className="cuzdan-admin-grid">
+                      <Alan etiket="Hediye oranı (%)"><input required type="number" min="0" max="100" step="0.01" value={cuzdanAyari.bonusYuzde} disabled={!cuzdanAyari.bonusAktif} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, bonusYuzde: e.target.value })} /><small>Örn. ₺500 nakit + %{cuzdanAyari.bonusYuzde || 0} = {para(500 + 500 * Number(cuzdanAyari.bonusYuzde || 0) / 100)} bakiye.</small></Alan>
+                      <Alan etiket="Minimum yükleme"><input required type="number" min="1" step="0.01" value={cuzdanAyari.minYukleme} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, minYukleme: e.target.value })} /></Alan>
+                      <Alan etiket="Tek işlem üst limiti"><input required type="number" min="1" max="1000000" step="0.01" value={cuzdanAyari.maxYukleme} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, maxYukleme: e.target.value })} /></Alan>
+                      <Alan etiket="Kampanya başlığı"><input required maxLength="100" value={cuzdanAyari.kampanyaBasligi} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, kampanyaBasligi: e.target.value })} /></Alan>
+                      <Alan etiket="Müşteriye gösterilen açıklama"><textarea maxLength="240" value={cuzdanAyari.kampanyaAciklamasi} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, kampanyaAciklamasi: e.target.value })} /></Alan>
+                    </div>
+                    <div className="cuzdan-admin-guvence"><b>Operasyon kuralları</b><ul><li>Yükleme sadece salon/kasiyer hesabından yapılır.</li><li>Her işlem personel, müşteri ve zaman bilgisiyle kaydedilir.</li><li>Aynı kasa isteği iki kez bakiyeye yansımaz.</li><li>Bakiye başka işletmede kullanılamaz.</li></ul></div>
+                    <div className="cuzdan-admin-alt"><p>Cüzdanı kapatmak mevcut bakiyeleri silmez; yalnızca yeni yükleme ve harcamaları durdurur.</p><button className="primary" type="submit">Cüzdan ayarlarını kaydet</button></div>
+                  </form>
+                  <aside className="cuzdan-admin-onizleme">
+                    <small>MÜŞTERİ UYGULAMASI</small><span className="cuzdan-admin-ikon">₺</span><h3>{cuzdanAyari.kampanyaBasligi}</h3><p>{cuzdanAyari.kampanyaAciklamasi}</p>
+                    {cuzdanAyari.bonusAktif && <strong>%{cuzdanAyari.bonusYuzde} hediye bakiye</strong>}
+                    <div><span>Örnek nakit yükleme</span><b>{para(500)}</b><span>Müşteriye geçen</span><b>{para(500 + 500 * Number(cuzdanAyari.bonusAktif ? cuzdanAyari.bonusYuzde : 0) / 100)}</b></div>
+                  </aside>
+                </div>
+              </section>
+            </>}
+
             {bolum === "oduller" && <>
+              <section className={`damga-ayar-paneli ${damgaKarti.aktif ? "aktif" : "pasif"}`}>
+                <header className="damga-ayar-baslik">
+                  <div><span>SADAKAT PROGRAMI</span><h2>Damga kartı</h2><p>Müşterinin hangi alışverişte damga kazanacağını, kaç damgada hangi ürünü hediye alacağını ve kartın uygulamadaki dilini yönetin.</p></div>
+                  <label className="admin-switch"><input type="checkbox" checked={damgaKarti.aktif === true} onChange={(e) => setDamgaKarti({ ...damgaKarti, aktif: e.target.checked })} /><span /></label>
+                </header>
+                <div className="damga-ayar-yerlesim">
+                  <form className="damga-ayar-form" onSubmit={damgaKartiniKaydet}>
+                    <div className="damga-ayar-grid">
+                      <Alan etiket="Kaç damgada hediye?"><input required type="number" min="2" max="30" step="1" value={damgaKarti.hedefAdet} onChange={(e) => setDamgaKarti({ ...damgaKarti, hedefAdet: e.target.value })} /><small>Örn. 5: Beş uygun ürün satın alan müşteri ödül kazanır.</small></Alan>
+                      <Alan etiket="Damga kazandıran kategori"><select required value={damgaKarti.kategori} onChange={(e) => setDamgaKarti({ ...damgaKarti, kategori: e.target.value })}>{kategoriler.filter((k) => k.aktif !== false).map((k) => <option key={k.id} value={k.ad}>{k.ad}</option>)}</select><small>Bu kategorideki her ürün adedi bir damga kazandırır.</small></Alan>
+                      <Alan etiket="Tamamlanınca verilecek ürün"><select required={damgaKarti.aktif} value={damgaKarti.odulUrunId || ""} onChange={(e) => { const urun = urunler.find((u) => String(u.id) === e.target.value); setDamgaKarti({ ...damgaKarti, odulUrunId: e.target.value, odulMetni: urun ? `1 ${urun.ad} Hediye` : damgaKarti.odulMetni }); }}><option value="">Ürün seçin</option>{urunler.filter((u) => u.aktif).map((u) => <option key={u.id} value={u.id}>{u.ad} · {u.kategori}</option>)}</select></Alan>
+                      <Alan etiket="Ödül adı"><input required maxLength="120" value={damgaKarti.odulMetni} onChange={(e) => setDamgaKarti({ ...damgaKarti, odulMetni: e.target.value })} placeholder="1 Burger Hediye" /></Alan>
+                      <Alan etiket="Kart etiketi"><input required maxLength="40" value={damgaKarti.kartEtiketi} onChange={(e) => setDamgaKarti({ ...damgaKarti, kartEtiketi: e.target.value })} /></Alan>
+                      <Alan etiket="Kart başlığı"><input required maxLength="100" value={damgaKarti.baslik} onChange={(e) => setDamgaKarti({ ...damgaKarti, baslik: e.target.value })} /></Alan>
+                      <Alan etiket="Damga birimi"><input required maxLength="40" value={damgaKarti.damgaBirimi} onChange={(e) => setDamgaKarti({ ...damgaKarti, damgaBirimi: e.target.value })} placeholder="burger / kahve / ürün" /></Alan>
+                      <Alan etiket="Damga ikonu"><input required maxLength="16" value={damgaKarti.ikon} onChange={(e) => setDamgaKarti({ ...damgaKarti, ikon: e.target.value })} placeholder="★" /></Alan>
+                      <Alan etiket="Kart açıklaması"><textarea maxLength="240" value={damgaKarti.aciklama} onChange={(e) => setDamgaKarti({ ...damgaKarti, aciklama: e.target.value })} /></Alan>
+                      <Alan etiket="Tamamlanma mesajı"><input required maxLength="80" value={damgaKarti.tamamlanmaMetni} onChange={(e) => setDamgaKarti({ ...damgaKarti, tamamlanmaMetni: e.target.value })} /></Alan>
+                    </div>
+                    <div className="damga-ayar-alt"><p>Hedef değiştiğinde müşterilerin mevcut damgaları silinmez. Kazanılmış hediyeler her zaman korunur.</p><button className="primary" type="submit">Damga kartını kaydet</button></div>
+                  </form>
+                  <aside className="damga-admin-onizleme">
+                    <span>{damgaKarti.kartEtiketi || "YE KAZAN"}</span><h3>{damgaKarti.baslik || "Damga kartı"}</h3><p>{damgaKarti.aciklama}</p>
+                    <div className="damga-admin-daireler">{Array.from({ length: Math.min(12, Math.max(2, Number(damgaKarti.hedefAdet) || 5)) }, (_, i) => <i key={i} className={i < Math.min(2, Number(damgaKarti.hedefAdet) || 5) ? "dolu" : ""}>{i < 2 ? damgaKarti.ikon : i + 1}</i>)}</div>
+                    {Number(damgaKarti.hedefAdet) > 12 && <small>+{Number(damgaKarti.hedefAdet) - 12} damga daha</small>}
+                    <footer><b>2 / {damgaKarti.hedefAdet || 5}</b><strong>{damgaKarti.odulMetni || "Hediye"}</strong></footer>
+                  </aside>
+                </div>
+              </section>
               <BolumBaslik baslik="Puan marketi" aciklama="Müşterilerin puanlarıyla alabileceği ürünleri ve gerekli puan tutarını belirleyin." buton="+ Yeni ödül" onClick={() => setOdulForm({ ...BOS_ODUL, urunId: urunler.find((urun) => urun.aktif)?.id || urunler[0]?.id || "" })} />
               <div className="yonetim-kart-grid">{oduller.length ? oduller.map((odul) => (
                 <article className={`yonetim-kart odul-yonetim-kart ${!odul.aktif ? "pasif" : ""}`} key={odul.id}>

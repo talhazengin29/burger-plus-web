@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { abonelikGuncelle, abonelikOlustur, erisimTokeniOlustur, isletmeAdminiKaydet, isletmeAdminleriniGetir, isletmeDurumuDegistir, isletmeGetir, isletmeGuncelle, isletmeSil, personelPanelineGit } from "../lib/superApi";
+import { abonelikGuncelle, abonelikOlustur, erisimTokeniOlustur, isletmeAdminiKaydet, isletmeAdminleriniGetir, isletmeDurumuDegistir, isletmeGetir, isletmeGuncelle, isletmeSil, masaErisimTokenlariniGetir, personelPanelineGit } from "../lib/superApi";
 import { qrPdfIndir } from "../lib/qrPdf";
 import { Basari, DurumRozeti, Hata, Metrik, para, sayi, Yukleme } from "../components/Ui";
 
@@ -83,7 +83,10 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
   };
   const qrIndir = async () => {
     setIslemde(true); setHata("");
-    try { await qrPdfIndir({ slug: isletme.slug, ad: isletme.ad, masaSayisi: isletme.masaSayisi }); } catch (err) { setHata(err.message); } finally { setIslemde(false); }
+    try {
+      const { tokenlar } = await masaErisimTokenlariniGetir(isletme.id, isletme.masaSayisi);
+      await qrPdfIndir({ slug: isletme.slug, ad: isletme.ad, masaSayisi: isletme.masaSayisi, masaTokenlari: tokenlar });
+    } catch (err) { setHata(err.message); } finally { setIslemde(false); }
   };
   const sil = async () => {
     if (onay !== isletme.slug) return setHata("Silmek için işletmenin slug değerini birebir yazın.");

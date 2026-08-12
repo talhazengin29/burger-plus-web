@@ -77,7 +77,7 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
 
 export default function Orders() {
   const git = useIsletmeNavigate();
-  const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo, sepeteEkle, urunler } = useApp();
+  const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo, ozetMasaTokeni, sepeteEkle, urunler } = useApp();
 
   const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
   useEffect(() => {
@@ -131,8 +131,11 @@ export default function Orders() {
     const sorgula = async () => {
       const yeni = {};
       for (const no of masalar) {
+        if (String(ozetMasaNo) !== no || !ozetMasaTokeni) continue;
         try {
-          const r = await istekAt(`/api/masa/${encodeURIComponent(no)}`);
+          const r = await istekAt(`/api/masa/${encodeURIComponent(no)}`, {
+            headers: { "X-Masa-Token": ozetMasaTokeni },
+          });
           if (!r.ok) continue;
           const d = await r.json();
           const k = d.kalemler || [];
@@ -151,7 +154,7 @@ export default function Orders() {
     sorgula();
     const zamanlayici = setInterval(sorgula, 5000);
     return () => { iptal = true; clearInterval(zamanlayici); };
-  }, [siparislerim]);
+  }, [siparislerim, ozetMasaNo, ozetMasaTokeni]);
 
   const durumBilgi = (s) => {
     if (s.tip === "masa" && s.masaNo) {

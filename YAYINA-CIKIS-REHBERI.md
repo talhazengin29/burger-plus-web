@@ -97,6 +97,7 @@ Aynısını `burger-plus-web` klasörü için de yap (adres kısmını değişti
    |---|---|
    | `DATABASE_URL` | Supabase'den aldığın tam adres (Adım 1.5) |
    | `JWT_SECRET` | Uzun ve rastgele bir metin yaz (örn: `bp-2026-gizli-anahtar-x7k9m2p4` ) |
+   | `MASA_TOKEN_SECRET` | Basılı masa QR'larını imzalamak için JWT anahtarından farklı, sabit ve en az 32 karakterli rastgele anahtar |
    | `MFA_ENCRYPTION_KEY` | 2FA sırlarını şifreleyen, JWT anahtarından farklı en az 32 karakterli rastgele anahtar |
    | `IYZICO_API_KEY` | İyzico üye işyeri API anahtarı |
    | `IYZICO_SECRET_KEY` | İyzico üye işyeri gizli anahtarı |

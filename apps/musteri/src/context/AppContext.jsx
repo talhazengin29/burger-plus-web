@@ -18,10 +18,16 @@ import { useIsletme } from "./IsletmeContext";
 import {
   beniGetir, tokeniAl, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
   sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
-  istekAt, tenantDepoAnahtari,
+  damgaKartiAyariniGetir, istekAt, tenantDepoAnahtari,
 } from "../lib/authApi";
 
 const AppContext = createContext(null);
+const VARSAYILAN_DAMGA_KARTI = {
+  aktif: true, hedefAdet: 5, kategori: "Burgerler", odulMetni: "1 Burger Hediye",
+  kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun",
+  aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.",
+  damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★",
+};
 
 function kataloguBirlestir(uzakUrunler, isletmeSlug) {
   return uzakUrunler.map((uzak) => {
@@ -72,7 +78,8 @@ export function AppProvider({ children }) {
   const { isletmeSlug, tema } = useIsletme();
   const depoAnahtari = useCallback((anahtar) => tenantDepoAnahtari(anahtar, isletmeSlug), [isletmeSlug]);
   const [puan, setPuan] = useState(0);
-  const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
+  const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, damgaKarti: VARSAYILAN_DAMGA_KARTI, oduller: [], puanGecmisi: [], hediyeler: [] });
+  const [damgaKarti, setDamgaKarti] = useState(VARSAYILAN_DAMGA_KARTI);
   const [urunler, setUrunler] = useState(() => isletmeSlug === "burger-plus" ? varsayilanUrunler : []);
   const [menuKategorileri, setMenuKategorileri] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKategoriler : [varsayilanKategoriler[0]]);
   const [kampanyalar, setKampanyalar] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKampanyalar : []);
@@ -102,6 +109,9 @@ export function AppProvider({ children }) {
         if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
       })
       .catch(() => {});
+    damgaKartiAyariniGetir()
+      .then((ayar) => { if (ayar) setDamgaKarti({ ...VARSAYILAN_DAMGA_KARTI, ...ayar }); })
+      .catch(() => {});
   }, [isletmeSlug]);
 
   // İşletme "Tümü" rozeti için kendi görselini ayarladıysa (yönetim panelinden),
@@ -130,13 +140,20 @@ export function AppProvider({ children }) {
     const kampanyalarGuncelle = (uzakKampanyalar) => {
       if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);
     };
+    const sadakatAyariGuncellendi = (ayar) => {
+      const guncel = { ...VARSAYILAN_DAMGA_KARTI, ...(ayar || {}) };
+      setDamgaKarti(guncel);
+      setSadakat((onceki) => ({ ...onceki, burgerDamgaHedef: guncel.hedefAdet, damgaKarti: guncel }));
+    };
     socket.on("urunler-guncellendi", katalogGuncelle);
     socket.on("kategoriler-guncellendi", kategorilerGuncelle);
     socket.on("kampanyalar-guncellendi", kampanyalarGuncelle);
+    socket.on("sadakat-ayari-guncellendi", sadakatAyariGuncellendi);
     return () => {
       socket.off("urunler-guncellendi", katalogGuncelle);
       socket.off("kategoriler-guncellendi", kategorilerGuncelle);
       socket.off("kampanyalar-guncellendi", kampanyalarGuncelle);
+      socket.off("sadakat-ayari-guncellendi", sadakatAyariGuncellendi);
     };
   }, [isletmeSlug]);
 
@@ -204,7 +221,7 @@ export function AppProvider({ children }) {
     setPuan(0);
     setAvatar(null);
     setSiparislerim([]);
-    setSadakat({ burgerDamga: 0, burgerDamgaHedef: 5, oduller: [], puanGecmisi: [], hediyeler: [] });
+    setSadakat({ burgerDamga: 0, burgerDamgaHedef: damgaKarti.hedefAdet, damgaKarti, oduller: [], puanGecmisi: [], hediyeler: [] });
     socketIsletmesiniAyarla(isletmeSlug);
   };
 
@@ -226,12 +243,19 @@ export function AppProvider({ children }) {
   const [aktifMasa, setAktifMasaState] = useState(
     () => sessionStorage.getItem(tenantDepoAnahtari("bp_aktifMasa", isletmeSlug)) || null
   );
-  const setAktifMasa = (deger) => {
+  const [aktifMasaTokeni, setAktifMasaTokeni] = useState(
+    () => sessionStorage.getItem(tenantDepoAnahtari("bp_aktifMasaTokeni", isletmeSlug)) || null
+  );
+  const setAktifMasa = useCallback((deger, masaToken = null) => {
     const anahtar = depoAnahtari("bp_aktifMasa");
+    const tokenAnahtari = depoAnahtari("bp_aktifMasaTokeni");
     if (deger) sessionStorage.setItem(anahtar, deger);
     else sessionStorage.removeItem(anahtar);
+    if (deger && masaToken) sessionStorage.setItem(tokenAnahtari, masaToken);
+    else if (!deger) sessionStorage.removeItem(tokenAnahtari);
     setAktifMasaState(deger);
-  };
+    setAktifMasaTokeni(deger ? masaToken : null);
+  }, [depoAnahtari]);
 
   // Misafir oturumu: QR'dan "Misafir olarak devam et" ile gelince true olur.
   // sessionStorage'a yazılır → sayfa yenilenince korunur.
@@ -254,6 +278,9 @@ export function AppProvider({ children }) {
   const [ozetMasaNo, setOzetMasaNo] = useState(
     () => localStorage.getItem(tenantDepoAnahtari("bp_ozetMasa", isletmeSlug)) || sessionStorage.getItem(tenantDepoAnahtari("bp_ozetMasa", isletmeSlug)) || null
   );
+  const [ozetMasaTokeni, setOzetMasaTokeni] = useState(
+    () => localStorage.getItem(tenantDepoAnahtari("bp_ozetMasaTokeni", isletmeSlug)) || null
+  );
   const [masaOzeti, setMasaOzeti] = useState({ kalemler: [], toplam: 0 });
 
   // Masadaki siparişlerin canlı durumu (mutfak güncelledikçe değişir).
@@ -268,25 +295,32 @@ export function AppProvider({ children }) {
 
   // aktifMasa set edilince özet masasını da güncelle (kalıcı)
   useEffect(() => {
-    if (aktifMasa) {
+    if (aktifMasa && aktifMasaTokeni) {
       setOzetMasaNo(aktifMasa);
+      setOzetMasaTokeni(aktifMasaTokeni);
       localStorage.setItem(depoAnahtari("bp_ozetMasa"), aktifMasa);
+      localStorage.setItem(depoAnahtari("bp_ozetMasaTokeni"), aktifMasaTokeni);
     }
-  }, [aktifMasa, depoAnahtari]);
+  }, [aktifMasa, aktifMasaTokeni, depoAnahtari]);
 
   // Özet masasına bağlan, canlı güncellemeleri dinle
   useEffect(() => {
-    if (!ozetMasaNo) {
+    if (!ozetMasaNo || !ozetMasaTokeni) {
       setMasaOzeti({ kalemler: [], toplam: 0 });
       return;
     }
-    socket.emit("masaya-katil", ozetMasaNo);
+    const masayaKatil = () => socket.emit("masaya-katil", { masaNo: ozetMasaNo, masaToken: ozetMasaTokeni });
+    masayaKatil();
     const dinleyici = (veri) => {
       if (String(veri.masaNo) === String(ozetMasaNo)) setMasaOzeti(veri);
     };
     socket.on("masa-guncellendi", dinleyici);
-    return () => socket.off("masa-guncellendi", dinleyici);
-  }, [ozetMasaNo]);
+    socket.on("connect", masayaKatil);
+    return () => {
+      socket.off("masa-guncellendi", dinleyici);
+      socket.off("connect", masayaKatil);
+    };
+  }, [ozetMasaNo, ozetMasaTokeni]);
 
   // --- Kampanyalar (saatli/sürekli indirimler) ---
   // Dakikada bir tazelenen saat — saatli kampanyaların (örn. 14:00-17:00
@@ -437,6 +471,7 @@ export function AppProvider({ children }) {
     if (!kullanici?.id) return null;
     const guncel = await sadakatOzetiniGetir();
     setSadakat(guncel);
+    if (guncel?.damgaKarti) setDamgaKarti({ ...VARSAYILAN_DAMGA_KARTI, ...guncel.damgaKarti });
     setPuan(guncel.puan);
     return guncel;
   }, [kullanici?.id]);
@@ -477,7 +512,7 @@ export function AppProvider({ children }) {
   };
 
   const burgerDamga = Number(sadakat.burgerDamga || 0);
-  const DAMGA_HEDEF = Number(sadakat.burgerDamgaHedef || 5);
+  const DAMGA_HEDEF = Number(damgaKarti.hedefAdet || sadakat.burgerDamgaHedef || 5);
   const hediyeler = sadakat.hediyeler || [];
 
   // Masa kapatıldı bildirimini dinle (salon personeli kapatınca gelir).
@@ -488,7 +523,9 @@ export function AppProvider({ children }) {
       // Bu masaya bağlıysak bağlantıyı bırak (yeni müşteri temiz başlasın)
       if (String(masaNo) === String(ozetMasaNo)) {
         setOzetMasaNo(null);
+        setOzetMasaTokeni(null);
         localStorage.removeItem(depoAnahtari("bp_ozetMasa"));
+        localStorage.removeItem(depoAnahtari("bp_ozetMasaTokeni"));
         setMasaOzeti({ kalemler: [], toplam: 0 });
       }
     };
@@ -559,6 +596,7 @@ export function AppProvider({ children }) {
     // burger damga sayacı (5 al 1 bedava)
     burgerDamga,
     burgerDamgaHedef: DAMGA_HEDEF,
+    damgaKarti: { ...damgaKarti, hedefAdet: DAMGA_HEDEF },
     // hediye envanteri (Ye Kazan + puanla alınan ödüller)
     hediyeler,
     oduller: sadakat.oduller || [],
@@ -568,9 +606,11 @@ export function AppProvider({ children }) {
     // masa özeti (canlı, masadaki herkesin siparişi)
     masaOzeti,
     ozetMasaNo,
+    ozetMasaTokeni,
     masaDurumu,
     // aktif masa (QR ile gelen)
     aktifMasa,
+    aktifMasaTokeni,
     setAktifMasa,
     // misafir oturumu
     misafir,

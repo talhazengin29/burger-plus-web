@@ -8,6 +8,7 @@ import {
   nakitSiparisiTahsilEt,
 } from "../lib/adminApi";
 import "./Salon.css";
+import CuzdanYukleme from "../components/CuzdanYukleme";
 
 /*
   Salon ekrani (garson/kasiyer). Tum acik masalari, hesaplarini ve kimin ne
@@ -161,6 +162,8 @@ export default function Salon() {
       </header>
 
       {hata && <div className="salon-hata" role="alert">{hata}</div>}
+
+      <CuzdanYukleme />
 
       <section className="nakit-masa-paneli">
         <div className="salon-bolum-baslik">
