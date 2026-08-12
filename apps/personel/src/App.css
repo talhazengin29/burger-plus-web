@@ -84,3 +84,19 @@
 .sekme-tema:hover { background: var(--border); }
 /* Tema butonu geldiği için çıkış artık margin-left:auto olmasın */
 .sekme-cikis { margin-left: 8px; }
+.cuzdan-sekme-ekrani {
+  width: min(1320px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.cuzdan-sekme-ekrani .kasa-cuzdan {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .cuzdan-sekme-ekrani {
+    width: min(100% - 18px, 1320px);
+    padding-top: 12px;
+  }
+}
