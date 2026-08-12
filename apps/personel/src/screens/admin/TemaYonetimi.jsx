@@ -134,7 +134,7 @@ export default function TemaYonetimi() {
           <legend>Logo</legend>
           <div className="logo-satiri">
             <span className="logo-onizleme">{logoOnizleme ? <img src={logoOnizleme} alt={`${isletme.ad} logosu`} /> : <b>{isletme.ad}</b>}</span>
-            <div><p>PNG, JPG, WebP veya SVG · en fazla 2 MB</p><button type="button" disabled={logoYukleniyor} onClick={() => dosyaRef.current?.click()}>{logoYukleniyor ? "Yükleniyor…" : "Logo Yükle"}</button></div>
+            <div><p>PNG, JPG, WebP veya SVG · en fazla 2 MB<br />Boş kenarlar otomatik kırpılır ve tüm ekranlar için standartlaştırılır.</p><button type="button" disabled={logoYukleniyor} onClick={() => dosyaRef.current?.click()}>{logoYukleniyor ? "Yükleniyor…" : "Logo Yükle"}</button></div>
             <input ref={dosyaRef} type="file" hidden accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={logoSecildi} />
           </div>
         </fieldset>
