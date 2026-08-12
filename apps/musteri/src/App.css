@@ -53,7 +53,7 @@
   gap: 12px;
   padding: 24px;
   text-align: center;
-  background: var(--isletme-yukleme-bg, #0d0f14);
+  background: linear-gradient(135deg, #24262b 0%, #17191d 50%, #24262b 100%);
   color: #fff;
 }
 

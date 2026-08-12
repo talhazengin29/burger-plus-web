@@ -23,9 +23,6 @@
   display: block;
   filter: none;
 }
-.login-logo--burger-plus {
-  filter: invert(1) hue-rotate(180deg);
-}
 .login-logo.marka-logo-ozel { max-height: 104px; object-fit: contain; filter: none; }
 .login-logo.marka-logo-metin {
   width: auto;

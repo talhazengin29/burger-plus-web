@@ -36,6 +36,7 @@ function googleFontAgirliklari() {
 
 export function TemaSaglayici({ tema, isletme, children }) {
   const aktifTema = tema || VARSAYILAN_TEMA;
+  const logoUrl = aktifTema.logoUrl || isletme.logoUrl || null;
 
   useLayoutEffect(() => {
     const kok = document.documentElement;
@@ -56,14 +57,20 @@ export function TemaSaglayici({ tema, isletme, children }) {
     }
     fontLink.href = `https://fonts.googleapis.com/css2?${aileler.map((aile) => `family=${googleFontParametresi(aile)}:wght@${googleFontAgirliklari()}`).join("&")}&display=swap`;
     document.title = isletme.ad;
-  }, [aktifTema, isletme.ad]);
+    const favicon = document.querySelector("link[rel~='icon']");
+    const oncekiFavicon = favicon?.getAttribute("href") || "";
+    if (favicon && logoUrl) favicon.setAttribute("href", logoUrl);
+    return () => {
+      if (favicon && oncekiFavicon) favicon.setAttribute("href", oncekiFavicon);
+    };
+  }, [aktifTema, isletme.ad, logoUrl]);
 
   const deger = useMemo(() => ({
     ...aktifTema,
-    logoUrl: aktifTema.logoUrl || isletme.logoUrl || null,
+    logoUrl,
     isletmeAdi: isletme.ad,
     isletmeSlug: isletme.slug,
-  }), [aktifTema, isletme]);
+  }), [aktifTema, isletme, logoUrl]);
 
   return <TemaContext.Provider value={deger}>{children}</TemaContext.Provider>;
 }
