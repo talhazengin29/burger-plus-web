@@ -5,14 +5,38 @@ import { hexRgba, KONSEPTLER, METIN_ALANLARI } from "../../data/konseptler";
 import "./TemaYonetimi.css";
 
 const HEX = /^#[0-9a-f]{6}$/i;
+const RENK_ALANLARI = [
+  ["accent", "Vurgu rengi", "Butonlar ve öne çıkan detaylar"],
+  ["bgPrimary", "Ana arka plan", "Uygulamanın genel zemin rengi"],
+  ["bgCard", "Kart ve yüzey", "Kartlar ve içerik panelleri"],
+];
+
+function renkHexineCevir(renk, arkaPlan = "#000000") {
+  const deger = String(renk || "").trim();
+  if (HEX.test(deger)) return deger.toUpperCase();
+  const rgba = deger.match(/^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0|1|0?\.\d+)\s*\)$/i);
+  if (!rgba) return arkaPlan.toUpperCase();
+  const taban = HEX.test(arkaPlan) ? arkaPlan.slice(1).match(/.{2}/g).map((kanal) => Number.parseInt(kanal, 16)) : [0, 0, 0];
+  const alfa = Number(rgba[4]);
+  return `#${rgba.slice(1, 4).map((kanal, indeks) => Math.round(Number(kanal) * alfa + taban[indeks] * (1 - alfa)).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+function varsayilanRenkleriGetir(konsept) {
+  const renkler = KONSEPTLER[konsept].renkler;
+  const bgPrimary = renkHexineCevir(renkler.bgPrimary);
+  return { accent: renkHexineCevir(renkler.accent), bgPrimary, bgCard: renkHexineCevir(renkler.bgCard, bgPrimary) };
+}
 
 function baslangicFormu(isletme, tema) {
   const konsept = KONSEPTLER[isletme?.konsept] ? isletme.konsept : "burger";
   const varsayilan = KONSEPTLER[konsept];
+  const varsayilanRenkler = varsayilanRenkleriGetir(konsept);
   return {
     konsept,
     ozelPalet: tema?.ozelPalet === true,
-    accent: tema?.renkler?.accent || varsayilan.renkler.accent,
+    accent: renkHexineCevir(tema?.renkler?.accent || varsayilanRenkler.accent),
+    bgPrimary: renkHexineCevir(tema?.renkler?.bgPrimary || varsayilanRenkler.bgPrimary),
+    bgCard: renkHexineCevir(tema?.renkler?.bgCard || varsayilanRenkler.bgCard, tema?.renkler?.bgPrimary || varsayilanRenkler.bgPrimary),
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [
       alan,
       tema?.metinler?.[alan] && tema.metinler[alan] !== varsayilan.metinler[alan] ? tema.metinler[alan] : "",
@@ -42,7 +66,7 @@ export default function TemaYonetimi() {
 
   const varsayilan = KONSEPTLER[form.konsept];
   const onizleme = useMemo(() => ({
-    renkler: form.ozelPalet ? { ...varsayilan.renkler, accent: form.accent, accentGlow: hexRgba(form.accent) } : varsayilan.renkler,
+    renkler: form.ozelPalet ? { ...varsayilan.renkler, accent: form.accent, accentGlow: hexRgba(form.accent), bgPrimary: form.bgPrimary, bgCard: form.bgCard } : varsayilan.renkler,
     metinler: {
       ...varsayilan.metinler,
       ...Object.fromEntries(Object.entries(form.metinler).filter(([, deger]) => deger.trim())),
@@ -52,14 +76,15 @@ export default function TemaYonetimi() {
   const konseptSec = (konsept) => setForm({
     konsept,
     ozelPalet: false,
-    accent: KONSEPTLER[konsept].renkler.accent,
+    ...varsayilanRenkleriGetir(konsept),
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
   });
 
   const kaydet = async (e) => {
     e.preventDefault();
-    if (form.ozelPalet && !HEX.test(form.accent)) {
-      setHata("Vurgu rengi #RRGGBB biçiminde geçerli bir hex değeri olmalı.");
+    const gecersizRenk = RENK_ALANLARI.find(([alan]) => !HEX.test(form[alan]));
+    if (form.ozelPalet && gecersizRenk) {
+      setHata(`${gecersizRenk[1]} #RRGGBB biçiminde geçerli bir HEX değeri olmalı.`);
       return;
     }
     setKaydediliyor(true);
@@ -69,7 +94,7 @@ export default function TemaYonetimi() {
       const yanit = await temaKaydet({
         konsept: form.konsept,
         ozelPalet: form.ozelPalet,
-        renkler: form.ozelPalet ? { accent: form.accent, accentGlow: hexRgba(form.accent) } : {},
+        renkler: form.ozelPalet ? { accent: form.accent, accentGlow: hexRgba(form.accent), bgPrimary: form.bgPrimary, bgCard: form.bgCard } : {},
         metinler: form.metinler,
       });
       isletmeyiGuncelle(yanit.isletme, yanit.tema);
@@ -141,8 +166,8 @@ export default function TemaYonetimi() {
 
         <fieldset className="tema-kutu">
           <legend>Renk özelleştirme</legend>
-          <label className="tema-toggle"><input type="checkbox" checked={form.ozelPalet} onChange={(e) => setForm({ ...form, ozelPalet: e.target.checked, accent: e.target.checked ? form.accent : varsayilan.renkler.accent })} /><span /><b>{form.ozelPalet ? "Kendi renklerimi seç" : "Konsept renklerini kullan"}</b></label>
-          {form.ozelPalet && <div className="renk-secimi"><input type="color" value={HEX.test(form.accent) ? form.accent : varsayilan.renkler.accent} onChange={(e) => setForm({ ...form, accent: e.target.value.toUpperCase() })} aria-label="Vurgu rengi" /><label><span>Accent rengi</span><input maxLength="7" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value.slice(0, 7) })} placeholder="#FF6B00" /></label></div>}
+          <label className="tema-toggle"><input type="checkbox" checked={form.ozelPalet} onChange={(e) => setForm({ ...form, ozelPalet: e.target.checked, ...(!e.target.checked ? varsayilanRenkleriGetir(form.konsept) : {}) })} /><span /><b>{form.ozelPalet ? "Kendi renklerimi seç" : "Konsept renklerini kullan"}</b></label>
+          {form.ozelPalet && <div className="renk-secimleri">{RENK_ALANLARI.map(([alan, etiket, aciklama]) => <div className="renk-secimi" key={alan}><input type="color" value={HEX.test(form[alan]) ? form[alan] : varsayilanRenkleriGetir(form.konsept)[alan]} onChange={(e) => setForm({ ...form, [alan]: e.target.value.toUpperCase() })} aria-label={etiket} /><label><span>{etiket}</span><input maxLength="7" value={form[alan]} onChange={(e) => setForm({ ...form, [alan]: e.target.value.slice(0, 7).toUpperCase() })} placeholder={varsayilanRenkleriGetir(form.konsept)[alan]} /><small>{aciklama}</small></label></div>)}</div>}
         </fieldset>
 
         <fieldset className="tema-kutu">

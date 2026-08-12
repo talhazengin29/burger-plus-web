@@ -2,3 +2,10 @@
 
 @media(max-width:1000px){.tema-yonetimi{grid-template-columns:1fr}.tema-canli{position:static}.tema-telefon{width:220px}}
 @media(max-width:650px){.tema-baslik{align-items:flex-start;flex-direction:column}.tema-baslik button{width:100%}.konsept-kartlari,.tema-metinleri{grid-template-columns:1fr}.logo-satiri{align-items:flex-start;flex-direction:column}.logo-onizleme{width:100%;height:100px}}
+
+/* Üçlü işletme paleti: vurgu, ana zemin ve kart/yüzey rengi. */
+.renk-secimleri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}
+.renk-secimleri .renk-secimi{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:start;gap:10px;margin-top:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--panel-2)}
+.renk-secimleri .renk-secimi>input[type="color"]{width:48px;height:48px;background:var(--panel-3)}
+.renk-secimleri .renk-secimi label small{position:static;color:var(--metin-soluk);font-size:7px;line-height:1.35}
+@media(max-width:900px){.renk-secimleri{grid-template-columns:1fr}}
