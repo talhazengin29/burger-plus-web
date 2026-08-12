@@ -85,5 +85,11 @@
 .isletme-durum .isletme-spinner {
   border-top-color: var(--isletme-yukleme-accent, #8b5cf6);
 }
+.isletme-durum[data-gorunum="acik"] {
+  background: linear-gradient(135deg, #ffffff 0%, #f1efeb 50%, #ffffff 100%);
+  color: #171717;
+}
+.isletme-durum[data-gorunum="acik"] .isletme-splash-ad { color: #171717; }
+.isletme-durum[data-gorunum="acik"] .isletme-spinner { border-color: rgba(23,23,23,.14); border-top-color: var(--isletme-yukleme-accent, #8b5cf6); }
 
 @keyframes isletme-don { to { transform: rotate(360deg); } }

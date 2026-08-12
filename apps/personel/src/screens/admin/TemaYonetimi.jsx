@@ -12,6 +12,7 @@ function baslangicFormu(isletme, tema) {
   return {
     konsept,
     ozelPalet: tema?.ozelPalet === true,
+    gorunum: tema?.gorunum === "acik" ? "acik" : "koyu",
     accent: tema?.renkler?.accent || varsayilan.renkler.accent,
     logoOlcegi: Math.min(180, Math.max(60, Number(tema?.logoOlcegi) || 100)),
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [
@@ -53,6 +54,7 @@ export default function TemaYonetimi() {
   const konseptSec = (konsept) => setForm({
     konsept,
     ozelPalet: false,
+    gorunum: form.gorunum,
     accent: KONSEPTLER[konsept].renkler.accent,
     logoOlcegi: form.logoOlcegi,
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
@@ -71,6 +73,7 @@ export default function TemaYonetimi() {
       const yanit = await temaKaydet({
         konsept: form.konsept,
         ozelPalet: form.ozelPalet,
+        gorunum: form.gorunum,
         renkler: form.ozelPalet ? { accent: form.accent, accentGlow: hexRgba(form.accent), bgPrimary: varsayilan.renkler.bgPrimary, bgCard: varsayilan.renkler.bgCard } : {},
         logoOlcegi: form.logoOlcegi,
         metinler: form.metinler,
@@ -144,6 +147,19 @@ export default function TemaYonetimi() {
         </fieldset>
 
         <fieldset className="tema-kutu">
+          <legend>Uygulama görünümü</legend>
+          <p>Müşteri uygulamasının cam yüzeylerini işletmenin tarzına göre koyu veya aydınlık kullan.</p>
+          <div className="gorunum-secimi" role="radiogroup" aria-label="Müşteri uygulaması görünümü">
+            <button type="button" role="radio" aria-checked={form.gorunum === "koyu"} className={form.gorunum === "koyu" ? "secili" : ""} onClick={() => setForm({ ...form, gorunum: "koyu" })}>
+              <i className="gorunum-ornek gorunum-ornek--koyu"><span /><span /></i><b>Koyu</b><small>Siyah cam görünüm</small>
+            </button>
+            <button type="button" role="radio" aria-checked={form.gorunum === "acik"} className={form.gorunum === "acik" ? "secili" : ""} onClick={() => setForm({ ...form, gorunum: "acik" })}>
+              <i className="gorunum-ornek gorunum-ornek--acik"><span /><span /></i><b>Aydınlık</b><small>Beyaz buzlu cam görünüm</small>
+            </button>
+          </div>
+        </fieldset>
+
+        <fieldset className="tema-kutu">
           <legend>Renk özelleştirme</legend>
           <label className="tema-toggle"><input type="checkbox" checked={form.ozelPalet} onChange={(e) => setForm({ ...form, ozelPalet: e.target.checked, accent: e.target.checked ? form.accent : varsayilan.renkler.accent })} /><span /><b>{form.ozelPalet ? "Kendi rengimi seç" : "Konsept rengini kullan"}</b></label>
           {form.ozelPalet && <div className="renk-secimi"><input type="color" value={HEX.test(form.accent) ? form.accent : varsayilan.renkler.accent} onChange={(e) => setForm({ ...form, accent: e.target.value.toUpperCase() })} aria-label="Vurgu rengi" /><label><span>Accent rengi</span><input maxLength="7" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value.slice(0, 7) })} placeholder="#FF6B00" /></label></div>}
@@ -158,7 +174,7 @@ export default function TemaYonetimi() {
         </fieldset>
       </section>
 
-      <aside className="tema-canli" style={{ "--onizleme-accent": onizleme.renkler.accent, "--onizleme-bg": onizleme.renkler.bgPrimary, "--onizleme-card": onizleme.renkler.bgCard }}>
+      <aside className={`tema-canli ${form.gorunum === "acik" ? "acik" : "koyu"}`} style={{ "--onizleme-accent": onizleme.renkler.accent, "--onizleme-bg": form.gorunum === "acik" ? "#F5F4F1" : onizleme.renkler.bgPrimary, "--onizleme-card": form.gorunum === "acik" ? "rgba(255,255,255,.72)" : onizleme.renkler.bgCard }}>
         <div className="tema-telefon">
           <header>{logoOnizleme ? <img style={{ transform: `scale(${form.logoOlcegi / 100})` }} src={logoOnizleme} alt="" /> : <b>{isletme.ad}</b>}<i /></header>
           <main><small>Merhaba 👋</small><h2>{onizleme.metinler.slogan}</h2><span>{onizleme.metinler.kampanyaBaslik}</span><article><b>{onizleme.metinler.damgaMetni.replace("{hedef}", "5")}</b><div><i /><i /><i /><i /><i /></div></article><h3>{varsayilan.metinler.urunBolumBaslik}</h3><section><i /><i /></section></main>

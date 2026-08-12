@@ -31,6 +31,7 @@ function isletmeOnizlemesiniKaydet(isletme) {
       logoUrl: isletme.tema?.logoUrl || isletme.logoUrl || null,
       accent: isletme.tema?.renkler?.accent || null,
       logoOlcegi: isletme.tema?.logoOlcegi || 100,
+      gorunum: isletme.tema?.gorunum === "acik" ? "acik" : "koyu",
     };
     localStorage.setItem(onizlemeAnahtari(isletme.slug), JSON.stringify(onizleme));
     return onizleme;
@@ -56,11 +57,12 @@ function IsletmeYukleniyor({ slug, onizleme }) {
     "--isletme-yukleme-accent": onizleme?.accent || (burgerPlusMu ? "#FF6B00" : "#8B5CF6"),
     "--logo-olcegi": String(Math.min(180, Math.max(60, Number(onizleme?.logoOlcegi) || 100)) / 100),
   };
+  const gorunum = onizleme?.gorunum === "acik" ? "acik" : "koyu";
 
   useEffect(() => setLogoHatasi(false), [logoUrl]);
 
   return (
-    <div className="isletme-durum" style={stil}>
+    <div className="isletme-durum" data-gorunum={gorunum} style={stil}>
       {logoUrl && !logoHatasi
         ? <img className="isletme-splash-logo isletme-splash-logo--yuklu" src={logoUrl} alt={isletmeAdi} onError={() => setLogoHatasi(true)} />
         : burgerPlusMu

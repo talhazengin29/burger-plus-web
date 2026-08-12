@@ -21,6 +21,7 @@ const VARSAYILAN_TEMA = {
     aramaPlaceholder: "Menüde ara...",
   },
   konsept: "burger",
+  gorunum: "koyu",
   logoUrl: null,
   logoOlcegi: 100,
 };
@@ -41,7 +42,13 @@ export function TemaSaglayici({ tema, isletme, children }) {
 
   useLayoutEffect(() => {
     const kok = document.documentElement;
+    const gorunum = aktifTema.gorunum === "acik" ? "acik" : "koyu";
+    kok.dataset.gorunum = gorunum;
     for (const [ad, deger] of Object.entries(aktifTema.renkler || {})) {
+      if (gorunum === "acik" && ["bgPrimary", "bgCard"].includes(ad)) {
+        kok.style.removeProperty(DEGISKEN_ADI(ad));
+        continue;
+      }
       kok.style.setProperty(DEGISKEN_ADI(ad), deger);
     }
     kok.style.setProperty("--font-baslik", `"${aktifTema.font.baslik}", sans-serif`);
@@ -65,6 +72,7 @@ export function TemaSaglayici({ tema, isletme, children }) {
     return () => {
       if (favicon && oncekiFavicon) favicon.setAttribute("href", oncekiFavicon);
       kok.style.removeProperty("--logo-olcegi");
+      delete kok.dataset.gorunum;
     };
   }, [aktifTema, isletme.ad, logoUrl]);
 

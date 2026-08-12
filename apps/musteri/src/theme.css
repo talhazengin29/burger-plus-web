@@ -111,6 +111,119 @@
   --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.6), var(--glass-inset);
 }
 
+/* İşletme tarafından seçilen aydınlık glassmorphism görünümü. Marka rengi
+   değişmez; yalnızca nötr zemin, cam, metin, kenarlık ve gölgeler dönüşür. */
+:root[data-gorunum="acik"] {
+  --bg-primary: #f5f4f1;
+  --bg-card: rgba(255, 255, 255, 0.72);
+  --bg-card-hover: rgba(255, 255, 255, 0.9);
+  --bg-input: rgba(255, 255, 255, 0.78);
+  --text-primary: #171717;
+  --text-secondary: rgba(23, 23, 23, 0.68);
+  --text-muted: rgba(23, 23, 23, 0.46);
+  --border-glass: rgba(23, 23, 23, 0.1);
+  --bg-page: var(--bg-primary);
+  --bg-deep: #e6e3de;
+  --surface: var(--bg-page);
+  --glass-bg: var(--bg-card);
+  --glass-bg-soft: rgba(255, 255, 255, 0.5);
+  --glass-bg-strong: var(--bg-card-hover);
+  --glass-bg-solid: rgba(255, 255, 255, 0.96);
+  --glass-border: var(--border-glass);
+  --glass-border-soft: rgba(23, 23, 23, 0.06);
+  --glass-border-strong: rgba(23, 23, 23, 0.14);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  --glass-shadow: 0 12px 34px rgba(42, 35, 28, 0.1), var(--glass-inset);
+  --glass-shadow-sm: 0 6px 18px rgba(42, 35, 28, 0.08), var(--glass-inset);
+  --surface-container-lowest: rgba(255, 255, 255, 0.96);
+  --surface-container-low: rgba(255, 255, 255, 0.66);
+  --surface-container: rgba(255, 255, 255, 0.74);
+  --surface-container-high: rgba(255, 255, 255, 0.84);
+  --surface-container-highest: #ffffff;
+  --on-surface: var(--text-primary);
+  --on-surface-variant: var(--text-secondary);
+  --outline: var(--text-muted);
+  --outline-variant: rgba(23, 23, 23, 0.15);
+  --hairline: rgba(23, 23, 23, 0.1);
+  --placeholder: rgba(23, 23, 23, 0.36);
+  --charcoal: rgba(23, 23, 23, 0.08);
+  --charcoal-soft: rgba(23, 23, 23, 0.52);
+  --shadow-card: var(--glass-shadow);
+  --shadow-modal: 0 20px 58px rgba(42, 35, 28, 0.2), var(--glass-inset);
+  color-scheme: light;
+}
+
+:root[data-gorunum="acik"] input,
+:root[data-gorunum="acik"] textarea,
+:root[data-gorunum="acik"] select { color-scheme: light; }
+
+:root[data-gorunum="acik"] .bottom-nav {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 12px 34px rgba(42, 35, 28, 0.14), var(--glass-inset);
+}
+:root[data-gorunum="acik"] .nav-item,
+:root[data-gorunum="acik"] .nav-item--pasif { color: var(--text-muted); }
+:root[data-gorunum="acik"] .nav-item--aktif { color: var(--primary-container); }
+:root[data-gorunum="acik"] .destek-modal { background: rgba(255, 255, 255, 0.97); }
+:root[data-gorunum="acik"] .destek-modal button { background: var(--charcoal); color: var(--on-surface); }
+:root[data-gorunum="acik"] .iki-faktor-modal input { background: var(--bg-input); color: var(--on-surface); }
+:root[data-gorunum="acik"] .iki-faktor-secret,
+:root[data-gorunum="acik"] .iki-faktor-kodlar code { background: var(--charcoal); color: var(--on-surface); }
+:root[data-gorunum="acik"] .login-input::placeholder { color: var(--placeholder); }
+:root[data-gorunum="acik"] .sifre-goster-btn:hover,
+:root[data-gorunum="acik"] .sifre-goster-btn:focus-visible,
+:root[data-gorunum="acik"] .cinsiyet-btn:hover,
+:root[data-gorunum="acik"] .filtre-btn:hover,
+:root[data-gorunum="acik"] .filtre-secenek:hover,
+:root[data-gorunum="acik"] .daire-btn:hover,
+:root[data-gorunum="acik"] .uyeol-btn-ikincil:hover { color: var(--on-surface); }
+:root[data-gorunum="acik"] .damga-sayac { background: rgba(255, 255, 255, 0.6); }
+:root[data-gorunum="acik"] .damga-noktalar > span { background: rgba(255, 255, 255, 0.5); }
+:root[data-gorunum="acik"] .odeme-bilgi-grid input,
+:root[data-gorunum="acik"] .odeme-bilgi-grid textarea { background: var(--bg-input); }
+
+/* Eski ekranlardaki koyu renge sabitlenmiş kabuklar için açık karşılıklar. */
+:root[data-gorunum="acik"] .home-header,
+:root[data-gorunum="acik"] .camp-header,
+:root[data-gorunum="acik"] .basit-header,
+:root[data-gorunum="acik"] .alt-header {
+  background: color-mix(in srgb, var(--bg-page) 84%, transparent);
+}
+:root[data-gorunum="acik"] .brand-name,
+:root[data-gorunum="acik"] .camp-brand,
+:root[data-gorunum="acik"] .basit-baslik,
+:root[data-gorunum="acik"] .orders-brand,
+:root[data-gorunum="acik"] .profil-brand,
+:root[data-gorunum="acik"] .ikon-btn,
+:root[data-gorunum="acik"] .ikon-btn.koyu,
+:root[data-gorunum="acik"] .geri-btn,
+:root[data-gorunum="acik"] .urun-detay-geri,
+:root[data-gorunum="acik"] .table-order h1,
+:root[data-gorunum="acik"] .tw-baslik { color: var(--on-surface); }
+:root[data-gorunum="acik"] .bildirim-panel { background: rgba(255, 255, 255, 0.97); }
+:root[data-gorunum="acik"] .kategori-daire { background: var(--surface-container-highest); border-color: var(--glass-border-strong); box-shadow: var(--glass-shadow-sm); }
+:root[data-gorunum="acik"] .login-form { background: rgba(255, 255, 255, 0.76); border-color: var(--glass-border); }
+:root[data-gorunum="acik"] .login-input { background: var(--bg-input); border-color: var(--glass-border-strong); color: var(--on-surface); }
+:root[data-gorunum="acik"] .login-input:focus { background: #fff; }
+:root[data-gorunum="acik"] .cinsiyet-btn,
+:root[data-gorunum="acik"] .adet-kontrol,
+:root[data-gorunum="acik"] .adet-kontrol button { background: var(--charcoal); color: var(--on-surface); }
+:root[data-gorunum="acik"] .login-misafir-link,
+:root[data-gorunum="acik"] .orders-bos-ikon,
+:root[data-gorunum="acik"] .sepet-bos-ikon { color: var(--text-muted); }
+:root[data-gorunum="acik"] .login-misafir-link:hover { color: var(--on-surface-variant); }
+:root[data-gorunum="acik"] .cart-alt-bar,
+:root[data-gorunum="acik"] .payment-alt-bar,
+:root[data-gorunum="acik"] .urun-detay-alt-bar,
+:root[data-gorunum="acik"] .table-alt-bar {
+  background: color-mix(in srgb, var(--bg-page) 88%, transparent);
+  box-shadow: 0 -8px 32px rgba(42, 35, 28, 0.1), var(--glass-inset);
+}
+:root[data-gorunum="acik"] .siparis-tip-btn--algotur,
+:root[data-gorunum="acik"] .tw-btn--misafir,
+:root[data-gorunum="acik"] .camp-btn--charcoal { background: var(--charcoal); color: var(--on-surface); }
+
 /* Backdrop blur her kart için ayrı bir dikdörtgen katman oluşturur ve
    arka plandaki efektin kart sınırlarında kesilmiş görünmesine yol açar.
    Ambiyans .telefon-ekran zemininde kaldığı için burada kapatılır. */
