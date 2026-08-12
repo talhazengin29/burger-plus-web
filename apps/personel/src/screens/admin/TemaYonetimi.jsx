@@ -54,7 +54,10 @@ export default function TemaYonetimi({ urunler = [], kategoriler = [], damgaKart
   const sloganBaslangici = sloganVurguIndex >= 0
     ? onizleme.metinler.slogan.slice(0, sloganVurguIndex).trim()
     : onizleme.metinler.slogan;
-  const onizlemeKategorileri = kategoriler.filter((kategori) => kategori.aktif !== false).slice(0, 4);
+  const onizlemeKategorileri = [
+    { id: "onizleme-tumu", ad: "Tümü", gorsel: tema?.tumuGorseli || "" },
+    ...kategoriler.filter((kategori) => kategori.aktif !== false && kategori.ad !== "Tümü"),
+  ].slice(0, 4);
   const onizlemeUrunleri = urunler.filter((urun) => urun.aktif !== false).slice(0, 2);
   const damgaHedefi = Math.min(6, Math.max(3, Number(damgaKarti?.hedefAdet) || 5));
   const doluDamga = Math.min(2, damgaHedefi);
