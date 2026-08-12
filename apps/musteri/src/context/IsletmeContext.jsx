@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { AppProvider } from "./AppContext";
 import { TemaSaglayici } from "./TemaContext";
@@ -76,6 +76,8 @@ function IsletmeYukleniyor({ slug, onizleme }) {
 
 export function IsletmeSarici() {
   const { isletmeSlug } = useParams();
+  const temaOnizlemeModu = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("temaOnizleme") === "1";
+  const onizlemeHazirMesajiGonderildi = useRef(false);
   const [durum, setDurum] = useState(() => ({
     yukleniyor: true,
     isletme: null,
@@ -107,6 +109,28 @@ export function IsletmeSarici() {
     socket.on("tema-guncellendi", temaGuncellendi);
     return () => socket.off("tema-guncellendi", temaGuncellendi);
   }, [isletmeSlug]);
+
+  useEffect(() => {
+    if (!temaOnizlemeModu) return undefined;
+    const temaMesajiniAl = (event) => {
+      if (event.origin !== window.location.origin || event.data?.type !== "burger-plus-tema-onizleme") return;
+      if (String(event.data?.isletmeSlug || "") !== String(isletmeSlug || "")) return;
+      const onizlemeTemasi = event.data?.tema;
+      if (!onizlemeTemasi || typeof onizlemeTemasi !== "object") return;
+      setDurum((onceki) => onceki.isletme ? {
+        ...onceki,
+        isletme: { ...onceki.isletme, konsept: onizlemeTemasi.konsept || onceki.isletme.konsept, tema: onizlemeTemasi },
+      } : onceki);
+    };
+    window.addEventListener("message", temaMesajiniAl);
+    return () => window.removeEventListener("message", temaMesajiniAl);
+  }, [isletmeSlug, temaOnizlemeModu]);
+
+  useEffect(() => {
+    if (!temaOnizlemeModu || !durum.isletme || window.parent === window || onizlemeHazirMesajiGonderildi.current) return;
+    onizlemeHazirMesajiGonderildi.current = true;
+    window.parent.postMessage({ type: "burger-plus-tema-onizleme-hazir", isletmeSlug }, window.location.origin);
+  }, [durum.isletme, isletmeSlug, temaOnizlemeModu]);
 
   const deger = useMemo(() => ({
     isletme: durum.isletme,

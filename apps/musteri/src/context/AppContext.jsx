@@ -76,6 +76,7 @@ function kategorileriUrunlerdenTamamla(mevcut, urunler) {
 
 export function AppProvider({ children }) {
   const { isletmeSlug, tema } = useIsletme();
+  const temaOnizlemeModu = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("temaOnizleme") === "1";
   const depoAnahtari = useCallback((anahtar) => tenantDepoAnahtari(anahtar, isletmeSlug), [isletmeSlug]);
   const [puan, setPuan] = useState(0);
   const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, damgaKarti: VARSAYILAN_DAMGA_KARTI, oduller: [], puanGecmisi: [], hediyeler: [] });
@@ -261,7 +262,7 @@ export function AppProvider({ children }) {
   // sessionStorage'a yazılır → sayfa yenilenince korunur.
   // ÖNEMLİ: Giriş yapmış kullanıcı ASLA misafir değildir (kullanici doluysa misafir=false).
   const [misafirState, setMisafirState] = useState(
-    () => sessionStorage.getItem(tenantDepoAnahtari("bp_misafir", isletmeSlug)) === "1"
+    () => temaOnizlemeModu || sessionStorage.getItem(tenantDepoAnahtari("bp_misafir", isletmeSlug)) === "1"
   );
   const misafir = kullanici ? false : misafirState;
   const setMisafir = (deger) => {
