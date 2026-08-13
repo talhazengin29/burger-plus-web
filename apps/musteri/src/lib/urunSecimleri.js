@@ -45,7 +45,7 @@ export function varsayilanSecimliUrunHazirla(urun, urunler) {
     ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.icecekUrunId))
     : null;
   const gramajKaynagi = menuBurger || urun;
-  const gramajOpsiyonu = gramajKaynagi.gramajOpsiyonu?.aktif ? gramajKaynagi.gramajOpsiyonu : null;
+  const miktarGoster = Boolean(gramajKaynagi.gramajOpsiyonu) && gramajKaynagi.gramajOpsiyonu.goster !== false && Number(gramajKaynagi.temelMiktar) > 0;
   const urunBoyutu = varsayilanBoyut(urun.boyutSecenekleri);
   const yanBoyut = varsayilanBoyut(menuYanLezzet?.boyutSecenekleri, menuYapisi?.varsayilanYanBoyut);
   const icecekBoyut = varsayilanBoyut(menuIcecek?.boyutSecenekleri, menuYapisi?.varsayilanIcecekBoyut);
@@ -53,12 +53,12 @@ export function varsayilanSecimliUrunHazirla(urun, urunler) {
   const secimler = {
     dahilMalzemeler,
     haricMalzemeler: [],
-    ...(gramajOpsiyonu ? {
+    ...(miktarGoster ? {
       ekstraGramaj: 0,
       standartGramaj: Number(gramajKaynagi.temelMiktar || 0),
       toplamGramaj: Number(gramajKaynagi.temelMiktar || 0),
-      gramajEtiketi: gramajOpsiyonu.etiket,
-      gramajBirim: gramajOpsiyonu.birim,
+      gramajEtiketi: gramajKaynagi.gramajOpsiyonu.etiket,
+      gramajBirim: gramajKaynagi.gramajOpsiyonu.birim,
     } : {}),
     ...(["yan_lezzet", "icecek"].includes(urunTipi) && urunBoyutu ? {
       boyutKodu: urunBoyutu.kod,

@@ -8,7 +8,7 @@ import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 import TemaYonetimi from "./admin/TemaYonetimi";
 import "./Admin.css";
 
-const BOS_GRAMAJ = { aktif: true, etiket: "Köfte gramajı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
+const BOS_GRAMAJ = { goster: false, aktif: false, etiket: "Ürün miktarı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
 const BOS_BOYUTLAR = (birim = "gr") => [
   { kod: "kucuk", etiket: "Küçük Boy", miktar: "", birim, fiyatFarki: 0, varsayilan: true },
   { kod: "orta", etiket: "Orta Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
@@ -81,6 +81,7 @@ const gramajVarsayilani = (urun) => {
   const fiyat = Number(urun.fiyat);
   if (!kural || !Number.isFinite(temel) || temel <= 0) return { ...BOS_GRAMAJ, etiket: kural?.etiket || BOS_GRAMAJ.etiket, birim: kural?.birim || "gr" };
   return {
+    goster: true,
     aktif: true,
     etiket: kural.etiket,
     birim: kural.birim,
@@ -99,7 +100,11 @@ const urunuFormaCevir = (urun) => ({
   onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
   malzemeler: (urun.malzemeler || []).join(", "),
   alerjenler: (urun.alerjenler || []).join(", "),
-  gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
+  gramajOpsiyonu: {
+    ...gramajVarsayilani(urun),
+    ...(urun.gramajOpsiyonu || {}),
+    goster: urun.gramajOpsiyonu ? urun.gramajOpsiyonu.goster !== false : false,
+  },
   // Boyut seçenekleri isteğe bağlıdır: boş bırakılmışsa ürün standart/tek fiyatla satılır.
   boyutSecenekleri: (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut })),
   ekstraMalzemeAyari: {
@@ -291,6 +296,7 @@ export default function Admin({ onCikis }) {
       urunTipi,
       fiyat: Number(urunForm.fiyat), temelMiktar: Number(urunForm.temelMiktar),
       gramajOpsiyonu: urunTipi === "burger" ? {
+        goster: urunForm.gramajOpsiyonu?.goster === true,
         aktif: urunForm.gramajOpsiyonu?.aktif === true,
         etiket: String(urunForm.gramajOpsiyonu?.etiket || "").trim(),
         birim: String(urunForm.gramajOpsiyonu?.birim || "gr").trim().toLowerCase(),
@@ -436,7 +442,7 @@ export default function Admin({ onCikis }) {
       kategori,
       urunTipi,
       temelMiktar: urunTipi === "burger" ? onceki.temelMiktar : "",
-      gramajOpsiyonu: urunTipi === "burger" ? { ...BOS_GRAMAJ, ...onceki.gramajOpsiyonu, etiket: varsayilan.etiket, birim: varsayilan.birim } : null,
+      gramajOpsiyonu: urunTipi === "burger" ? { ...BOS_GRAMAJ, ...onceki.gramajOpsiyonu, etiket: varsayilan.etiket, birim: varsayilan.birim, goster: varsayilan.goster === true, aktif: varsayilan.aktif === true } : null,
       boyutSecenekleri: ["yan_lezzet", "icecek"].includes(urunTipi) ? (onceki.boyutSecenekleri || []) : [],
       menuYapisi: urunTipi === "menu" ? { ...BOS_MENU, ...onceki.menuYapisi } : { ...BOS_MENU },
     };
@@ -704,7 +710,7 @@ export default function Admin({ onCikis }) {
               <div className="admin-kart-grid">{filtreliUrunler.map((u) => (
                 <article className={`admin-urun-kart ${!u.aktif ? "pasif" : ""}`} key={u.id}>
                   {u.gorsel ? <img src={u.gorsel} alt="" /> : <div className="admin-urun-gorselsiz">Görsel</div>}
-                  <div><span className="admin-rozet">{u.kategori}</span><h3>{u.ad}</h3>{u.urunTipi === "burger" && <p>{u.temelMiktar || "—"} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}{u.stokTakibi && <small className={`admin-stok-ozet ${u.stokAdedi <= 5 ? "kritik" : ""}`}>{u.stokAdedi > 0 ? `${u.stokAdedi} adet stokta` : "Stok tükendi"}</small>}{!u.stokTakibi && u.stokta === false && <small className="admin-stok-ozet kritik">Menü bileşeni tükendi</small>}<strong>{para(u.fiyat)}</strong></div>
+                  <div><span className="admin-rozet">{u.kategori}</span><h3>{u.ad}</h3>{u.gramajOpsiyonu?.goster !== false && u.temelMiktar > 0 && <p>{u.temelMiktar} {u.gramajOpsiyonu?.birim || "gr"}</p>}{u.boyutSecenekleri?.length > 0 && <small className="admin-gramaj-ozet">{u.boyutSecenekleri.map((boyut) => boyut.etiket).join(" · ")}</small>}{u.urunTipi === "menu" && <small className="admin-gramaj-ozet">Burger + Yan lezzet + İçecek</small>}{u.gramajOpsiyonu?.aktif && <small className="admin-gramaj-ozet">+{u.gramajOpsiyonu.artisMiktari} {u.gramajOpsiyonu.birim} · {para(u.gramajOpsiyonu.fiyatArtisi)} / adım</small>}{u.stokTakibi && <small className={`admin-stok-ozet ${u.stokAdedi <= 5 ? "kritik" : ""}`}>{u.stokAdedi > 0 ? `${u.stokAdedi} adet stokta` : "Stok tükendi"}</small>}{!u.stokTakibi && u.stokta === false && <small className="admin-stok-ozet kritik">Menü bileşeni tükendi</small>}<strong>{para(u.fiyat)}</strong></div>
                   <footer><button onClick={() => setUrunForm(urunuFormaCevir(u))}>Düzenle</button>{u.stokTakibi && <button onClick={() => islem(() => adminIstek("/urunler", jsonGonder("POST", { ...u, stokAdedi: Number(u.stokAdedi || 0) + 10 })), "Stoğa 10 adet eklendi.")}>+10 stok</button>}<button onClick={() => islem(() => adminIstek(`/urunler/${u.id}/aktif`, jsonGonder("PATCH", { aktif: !u.aktif })), u.aktif ? "Ürün yayından kaldırıldı." : "Ürün yayınlandı.")}>{u.aktif ? "Pasife al" : "Yayınla"}</button><button className="tehlike" onClick={() => { if (window.confirm(`${u.ad} katalogdan silinsin mi? Geçmiş siparişler korunacak.`)) islem(() => adminIstek(`/urunler/${u.id}`, { method: "DELETE" }), "Ürün katalogdan silindi."); }}>Sil</button></footer>
               </article>
               ))}{filtreliUrunler.length === 0 && <Bos yazi={urunler.length ? "Filtreye uygun ürün bulunamadı." : "Katalog boş. İlk ürünü yönetim panelinden ekleyebilirsin."} />}</div>
@@ -912,7 +918,7 @@ export default function Admin({ onCikis }) {
           <form className="admin-form urun-duzenleme-form" onSubmit={urunKaydet}>
             <div className="urun-form-onizleme">
               <span className="urun-form-gorsel">{urunForm.gorsel ? <img src={urunForm.gorsel} alt="Ürün önizleme" /> : <b>BP</b>}</span>
-              <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)}{urunForm.urunTipi === "burger" ? ` · Standart ${urunForm.temelMiktar || "—"} ${urunForm.gramajOpsiyonu?.birim || "gr"}` : ""}</p></div>
+              <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)}{urunForm.gramajOpsiyonu?.goster ? ` · ${urunForm.temelMiktar || "—"} ${urunForm.gramajOpsiyonu?.birim || "gr"}` : ""}</p></div>
               <i>{urunForm.id ? "DÜZENLENİYOR" : "YENİ KAYIT"}</i>
             </div>
             <Ikili>
@@ -977,26 +983,26 @@ export default function Admin({ onCikis }) {
               {!onerilebilecekUrunler.length && <p>Öneri eklemek için önce başka bir aktif ürün oluşturmalısın.</p>}
             </section>
 
-            {urunForm.urunTipi === "burger" && <Alan etiket="Standart ürün miktarı"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>}
-
-            {urunForm.urunTipi === "burger" && <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.aktif ? "aktif" : ""}`}>
+            {urunForm.urunTipi === "burger" && <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.goster ? "aktif" : ""}`}>
               <header>
-                <div><b>Dinamik gramaj artırımı</b><small>Müşteri ürün detayında miktarı adım adım artırabilir.</small></div>
-                <label className="admin-switch"><input type="checkbox" checked={urunForm.gramajOpsiyonu?.aktif === true} onChange={(e) => gramajGuncelle("aktif", e.target.checked)} /><span /></label>
+                <div><b>Miktar / gramaj bilgisini göster</b><small>Kapalıysa müşteri ürünün gramajını veya miktarını hiçbir yerde görmez.</small></div>
+                <label className="admin-switch"><input type="checkbox" checked={urunForm.gramajOpsiyonu?.goster === true} onChange={(e) => setUrunForm((onceki) => ({ ...onceki, gramajOpsiyonu: { ...onceki.gramajOpsiyonu, goster: e.target.checked, aktif: e.target.checked ? onceki.gramajOpsiyonu.aktif : false } }))} /><span /></label>
               </header>
-              {urunForm.gramajOpsiyonu?.aktif && (
+              {urunForm.gramajOpsiyonu?.goster && (
                 <div className="gramaj-kural-alanlari">
                   <Ikili>
-                    <Alan etiket="Müşteriye görünen etiket"><input required maxLength="80" value={urunForm.gramajOpsiyonu.etiket} onChange={(e) => gramajGuncelle("etiket", e.target.value)} placeholder="Köfte gramajı" /></Alan>
+                    <Alan etiket="Müşteriye görünen başlık"><input required maxLength="80" value={urunForm.gramajOpsiyonu.etiket} onChange={(e) => gramajGuncelle("etiket", e.target.value)} placeholder="Örn. Porsiyon miktarı" /></Alan>
                     <Alan etiket="Birim"><select value={urunForm.gramajOpsiyonu.birim} onChange={(e) => gramajGuncelle("birim", e.target.value)}><option value="gr">gr</option><option value="ml">ml</option><option value="adet">adet</option></select></Alan>
                   </Ikili>
-                  <div className="gramaj-uc-alan">
-                    <Alan etiket="Her adımda artış"><input required type="number" min="1" max="10000" step="1" value={urunForm.gramajOpsiyonu.artisMiktari} onChange={(e) => gramajGuncelle("artisMiktari", e.target.value)} /></Alan>
-                    <Alan etiket="Maksimum adım"><input required type="number" min="1" max="20" step="1" value={urunForm.gramajOpsiyonu.maxAdim} onChange={(e) => gramajGuncelle("maxAdim", e.target.value)} /></Alan>
-                    <Alan etiket="Adım fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.gramajOpsiyonu.fiyatArtisi} onChange={(e) => gramajGuncelle("fiyatArtisi", e.target.value)} /></Alan>
+                  <Alan etiket="Standart miktar"><input required type="number" min="1" max="10000" step="1" value={urunForm.temelMiktar} onChange={(e) => setUrunForm({ ...urunForm, temelMiktar: e.target.value })} /></Alan>
+                  <div className="gramaj-alt-switch"><div><b>Müşteri miktarı artırabilsin</b><small>Kapalıysa miktar yalnızca bilgi olarak gösterilir.</small></div><label className="admin-switch"><input type="checkbox" checked={urunForm.gramajOpsiyonu?.aktif === true} onChange={(e) => gramajGuncelle("aktif", e.target.checked)} /><span /></label></div>
+                  {urunForm.gramajOpsiyonu?.aktif && <div className="gramaj-uc-alan">
+                    <Alan etiket="Her artışta miktar"><input required type="number" min="1" max="10000" step="1" value={urunForm.gramajOpsiyonu.artisMiktari} onChange={(e) => gramajGuncelle("artisMiktari", e.target.value)} /></Alan>
+                    <Alan etiket="Maksimum artış"><input required type="number" min="1" max="20" step="1" value={urunForm.gramajOpsiyonu.maxAdim} onChange={(e) => gramajGuncelle("maxAdim", e.target.value)} /></Alan>
+                    <Alan etiket="Artış fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.gramajOpsiyonu.fiyatArtisi} onChange={(e) => gramajGuncelle("fiyatArtisi", e.target.value)} /></Alan>
                   </div>
-                  <button type="button" className="gramaj-oneri-btn" onClick={() => setUrunForm((onceki) => ({ ...onceki, gramajOpsiyonu: gramajVarsayilani(onceki) }))}>Kategori önerisini yeniden hesapla</button>
-                  <p className="gramaj-onizleme">Örnek: Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu.birim} → ilk artış +{urunForm.gramajOpsiyonu.artisMiktari || "—"} {urunForm.gramajOpsiyonu.birim}, fiyat +{para(urunForm.gramajOpsiyonu.fiyatArtisi)}</p>
+                  }
+                  {urunForm.gramajOpsiyonu?.aktif && <p className="gramaj-onizleme">Örnek: Standart {urunForm.temelMiktar || "—"} {urunForm.gramajOpsiyonu.birim} → ilk artış +{urunForm.gramajOpsiyonu.artisMiktari || "—"} {urunForm.gramajOpsiyonu.birim}, fiyat +{para(urunForm.gramajOpsiyonu.fiyatArtisi)}</p>}
                 </div>
               )}
             </section>}

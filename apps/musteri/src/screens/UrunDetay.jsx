@@ -50,7 +50,9 @@ export default function UrunDetay() {
   const menuIcecek = menuYapisi ? urunler.find((aday) => Number(aday.id) === Number(menuYapisi.icecekUrunId)) : null;
   const gramajKaynagi = menuBurger || urun;
   const malzemeListesi = gramajKaynagi.malzemeler || [];
-  const gramajOpsiyonu = gramajKaynagi.gramajOpsiyonu?.aktif ? gramajKaynagi.gramajOpsiyonu : null;
+  const miktarAyari = gramajKaynagi.gramajOpsiyonu || null;
+  const miktarGoster = Boolean(miktarAyari) && miktarAyari.goster !== false && Number(gramajKaynagi.temelMiktar) > 0;
+  const gramajOpsiyonu = miktarGoster && miktarAyari?.aktif ? miktarAyari : null;
   const ekstraGramaj = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.artisMiktari : 0;
   const toplamGramaj = Number(gramajKaynagi.temelMiktar || 0) + ekstraGramaj;
   const gramajFiyatArtisi = gramajOpsiyonu ? gramajAdimi * gramajOpsiyonu.fiyatArtisi : 0;
@@ -100,12 +102,12 @@ export default function UrunDetay() {
     const secimler = {
       dahilMalzemeler,
       haricMalzemeler,
-      ...(gramajOpsiyonu ? {
+      ...(miktarGoster ? {
         ekstraGramaj,
         standartGramaj: Number(gramajKaynagi.temelMiktar || 0),
         toplamGramaj,
-        gramajEtiketi: gramajOpsiyonu.etiket,
-        gramajBirim: gramajOpsiyonu.birim,
+        gramajEtiketi: miktarAyari.etiket,
+        gramajBirim: miktarAyari.birim,
       } : {}),
       ...(["yan_lezzet", "icecek"].includes(urunTipi) && tekUrunBoyut ? {
         boyutKodu: tekUrunBoyut.kod, boyutEtiketi: tekUrunBoyut.etiket,
@@ -175,19 +177,17 @@ export default function UrunDetay() {
             {urun.aciklama && <p className="urun-detay-aciklama">{urun.aciklama}</p>}
           </section>
 
-          {gramajOpsiyonu && (
+          {miktarGoster && (
             <section className="urun-detay-kart gramaj-kart">
               <div className="gramaj-bilgi">
-                <h2 className="urun-detay-baslik">{gramajOpsiyonu.etiket}</h2>
+                <h2 className="urun-detay-baslik">{miktarAyari.etiket || "Ürün miktarı"}</h2>
                 <span className="gramaj-deger">
-                  {toplamGramaj} {gramajOpsiyonu.birim}
+                  {toplamGramaj} {miktarAyari.birim}
                 </span>
-                <span className="gramaj-standart">Standart: {gramajKaynagi.temelMiktar} {gramajOpsiyonu.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${gramajOpsiyonu.birim}` : ""}</span>
-                <span className="gramaj-fiyat">
-                  Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}
-                </span>
+                {gramajOpsiyonu && <span className="gramaj-standart">Standart: {gramajKaynagi.temelMiktar} {miktarAyari.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${miktarAyari.birim}` : ""}</span>}
+                {gramajOpsiyonu && <span className="gramaj-fiyat">Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}</span>}
               </div>
-              <div className="gramaj-kontrol" aria-label={`${gramajOpsiyonu.etiket} seçimi`}>
+              {gramajOpsiyonu && <div className="gramaj-kontrol" aria-label={`${gramajOpsiyonu.etiket} seçimi`}>
                 <button
                   type="button"
                   onClick={() => setGramajAdimi((a) => Math.max(0, a - 1))}
@@ -205,7 +205,7 @@ export default function UrunDetay() {
                 >
                   <IconPlus />
                 </button>
-              </div>
+              </div>}
             </section>
           )}
 
