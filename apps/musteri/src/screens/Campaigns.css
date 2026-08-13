@@ -34,7 +34,7 @@
   margin-bottom: 24px;
 }
 
-.camp-liste { display: flex; flex-direction: column; gap: 24px; }
+.camp-liste { display: flex; flex-direction: column; gap: 18px; }
 
 /* --- Kampanya kartı — cam --- */
 .camp-kart {
@@ -51,11 +51,11 @@
   border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5), var(--glass-inset);
 }
-.camp-gorsel-wrap { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.camp-gorsel-wrap { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
 .camp-gorsel { width: 100%; height: 100%; object-fit: cover; }
 .camp-rozet {
   position: absolute;
-  top: 14px; left: 14px;
+  top: 11px; left: 11px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -66,7 +66,7 @@
   color: #fff;
   font-size: 12px;
   font-weight: 700;
-  padding: 7px 12px;
+  padding: 6px 10px;
   border-radius: var(--r-full);
 }
 .rozet-ikon { width: 14px; height: 14px; }
@@ -75,11 +75,11 @@
 /* Canlı kampanya durumu — AKTİF (yeşil) / BAŞLAMADI / SONA ERDİ (gri) */
 .camp-durum-rozet {
   position: absolute;
-  top: 14px; right: 14px;
+  top: 11px; right: 11px;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  padding: 6px 11px;
+  padding: 5px 9px;
   border-radius: var(--r-full);
   -webkit-backdrop-filter: var(--glass-blur-sm);
   backdrop-filter: var(--glass-blur-sm);
@@ -97,39 +97,39 @@
   color: var(--on-surface-variant);
 }
 
-.camp-icerik { padding: 18px; }
+.camp-icerik { padding: 14px; }
 .camp-baslik-satir {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .camp-kart-baslik {
   font-family: var(--font-baslik);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 19px;
   color: var(--on-surface);
 }
 .camp-fiyat {
   font-family: var(--font-baslik);
   font-weight: 800;
-  font-size: 24px;
+  font-size: 21px;
   color: var(--primary-container);
 }
 .camp-aciklama {
   color: var(--on-surface-variant);
-  font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 13px;
 }
 
 .camp-btn {
   width: 100%;
-  padding: 15px;
+  padding: 12px;
   border-radius: var(--r-lg);
   font-family: var(--font-baslik);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
 }
 .camp-btn:active { transform: scale(0.99); }
@@ -147,7 +147,7 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--outline);
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 
 /* --- Üyelik gerektiren kampanya modalı --- */
