@@ -36,6 +36,7 @@
 .brand-logo {
   width: 112px; height: 45px;
   object-fit: contain;
+  object-position: left center;
   filter: none;
 }
 .brand-logo.marka-logo-metin {
