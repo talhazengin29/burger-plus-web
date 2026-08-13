@@ -203,6 +203,14 @@
 :root[data-gorunum="acik"] .tw-baslik { color: var(--on-surface); }
 :root[data-gorunum="acik"] .bildirim-panel { background: rgba(255, 255, 255, 0.97); }
 :root[data-gorunum="acik"] .kategori-daire { background: var(--surface-container-highest); border-color: var(--glass-border-strong); box-shadow: var(--glass-shadow-sm); }
+:root[data-gorunum="acik"] .camp-rozet,
+:root[data-gorunum="acik"] .camp-durum-rozet--baslamadi,
+:root[data-gorunum="acik"] .camp-durum-rozet--sonaerdi {
+  background: rgba(255, 255, 255, 0.74);
+  border-color: rgba(255, 255, 255, 0.88);
+  color: #292520;
+  box-shadow: 0 3px 12px rgba(42, 35, 28, 0.12);
+}
 :root[data-gorunum="acik"] .login-form { background: rgba(255, 255, 255, 0.76); border-color: var(--glass-border); }
 :root[data-gorunum="acik"] .login-input { background: var(--bg-input); border-color: var(--glass-border-strong); color: var(--on-surface); }
 :root[data-gorunum="acik"] .login-input:focus { background: #fff; }
