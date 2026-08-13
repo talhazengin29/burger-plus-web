@@ -63,6 +63,10 @@ export default function Home() {
 
   const gorunenDamga = Math.min(burgerDamga, burgerDamgaHedef);
   const kalanDamga = Math.max(burgerDamgaHedef - burgerDamga, 0);
+  const damgaSutunSayisi = burgerDamgaHedef > 6 ? Math.ceil(burgerDamgaHedef / 2) : Math.max(1, burgerDamgaHedef);
+  const sonDamgaSatiriAdedi = burgerDamgaHedef % damgaSutunSayisi || damgaSutunSayisi;
+  const sonDamgaSatiriEksik = sonDamgaSatiriAdedi < damgaSutunSayisi;
+  const sonDamgaSatiriBaslangici = burgerDamgaHedef - sonDamgaSatiriAdedi;
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
@@ -103,11 +107,12 @@ export default function Home() {
             )}
           </div>
 
-          <div className="damga-noktalar" style={{ "--damga-sutun": Math.min(burgerDamgaHedef, 6) }}>
+          <div className="damga-noktalar" style={{ "--damga-sutun": damgaSutunSayisi }}>
             {Array.from({ length: burgerDamgaHedef }, (_, indeks) => {
               const dolu = !misafir && indeks < gorunenDamga;
               const siradaki = !misafir && indeks === gorunenDamga;
-              return <motion.span key={indeks} className={`${dolu ? "dolu" : ""} ${siradaki ? "siradaki" : ""}`} initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .08 + indeks * .035 }}><i>{dolu ? damgaKarti.ikon : indeks + 1}</i><small>{dolu ? "Damga" : indeks + 1 === burgerDamgaHedef ? "Hediye" : ""}</small></motion.span>;
+              const ortalanmisSonSatir = sonDamgaSatiriEksik && indeks >= sonDamgaSatiriBaslangici;
+              return <motion.span key={indeks} className={`${dolu ? "dolu" : ""} ${siradaki ? "siradaki" : ""} ${ortalanmisSonSatir ? "damga-son-satir" : ""}`} initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .08 + indeks * .035 }}><i>{dolu ? damgaKarti.ikon : indeks + 1}</i><small>{dolu ? "Damga" : indeks + 1 === burgerDamgaHedef ? "Hediye" : ""}</small></motion.span>;
             })}
           </div>
 
