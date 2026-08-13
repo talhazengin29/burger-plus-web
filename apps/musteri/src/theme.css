@@ -233,6 +233,12 @@
   backdrop-filter: none !important;
 }
 
+/* Sadakat kartı genel mobil performans kuralının bilinçli tek istisnasıdır. */
+.telefon-ekran .ekran .damga-kart {
+  -webkit-backdrop-filter: saturate(135%) blur(22px) !important;
+  backdrop-filter: saturate(135%) blur(22px) !important;
+}
+
 /* Durum/hover geçişlerini yumuşat */
 body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
 .puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,
