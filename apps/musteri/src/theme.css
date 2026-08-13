@@ -178,6 +178,23 @@
 :root[data-gorunum="acik"] .filtre-secenek:hover,
 :root[data-gorunum="acik"] .daire-btn:hover,
 :root[data-gorunum="acik"] .uyeol-btn-ikincil:hover { color: var(--on-surface); }
+:root[data-gorunum="acik"] .filtre-menu {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(42, 35, 28, 0.12);
+  box-shadow: 0 12px 32px rgba(42, 35, 28, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+:root[data-gorunum="acik"] .filtre-secenek {
+  color: var(--on-surface-variant);
+}
+:root[data-gorunum="acik"] .filtre-secenek:hover {
+  background: color-mix(in srgb, var(--accent) 8%, white);
+  color: var(--on-surface);
+}
+:root[data-gorunum="acik"] .filtre-secenek--aktif,
+:root[data-gorunum="acik"] .filtre-secenek--aktif:hover {
+  background: color-mix(in srgb, var(--accent) 16%, white);
+  color: var(--primary);
+}
 :root[data-gorunum="acik"] .damga-sayac { background: rgba(255, 255, 255, 0.6); }
 :root[data-gorunum="acik"] .damga-noktalar > span { background: rgba(255, 255, 255, 0.5); }
 :root[data-gorunum="acik"] .odeme-bilgi-grid input,
