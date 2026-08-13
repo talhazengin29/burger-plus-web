@@ -53,8 +53,13 @@ export default function Home() {
     );
     if (siralama === "artan") return [...liste].sort((a, b) => a.fiyat - b.fiyat);
     if (siralama === "azalan") return [...liste].sort((a, b) => b.fiyat - a.fiyat);
-    return liste;
-  }, [aktifKategori, arama, siralama, urunler]);
+    const kategoriSirasi = new Map(kategoriler.map((kategori, index) => [kategori.ad, index]));
+    return [...liste].sort((a, b) =>
+      (aktifKategori === "Tümü" ? (kategoriSirasi.get(a.kategori) ?? 999) - (kategoriSirasi.get(b.kategori) ?? 999) : 0)
+      || Number(a.sira ?? 100) - Number(b.sira ?? 100)
+      || a.ad.localeCompare(b.ad, "tr")
+    );
+  }, [aktifKategori, arama, siralama, urunler, kategoriler]);
 
   const gorunenDamga = Math.min(burgerDamga, burgerDamgaHedef);
   const kalanDamga = Math.max(burgerDamgaHedef - burgerDamga, 0);

@@ -16,7 +16,7 @@ const BOS_BOYUTLAR = (birim = "gr") => [
 ];
 const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
 const BOS_EKSTRA = { aktif: false, baslik: "Ekstra malzeme seç", minSecim: 0, maxSecim: 1, secenekler: [] };
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], ekstraMalzemeAyari: BOS_EKSTRA, menuYapisi: BOS_MENU };
+const BOS_URUN = { ad: "", fiyat: "", sira: 100, kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], ekstraMalzemeAyari: BOS_EKSTRA, menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -97,6 +97,7 @@ const urunuFormaCevir = (urun) => ({
   populer: urun.populer === true,
   stokTakibi: urun.stokTakibi === true,
   stokAdedi: Number(urun.stokAdedi || 0),
+  sira: Number(urun.sira ?? 100),
   onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
   malzemeler: (urun.malzemeler || []).join(", "),
   alerjenler: (urun.alerjenler || []).join(", "),
@@ -294,7 +295,7 @@ export default function Admin({ onCikis }) {
     const veri = {
       ...urunForm,
       urunTipi,
-      fiyat: Number(urunForm.fiyat), temelMiktar: Number(urunForm.temelMiktar),
+      fiyat: Number(urunForm.fiyat), sira: Number(urunForm.sira), temelMiktar: Number(urunForm.temelMiktar),
       gramajOpsiyonu: urunTipi === "burger" ? {
         goster: urunForm.gramajOpsiyonu?.goster === true,
         aktif: urunForm.gramajOpsiyonu?.aktif === true,
@@ -925,7 +926,10 @@ export default function Admin({ onCikis }) {
               <Alan etiket="Ürün adı"><input required maxLength="120" value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan>
               <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select></Alan>
             </Ikili>
-            <Alan etiket="Başlangıç fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
+            <Ikili>
+              <Alan etiket="Başlangıç fiyatı (₺)"><input required type="number" min="0" max="100000" step="0.01" value={urunForm.fiyat} onChange={(e) => setUrunForm({ ...urunForm, fiyat: e.target.value })} /></Alan>
+              <Alan etiket="Gösterim sırası"><input required type="number" min="0" max="9999" step="1" value={urunForm.sira} onChange={(e) => setUrunForm({ ...urunForm, sira: e.target.value })} /><small>Küçük sayı önce görünür. Örn. 10, 20, 30.</small></Alan>
+            </Ikili>
 
             <section className={`urun-vitrin-kart ${urunForm.populer ? "aktif" : ""}`}>
               <header>
