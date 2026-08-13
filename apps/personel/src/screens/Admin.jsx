@@ -15,7 +15,8 @@ const BOS_BOYUTLAR = (birim = "gr") => [
   { kod: "buyuk", etiket: "Büyük Boy", miktar: "", birim, fiyatFarki: "", varsayilan: false },
 ];
 const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
-const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], menuYapisi: BOS_MENU };
+const BOS_EKSTRA = { aktif: false, baslik: "Ekstra malzeme seç", minSecim: 0, maxSecim: 1, secenekler: [] };
+const BOS_URUN = { ad: "", fiyat: "", kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], ekstraMalzemeAyari: BOS_EKSTRA, menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -83,7 +84,7 @@ const gramajVarsayilani = (urun) => {
   };
 };
 
-const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], menuYapisi: { ...BOS_MENU } });
+const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], ekstraMalzemeAyari: { ...BOS_EKSTRA, secenekler: [] }, menuYapisi: { ...BOS_MENU } });
 const urunuFormaCevir = (urun) => ({
   ...urun,
   populer: urun.populer === true,
@@ -95,6 +96,11 @@ const urunuFormaCevir = (urun) => ({
   gramajOpsiyonu: { ...gramajVarsayilani(urun), ...(urun.gramajOpsiyonu || {}) },
   // Boyut seçenekleri isteğe bağlıdır: boş bırakılmışsa ürün standart/tek fiyatla satılır.
   boyutSecenekleri: (urun.boyutSecenekleri || []).map((boyut) => ({ ...boyut })),
+  ekstraMalzemeAyari: {
+    ...BOS_EKSTRA,
+    ...(urun.ekstraMalzemeAyari || {}),
+    secenekler: (urun.ekstraMalzemeAyari?.secenekler || []).map((secenek) => ({ ...secenek })),
+  },
   menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
 });
 
@@ -288,6 +294,18 @@ export default function Admin({ onCikis }) {
       boyutSecenekleri: (urunForm.boyutSecenekleri || []).map((boyut) => ({
         ...boyut, miktar: Number(boyut.miktar), fiyatFarki: Number(boyut.fiyatFarki),
       })),
+      ekstraMalzemeAyari: {
+        aktif: urunForm.ekstraMalzemeAyari?.aktif === true,
+        baslik: String(urunForm.ekstraMalzemeAyari?.baslik || "Ekstra malzeme seç").trim(),
+        minSecim: Number(urunForm.ekstraMalzemeAyari?.minSecim || 0),
+        maxSecim: Number(urunForm.ekstraMalzemeAyari?.maxSecim || 1),
+        secenekler: (urunForm.ekstraMalzemeAyari?.secenekler || []).map((secenek) => ({
+          id: secenek.id,
+          ad: String(secenek.ad || "").trim(),
+          fiyat: Number(secenek.fiyat),
+          aktif: secenek.aktif !== false,
+        })),
+      },
       menuYapisi: urunForm.urunTipi === "menu" ? {
         ...urunForm.menuYapisi,
         burgerUrunId: Number(urunForm.menuYapisi.burgerUrunId),
@@ -343,6 +361,33 @@ export default function Admin({ onCikis }) {
       ...boyut,
       ...(alan === "varsayilan" ? { varsayilan: sira === index } : (sira === index ? { [alan]: deger } : {})),
     })),
+  }));
+
+  const ekstraAyarGuncelle = (alan, deger) => setUrunForm((onceki) => ({
+    ...onceki,
+    ekstraMalzemeAyari: { ...BOS_EKSTRA, ...onceki.ekstraMalzemeAyari, [alan]: deger },
+  }));
+  const ekstraSecenekEkle = () => setUrunForm((onceki) => ({
+    ...onceki,
+    ekstraMalzemeAyari: {
+      ...BOS_EKSTRA,
+      ...onceki.ekstraMalzemeAyari,
+      secenekler: [...(onceki.ekstraMalzemeAyari?.secenekler || []), { id: `ekstra-${Date.now()}`, ad: "", fiyat: "", aktif: true }],
+    },
+  }));
+  const ekstraSecenekGuncelle = (index, alan, deger) => setUrunForm((onceki) => ({
+    ...onceki,
+    ekstraMalzemeAyari: {
+      ...onceki.ekstraMalzemeAyari,
+      secenekler: onceki.ekstraMalzemeAyari.secenekler.map((secenek, sira) => sira === index ? { ...secenek, [alan]: deger } : secenek),
+    },
+  }));
+  const ekstraSecenekSil = (index) => setUrunForm((onceki) => ({
+    ...onceki,
+    ekstraMalzemeAyari: {
+      ...onceki.ekstraMalzemeAyari,
+      secenekler: onceki.ekstraMalzemeAyari.secenekler.filter((_, sira) => sira !== index),
+    },
   }));
 
   const gorselSecici = (setForm) => async (dosya) => {
@@ -892,6 +937,31 @@ export default function Admin({ onCikis }) {
                 <label className="admin-switch"><input type="checkbox" checked={urunForm.stokTakibi === true} onChange={(e) => setUrunForm({ ...urunForm, stokTakibi: e.target.checked, stokAdedi: e.target.checked ? urunForm.stokAdedi : 0 })} /><span /></label>
               </header>
               {urunForm.stokTakibi && <Alan etiket="Mevcut stok (adet)"><input required type="number" min="0" max="1000000" step="1" value={urunForm.stokAdedi} onChange={(e) => setUrunForm({ ...urunForm, stokAdedi: e.target.value })} /></Alan>}
+            </section>
+
+            <section className={`ekstra-malzeme-editoru ${urunForm.ekstraMalzemeAyari?.aktif ? "aktif" : ""}`}>
+              <header>
+                <div><b>Ekstra malzeme seçenekleri</b><small>Bu ürün için müşterinin ücretli veya ücretsiz ek malzeme seçmesini açıp kapat.</small></div>
+                <label className="admin-switch"><input type="checkbox" checked={urunForm.ekstraMalzemeAyari?.aktif === true} onChange={(e) => ekstraAyarGuncelle("aktif", e.target.checked)} /><span /></label>
+              </header>
+              {urunForm.ekstraMalzemeAyari?.aktif && <div className="ekstra-malzeme-alanlari">
+                <div className="ekstra-malzeme-kurallari">
+                  <Alan etiket="Müşteriye görünen başlık"><input required maxLength="80" value={urunForm.ekstraMalzemeAyari.baslik} onChange={(e) => ekstraAyarGuncelle("baslik", e.target.value)} /></Alan>
+                  <Alan etiket="Minimum seçim"><input required type="number" min="0" max="10" value={urunForm.ekstraMalzemeAyari.minSecim} onChange={(e) => ekstraAyarGuncelle("minSecim", e.target.value)} /></Alan>
+                  <Alan etiket="Maksimum seçim"><input required type="number" min="1" max="10" value={urunForm.ekstraMalzemeAyari.maxSecim} onChange={(e) => ekstraAyarGuncelle("maxSecim", e.target.value)} /></Alan>
+                </div>
+                <div className="ekstra-malzeme-liste-baslik"><span>Malzeme</span><span>Ek fiyat</span><span>Satışta</span><i /></div>
+                <div className="ekstra-malzeme-editor-listesi">
+                  {(urunForm.ekstraMalzemeAyari.secenekler || []).map((secenek, index) => <div className="ekstra-malzeme-editor-satir" key={secenek.id}>
+                    <input required maxLength="80" value={secenek.ad} onChange={(e) => ekstraSecenekGuncelle(index, "ad", e.target.value)} placeholder="Örn. Cheddar peyniri" />
+                    <input required type="number" min="0" max="100000" step="0.01" value={secenek.fiyat} onChange={(e) => ekstraSecenekGuncelle(index, "fiyat", e.target.value)} placeholder="₺0,00" />
+                    <label className="ekstra-aktif-secim"><input type="checkbox" checked={secenek.aktif !== false} onChange={(e) => ekstraSecenekGuncelle(index, "aktif", e.target.checked)} /><span>✓</span></label>
+                    <button type="button" onClick={() => ekstraSecenekSil(index)} aria-label={`${secenek.ad || "Malzeme"} seçeneğini sil`}>×</button>
+                  </div>)}
+                </div>
+                <button className="ekstra-malzeme-ekle" type="button" onClick={ekstraSecenekEkle} disabled={(urunForm.ekstraMalzemeAyari.secenekler || []).length >= 30}>+ Malzeme ekle</button>
+                <p>Müşteri en az {urunForm.ekstraMalzemeAyari.minSecim || 0}, en fazla {urunForm.ekstraMalzemeAyari.maxSecim || 1} seçenek seçebilir. Fiyat sipariş sırasında sunucuda doğrulanır.</p>
+              </div>}
             </section>
 
             <section className="urun-oneri-editoru">

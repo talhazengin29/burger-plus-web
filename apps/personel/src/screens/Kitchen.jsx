@@ -158,6 +158,7 @@ export default function Kitchen() {
                         ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"} ${secimler.gramajEtiketi || "Ekstra gramaj"}`
                         : null;
                     const boyutlar = boyutMetinleri(secimler);
+                    const ekstralar = Array.isArray(secimler.ekstraMalzemeler) ? secimler.ekstraMalzemeler : [];
                     return (
                       <li key={k.id} className="kalem">
                         <span className="kalem-adet">{k.adet}×</span>
@@ -165,6 +166,7 @@ export default function Kitchen() {
                           <span className="kalem-ad">{k.urun_ad}</span>
                           {gramaj && <span className="kalem-gramaj">{gramaj}</span>}
                           {boyutlar.map((boyut) => <span className="kalem-gramaj" key={boyut}>{boyut}</span>)}
+                          {ekstralar.length > 0 && <span className="kalem-dahil">Ekstra: {ekstralar.map((ekstra) => ekstra.ad).join(", ")}</span>}
                           {dahil.length > 0 && (
                             <span className="kalem-dahil">Dahil: {dahil.join(", ")}</span>
                           )}

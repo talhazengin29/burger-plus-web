@@ -13,6 +13,9 @@ export function gramajMetni(secimler) {
   if (secimler?.boyutEtiketi) parcalar.push(`${secimler.boyutEtiketi}: ${secimler.boyutMiktar} ${secimler.boyutBirim}`);
   if (secimler?.yanBoyutEtiketi) parcalar.push(`${secimler.yanLezzetAd}: ${secimler.yanBoyutEtiketi} (${secimler.yanBoyutMiktar} ${secimler.yanBoyutBirim})`);
   if (secimler?.icecekBoyutEtiketi) parcalar.push(`${secimler.icecekAd}: ${secimler.icecekBoyutEtiketi} (${secimler.icecekBoyutMiktar} ${secimler.icecekBoyutBirim})`);
+  if (Array.isArray(secimler?.ekstraMalzemeler) && secimler.ekstraMalzemeler.length) {
+    parcalar.push(`Ekstra: ${secimler.ekstraMalzemeler.map((ekstra) => ekstra.ad).join(", ")}`);
+  }
   return parcalar.length ? parcalar.join(" · ") : null;
 }
 
@@ -79,6 +82,8 @@ export function varsayilanSecimliUrunHazirla(urun, urunler) {
       icecekBoyutMiktar: icecekBoyut?.miktar,
       icecekBoyutBirim: icecekBoyut?.birim,
     } : {}),
+    ekstraMalzemeIdleri: [],
+    ekstraMalzemeler: [],
   };
 
   return { ...urun, haricMalzemeler: [], secimler };

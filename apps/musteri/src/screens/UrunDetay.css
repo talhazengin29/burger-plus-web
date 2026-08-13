@@ -193,6 +193,18 @@
 }
 
 /* --- Alt sabit bar — adet seçici + sepete ekle --- */
+.ekstra-malzeme-secici-baslik{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.ekstra-malzeme-secici-baslik .urun-detay-baslik{margin-bottom:3px}.ekstra-malzeme-secici-baslik p{color:var(--outline);font-size:11px}
+.ekstra-malzeme-secici-baslik>span{flex:none;padding:5px 8px;border-radius:9px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--primary-container);font-size:11px;font-weight:750}
+.ekstra-malzeme-secenekleri{display:flex;flex-direction:column;gap:7px}
+.ekstra-malzeme-secenekleri button{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;padding:11px 12px;border:1px solid var(--glass-border);border-radius:13px;background:color-mix(in srgb,var(--surface-container) 76%,transparent);color:var(--on-surface);text-align:left;transition:border-color .18s,background .18s,opacity .18s}
+.ekstra-malzeme-secenekleri button i{display:grid;place-items:center;width:20px;height:20px;border:1.5px solid var(--outline);border-radius:50%;color:white;font-size:11px;font-style:normal;font-weight:900}
+.ekstra-malzeme-secenekleri button b{font-size:13px}.ekstra-malzeme-secenekleri button span{color:var(--primary-container);font-size:12px;font-weight:700}
+.ekstra-malzeme-secenekleri button.secili{border-color:color-mix(in srgb,var(--accent) 62%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.ekstra-malzeme-secenekleri button.secili i{border-color:var(--accent);background:var(--accent)}
+.ekstra-malzeme-secenekleri button:disabled{opacity:.42;cursor:not-allowed}
+.ekstra-malzeme-zorunlu{margin:10px 0 0;color:#f59e0b;font-size:11px;font-weight:650}
+
 .urun-detay-alt-bar {
   position: absolute;
   bottom: 0; left: 0; right: 0;

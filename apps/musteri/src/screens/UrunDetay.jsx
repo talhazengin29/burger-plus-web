@@ -28,6 +28,7 @@ export default function UrunDetay() {
   const [boyutKodu, setBoyutKodu] = useState("");
   const [yanBoyutKodu, setYanBoyutKodu] = useState("");
   const [icecekBoyutKodu, setIcecekBoyutKodu] = useState("");
+  const [ekstraMalzemeIdleri, setEkstraMalzemeIdleri] = useState([]);
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
 
   const urun = urunler.find((u) => String(u.id) === id);
@@ -65,7 +66,14 @@ export default function UrunDetay() {
     : ["yan_lezzet", "icecek"].includes(urunTipi)
       ? Number(tekUrunBoyut?.fiyatFarki || 0) - Number(tekUrunVarsayilanBoyut?.fiyatFarki || 0)
       : 0;
-  const toplamFiyatArtisi = gramajFiyatArtisi + boyutFiyatArtisi;
+  const ekstraMalzemeAyari = urun.ekstraMalzemeAyari?.aktif ? urun.ekstraMalzemeAyari : null;
+  const ekstraSecenekler = ekstraMalzemeAyari?.secenekler?.filter((secenek) => secenek.aktif !== false) || [];
+  const seciliEkstraMalzemeler = ekstraSecenekler.filter((secenek) => ekstraMalzemeIdleri.includes(String(secenek.id)));
+  const ekstraMalzemeFiyati = seciliEkstraMalzemeler.reduce((toplam, secenek) => toplam + Number(secenek.fiyat || 0), 0);
+  const minimumEkstraSecimi = Number(ekstraMalzemeAyari?.minSecim || 0);
+  const maksimumEkstraSecimi = Number(ekstraMalzemeAyari?.maxSecim || 1);
+  const ekstraSecimiEksik = ekstraMalzemeAyari && ekstraMalzemeIdleri.length < minimumEkstraSecimi;
+  const toplamFiyatArtisi = gramajFiyatArtisi + boyutFiyatArtisi + ekstraMalzemeFiyati;
   const birimFiyat = (indirim ? indirim.fiyat : urun.fiyat) + toplamFiyatArtisi;
 
   const malzemeToggle = (malzeme) => {
@@ -76,8 +84,18 @@ export default function UrunDetay() {
     );
   };
 
+  const ekstraMalzemeToggle = (secenekId) => {
+    const id = String(secenekId);
+    setEkstraMalzemeIdleri((onceki) => {
+      if (onceki.includes(id)) return onceki.filter((mevcutId) => mevcutId !== id);
+      if (maksimumEkstraSecimi === 1) return [id];
+      if (onceki.length >= maksimumEkstraSecimi) return onceki;
+      return [...onceki, id];
+    });
+  };
+
   const sepeteEkleyeBas = () => {
-    if (stoktaYok) return;
+    if (stoktaYok || ekstraSecimiEksik) return;
     const dahilMalzemeler = malzemeListesi.filter((m) => !haricMalzemeler.includes(m));
     const secimler = {
       dahilMalzemeler,
@@ -102,6 +120,8 @@ export default function UrunDetay() {
         icecekBoyutKodu: secilenIcecekBoyut?.kod, icecekBoyutEtiketi: secilenIcecekBoyut?.etiket,
         icecekBoyutMiktar: secilenIcecekBoyut?.miktar, icecekBoyutBirim: secilenIcecekBoyut?.birim,
       } : {}),
+      ekstraMalzemeIdleri,
+      ekstraMalzemeler: seciliEkstraMalzemeler.map((secenek) => ({ id: String(secenek.id), ad: secenek.ad, fiyat: Number(secenek.fiyat || 0) })),
     };
     for (let i = 0; i < adet; i++) {
       sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi });
@@ -110,6 +130,10 @@ export default function UrunDetay() {
   };
 
   const oneriyiSepeteEkle = (onerilen) => {
+    if (onerilen.ekstraMalzemeAyari?.aktif) {
+      git(`/urun/${onerilen.id}`);
+      return;
+    }
     if (sepeteEkle(varsayilanSecimliUrunHazirla(onerilen, urunler))) {
       setEklenenOneriIdleri((onceki) => [...onceki, Number(onerilen.id)]);
     }
@@ -262,6 +286,25 @@ export default function UrunDetay() {
             </section>
           )}
 
+          {ekstraMalzemeAyari && ekstraSecenekler.length > 0 && (
+            <section className="urun-detay-kart ekstra-malzeme-secici">
+              <div className="ekstra-malzeme-secici-baslik">
+                <div><h2 className="urun-detay-baslik">{ekstraMalzemeAyari.baslik || "Ekstra malzeme seç"}</h2><p>{minimumEkstraSecimi > 0 ? `En az ${minimumEkstraSecimi}, ` : ""}en fazla {maksimumEkstraSecimi} seçim</p></div>
+                <span>{ekstraMalzemeIdleri.length}/{maksimumEkstraSecimi}</span>
+              </div>
+              <div className="ekstra-malzeme-secenekleri">
+                {ekstraSecenekler.map((secenek) => {
+                  const secili = ekstraMalzemeIdleri.includes(String(secenek.id));
+                  const siniraUlasti = !secili && ekstraMalzemeIdleri.length >= maksimumEkstraSecimi;
+                  return <button type="button" key={secenek.id} className={secili ? "secili" : ""} disabled={siniraUlasti} onClick={() => ekstraMalzemeToggle(secenek.id)}>
+                    <i aria-hidden="true">{secili ? "✓" : ""}</i><b>{secenek.ad}</b><span>{Number(secenek.fiyat) > 0 ? `+₺${Number(secenek.fiyat).toFixed(2)}` : "Ücretsiz"}</span>
+                  </button>;
+                })}
+              </div>
+              {ekstraSecimiEksik && <p className="ekstra-malzeme-zorunlu">Devam etmek için en az {minimumEkstraSecimi} seçim yapmalısın.</p>}
+            </section>
+          )}
+
           <AnimatePresence>
             {gorunenUrunOnerileri.length > 0 && (
               <motion.section
@@ -323,12 +366,12 @@ export default function UrunDetay() {
         <motion.button
           type="button"
           className="urun-detay-sepet-btn"
-          disabled={stoktaYok}
+          disabled={stoktaYok || ekstraSecimiEksik}
           onClick={sepeteEkleyeBas}
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          {stoktaYok ? "Stokta yok" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
+          {stoktaYok ? "Stokta yok" : ekstraSecimiEksik ? "Ekstra malzeme seç" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
         </motion.button>
       </div>
     </div>

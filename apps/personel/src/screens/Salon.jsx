@@ -268,6 +268,7 @@ export default function Salon() {
                       ? `+${secimler.ekstraGramaj} ${secimler.gramajBirim || "gr"}`
                       : null;
                   const boyutlar = boyutMetinleri(secimler);
+                  const ekstralar = Array.isArray(secimler.ekstraMalzemeler) ? secimler.ekstraMalzemeler : [];
                   return (
                     <div key={k.id} className="salon-kalem">
                       <span className="salon-kalem-adet">{k.adet}×</span>
@@ -275,6 +276,7 @@ export default function Salon() {
                         {k.urun_ad}
                         {gramaj && <small className="salon-kalem-gramaj">{gramaj}</small>}
                         {boyutlar.map((boyut) => <small className="salon-kalem-gramaj" key={boyut}>{boyut}</small>)}
+                        {ekstralar.length > 0 && <small className="salon-kalem-dahil">Ekstra: {ekstralar.map((ekstra) => ekstra.ad).join(", ")}</small>}
                         {dahil.length > 0 && <small className="salon-kalem-dahil">Dahil: {dahil.join(", ")}</small>}
                         {haric?.length > 0 && <small className="salon-kalem-haric">Haric: {haric.join(", ")}</small>}
                       </span>
