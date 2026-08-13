@@ -318,10 +318,10 @@
 .kategori--aktif { z-index: 5; }
 .kategori--aktif .kategori-daire {
   border-color: var(--primary-container);
-  box-shadow: 0 0 0 1px var(--accent-glow), 0 0 6px color-mix(in srgb, var(--accent) 36%, transparent), 0 5px 12px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent), 0 2px 6px rgba(0, 0, 0, 0.26);
   transform: translateY(-1px);
 }
-.kategori--aktif .kategori-daire::before { opacity: 1; transform: scale(1); }
+.kategori--aktif .kategori-daire::before { opacity: .28; transform: scale(.96); }
 .kategori--aktif .kategori-ad { color: var(--primary-container); font-weight: 700; }
 
 /* --- Ye Kazan damga kartı --- */
@@ -637,3 +637,19 @@
 .urun-fiyat { font-size: 15px; }
 .ekle-btn { width: 32px; height: 32px; }
 .ekle-ikon { width: 18px; height: 18px; }
+
+/* Damga kartında cam yüzeyi koru, gölge ve parlamaları kaldır. */
+.damga-kart,
+:root[data-gorunum="acik"] .damga-kart,
+.damga-sayac,
+.damga-noktalar > span,
+.damga-noktalar > span.dolu,
+.damga-noktalar > span.siradaki {
+  box-shadow: none;
+}
+
+.damga-baslik .vurgu,
+.damga-sayac,
+.damga-sayac strong {
+  text-shadow: none;
+}
