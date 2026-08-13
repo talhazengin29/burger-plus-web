@@ -133,14 +133,16 @@ export default function OrtakHeader({ selamlama = false }) {
             )}
           </AnimatePresence>
         </motion.button>
-        <motion.button
-          className="avatar-sm avatar-harf"
-          onClick={() => git("/profil")}
-          aria-label="Profil"
-          whileTap={{ scale: 0.9 }}
-        >
-          {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
-        </motion.button>
+        {!misafir && (
+          <motion.button
+            className="avatar-sm avatar-harf"
+            onClick={() => git("/profil")}
+            aria-label="Profil"
+            whileTap={{ scale: 0.9 }}
+          >
+            {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
+          </motion.button>
+        )}
       </div>
       {createPortal(
         <AnimatePresence>
