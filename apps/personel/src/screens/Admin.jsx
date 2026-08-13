@@ -92,6 +92,17 @@ const gramajVarsayilani = (urun) => {
 };
 
 const yeniUrunFormu = (kategori = "Burgerler") => ({ ...BOS_URUN, kategori, urunTipi: kategoriyeGoreUrunTipi(kategori), gramajOpsiyonu: { ...BOS_GRAMAJ }, boyutSecenekleri: [], ekstraMalzemeAyari: { ...BOS_EKSTRA, secenekler: [] }, menuYapisi: { ...BOS_MENU } });
+const yeniMenuFormu = (kategoriler = []) => {
+  const kategori = kategoriler.find((secenek) => kategoriyeGoreUrunTipi(secenek.ad) === "menu")?.ad || kategoriler[0]?.ad || "Menüler";
+  return {
+    ...yeniUrunFormu(kategori),
+    urunTipi: "menu",
+    temelMiktar: "",
+    gramajOpsiyonu: null,
+    boyutSecenekleri: [],
+    menuYapisi: { ...BOS_MENU },
+  };
+};
 const urunuFormaCevir = (urun) => ({
   ...urun,
   populer: urun.populer === true,
@@ -291,7 +302,7 @@ export default function Admin({ onCikis }) {
     e.preventDefault();
     if (gorselYukleniyor) return setHata("Görsel yüklemesi tamamlanmadan ürünü kaydedemezsin.");
     if (!urunForm.gorsel) return setHata("Ürün için bir görsel yüklemelisin.");
-    const urunTipi = kategoriyeGoreUrunTipi(urunForm.kategori);
+    const urunTipi = urunForm.urunTipi === "menu" ? "menu" : kategoriyeGoreUrunTipi(urunForm.kategori);
     const veri = {
       ...urunForm,
       urunTipi,
@@ -436,7 +447,7 @@ export default function Admin({ onCikis }) {
   }));
 
   const urunKategorisiDegistir = (kategori) => setUrunForm((onceki) => {
-    const urunTipi = kategoriyeGoreUrunTipi(kategori);
+    const urunTipi = onceki.urunTipi === "menu" ? "menu" : kategoriyeGoreUrunTipi(kategori);
     const varsayilan = gramajVarsayilani({ ...onceki, kategori });
     return {
       ...onceki,
@@ -677,7 +688,7 @@ export default function Admin({ onCikis }) {
             </>}
 
             {bolum === "urunler" && <>
-              <BolumBaslik baslik="Menü kataloğu" aciklama="Burger, boyutlu ürün ve menü yapılarını müşteri uygulamasıyla birlikte yönetin." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu(kategoriler[0]?.ad))} />
+              <BolumBaslik baslik="Menü kataloğu" aciklama="Ürünleri tek tek yönetin veya mevcut ürünleri bir araya getirerek menü oluşturun." buton="+ Yeni ürün" onClick={() => setUrunForm(yeniUrunFormu(kategoriler[0]?.ad))} ikincilButon="+ Ürünlerden menü oluştur" ikincilOnClick={() => setUrunForm(yeniMenuFormu(kategoriler))} />
               <section className="kategori-yonetim-karti">
                 <header><div><span>UYGULAMA MENÜSÜ</span><h3>Kategoriler</h3><p>Buradaki sıralama ve görseller müşteri uygulamasına anında yansır.</p></div><button type="button" onClick={() => setKategoriForm({ ...BOS_KATEGORI, sira: (kategoriler.at(-1)?.sira || 0) + 10 })}>+ Kategori ekle</button></header>
                 <div className="kategori-yonetim-listesi">
@@ -1036,17 +1047,17 @@ export default function Admin({ onCikis }) {
 
             {urunForm.urunTipi === "menu" && (
               <section className="menu-editoru">
-                <header><b>Menü içeriği</b><small>Önce burger, yan lezzet ve içecek ürünlerini eklemelisin.</small></header>
-                <Alan etiket="Menü burgeri"><select required value={urunForm.menuYapisi.burgerUrunId} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, burgerUrunId: e.target.value } })}><option value="">Burger seç</option>{burgerUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
+                <header><b>Ürünlerden menü oluştur</b><small>Ana ürün, yan ürün ve içeceği mevcut aktif ürünlerinden seç.</small></header>
+                <Alan etiket="Ana ürün"><select required value={urunForm.menuYapisi.burgerUrunId} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, burgerUrunId: e.target.value } })}><option value="">Ana ürün seç</option>{burgerUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad} · {urun.kategori}</option>)}</select></Alan>
                 <Ikili>
                   <Alan etiket="Yan lezzet"><select required value={urunForm.menuYapisi.yanLezzetUrunId} onChange={(e) => { const urun = yanLezzetUrunleri.find((aday) => String(aday.id) === e.target.value); setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, yanLezzetUrunId: e.target.value, varsayilanYanBoyut: urun?.boyutSecenekleri?.find((boyut) => boyut.varsayilan)?.kod || urun?.boyutSecenekleri?.[0]?.kod || "" } }); }}><option value="">Yan lezzet seç</option>{yanLezzetUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
-                  <Alan etiket="Başlangıç boyutu"><select required value={urunForm.menuYapisi.varsayilanYanBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanYanBoyut: e.target.value } })}><option value="">Boyut seç</option>{(yanLezzetUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.yanLezzetUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
+                  <Alan etiket="Başlangıç boyutu"><select required={(yanLezzetUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.yanLezzetUrunId))?.boyutSecenekleri || []).length > 0} value={urunForm.menuYapisi.varsayilanYanBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanYanBoyut: e.target.value } })}><option value="">Standart</option>{(yanLezzetUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.yanLezzetUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
                 </Ikili>
                 <Ikili>
                   <Alan etiket="İçecek"><select required value={urunForm.menuYapisi.icecekUrunId} onChange={(e) => { const urun = icecekUrunleri.find((aday) => String(aday.id) === e.target.value); setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, icecekUrunId: e.target.value, varsayilanIcecekBoyut: urun?.boyutSecenekleri?.find((boyut) => boyut.varsayilan)?.kod || urun?.boyutSecenekleri?.[0]?.kod || "" } }); }}><option value="">İçecek seç</option>{icecekUrunleri.map((urun) => <option key={urun.id} value={urun.id}>{urun.ad}</option>)}</select></Alan>
-                  <Alan etiket="Başlangıç boyutu"><select required value={urunForm.menuYapisi.varsayilanIcecekBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanIcecekBoyut: e.target.value } })}><option value="">Boyut seç</option>{(icecekUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.icecekUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
+                  <Alan etiket="Başlangıç boyutu"><select required={(icecekUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.icecekUrunId))?.boyutSecenekleri || []).length > 0} value={urunForm.menuYapisi.varsayilanIcecekBoyut} onChange={(e) => setUrunForm({ ...urunForm, menuYapisi: { ...urunForm.menuYapisi, varsayilanIcecekBoyut: e.target.value } })}><option value="">Standart</option>{(icecekUrunleri.find((urun) => String(urun.id) === String(urunForm.menuYapisi.icecekUrunId))?.boyutSecenekleri || []).map((boyut) => <option key={boyut.kod} value={boyut.kod}>{boyut.etiket} · {boyut.miktar} {boyut.birim}</option>)}</select></Alan>
                 </Ikili>
-                <p>Menünün “İçindekiler” alanında seçilen burgerin malzemeleri gösterilir. Boyut büyütmelerinin fiyatı ilgili yan lezzet ve içecekten alınır.</p>
+                <p>Menü fiyatını yukarıdaki başlangıç fiyatı alanından belirlersin. Boyut büyütmelerinin farkı ilgili yan ürün ve içecekten otomatik alınır.</p>
               </section>
             )}
 
@@ -1160,7 +1171,7 @@ function MetrikSparkline({ veriler }) {
 }
 function Panel({ baslik, alt, children }) { return <section className="admin-panel"><header><h2>{baslik}</h2><span>{alt}</span></header>{children}</section>; }
 function Bos({ yazi }) { return <div className="admin-bos">{yazi}</div>; }
-function BolumBaslik({ baslik, aciklama, buton, onClick }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div>{buton && <button onClick={onClick}>{buton}</button>}</div>; }
+function BolumBaslik({ baslik, aciklama, buton, onClick, ikincilButon, ikincilOnClick }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div><span className="admin-bolum-islemler">{ikincilButon && <button className="ikincil" onClick={ikincilOnClick}>{ikincilButon}</button>}{buton && <button onClick={onClick}>{buton}</button>}</span></div>; }
 function SatisCizgiGrafigi({ veriler }) {
   const [secili, setSecili] = useState(null);
   const gunler = sonOtuzGunuDoldur(veriler);
