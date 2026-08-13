@@ -15,6 +15,8 @@ function baslangicFormu(isletme, tema) {
     gorunum: tema?.gorunum === "acik" ? "acik" : "koyu",
     accent: tema?.renkler?.accent || varsayilan.renkler.accent,
     logoOlcegi: Math.min(180, Math.max(60, Number(tema?.logoOlcegi) || 100)),
+    logoKonumX: Math.min(80, Math.max(-80, Number(tema?.logoKonumX) || 0)),
+    logoKonumY: Math.min(30, Math.max(-30, Number(tema?.logoKonumY) || 0)),
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [
       alan,
       tema?.metinler?.[alan] && tema.metinler[alan] !== varsayilan.metinler[alan] ? tema.metinler[alan] : "",
@@ -61,6 +63,8 @@ export default function TemaYonetimi() {
     metinler: onizleme.metinler,
     logoUrl: logoOnizleme || tema?.logoUrl || isletme.logoUrl || null,
     logoOlcegi: form.logoOlcegi,
+    logoKonumX: form.logoKonumX,
+    logoKonumY: form.logoKonumY,
   }), [form, isletme.logoUrl, logoOnizleme, onizleme, tema, varsayilan.font]);
 
   const onizlemeMesajiniGonder = useCallback(() => canliOnizlemeRef.current?.contentWindow?.postMessage({
@@ -85,6 +89,8 @@ export default function TemaYonetimi() {
     gorunum: form.gorunum,
     accent: KONSEPTLER[konsept].renkler.accent,
     logoOlcegi: form.logoOlcegi,
+    logoKonumX: form.logoKonumX,
+    logoKonumY: form.logoKonumY,
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
   });
 
@@ -104,6 +110,8 @@ export default function TemaYonetimi() {
         gorunum: form.gorunum,
         renkler: form.ozelPalet ? { accent: form.accent, accentGlow: hexRgba(form.accent), bgPrimary: varsayilan.renkler.bgPrimary, bgCard: varsayilan.renkler.bgCard } : {},
         logoOlcegi: form.logoOlcegi,
+        logoKonumX: form.logoKonumX,
+        logoKonumY: form.logoKonumY,
         metinler: form.metinler,
       });
       isletmeyiGuncelle(yanit.isletme, yanit.tema);
@@ -167,11 +175,14 @@ export default function TemaYonetimi() {
         <fieldset className="tema-kutu logo-kutusu">
           <legend>Logo</legend>
           <div className="logo-satiri">
-            <span className="logo-onizleme">{logoOnizleme ? <img style={{ transform: `scale(${form.logoOlcegi / 100})` }} src={logoOnizleme} alt={`${isletme.ad} logosu`} /> : <b>{isletme.ad}</b>}</span>
+            <span className="logo-onizleme">{logoOnizleme ? <img style={{ transform: `translate(${form.logoKonumX}px, ${form.logoKonumY}px) scale(${form.logoOlcegi / 100})` }} src={logoOnizleme} alt={`${isletme.ad} logosu`} /> : <b>{isletme.ad}</b>}</span>
             <div><p>PNG, JPG, WebP veya SVG · en fazla 2 MB<br />Boş kenarlar otomatik kırpılır ve tüm ekranlar için standartlaştırılır.</p><button type="button" disabled={logoYukleniyor} onClick={() => dosyaRef.current?.click()}>{logoYukleniyor ? "Yükleniyor…" : "Logo Yükle"}</button></div>
             <input ref={dosyaRef} type="file" hidden accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={logoSecildi} />
           </div>
-          <label className="logo-olcek"><span>Logo boyutu</span><input type="range" min="60" max="180" step="5" value={form.logoOlcegi} onChange={(e) => setForm({ ...form, logoOlcegi: Number(e.target.value) })} /><output>{form.logoOlcegi}%</output></label>
+          <div className="logo-yerlesim-baslik"><b>Logo yerleşimi</b><button type="button" onClick={() => setForm({ ...form, logoOlcegi: 100, logoKonumX: 0, logoKonumY: 0 })}>Sıfırla</button></div>
+          <label className="logo-olcek"><span>Boyut</span><input type="range" min="60" max="180" step="5" value={form.logoOlcegi} onChange={(e) => setForm({ ...form, logoOlcegi: Number(e.target.value) })} /><output>{form.logoOlcegi}%</output></label>
+          <label className="logo-olcek"><span>Sağ / sol</span><input type="range" min="-80" max="80" step="2" value={form.logoKonumX} onChange={(e) => setForm({ ...form, logoKonumX: Number(e.target.value) })} /><output>{form.logoKonumX}px</output></label>
+          <label className="logo-olcek"><span>Yukarı / aşağı</span><input type="range" min="-30" max="30" step="1" value={form.logoKonumY} onChange={(e) => setForm({ ...form, logoKonumY: Number(e.target.value) })} /><output>{form.logoKonumY}px</output></label>
         </fieldset>
 
         <fieldset className="tema-kutu">

@@ -98,7 +98,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       ) : (
         <div className="brand">
-          <MarkaLogosu className="brand-logo" alt={isletme.ad} saydamBosluklariKirp />
+          <MarkaLogosu className="brand-logo" alt={isletme.ad} />
         </div>
       )}
       <div className="home-header-sag">

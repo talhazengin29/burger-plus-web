@@ -24,6 +24,8 @@ const VARSAYILAN_TEMA = {
   gorunum: "koyu",
   logoUrl: null,
   logoOlcegi: 100,
+  logoKonumX: 0,
+  logoKonumY: 0,
 };
 
 const DEGISKEN_ADI = (ad) => `--${ad.replace(/[A-Z]/g, (harf) => `-${harf.toLowerCase()}`)}`;
@@ -54,6 +56,8 @@ export function TemaSaglayici({ tema, isletme, children }) {
     kok.style.setProperty("--font-baslik", `"${aktifTema.font.baslik}", sans-serif`);
     kok.style.setProperty("--font-govde", `"${aktifTema.font.govde}", sans-serif`);
     kok.style.setProperty("--logo-olcegi", String(Math.min(180, Math.max(60, Number(aktifTema.logoOlcegi) || 100)) / 100));
+    kok.style.setProperty("--logo-konum-x", `${Math.min(80, Math.max(-80, Number(aktifTema.logoKonumX) || 0))}px`);
+    kok.style.setProperty("--logo-konum-y", `${Math.min(30, Math.max(-30, Number(aktifTema.logoKonumY) || 0))}px`);
     kok.dataset.konsept = aktifTema.konsept;
 
     const aileler = [...new Set([aktifTema.font.baslik, aktifTema.font.govde].filter(Boolean))];
@@ -72,6 +76,8 @@ export function TemaSaglayici({ tema, isletme, children }) {
     return () => {
       if (favicon && oncekiFavicon) favicon.setAttribute("href", oncekiFavicon);
       kok.style.removeProperty("--logo-olcegi");
+      kok.style.removeProperty("--logo-konum-x");
+      kok.style.removeProperty("--logo-konum-y");
       delete kok.dataset.gorunum;
     };
   }, [aktifTema, isletme.ad, logoUrl]);

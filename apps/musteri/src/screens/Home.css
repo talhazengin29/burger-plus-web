@@ -39,6 +39,10 @@
   object-position: left center;
   filter: none;
 }
+.brand-logo.marka-logo-ozel {
+  transform: translate(var(--logo-konum-x, 0), var(--logo-konum-y, 0)) scale(var(--logo-olcegi, 1));
+  transform-origin: left center;
+}
 .brand-logo.marka-logo-metin {
   width: auto;
   max-width: 170px;
