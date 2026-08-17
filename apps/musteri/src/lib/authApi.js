@@ -55,6 +55,28 @@ export async function istekAt(yol, secenekler = {}) {
   return fetch(`${BACKEND_URL}${yol}`, { ...fetchSecenekleri, headers });
 }
 
+export async function masaCagriOturumuAc(masaNo, masaTokeni, cihazAnahtari) {
+  return (await jsonIstegi(`/api/masa/${encodeURIComponent(masaNo)}/cagri-oturumu`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Masa-Token": masaTokeni },
+    body: JSON.stringify({ cihazAnahtari }),
+  }, "Personel çağrı oturumu açılamadı.")).oturum;
+}
+
+export async function masaPersonelCagrisiniGetir(masaNo, oturumTokeni) {
+  return (await jsonIstegi(`/api/masa/${encodeURIComponent(masaNo)}/personel-cagrisi`, {
+    headers: { "X-Masa-Oturum": oturumTokeni },
+  }, "Personel çağrısı alınamadı.")).cagri;
+}
+
+export async function masaPersonelCagrisiOlustur(masaNo, oturumTokeni, neden, istekAnahtari) {
+  return (await jsonIstegi(`/api/masa/${encodeURIComponent(masaNo)}/personel-cagrisi`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Masa-Oturum": oturumTokeni },
+    body: JSON.stringify({ neden, istekAnahtari }),
+  }, "Personel çağrılamadı.")).cagri;
+}
+
 async function jsonYanitiOku(yanit, varsayilanHata) {
   const icerikTipi = yanit.headers.get("content-type") || "";
   if (!icerikTipi.toLowerCase().includes("application/json")) {

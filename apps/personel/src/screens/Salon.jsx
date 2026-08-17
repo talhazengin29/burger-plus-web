@@ -6,6 +6,8 @@ import {
   nakitSiparisiOnayla,
   nakitSiparisiReddet,
   nakitSiparisiTahsilEt,
+  personelCagrilariniGetir,
+  personelCagrisiGuncelle,
 } from "../lib/adminApi";
 import "./Salon.css";
 
@@ -31,6 +33,13 @@ const DURUM_ETIKET = {
   hazir: "Hazır",
 };
 
+const CAGRI_NEDENLERI = {
+  siparis: ["Sipariş desteği", "Müşteri sipariş vermek istiyor"],
+  hesap: ["Hesap istiyor", "Ödeme için personel bekliyor"],
+  ihtiyac: ["Bir ihtiyacı var", "Peçete, çatal veya farklı bir istek"],
+  temizlik: ["Masa temizliği", "Masanın temizlenmesini istiyor"],
+};
+
 function boyutMetinleri(secimler) {
   return [
     secimler.boyutEtiketi && `${secimler.boyutEtiketi}: ${secimler.boyutMiktar} ${secimler.boyutBirim}`,
@@ -49,6 +58,13 @@ export default function Salon() {
   const [nakitIslemler, setNakitIslemler] = useState(new Set());
   const [nakitOnay, setNakitOnay] = useState(null);
   const [hata, setHata] = useState("");
+  const [personelCagrilari, setPersonelCagrilari] = useState([]);
+  const [cagriIslemleri, setCagriIslemleri] = useState(new Set());
+
+  const personelCagrilariniYenile = useCallback(async () => {
+    try { setPersonelCagrilari(await personelCagrilariniGetir()); }
+    catch (e) { setHata(e.message || "Personel çağrıları alınamadı."); }
+  }, []);
 
   const nakitMasalariYenile = useCallback(async () => {
     try {
@@ -69,22 +85,39 @@ export default function Salon() {
     const kapandi = () => setBagli(false);
     const guncelle = (yeniMasalar) => setMasalar(yeniMasalar);
     const nakitGuncelle = () => nakitMasalariYenile();
+    const cagrilariGuncelle = (cagrilar) => setPersonelCagrilari(Array.isArray(cagrilar) ? cagrilar : []);
 
     socket.on("connect", acildi);
     socket.on("disconnect", kapandi);
     socket.on("salon-guncellendi", guncelle);
     socket.on("nakit-guncellendi", nakitGuncelle);
+    socket.on("personel-cagrilari-guncellendi", cagrilariGuncelle);
 
     if (socket.connected) acildi();
     nakitMasalariYenile();
+    personelCagrilariniYenile();
 
     return () => {
       socket.off("connect", acildi);
       socket.off("disconnect", kapandi);
       socket.off("salon-guncellendi", guncelle);
       socket.off("nakit-guncellendi", nakitGuncelle);
+      socket.off("personel-cagrilari-guncellendi", cagrilariGuncelle);
     };
-  }, [nakitMasalariYenile]);
+  }, [nakitMasalariYenile, personelCagrilariniYenile]);
+
+  const cagriyiGuncelle = async (cagri, durum) => {
+    if (cagriIslemleri.has(cagri.id)) return;
+    setCagriIslemleri((onceki) => new Set(onceki).add(cagri.id));
+    setHata("");
+    try {
+      await personelCagrisiGuncelle(cagri.id, durum);
+      await personelCagrilariniYenile();
+    } catch (e) { setHata(e.message || "Çağrı güncellenemedi."); }
+    finally {
+      setCagriIslemleri((onceki) => { const sonraki = new Set(onceki); sonraki.delete(cagri.id); return sonraki; });
+    }
+  };
 
   const masayiKapat = (masaNo) => {
     if (kapatilanMasalar.has(masaNo)) return;
@@ -161,6 +194,32 @@ export default function Salon() {
       </header>
 
       {hata && <div className="salon-hata" role="alert">{hata}</div>}
+
+      <section className={`personel-cagri-paneli${personelCagrilari.length ? " personel-cagri-paneli--aktif" : ""}`}>
+        <div className="salon-bolum-baslik">
+          <div><small>CANLI SERVİS TALEPLERİ</small><h2>Personel Çağrıları</h2></div>
+          <span>{personelCagrilari.length ? `${personelCagrilari.length} bekliyor` : "Çağrı yok"}</span>
+        </div>
+        {personelCagrilari.length ? (
+          <div className="personel-cagri-grid">
+            {personelCagrilari.map((cagri) => {
+              const [baslik, aciklama] = CAGRI_NEDENLERI[cagri.neden] || ["Personel çağrısı", "Müşteri destek bekliyor"];
+              const islemde = cagriIslemleri.has(cagri.id);
+              return (
+                <article key={cagri.id} className={`personel-cagri-karti personel-cagri-karti--${cagri.durum}`}>
+                  <header><div><strong>Masa {cagri.masaNo}</strong><span>{gecenSure(cagri.olusturma)}</span></div><em>{cagri.durum === "goruldu" ? "İlgileniliyor" : "Yeni çağrı"}</em></header>
+                  <h3>{baslik}</h3><p>{aciklama}</p>
+                  <div className="personel-cagri-butonlar">
+                    {cagri.durum === "bekliyor" && <button disabled={islemde} onClick={() => cagriyiGuncelle(cagri, "goruldu")}>Gördüm</button>}
+                    <button disabled={islemde} onClick={() => cagriyiGuncelle(cagri, "tamamlandi")}>Tamamlandı</button>
+                    <button className="masada-yok" disabled={islemde} onClick={() => cagriyiGuncelle(cagri, "masada_yok")}>Masada yok</button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : <p className="personel-cagri-bos">Aktif servis talebi bulunmuyor. Yeni çağrılar bu alana anında düşer.</p>}
+      </section>
 
       <section className="nakit-masa-paneli">
         <div className="salon-bolum-baslik">

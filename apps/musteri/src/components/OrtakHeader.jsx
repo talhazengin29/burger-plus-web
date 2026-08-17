@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
-import { IconBell, IconBag } from "./Icons";
+import { IconBell, IconBag, IconService } from "./Icons";
 import { badgePop } from "../lib/animasyonlar";
 import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
@@ -32,8 +32,13 @@ const okunanlariKaydet = (anahtar, duyuruIdleri) => {
 export default function OrtakHeader({ selamlama = false }) {
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
-  const { sepetAdet, kullanici, misafir, avatar } = useApp();
+  const {
+    sepetAdet, kullanici, misafir, avatar, ozetMasaNo,
+    personelCagrisi, personelCagriHazir, personelCagriYukleniyor,
+    personelCagriHatasi, personelCagir,
+  } = useApp();
   const [bildirimlerAcik, setBildirimlerAcik] = useState(false);
+  const [personelPaneliAcik, setPersonelPaneliAcik] = useState(false);
   const [duyurular, setDuyurular] = useState([]);
   const okunanAnahtari = `bp_okunan_duyurular_${isletmeSlug}_${kullanici?.id || (misafir ? "misafir" : "anonim")}`;
   const [okunanDuyurular, setOkunanDuyurular] = useState(() => okunanlariGetir(okunanAnahtari));
@@ -43,6 +48,16 @@ export default function OrtakHeader({ selamlama = false }) {
   );
 
   const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
+  const aktifCagri = ["bekliyor", "goruldu"].includes(personelCagrisi?.durum);
+  const cagriDurumMetni = personelCagrisi?.durum === "goruldu"
+    ? "Personel çağrınızı gördü ve masanıza geliyor."
+    : personelCagrisi?.durum === "bekliyor"
+      ? "Çağrınız salondaki personele iletildi."
+      : personelCagrisi?.durum === "tamamlandi"
+        ? "Son çağrınız tamamlandı."
+        : personelCagrisi?.durum === "masada_yok"
+          ? "Masada müşteri bulunamadığı için çağrı kapatıldı."
+          : "İhtiyacınızı seçin; salon personeli anında bilgilendirilsin.";
 
   const duyurulariYukle = useCallback(() => {
     return duyurulariGetir().then(setDuyurular).catch(() => setDuyurular([]));
@@ -68,6 +83,7 @@ export default function OrtakHeader({ selamlama = false }) {
   }, [bildirimlerAcik]);
 
   const bildirimleriAcKapat = () => {
+    setPersonelPaneliAcik(false);
     setBildirimlerAcik((acik) => {
       const sonrakiDurum = !acik;
       if (sonrakiDurum) duyurulariYukle();
@@ -102,6 +118,17 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       )}
       <div className="home-header-sag">
+        {ozetMasaNo && (
+          <motion.button
+            className={`ikon-btn personel-cagir-btn${aktifCagri ? " personel-cagir-btn--aktif" : ""}`}
+            aria-label="Personel çağır"
+            onClick={() => { setBildirimlerAcik(false); setPersonelPaneliAcik(true); }}
+            whileTap={{ scale: 0.88 }}
+          >
+            <IconService />
+            {aktifCagri && <span />}
+          </motion.button>
+        )}
         <div className="bildirim-sarici">
           <motion.button
             className="ikon-btn bildirim-btn"
@@ -171,6 +198,36 @@ export default function OrtakHeader({ selamlama = false }) {
                   const okundu = okunanDuyurular.includes(String(duyuru.id));
                   return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>;
                 })}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
+              </motion.section>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+      {createPortal(
+        <AnimatePresence>
+          {personelPaneliAcik && (
+            <div className="personel-cagri-katman">
+              <motion.button className="personel-cagri-perde" aria-label="Kapat" onClick={() => setPersonelPaneliAcik(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+              <motion.section className="personel-cagri-panel" role="dialog" aria-modal="true" aria-label="Personel çağır" initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: .97 }}>
+                <header><div><small>MASA {ozetMasaNo}</small><h2>Personel çağır</h2></div><button onClick={() => setPersonelPaneliAcik(false)} aria-label="Kapat">×</button></header>
+                <p className={`personel-cagri-durum${aktifCagri ? " personel-cagri-durum--aktif" : ""}`}>{cagriDurumMetni}</p>
+                {!aktifCagri && personelCagrisi?.durum !== "masada_yok" && (
+                  <div className="personel-cagri-secenekler">
+                    {[
+                      ["siparis", "Sipariş vermek istiyorum", "Menü ve sipariş desteği"],
+                      ["hesap", "Hesap istiyorum", "Ödeme için personel gelsin"],
+                      ["ihtiyac", "Bir ihtiyacım var", "Peçete, çatal veya başka bir istek"],
+                      ["temizlik", "Masa temizliği", "Masanın temizlenmesini istiyorum"],
+                    ].map(([neden, baslik, aciklama]) => (
+                      <button key={neden} disabled={!personelCagriHazir || personelCagriYukleniyor} onClick={() => personelCagir(neden).catch(() => {})}>
+                        <span><b>{baslik}</b><small>{aciklama}</small></span><em>›</em>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {personelCagriHatasi && <div className="personel-cagri-hata" role="alert">{personelCagriHatasi}</div>}
+                {personelCagriYukleniyor && <span className="personel-cagri-yukleniyor">Hazırlanıyor…</span>}
               </motion.section>
             </div>
           )}

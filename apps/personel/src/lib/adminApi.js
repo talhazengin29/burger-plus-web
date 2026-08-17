@@ -67,6 +67,18 @@ export const nakitSiparisiOnayla = async (id) => (await nakitIstegi(`/siparis/${
 export const nakitSiparisiReddet = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/reddet`, { method: "POST" })).siparis;
 export const nakitSiparisiTahsilEt = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/tahsil`, { method: "POST" })).siparis;
 
+async function personelCagriIstegi(yol = "", secenekler = {}) {
+  const r = await istekAt(`/api/personel/personel-cagrilari${yol}`, secenekler);
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Personel çağrısı işlemi tamamlanamadı.");
+  return veri;
+}
+
+export const personelCagrilariniGetir = async () => (await personelCagriIstegi()).cagrilar || [];
+export const personelCagrisiGuncelle = async (id, durum) => (await personelCagriIstegi(`/${encodeURIComponent(id)}`, {
+  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ durum }),
+})).cagri;
+
 async function kasaCuzdanIstegi(yol, secenekler = {}) {
   const r = await istekAt(`/api/kasa/cuzdan${yol}`, secenekler);
   const veri = await jsonOku(r);

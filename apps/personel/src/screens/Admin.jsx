@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { adminIstek, gorselYukle, jsonGonder, temaKaydet } from "../lib/adminApi";
 import { socket } from "../lib/socket";
+import { yuzdeliToplamiHesapla } from "../lib/yuzde";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useIsletme } from "../context/IsletmeContext";
 import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
@@ -766,7 +767,7 @@ export default function Admin({ onCikis }) {
                   <form className="cuzdan-admin-form" onSubmit={cuzdanAyariniKaydet}>
                     <label className="cuzdan-bonus-switch"><span><b>Hediye bakiye kampanyası</b><small>Nakit yüklemeye ek bakiye ver</small></span><input type="checkbox" checked={cuzdanAyari.bonusAktif === true} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, bonusAktif: e.target.checked })} /></label>
                     <div className="cuzdan-admin-grid">
-                      <Alan etiket="Hediye oranı (%)"><input required type="number" min="0" max="100" step="0.01" value={cuzdanAyari.bonusYuzde} disabled={!cuzdanAyari.bonusAktif} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, bonusYuzde: e.target.value })} /><small>Örn. ₺500 nakit + %{cuzdanAyari.bonusYuzde || 0} = {para(500 + 500 * Number(cuzdanAyari.bonusYuzde || 0) / 100)} bakiye.</small></Alan>
+                      <Alan etiket="Hediye oranı (%)"><input required type="number" min="0" max="100" step="0.01" value={cuzdanAyari.bonusYuzde} disabled={!cuzdanAyari.bonusAktif} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, bonusYuzde: e.target.value })} /><small>Örn. ₺500 nakit + %{cuzdanAyari.bonusYuzde || 0} = {para(yuzdeliToplamiHesapla(500, cuzdanAyari.bonusYuzde))} bakiye.</small></Alan>
                       <Alan etiket="Minimum yükleme"><input required type="number" min="1" step="0.01" value={cuzdanAyari.minYukleme} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, minYukleme: e.target.value })} /></Alan>
                       <Alan etiket="Tek işlem üst limiti"><input required type="number" min="1" max="1000000" step="0.01" value={cuzdanAyari.maxYukleme} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, maxYukleme: e.target.value })} /></Alan>
                       <Alan etiket="Kampanya başlığı"><input required maxLength="100" value={cuzdanAyari.kampanyaBasligi} onChange={(e) => setCuzdanAyari({ ...cuzdanAyari, kampanyaBasligi: e.target.value })} /></Alan>
@@ -778,7 +779,7 @@ export default function Admin({ onCikis }) {
                   <aside className="cuzdan-admin-onizleme">
                     <small>MÜŞTERİ UYGULAMASI</small><span className="cuzdan-admin-ikon">₺</span><h3>{cuzdanAyari.kampanyaBasligi}</h3><p>{cuzdanAyari.kampanyaAciklamasi}</p>
                     {cuzdanAyari.bonusAktif && <strong>%{cuzdanAyari.bonusYuzde} hediye bakiye</strong>}
-                    <div><span>Örnek nakit yükleme</span><b>{para(500)}</b><span>Müşteriye geçen</span><b>{para(500 + 500 * Number(cuzdanAyari.bonusAktif ? cuzdanAyari.bonusYuzde : 0) / 100)}</b></div>
+                    <div><span>Örnek nakit yükleme</span><b>{para(500)}</b><span>Müşteriye geçen</span><b>{para(yuzdeliToplamiHesapla(500, cuzdanAyari.bonusAktif ? cuzdanAyari.bonusYuzde : 0))}</b></div>
                   </aside>
                 </div>
               </section>

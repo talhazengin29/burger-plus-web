@@ -27,6 +27,10 @@ export const IconBell = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
 );
 
+export const IconService = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M4 14h16M6 14a6 6 0 0 1 12 0M12 8V5M9.5 5h5M3 18h18" /></svg>
+);
+
 export const IconMenu = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M4 6h16M4 12h16M4 18h16" /></svg>
 );

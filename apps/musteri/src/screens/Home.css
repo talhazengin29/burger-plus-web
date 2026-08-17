@@ -95,6 +95,28 @@
 .bildirim-perde { position:absolute;inset:max(78px,calc(env(safe-area-inset-top,0px) + 70px)) 0 0;z-index:0;width:auto;height:auto;border:0;border-radius:0;background:rgba(0,0,0,.12);pointer-events:auto }
 .bildirim-katman .bildirim-panel { position:relative;z-index:1;top:auto;left:auto;width:min(340px,100%);max-height:calc(100dvh - 180px);pointer-events:auto;transform-origin:center }
 .bildirim-katman .bildirim-panel>div { max-height:min(320px,calc(100dvh - 260px)); }
+.personel-cagir-btn { position:relative;color:var(--on-surface) }
+.personel-cagir-btn--aktif { color:var(--primary-container);background:var(--primary-fixed) }
+.personel-cagir-btn>span { position:absolute;right:5px;top:5px;width:9px;height:9px;border:2px solid var(--surface);border-radius:50%;background:#42d98b }
+.personel-cagri-katman { position:fixed;inset:0;z-index:1100;display:flex;align-items:flex-end;justify-content:center;padding:16px;pointer-events:none }
+.personel-cagri-perde { position:absolute;inset:0;width:auto;height:auto;border:0;border-radius:0;background:rgba(0,0,0,.58);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);pointer-events:auto }
+.personel-cagri-panel { position:relative;z-index:1;width:min(430px,100%);padding:20px;border:1px solid var(--glass-border-strong);border-radius:26px;background:var(--glass-bg-solid);box-shadow:var(--shadow-modal);-webkit-backdrop-filter:var(--glass-blur-lg);backdrop-filter:var(--glass-blur-lg);pointer-events:auto }
+.personel-cagri-panel>header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px }
+.personel-cagri-panel>header small { display:block;margin-bottom:3px;color:var(--primary-container);font-size:10px;font-weight:800;letter-spacing:.11em }
+.personel-cagri-panel>header h2 { margin:0;color:var(--on-surface);font-family:var(--font-baslik);font-size:23px }
+.personel-cagri-panel>header button { width:36px;height:36px;border-radius:50%;background:var(--bg-card);color:var(--on-surface);font-size:24px;line-height:1 }
+.personel-cagri-durum { margin:0 0 14px;padding:13px 14px;border:1px solid var(--glass-border);border-radius:14px;background:var(--bg-card);color:var(--on-surface-variant);font-size:13px;line-height:1.45 }
+.personel-cagri-durum--aktif { border-color:color-mix(in srgb,var(--primary-container) 45%,transparent);color:var(--on-surface) }
+.personel-cagri-secenekler { display:grid;gap:8px }
+.personel-cagri-secenekler button { display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px;border:1px solid var(--glass-border);border-radius:15px;background:var(--bg-card);color:var(--on-surface);text-align:left }
+.personel-cagri-secenekler button:disabled { opacity:.45 }
+.personel-cagri-secenekler button span { display:flex;flex-direction:column;gap:3px }
+.personel-cagri-secenekler b { font-size:14px }
+.personel-cagri-secenekler small { color:var(--on-surface-variant);font-size:11px }
+.personel-cagri-secenekler em { color:var(--primary-container);font-size:25px;font-style:normal }
+.personel-cagri-hata { margin-top:10px;padding:11px;border-radius:12px;background:rgba(255,78,78,.12);color:#ff8b8b;font-size:12px }
+.personel-cagri-yukleniyor { display:block;margin-top:10px;color:var(--on-surface-variant);font-size:11px;text-align:center }
+@media (min-width:600px) { .personel-cagri-katman { align-items:center } }
 .sepet-btn { position: relative; }
 .sepet-badge {
   position: absolute;

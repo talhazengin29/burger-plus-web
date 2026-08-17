@@ -154,12 +154,31 @@
   color: #fecaca;
   font-size: 13px;
 }
-.nakit-masa-paneli, .nakit-siparis-paneli { padding: 24px 24px 0; }
+.nakit-masa-paneli, .nakit-siparis-paneli, .personel-cagri-paneli { padding: 24px 24px 0; }
 .salon-bolum-baslik { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 13px; }
 .salon-bolum-baslik div { min-width: 0; }
 .salon-bolum-baslik small { color: var(--primary); font-size: 10px; font-weight: 800; }
 .salon-bolum-baslik h2 { margin: 2px 0 0; color: var(--metin); font-size: 19px; }
 .salon-bolum-baslik > span { color: var(--metin-soluk); font-size: 12px; }
+.personel-cagri-paneli { padding-bottom:20px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,108,0,.05),transparent) }
+.personel-cagri-paneli--aktif { background:linear-gradient(180deg,rgba(245,158,11,.1),transparent) }
+.personel-cagri-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px }
+.personel-cagri-karti { padding:16px;border:1px solid rgba(245,158,11,.55);border-radius:var(--r-md);background:var(--panel);box-shadow:inset 3px 0 0 var(--uyari) }
+.personel-cagri-karti--goruldu { border-color:rgba(16,185,129,.5);box-shadow:inset 3px 0 0 var(--basari) }
+.personel-cagri-karti header { display:flex;justify-content:space-between;gap:10px }
+.personel-cagri-karti header>div { display:flex;align-items:baseline;gap:8px }
+.personel-cagri-karti header strong { color:var(--metin);font-size:20px }
+.personel-cagri-karti header span { color:var(--metin-soluk);font-size:11px }
+.personel-cagri-karti header em { color:var(--uyari);font-size:10px;font-style:normal;font-weight:800;text-transform:uppercase }
+.personel-cagri-karti--goruldu header em { color:var(--basari) }
+.personel-cagri-karti h3 { margin:16px 0 4px;color:var(--metin);font-size:16px }
+.personel-cagri-karti p { margin:0 0 14px;color:var(--metin-soluk);font-size:12px }
+.personel-cagri-butonlar { display:flex;flex-wrap:wrap;gap:7px }
+.personel-cagri-butonlar button { min-height:37px;flex:1;padding:8px 10px;border-radius:var(--r-sm);background:var(--primary);color:#160b03;font-size:11px;font-weight:800;white-space:nowrap }
+.personel-cagri-butonlar button:nth-child(2) { background:var(--basari);color:#07140f }
+.personel-cagri-butonlar .masada-yok { flex:0 0 100%;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.11);color:#fca5a5 }
+.personel-cagri-butonlar button:disabled { opacity:.5;cursor:wait }
+.personel-cagri-bos { margin:0;padding:18px;border:1px dashed var(--border);border-radius:var(--r-md);color:var(--metin-soluk);font-size:13px;text-align:center }
 
 .nakit-masa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .nakit-masa-karti {
@@ -214,7 +233,8 @@
 @media (max-width: 640px) {
   .salon-header { padding: 14px 16px; }
   .salon-header-sag { gap: 9px; }
-  .nakit-masa-paneli, .nakit-siparis-paneli { padding: 18px 16px 0; }
+  .nakit-masa-paneli, .nakit-siparis-paneli, .personel-cagri-paneli { padding: 18px 16px 0; }
+  .personel-cagri-paneli { padding-bottom:18px }
   .nakit-masa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nakit-siparis-liste { grid-template-columns: 1fr; }
   .salon-liste { padding: 18px 16px; grid-template-columns: 1fr; }

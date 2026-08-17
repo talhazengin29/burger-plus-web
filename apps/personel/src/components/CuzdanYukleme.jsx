@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { kasaCuzdanMusteriAra, kasaCuzdanSonYuklemeler, kasaCuzdanYukle } from "../lib/adminApi";
 import { socket } from "../lib/socket";
+import { yuzdeTutariniHesapla } from "../lib/yuzde";
 import "./CuzdanYukleme.css";
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -43,7 +44,7 @@ export default function CuzdanYukleme() {
   }, [arama, secili]);
 
   const sayisalTutar = Number(String(tutar).replace(",", ".")) || 0;
-  const bonus = useMemo(() => ayar?.bonusAktif ? Math.round(sayisalTutar * Number(ayar.bonusYuzde || 0) * 100) / 100 : 0, [ayar, sayisalTutar]);
+  const bonus = useMemo(() => ayar?.bonusAktif ? yuzdeTutariniHesapla(sayisalTutar, ayar.bonusYuzde) : 0, [ayar, sayisalTutar]);
   const toplam = sayisalTutar + bonus;
   const tutarUygun = sayisalTutar >= Number(ayar?.minYukleme || 0) && sayisalTutar <= Number(ayar?.maxYukleme || Infinity);
 

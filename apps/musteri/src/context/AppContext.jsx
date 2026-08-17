@@ -19,6 +19,7 @@ import {
   beniGetir, tokeniAl, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
   sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
   damgaKartiAyariniGetir, istekAt, tenantDepoAnahtari,
+  masaCagriOturumuAc, masaPersonelCagrisiniGetir, masaPersonelCagrisiOlustur,
 } from "../lib/authApi";
 
 const AppContext = createContext(null);
@@ -283,6 +284,10 @@ export function AppProvider({ children }) {
     () => localStorage.getItem(tenantDepoAnahtari("bp_ozetMasaTokeni", isletmeSlug)) || null
   );
   const [masaOzeti, setMasaOzeti] = useState({ kalemler: [], toplam: 0 });
+  const [personelCagrisi, setPersonelCagrisi] = useState(null);
+  const [personelCagriOturumu, setPersonelCagriOturumu] = useState(null);
+  const [personelCagriYukleniyor, setPersonelCagriYukleniyor] = useState(false);
+  const [personelCagriHatasi, setPersonelCagriHatasi] = useState("");
 
   // Masadaki siparişlerin canlı durumu (mutfak güncelledikçe değişir).
   // Tüm kalemler "hazir" ise → hazır; biri hazırlanıyorsa → hazırlanıyor; yoksa → yeni.
@@ -322,6 +327,86 @@ export function AppProvider({ children }) {
       socket.off("connect", masayaKatil);
     };
   }, [ozetMasaNo, ozetMasaTokeni]);
+
+  // Statik QR tokeni yalnızca kısa ömürlü çağrı oturumu açar. Çağrılarda bu
+  // ayrı token kullanılır; personel "masada yok" derse backend cihazı engeller.
+  useEffect(() => {
+    if (!ozetMasaNo || !ozetMasaTokeni) {
+      setPersonelCagriOturumu(null);
+      setPersonelCagrisi(null);
+      setPersonelCagriHatasi("");
+      return undefined;
+    }
+    let iptal = false;
+    let yenilemeZamanlayicisi;
+    const cihazAnahtari = depoAnahtari("bp_cagri_cihaz");
+    let cihazId = localStorage.getItem(cihazAnahtari);
+    if (!cihazId) {
+      cihazId = crypto.randomUUID();
+      localStorage.setItem(cihazAnahtari, cihazId);
+    }
+    const oturumAnahtari = depoAnahtari(`bp_cagri_oturum_${ozetMasaNo}`);
+    const bitisAnahtari = `${oturumAnahtari}_bitis`;
+
+    const yeniOturumAc = async () => {
+      const oturum = await masaCagriOturumuAc(ozetMasaNo, ozetMasaTokeni, cihazId);
+      sessionStorage.setItem(oturumAnahtari, oturum.token);
+      sessionStorage.setItem(bitisAnahtari, String(new Date(oturum.bitis).getTime()));
+      return oturum.token;
+    };
+
+    const yukle = async () => {
+      setPersonelCagriYukleniyor(true);
+      setPersonelCagriHatasi("");
+      try {
+        let token = sessionStorage.getItem(oturumAnahtari);
+        const bitis = Number(sessionStorage.getItem(bitisAnahtari) || 0);
+        if (!token || bitis < Date.now() + 30_000) token = await yeniOturumAc();
+        let cagri;
+        try {
+          cagri = await masaPersonelCagrisiniGetir(ozetMasaNo, token);
+        } catch (e) {
+          if (e.status !== 403) throw e;
+          sessionStorage.removeItem(oturumAnahtari);
+          sessionStorage.removeItem(bitisAnahtari);
+          token = await yeniOturumAc();
+          cagri = await masaPersonelCagrisiniGetir(ozetMasaNo, token);
+        }
+        if (!iptal) {
+          setPersonelCagriOturumu(token);
+          setPersonelCagrisi(cagri);
+          clearTimeout(yenilemeZamanlayicisi);
+          const kalanSure = Number(sessionStorage.getItem(bitisAnahtari)) - Date.now() - 30_000;
+          yenilemeZamanlayicisi = setTimeout(yukle, Math.max(30_000, kalanSure));
+        }
+      } catch (e) {
+        sessionStorage.removeItem(oturumAnahtari);
+        sessionStorage.removeItem(bitisAnahtari);
+        if (!iptal) setPersonelCagriHatasi(e.message || "Personel çağrı özelliği hazırlanamadı.");
+      } finally { if (!iptal) setPersonelCagriYukleniyor(false); }
+    };
+    yukle();
+
+    const cagrisiGuncellendi = (cagri) => {
+      if (String(cagri?.masaNo) === String(ozetMasaNo)) setPersonelCagrisi(cagri);
+    };
+    socket.on("personel-cagrisi-guncellendi", cagrisiGuncellendi);
+    return () => { iptal = true; clearTimeout(yenilemeZamanlayicisi); socket.off("personel-cagrisi-guncellendi", cagrisiGuncellendi); };
+  }, [ozetMasaNo, ozetMasaTokeni, depoAnahtari]);
+
+  const personelCagir = useCallback(async (neden) => {
+    if (!ozetMasaNo || !personelCagriOturumu) throw new Error("Masa çağrı oturumu henüz hazır değil.");
+    setPersonelCagriYukleniyor(true);
+    setPersonelCagriHatasi("");
+    try {
+      const cagri = await masaPersonelCagrisiOlustur(ozetMasaNo, personelCagriOturumu, neden, crypto.randomUUID());
+      setPersonelCagrisi(cagri);
+      return cagri;
+    } catch (e) {
+      setPersonelCagriHatasi(e.message || "Personel çağrılamadı.");
+      throw e;
+    } finally { setPersonelCagriYukleniyor(false); }
+  }, [ozetMasaNo, personelCagriOturumu]);
 
   // --- Kampanyalar (saatli/sürekli indirimler) ---
   // Dakikada bir tazelenen saat — saatli kampanyaların (örn. 14:00-17:00
@@ -527,7 +612,11 @@ export function AppProvider({ children }) {
         setOzetMasaTokeni(null);
         localStorage.removeItem(depoAnahtari("bp_ozetMasa"));
         localStorage.removeItem(depoAnahtari("bp_ozetMasaTokeni"));
+        sessionStorage.removeItem(depoAnahtari(`bp_cagri_oturum_${masaNo}`));
+        sessionStorage.removeItem(`${depoAnahtari(`bp_cagri_oturum_${masaNo}`)}_bitis`);
         setMasaOzeti({ kalemler: [], toplam: 0 });
+        setPersonelCagriOturumu(null);
+        setPersonelCagrisi(null);
       }
     };
     socket.on("masa-kapandi", kapandi);
@@ -609,6 +698,11 @@ export function AppProvider({ children }) {
     ozetMasaNo,
     ozetMasaTokeni,
     masaDurumu,
+    personelCagrisi,
+    personelCagriHazir: Boolean(ozetMasaNo && personelCagriOturumu),
+    personelCagriYukleniyor,
+    personelCagriHatasi,
+    personelCagir,
     // aktif masa (QR ile gelen)
     aktifMasa,
     aktifMasaTokeni,
