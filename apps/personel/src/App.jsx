@@ -6,6 +6,7 @@ import Kitchen from "./screens/Kitchen";
 import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
 import CuzdanYukleme from "./components/CuzdanYukleme";
+import Rezervasyonlar from "./screens/Rezervasyonlar";
 import { adminToken, erisimTokeniniCoz, personelOturumunuDogrula } from "./lib/adminApi";
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
@@ -72,7 +73,7 @@ function PersonelPaneli() {
           sessionStorage.setItem(oturumAnahtari, ekran);
           setRol(ekran);
           setImpersonation(kullanici.impersonation || null);
-          setAktifSekme(window.location.pathname.includes("cuzdan-yukleme") ? "cuzdan" : window.location.pathname.includes("salon") ? "salon" : ekran === "admin" ? "mutfak" : ekran);
+          setAktifSekme(window.location.pathname.includes("rezervasyonlar") ? "rezervasyon" : window.location.pathname.includes("cuzdan-yukleme") ? "cuzdan" : window.location.pathname.includes("salon") ? "salon" : ekran === "admin" ? "mutfak" : ekran);
           personelSocketiniBagla();
         } else {
           sessionStorage.removeItem(oturumAnahtari);
@@ -161,6 +162,14 @@ function PersonelPaneli() {
         )}
         {(rol === "salon" || rol === "admin") && (
         <button
+          className={"sekme " + (aktifSekme === "rezervasyon" ? "sekme--aktif" : "")}
+          onClick={() => { setAktifSekme("rezervasyon"); git("/rezervasyonlar"); }}
+        >
+          <span className="sekme-ikon">R</span>Rezervasyonlar
+        </button>
+        )}
+        {(rol === "salon" || rol === "admin") && (
+        <button
           className={"sekme " + (aktifSekme === "salon" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("salon"); git("/salon"); }}
         >
@@ -180,7 +189,7 @@ function PersonelPaneli() {
       </nav>
 
       <div className="sekme-icerik">
-        {aktifSekme === "mutfak" ? <Kitchen /> : aktifSekme === "cuzdan" ? <div className="cuzdan-sekme-ekrani"><CuzdanYukleme /></div> : <Salon />}
+        {aktifSekme === "mutfak" ? <Kitchen /> : aktifSekme === "cuzdan" ? <div className="cuzdan-sekme-ekrani"><CuzdanYukleme /></div> : aktifSekme === "rezervasyon" ? <Rezervasyonlar /> : <Salon />}
       </div>
     </div>
   );

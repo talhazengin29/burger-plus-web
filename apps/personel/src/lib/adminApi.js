@@ -79,6 +79,25 @@ export const personelCagrisiGuncelle = async (id, durum) => (await personelCagri
   method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ durum }),
 })).cagri;
 
+async function rezervasyonIstegi(yol = "", secenekler = {}) {
+  const r = await istekAt(`/api/personel/rezervasyonlar${yol}`, secenekler);
+  if (r.status === 204) return null;
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Rezervasyon işlemi tamamlanamadı.");
+  return veri;
+}
+export const rezervasyonlariGetir = async (filtre = {}) => {
+  const q = new URLSearchParams(Object.entries(filtre).filter(([, deger]) => deger));
+  return (await rezervasyonIstegi(q.size ? `?${q}` : "")).rezervasyonlar || [];
+};
+export const rezervasyonKaydet = async (veri) => (await rezervasyonIstegi(veri.id ? `/${encodeURIComponent(veri.id)}` : "", {
+  method: veri.id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri),
+})).rezervasyon;
+export const rezervasyonDurumuGuncelle = async (id, durum) => (await rezervasyonIstegi(`/${encodeURIComponent(id)}`, {
+  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ durum }),
+})).rezervasyon;
+export const rezervasyonSil = async (id) => rezervasyonIstegi(`/${encodeURIComponent(id)}`, { method: "DELETE" });
+
 async function kasaCuzdanIstegi(yol, secenekler = {}) {
   const r = await istekAt(`/api/kasa/cuzdan${yol}`, secenekler);
   const veri = await jsonOku(r);
