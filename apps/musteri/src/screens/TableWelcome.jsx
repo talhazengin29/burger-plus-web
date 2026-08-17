@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { usePerde } from "../hooks/usePerde";
+import { useDil } from "../context/DilContext";
+import DilSecici from "../components/DilSecici";
 import "./TableWelcome.css";
 
 /*
@@ -20,6 +22,7 @@ export default function TableWelcome() {
   const { aktifMasa, aktifMasaTokeni, setAktifMasa, setMisafir } = useApp();
   const masaToken = qrMasaTokeni || (String(aktifMasa) === String(masaNo) ? aktifMasaTokeni : null);
   const { perdeIleGit } = usePerde();
+  const { t } = useDil();
 
   // Masa numarasını hemen kaydet
   useEffect(() => {
@@ -38,11 +41,12 @@ export default function TableWelcome() {
   if (!masaNo || !masaToken) {
     return (
       <div className="ekran table-welcome">
+        <DilSecici className="tw-dil-secici" />
         <div className="tw-icerik">
           <span className="tw-emoji">❓</span>
-          <h1 className="tw-baslik">Geçersiz QR</h1>
-          <p className="tw-alt">Masadaki QR kodu tekrar okutmayı dene.</p>
-          <button className="tw-btn" onClick={() => git("/anasayfa")}>Ana Sayfaya Git</button>
+          <h1 className="tw-baslik">{t("table.invalid", "Geçersiz QR")}</h1>
+          <p className="tw-alt">{t("table.invalidHelp", "Masadaki QR kodu tekrar okutmayı dene.")}</p>
+          <button className="tw-btn" onClick={() => git("/anasayfa")}>{t("table.home", "Ana Sayfaya Git")}</button>
         </div>
       </div>
     );
@@ -60,29 +64,29 @@ export default function TableWelcome() {
 
   return (
     <div className="ekran table-welcome">
+      <DilSecici className="tw-dil-secici" />
       <div className="tw-icerik">
         <div className="tw-masa-daire">
           <span className="tw-masa-no">{masaNo}</span>
         </div>
-        <span className="tw-hosgeldin-etiket">MASA {masaNo}</span>
-        <h1 className="tw-baslik">Hoş Geldin! 👋</h1>
+        <span className="tw-hosgeldin-etiket">{t("table.label", `MASA ${masaNo}`, { table: masaNo })}</span>
+        <h1 className="tw-baslik">{t("table.welcome", "Hoş Geldin! 👋")}</h1>
         <p className="tw-alt">
-          Nasıl devam etmek istersin? Üyeysen giriş yap, puan kazanmaya
-          devam et. İlk kez geldiysen misafir olarak hemen sipariş verebilirsin.
+          {t("table.help", "Nasıl devam etmek istersin? Üyeysen giriş yap, puan kazanmaya devam et. İlk kez geldiysen misafir olarak hemen sipariş verebilirsin.")}
         </p>
 
         <div className="tw-butonlar">
           <button className="tw-btn tw-btn--uye" onClick={girisYap}>
-            Giriş Yap
-            <span className="tw-btn-alt">Üyeyim, puan kazanayım</span>
+            {t("table.signIn", "Giriş Yap")}
+            <span className="tw-btn-alt">{t("table.signInSub", "Üyeyim, puan kazanayım")}</span>
           </button>
           <button className="tw-btn tw-btn--misafir" onClick={misafirDevam}>
-            Misafir Olarak Devam Et
-            <span className="tw-btn-alt">Üye olmadan sipariş ver</span>
+            {t("table.guest", "Misafir Olarak Devam Et")}
+            <span className="tw-btn-alt">{t("table.guestSub", "Üye olmadan sipariş ver")}</span>
           </button>
         </div>
 
-        <p className="tw-not">Siparişin Masa {masaNo}'ye servis edilecek</p>
+        <p className="tw-not">{t("table.note", `Siparişin Masa ${masaNo}'ye servis edilecek`, { table: masaNo })}</p>
       </div>
     </div>
   );

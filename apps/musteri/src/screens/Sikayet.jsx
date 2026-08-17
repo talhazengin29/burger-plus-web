@@ -72,7 +72,10 @@ export default function Sikayet() {
 
         <form className="sikayet-form" onSubmit={gonder}>
           <div className="sikayet-form-ust"><span><IconChat /></span><div><b>Yeni başvuru</b><small>Açıklayıcı bilgi çözüm süresini hızlandırır.</small></div></div>
-          <label>Kategori<select value={form.kategori} onChange={(e) => setForm({ ...form, kategori: e.target.value })}>{KATEGORILER.map(([id, ad]) => <option value={id} key={id}>{ad}</option>)}</select></label>
+          <fieldset className="sikayet-kategori-secimi">
+            <legend>Kategori</legend>
+            <div>{KATEGORILER.map(([id, ad]) => <button type="button" className={form.kategori === id ? "aktif" : ""} aria-pressed={form.kategori === id} onClick={() => setForm({ ...form, kategori: id })} key={id}>{ad}</button>)}</div>
+          </fieldset>
           <label>Konu<input required maxLength="120" value={form.baslik} onChange={(e) => setForm({ ...form, baslik: e.target.value })} placeholder="Kısaca ne oldu?" /></label>
           <label>Açıklama<textarea required minLength="20" maxLength="3000" value={form.aciklama} onChange={(e) => setForm({ ...form, aciklama: e.target.value })} placeholder="Tarih, masa veya sipariş bilgisiyle birlikte yaşadığınız durumu anlatın." /><small>{form.aciklama.length}/3000</small></label>
           <label className={`sikayet-gorsel-sec${onizleme ? " dolu" : ""}`}>

@@ -29,7 +29,7 @@
   backdrop-filter: var(--glass-blur);
   position: sticky;
   top: 0;
-  z-index: 5;
+  z-index: 50;
   border-bottom: 1px solid var(--glass-border);
 }
 .brand { display: flex; align-items: center; gap: 8px; }
@@ -77,6 +77,8 @@
 }
 
 .home-header-sag { display: flex; align-items: center; gap: 6px; }
+.header-dil-secici .dil-secici-tetik { width:36px;padding:0;justify-content:center }
+.header-dil-secici .dil-secici-tetik b { display:none }
 /* 44×44 dokunma hedefi — ikonun kendisi 24px, alan büyük */
 .ikon-btn {
   color: #fff;

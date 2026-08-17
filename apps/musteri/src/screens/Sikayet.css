@@ -12,6 +12,11 @@
 .sikayet-form-ust div { display:flex;flex-direction:column;gap:2px }
 .sikayet-form-ust b { color:var(--on-surface);font-size:16px }
 .sikayet-form-ust small { color:var(--on-surface-variant);font-size:11px }
+.sikayet-kategori-secimi { min-width:0;margin:13px 0 0;padding:0;border:0 }
+.sikayet-kategori-secimi legend { margin-bottom:7px;color:var(--on-surface-variant);font-size:11px;font-weight:700 }
+.sikayet-kategori-secimi>div { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px }
+.sikayet-kategori-secimi button { min-width:0;padding:10px 5px;border:1px solid var(--glass-border);border-radius:11px;background:var(--bg-card);color:var(--on-surface-variant);font-size:10px;font-weight:700;transition:border-color .15s,background .15s,color .15s }
+.sikayet-kategori-secimi button.aktif { border-color:color-mix(in srgb,var(--primary-container) 55%,transparent);background:var(--primary-fixed);color:var(--primary-container);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--primary-container) 18%,transparent) }
 .sikayet-form>label:not(.sikayet-gorsel-sec) { position:relative;display:block;margin-top:13px;color:var(--on-surface-variant);font-size:11px;font-weight:700 }
 .sikayet-form input,.sikayet-form select,.sikayet-form textarea { width:100%;margin-top:6px;padding:13px 14px;border:1px solid var(--glass-border);border-radius:13px;background:var(--bg-card);color:var(--on-surface);font:inherit;outline:none }
 .sikayet-form input:focus,.sikayet-form select:focus,.sikayet-form textarea:focus { border-color:var(--primary-container) }
@@ -44,3 +49,4 @@
 .sikayet-gecmis-kart.reddedildi>footer b { color:var(--outline) }
 .sikayet-gecmis-kart>footer small { color:var(--on-surface-variant);font-size:9px }
 .sikayet-bos { padding:24px 14px;border:1px dashed var(--glass-border);border-radius:15px;color:var(--on-surface-variant);font-size:12px;text-align:center }
+@media (max-width:370px) { .sikayet-kategori-secimi>div { grid-template-columns:repeat(2,minmax(0,1fr)) } }
