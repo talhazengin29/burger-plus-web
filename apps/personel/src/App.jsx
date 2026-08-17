@@ -146,12 +146,17 @@ function PersonelPaneli() {
   return (
     <div className="personel">
       <nav className="sekme-bar">
+        <div className="personel-kimlik">
+          <span className="personel-kimlik-ikon">{String(isletme?.ad || "İ").slice(0, 1).toUpperCase()}</span>
+          <div><strong>{isletme?.ad || "İşletme"}</strong><small>Personel merkezi</small></div>
+        </div>
+        <div className="sekme-grup">
         {(rol === "mutfak" || rol === "admin") && (
         <button
           className={"sekme " + (aktifSekme === "mutfak" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("mutfak"); git("/mutfak"); }}
         >
-          🍳 Mutfak
+          <span className="sekme-ikon">M</span>Mutfak
         </button>
         )}
         {(rol === "salon" || rol === "admin") && (
@@ -159,7 +164,7 @@ function PersonelPaneli() {
           className={"sekme " + (aktifSekme === "salon" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("salon"); git("/salon"); }}
         >
-          🍽️ Salon
+          <span className="sekme-ikon">S</span>Salon
         </button>
         )}
         {(rol === "salon" || rol === "admin") && (
@@ -167,10 +172,11 @@ function PersonelPaneli() {
           className={"sekme " + (aktifSekme === "cuzdan" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("cuzdan"); git("/cuzdan-yukleme"); }}
         >
-          💳 Cüzdan Yükleme
+          <span className="sekme-ikon">₺</span>Cüzdan yükleme
         </button>
         )}
-        <button className="sekme-cikis" onClick={cikis}>Çıkış</button>
+        </div>
+        <button className="sekme-cikis" onClick={cikis}><span>↗</span>Çıkış</button>
       </nav>
 
       <div className="sekme-icerik">
