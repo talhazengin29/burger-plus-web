@@ -125,7 +125,7 @@
 @media(max-width:680px){.oneri-secim-listesi{grid-template-columns:1fr;max-height:230px}}
 
 /* Operasyon merkezi: canlı kayıtlar, filtreler ve revizyon zaman çizgisi */
-.admin-sidebar nav{min-height:0;overflow-y:auto;padding-right:3px;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--primary) 33.3%,transparent) transparent}
+.admin-sidebar nav{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding-right:3px;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--primary) 33.3%,transparent) transparent}
 .admin-sidebar nav::-webkit-scrollbar{width:4px}.admin-sidebar nav::-webkit-scrollbar-thumb{border-radius:99px;background:color-mix(in srgb,var(--primary) 33.3%,transparent)}
 .admin-canli-toast{position:fixed;z-index:110;right:24px;top:104px;display:flex;align-items:center;gap:11px;min-width:260px;padding:13px 16px;border:1px solid #10b98155;border-radius:12px;background:color-mix(in srgb,var(--panel) 94%,#10b981);box-shadow:0 18px 45px #0008;color:var(--metin)}
 .admin-canli-toast>i{width:10px;height:10px;flex:none;border-radius:50%;background:var(--basari);box-shadow:0 0 0 6px #10b98116,0 0 16px #10b981aa;animation:canli-nabiz 1.3s ease-in-out infinite}.admin-canli-toast div{display:flex;flex-direction:column;gap:2px}.admin-canli-toast b{font-size:11px}.admin-canli-toast span{color:var(--metin-soluk);font-size:9px}
@@ -159,7 +159,7 @@
 .admin-menu-grup.acik>.admin-menu-grup-baslik>i{transform:rotate(180deg)}
 .admin-menu-grup.secili>.admin-menu-grup-baslik{color:var(--primary)}
 .admin-menu-alt{display:grid;max-height:0;overflow:hidden;opacity:0;transition:max-height .24s ease,opacity .18s,padding .18s}
-.admin-menu-grup.acik>.admin-menu-alt{max-height:240px;opacity:1;padding:0 6px 7px}
+.admin-menu-grup.acik>.admin-menu-alt{max-height:520px;opacity:1;padding:0 6px 7px}
 .admin-menu-alt>button{min-height:38px;margin-top:3px;padding:9px 10px!important;border-radius:8px!important;font-size:9px!important}
 .admin-menu-alt>button b{width:18px!important;font-size:13px!important}
 .admin-menu-alt>button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
