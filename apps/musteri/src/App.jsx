@@ -19,6 +19,7 @@ import ProfilDuzenle from "./screens/ProfilDuzenle";
 import UrunDetay from "./screens/UrunDetay";
 import Hediyelerim from "./screens/Hediyelerim";
 import Wallet from "./screens/Wallet";
+import Sikayet from "./screens/Sikayet";
 import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { IsletmeSarici } from "./context/IsletmeContext";
@@ -71,6 +72,7 @@ export default function App() {
               <Route path="profil-duzenle" element={<Korumali><ProfilDuzenle /></Korumali>} />
               <Route path="hediyelerim" element={<Korumali><Hediyelerim /></Korumali>} />
               <Route path="cuzdanim" element={<Korumali><Wallet /></Korumali>} />
+              <Route path="sikayet" element={<Korumali><Sikayet /></Korumali>} />
               <Route path="sepet" element={<Korumali><Cart /></Korumali>} />
               <Route path="qr" element={<Korumali><QrScan /></Korumali>} />
               <Route path="odeme" element={<Korumali><Payment /></Korumali>} />

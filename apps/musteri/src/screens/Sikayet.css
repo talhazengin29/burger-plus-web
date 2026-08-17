@@ -1,0 +1,46 @@
+.sikayet-sayfasi { padding-bottom:36px }
+.sikayet-baslik { display:flex;align-items:flex-start;gap:12px;margin:12px 0 20px }
+.sikayet-baslik>button { width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--glass-border);border-radius:50%;background:var(--glass-bg);color:var(--on-surface) }
+.sikayet-baslik>button svg { width:20px }
+.sikayet-baslik small,.sikayet-gecmis>header small { color:var(--primary-container);font-size:9px;font-weight:800;letter-spacing:.1em }
+.sikayet-baslik h1 { margin:3px 0 4px;color:var(--on-surface);font-family:var(--font-baslik);font-size:25px }
+.sikayet-baslik p { margin:0;color:var(--on-surface-variant);font-size:12px;line-height:1.4 }
+.sikayet-form { padding:18px;border:1px solid var(--glass-border-strong);border-radius:var(--r-xl);background:var(--glass-bg);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur) }
+.sikayet-form-ust { display:flex;align-items:center;gap:11px;margin-bottom:17px }
+.sikayet-form-ust>span { width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:var(--primary-fixed);color:var(--primary-container) }
+.sikayet-form-ust svg { width:21px }
+.sikayet-form-ust div { display:flex;flex-direction:column;gap:2px }
+.sikayet-form-ust b { color:var(--on-surface);font-size:16px }
+.sikayet-form-ust small { color:var(--on-surface-variant);font-size:11px }
+.sikayet-form>label:not(.sikayet-gorsel-sec) { position:relative;display:block;margin-top:13px;color:var(--on-surface-variant);font-size:11px;font-weight:700 }
+.sikayet-form input,.sikayet-form select,.sikayet-form textarea { width:100%;margin-top:6px;padding:13px 14px;border:1px solid var(--glass-border);border-radius:13px;background:var(--bg-card);color:var(--on-surface);font:inherit;outline:none }
+.sikayet-form input:focus,.sikayet-form select:focus,.sikayet-form textarea:focus { border-color:var(--primary-container) }
+.sikayet-form textarea { min-height:125px;resize:vertical;line-height:1.45 }
+.sikayet-form>label>small { position:absolute;right:9px;bottom:8px;color:var(--outline);font-size:9px }
+.sikayet-gorsel-sec { display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px;border:1px dashed var(--glass-border-strong);border-radius:14px;background:var(--bg-card);cursor:pointer }
+.sikayet-gorsel-sec>input { display:none }
+.sikayet-gorsel-sec>span,.sikayet-gorsel-sec>img { width:54px;height:54px;display:grid;place-items:center;flex:0 0 auto;border-radius:11px;background:var(--primary-fixed);color:var(--primary-container);font-size:23px;object-fit:cover }
+.sikayet-gorsel-sec>div { min-width:0;display:flex;flex-direction:column;gap:3px }
+.sikayet-gorsel-sec b { overflow:hidden;color:var(--on-surface);font-size:12px;text-overflow:ellipsis;white-space:nowrap }
+.sikayet-gorsel-sec small { color:var(--on-surface-variant);font-size:9px;line-height:1.4 }
+.sikayet-gorsel-kaldir { display:block;margin:7px 0 0 auto;color:#ff8b84;font-size:10px }
+.sikayet-mesaj { margin:12px 0 0;padding:11px;border-radius:11px;font-size:11px;line-height:1.4 }
+.sikayet-mesaj.hata { background:rgba(255,80,80,.12);color:#ff8b84 }
+.sikayet-mesaj.basarili { background:rgba(55,210,140,.12);color:#57dda2 }
+.sikayet-gonder { width:100%;margin-top:15px;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--primary-grad-start),var(--primary-grad-end));color:#fff;font-family:var(--font-baslik);font-size:14px;font-weight:800;box-shadow:var(--glow-sm) }
+.sikayet-gonder:disabled { opacity:.55;cursor:wait }
+.sikayet-gecmis { margin-top:25px }
+.sikayet-gecmis>header { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:11px }
+.sikayet-gecmis>header h2 { margin:3px 0 0;color:var(--on-surface);font-family:var(--font-baslik);font-size:20px }
+.sikayet-gecmis>header>span { min-width:27px;padding:5px 8px;border-radius:99px;background:var(--primary-fixed);color:var(--primary-container);font-size:11px;font-weight:800;text-align:center }
+.sikayet-gecmis-kart { margin-bottom:10px;padding:15px;border:1px solid var(--glass-border);border-radius:16px;background:var(--glass-bg) }
+.sikayet-gecmis-kart>header { display:flex;justify-content:space-between;color:var(--outline);font-size:9px;font-weight:700;text-transform:uppercase }
+.sikayet-gecmis-kart h3 { margin:9px 0 5px;color:var(--on-surface);font-size:15px }
+.sikayet-gecmis-kart>p { display:-webkit-box;margin:0;overflow:hidden;color:var(--on-surface-variant);font-size:11px;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:3 }
+.sikayet-gecmis-kart>img { width:100%;max-height:170px;margin-top:11px;border-radius:12px;object-fit:cover }
+.sikayet-gecmis-kart>footer { display:flex;flex-direction:column;gap:2px;margin-top:12px;padding-top:11px;border-top:1px solid var(--hairline) }
+.sikayet-gecmis-kart>footer b { color:var(--primary-container);font-size:11px }
+.sikayet-gecmis-kart.cozuldu>footer b { color:#57dda2 }
+.sikayet-gecmis-kart.reddedildi>footer b { color:var(--outline) }
+.sikayet-gecmis-kart>footer small { color:var(--on-surface-variant);font-size:9px }
+.sikayet-bos { padding:24px 14px;border:1px dashed var(--glass-border);border-radius:15px;color:var(--on-surface-variant);font-size:12px;text-align:center }

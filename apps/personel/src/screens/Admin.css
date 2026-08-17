@@ -281,3 +281,34 @@
 .cuzdan-admin-onizleme > div span { color: rgba(255,255,255,.66); font-size: 12px; }
 @media (max-width: 1050px) { .cuzdan-admin-yerlesim { grid-template-columns: 1fr; } .cuzdan-admin-onizleme { min-height: 330px; } }
 @media (max-width: 650px) { .cuzdan-admin-paneli { padding: 15px; } .cuzdan-admin-baslik, .cuzdan-admin-alt { align-items: flex-start; flex-direction: column; } .cuzdan-admin-grid { grid-template-columns: 1fr; } .cuzdan-admin-grid .admin-alan:last-child { grid-column: auto; } }
+.sikayet-yonetim-ozet { display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px }
+.sikayet-yonetim-ozet button { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--panel);color:var(--metin-soluk);text-align:left }
+.sikayet-yonetim-ozet button.aktif { border-color:rgba(255,108,0,.6);background:rgba(255,108,0,.1);color:var(--metin) }
+.sikayet-yonetim-ozet strong { color:var(--primary);font-size:21px }
+.sikayet-yonetim-liste { display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px }
+.sikayet-yonetim-kart { min-width:0;padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--panel);box-shadow:inset 3px 0 0 var(--uyari) }
+.sikayet-yonetim-kart.inceleniyor { box-shadow:inset 3px 0 0 #60a5fa }
+.sikayet-yonetim-kart.cozuldu { box-shadow:inset 3px 0 0 var(--basari) }
+.sikayet-yonetim-kart.reddedildi { opacity:.72;box-shadow:inset 3px 0 0 var(--metin-soluk) }
+.sikayet-yonetim-kart>header { display:flex;align-items:flex-start;justify-content:space-between;gap:16px }
+.sikayet-yonetim-kart>header div { min-width:0 }
+.sikayet-yonetim-kart>header span { color:var(--primary);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em }
+.sikayet-yonetim-kart>header h3 { margin:5px 0 0;color:var(--metin);font-size:18px;overflow-wrap:anywhere }
+.sikayet-yonetim-kart>header time { flex:0 0 auto;color:var(--metin-soluk);font-size:10px }
+.sikayet-yonetim-musteri { display:flex;align-items:center;gap:9px;margin:14px 0;padding:10px;border-radius:var(--r-sm);background:var(--panel-2) }
+.sikayet-yonetim-musteri>i { width:35px;height:35px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:rgba(255,108,0,.13);color:var(--primary);font-style:normal;font-size:11px;font-weight:800 }
+.sikayet-yonetim-musteri>span { min-width:0;display:flex;flex-direction:column;gap:2px }
+.sikayet-yonetim-musteri b { color:var(--metin);font-size:12px }
+.sikayet-yonetim-musteri small { overflow:hidden;color:var(--metin-soluk);font-size:10px;text-overflow:ellipsis;white-space:nowrap }
+.sikayet-yonetim-kart>p { margin:0;color:var(--metin);font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere }
+.sikayet-yonetim-gorsel { position:relative;display:block;margin-top:13px;overflow:hidden;border:1px solid var(--border);border-radius:var(--r-md) }
+.sikayet-yonetim-gorsel img { display:block;width:100%;height:190px;object-fit:cover }
+.sikayet-yonetim-gorsel span { position:absolute;right:8px;bottom:8px;padding:6px 9px;border-radius:8px;background:rgba(0,0,0,.72);color:#fff;font-size:9px;font-weight:700 }
+.sikayet-yonetim-islem { display:grid;grid-template-columns:140px 1fr;gap:10px;margin-top:15px;padding-top:15px;border-top:1px solid var(--border) }
+.sikayet-yonetim-islem label { color:var(--metin-soluk);font-size:10px;font-weight:700 }
+.sikayet-yonetim-islem select,.sikayet-yonetim-islem textarea { width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel-2);color:var(--metin);font:inherit;outline:none }
+.sikayet-yonetim-islem textarea { min-height:70px;resize:vertical }
+.sikayet-yonetim-islem>button { grid-column:1/-1;padding:11px;border-radius:var(--r-sm);background:var(--primary);color:#170c03;font-size:11px;font-weight:800 }
+.sikayet-yonetim-islem>button:disabled { opacity:.5;cursor:wait }
+@media (max-width:900px) { .sikayet-yonetim-ozet { grid-template-columns:repeat(2,1fr) }.sikayet-yonetim-liste { grid-template-columns:1fr } }
+@media (max-width:560px) { .sikayet-yonetim-islem { grid-template-columns:1fr }.sikayet-yonetim-islem>button { grid-column:auto } }

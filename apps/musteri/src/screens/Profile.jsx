@@ -3,7 +3,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import QRCode from "qrcode";
 import { useApp } from "../context/AppContext";
 import {
-  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift, IconWallet,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift, IconWallet, IconChat,
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
@@ -16,6 +16,7 @@ const menuSatirlari = [
   { ad: "Kişisel Bilgiler", Ikon: IconUser, yol: "/profil-duzenle" },
   { ad: "Hediyelerim", Ikon: IconGift, yol: "/hediyelerim" },
   { ad: "Sipariş Geçmişi", Ikon: IconReceipt, yol: "/siparislerim" },
+  { ad: "Şikayet ve Geri Bildirim", Ikon: IconChat, yol: "/sikayet" },
   { ad: "Yardım & Destek", Ikon: IconHelp, yol: null },
 ];
 

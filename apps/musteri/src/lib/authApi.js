@@ -184,6 +184,27 @@ export async function profilGuncelle(email, telefon) {
   }
 }
 
+export async function sikayetleriGetir() {
+  if (!tokeniAl()) return [];
+  return (await jsonIstegi("/api/sikayetlerim", {}, "Şikayetler alınamadı.")).sikayetler || [];
+}
+
+export async function sikayetGorseliYukle(dosya) {
+  const izinli = new Set(["image/png", "image/jpeg", "image/webp"]);
+  if (!dosya || !izinli.has(dosya.type)) throw new Error("PNG, JPG veya WebP formatında bir görsel seçin.");
+  if (dosya.size > 5 * 1024 * 1024) throw new Error("Görsel en fazla 5 MB olabilir.");
+  const yanit = await istekAt("/api/sikayet-gorseli", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
+  const veri = await jsonYanitiOku(yanit, "Görsel yüklenemedi.");
+  if (!yanit.ok) throw new Error(veri.hata || "Görsel yüklenemedi.");
+  return veri.gorselUrl;
+}
+
+export async function sikayetGonder(veri) {
+  return (await jsonIstegi("/api/sikayetler", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri),
+  }, "Şikayet gönderilemedi.")).sikayet;
+}
+
 export async function duyurulariGetir() {
   try { return (await jsonIstegi("/api/duyurular", {}, "Duyurular alınamadı.")).duyurular || []; }
   catch { return []; }

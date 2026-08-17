@@ -71,6 +71,10 @@ export const IconHelp = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3M12 17v.01" /></svg>
 );
 
+export const IconChat = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.5-5A8 8 0 1 1 21 15z" /><path d="M8 11h8M8 15h5" /></svg>
+);
+
 export const IconLogout = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg>
 );

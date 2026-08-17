@@ -40,6 +40,7 @@ const BOLUMLER = [
   ["oduller", "Puan Marketi", "★", "puan-marketi"],
   ["cuzdan", "Uygulama Cüzdanı", "₺", "cuzdan"],
   ["duyurular", "Duyurular", "●", "duyurular"],
+  ["sikayetler", "Şikayetler", "!", "sikayetler"],
   ["satislar", "Canlı Satışlar", "◉", "satislar"],
   ["gecmis-siparisler", "Geçmiş Siparişler", "◷", "gecmis-siparisler"],
   ["mutfak-kayitlari", "Mutfak Kayıtları", "◫", "mutfak-kayitlari"],
@@ -51,7 +52,7 @@ const BOLUMLER = [
 ];
 
 const MENU_GRUPLARI = [
-  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular"] },
+  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
   { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
@@ -68,6 +69,8 @@ const kategoriyeGoreUrunTipi = (kategori) => {
 };
 const tarihSaat = (d) => d ? new Date(d).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
 const kampanyaIkonu = (kampanya) => kampanya?.ikon || (String(kampanya?.etiket || "").includes(":") ? "🕒" : kampanya?.kod === "davet-et" || kampanya?.etiket === "Davet Et" ? "👥" : "🎓");
+const SIKAYET_DURUMLARI = { yeni: "Yeni", inceleniyor: "İnceleniyor", cozuldu: "Çözüldü", reddedildi: "Reddedildi" };
+const SIKAYET_KATEGORILERI = { siparis: "Sipariş", urun: "Ürün / Lezzet", personel: "Personel", odeme: "Ödeme", uygulama: "Uygulama", diger: "Diğer" };
 
 const GRAMAJ_KURALLARI = {
   "Burgerler": { etiket: "Köfte gramajı", birim: "gr", artisOrani: .25, miktarYuvarlama: 25, fiyatArtisOrani: .20, fiyatYuvarlama: 5 },
@@ -154,6 +157,9 @@ export default function Admin({ onCikis }) {
   const [musteriler, setMusteriler] = useState([]);
   const [personelKayitlari, setPersonelKayitlari] = useState({ vardiyalar: [], performans: [] });
   const [revizyonlar, setRevizyonlar] = useState([]);
+  const [sikayetler, setSikayetler] = useState([]);
+  const [sikayetFiltre, setSikayetFiltre] = useState("tumu");
+  const [sikayetIslemId, setSikayetIslemId] = useState(null);
   const [kayitFiltre, setKayitFiltre] = useState({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
   const [canliBildirim, setCanliBildirim] = useState("");
   const [yukleniyor, setYukleniyor] = useState(true);
@@ -184,7 +190,7 @@ export default function Admin({ onCikis }) {
       const istekler = [
         ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
         ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
-        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"], ["Damga kartı", "/sadakat-ayari"], ["Cüzdan", "/cuzdan-ayari"], ["Cüzdan raporu", "/cuzdan-raporu"],
+        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"], ["Damga kartı", "/sadakat-ayari"], ["Cüzdan", "/cuzdan-ayari"], ["Cüzdan raporu", "/cuzdan-raporu"], ["Şikayetler", "/sikayetler"],
       ];
       const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
       const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -195,7 +201,7 @@ export default function Admin({ onCikis }) {
         return;
       }
 
-      const [d, u, p, r, duy, k, kamp, od, sadakatAyari, cuzdanVerisi, cuzdanRaporVerisi] = sonuclar.map((sonuc) =>
+      const [d, u, p, r, duy, k, kamp, od, sadakatAyari, cuzdanVerisi, cuzdanRaporVerisi, sikayetVerisi] = sonuclar.map((sonuc) =>
         sonuc.status === "fulfilled" ? sonuc.value : null
       );
       if (d) setDashboard(d);
@@ -210,6 +216,7 @@ export default function Admin({ onCikis }) {
       if (sadakatAyari?.damgaKarti) setDamgaKarti({ ...BOS_DAMGA_KARTI, ...sadakatAyari.damgaKarti });
       if (cuzdanVerisi?.cuzdanAyari) setCuzdanAyari({ ...BOS_CUZDAN_AYARI, ...cuzdanVerisi.cuzdanAyari });
       if (cuzdanRaporVerisi?.cuzdanRaporu) setCuzdanRaporu(cuzdanRaporVerisi.cuzdanRaporu);
+      if (sikayetVerisi) setSikayetler(sikayetVerisi.sikayetler || []);
 
       const hatalar = sonuclar.flatMap((sonuc, index) =>
         sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -247,15 +254,18 @@ export default function Admin({ onCikis }) {
         adminIstek("/kayitlar/mutfak?limit=200").then((veri) => setMutfakKayitlari(veri.kayitlar || [])),
       ]);
     };
+    const sikayetlerGuncellendi = () => adminIstek("/sikayetler").then((veri) => setSikayetler(veri.sikayetler || [])).catch(() => {});
     yonetimeKatil();
     socket.on("connect", yonetimeKatil);
     socket.on("yonetim-satis-guncellendi", satisGeldi);
     socket.on("yonetim-satislar", satislarGeldi);
     socket.on("yonetim-operasyon-guncellendi", operasyonGuncellendi);
+    socket.on("sikayetler-guncellendi", sikayetlerGuncellendi);
     return () => {
       socket.off("yonetim-satis-guncellendi", satisGeldi);
       socket.off("yonetim-satislar", satislarGeldi);
       socket.off("yonetim-operasyon-guncellendi", operasyonGuncellendi);
+      socket.off("sikayetler-guncellendi", sikayetlerGuncellendi);
       socket.off("connect", yonetimeKatil);
     };
   }, []);
@@ -297,6 +307,17 @@ export default function Admin({ onCikis }) {
     setHata("");
     try { await fn(); setBildirim(mesaj); await verileriYukle(); return true; }
     catch (err) { setHata(err.message); return false; }
+  };
+
+  const sikayetAlaniniGuncelle = (id, alan, deger) => setSikayetler((onceki) => onceki.map((sikayet) => sikayet.id === id ? { ...sikayet, [alan]: deger } : sikayet));
+  const sikayetiKaydet = async (sikayet) => {
+    setSikayetIslemId(sikayet.id); setHata("");
+    try {
+      const veri = await adminIstek(`/sikayetler/${sikayet.id}`, jsonGonder("PATCH", { durum: sikayet.durum, yoneticiNotu: sikayet.yoneticiNotu || "" }));
+      setSikayetler((onceki) => onceki.map((kayit) => kayit.id === sikayet.id ? { ...kayit, ...veri.sikayet } : kayit));
+      setBildirim("Şikayet durumu güncellendi.");
+    } catch (err) { setHata(err.message); }
+    finally { setSikayetIslemId(null); }
   };
 
   const urunKaydet = async (e) => {
@@ -575,6 +596,7 @@ export default function Admin({ onCikis }) {
     "personel-kayitlari": personelKayitlari.vardiyalar.length,
     revizyonlar: revizyonlar.length,
   };
+  const filtreliSikayetler = sikayetFiltre === "tumu" ? sikayetler : sikayetler.filter((sikayet) => sikayet.durum === sikayetFiltre);
 
   return (
     <div className="admin-shell">
@@ -831,6 +853,31 @@ export default function Admin({ onCikis }) {
             {bolum === "duyurular" && <>
               <BolumBaslik baslik="Müşteri duyuruları" aciklama="Yayınlanan duyurular müşterilerin bildirim panelinde görünür." buton="+ Duyuru yayınla" onClick={() => setDuyuruForm({ ...BOS_DUYURU })} />
               <div className="duyuru-liste">{duyurular.length ? duyurular.map((duyuru) => <article key={duyuru.id} className={!duyuru.aktif ? "pasif" : ""}><span>DUYURU</span><h3>{duyuru.baslik}</h3><p>{duyuru.mesaj}</p><footer><small>{tarihSaat(duyuru.olusturma)}</small><b>{duyuru.hedef}</b><button type="button" className="tehlike" onClick={() => { if (window.confirm(`${duyuru.baslik} duyurusu yayından kaldırılsın mı?`)) islem(() => adminIstek(`/duyurular/${duyuru.id}`, { method: "DELETE" }), "Duyuru yayından kaldırıldı."); }}>Sil</button></footer></article>) : <Bos yazi="Henüz yayınlanmış duyuru yok." />}</div>
+            </>}
+
+            {bolum === "sikayetler" && <>
+              <BolumBaslik baslik="Müşteri şikayetleri" aciklama="Müşterilerin uygulamadan ilettiği başvuruları, ek görselleri ve çözüm durumunu yönetin." />
+              <section className="sikayet-yonetim-ozet">
+                {Object.entries(SIKAYET_DURUMLARI).map(([durum, etiket]) => <button type="button" className={sikayetFiltre === durum ? "aktif" : ""} key={durum} onClick={() => setSikayetFiltre(durum)}><span>{etiket}</span><strong>{sikayetler.filter((sikayet) => sikayet.durum === durum).length}</strong></button>)}
+                <button type="button" className={sikayetFiltre === "tumu" ? "aktif" : ""} onClick={() => setSikayetFiltre("tumu")}><span>Tümü</span><strong>{sikayetler.length}</strong></button>
+              </section>
+              <div className="sikayet-yonetim-liste">
+                {filtreliSikayetler.map((sikayet) => <article className={`sikayet-yonetim-kart ${sikayet.durum}`} key={sikayet.id}>
+                  <header>
+                    <div><span>{SIKAYET_KATEGORILERI[sikayet.kategori] || "Diğer"}</span><h3>{sikayet.baslik}</h3></div>
+                    <time>{tarihSaat(sikayet.olusturma)}</time>
+                  </header>
+                  <div className="sikayet-yonetim-musteri"><i>{sikayet.musteri?.ad?.split(" ").map((parca) => parca[0]).join("").slice(0, 2)}</i><span><b>{sikayet.musteri?.ad || "Müşteri"}</b><small>{sikayet.musteri?.email}{sikayet.musteri?.telefon ? ` · ${sikayet.musteri.telefon}` : ""}</small></span></div>
+                  <p>{sikayet.aciklama}</p>
+                  {sikayet.gorselUrl && <a className="sikayet-yonetim-gorsel" href={sikayet.gorselUrl} target="_blank" rel="noreferrer"><img src={sikayet.gorselUrl} alt="Müşterinin eklediği şikayet görseli" /><span>Görseli büyüt ↗</span></a>}
+                  <div className="sikayet-yonetim-islem">
+                    <label>Durum<select value={sikayet.durum} onChange={(e) => sikayetAlaniniGuncelle(sikayet.id, "durum", e.target.value)}>{Object.entries(SIKAYET_DURUMLARI).map(([deger, etiket]) => <option value={deger} key={deger}>{etiket}</option>)}</select></label>
+                    <label>Yönetici iç notu<textarea maxLength="1000" value={sikayet.yoneticiNotu || ""} onChange={(e) => sikayetAlaniniGuncelle(sikayet.id, "yoneticiNotu", e.target.value)} placeholder="İnceleme veya çözümle ilgili yalnızca yönetimin göreceği not…" /></label>
+                    <button type="button" disabled={sikayetIslemId === sikayet.id} onClick={() => sikayetiKaydet(sikayet)}>{sikayetIslemId === sikayet.id ? "Kaydediliyor…" : "Değişiklikleri Kaydet"}</button>
+                  </div>
+                </article>)}
+                {!filtreliSikayetler.length && <Bos yazi="Bu durumda müşteri şikayeti bulunmuyor." />}
+              </div>
             </>}
 
             {bolum === "satislar" && <>
