@@ -9,14 +9,13 @@ import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
 import { useTema } from "../context/TemaContext";
-import { useDil } from "../context/DilContext";
 import "./Home.css";
 
 // Arama çubuğundaki filtre düğmesinin sıralama seçenekleri
 const siralamalar = [
-  { id: "onerilen", anahtar: "home.sortRecommended", etiket: "Önerilen" },
-  { id: "artan", anahtar: "home.sortAsc", etiket: "Fiyat: Artan" },
-  { id: "azalan", anahtar: "home.sortDesc", etiket: "Fiyat: Azalan" },
+  { id: "onerilen", etiket: "Önerilen" },
+  { id: "artan", etiket: "Fiyat: Artan" },
+  { id: "azalan", etiket: "Fiyat: Azalan" },
 ];
 
 function sayfaYenilendiMi() {
@@ -26,7 +25,6 @@ function sayfaYenilendiMi() {
 
 export default function Home() {
   const { metinler } = useTema();
-  const { dil, t } = useDil();
   const location = useLocation();
   // Kampanyalar'dan "Sipariş Ver" ile gelinirse ilgili kategori otomatik seçili açılır.
   // Tarayıcı yenilemesinde history state geri gelse bile menü her zaman Tümü'nden başlar.
@@ -146,7 +144,7 @@ export default function Home() {
                   </span>
                 )}
               </span>
-              <span className="kategori-ad">{k === "Tümü" ? t("home.all", "Tümü") : k}</span>
+              <span className="kategori-ad">{k}</span>
             </motion.button>
             );
           })}
@@ -166,15 +164,15 @@ export default function Home() {
               type="search"
               value={arama}
               onChange={(e) => setArama(guvenliMetin(e.target.value, 80))}
-              placeholder={dil === "en" ? t("home.search", "Menüde ara...") : metinler.aramaPlaceholder}
-              aria-label={dil === "en" ? t("home.search", "Menüde ara...") : metinler.aramaPlaceholder}
+              placeholder={metinler.aramaPlaceholder}
+              aria-label={metinler.aramaPlaceholder}
               maxLength="80"
             />
             <motion.button
               type="button"
               className={"filtre-btn" + (filtreAcik ? " filtre-btn--acik" : "")}
               onClick={() => setFiltreAcik((v) => !v)}
-              aria-label={t("home.sort", "Sıralama seçenekleri")}
+              aria-label="Sıralama seçenekleri"
               aria-expanded={filtreAcik}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -204,7 +202,7 @@ export default function Home() {
                         setFiltreAcik(false);
                       }}
                     >
-                      {t(s.anahtar, s.etiket)}
+                      {s.etiket}
                     </button>
                   ))}
                 </motion.div>
@@ -215,7 +213,7 @@ export default function Home() {
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         {populerUrunler.length > 0 && <div className="bolum-satir">
-          <h3 className="bolum-baslik">{aktifKategori === "Tümü" ? (dil === "en" ? t("home.featured", "Popüler Ürünler") : metinler.urunBolumBaslik) : `${dil === "en" ? t("home.featured", "Popüler Ürünler") : metinler.urunBolumBaslik}: ${kategoriBasligi}`}</h3>
+          <h3 className="bolum-baslik">{aktifKategori === "Tümü" ? metinler.urunBolumBaslik : `${metinler.urunBolumBaslik}: ${kategoriBasligi}`}</h3>
         </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
@@ -236,7 +234,7 @@ export default function Home() {
 
         {digerUrunler.length > 0 && (
           <section className="diger-urunler">
-            <div className="bolum-satir diger-urunler-baslik"><h3 className="bolum-baslik">{dil === "en" ? `${t("home.all", "Tümü")} ${aktifKategori === "Tümü" ? t("home.products", "Ürünler") : kategoriBasligi}` : `Tüm ${kategoriBasligi}`}</h3><small>{t("home.productCount", `${digerUrunler.length} ürün`, { count: digerUrunler.length })}</small></div>
+            <div className="bolum-satir diger-urunler-baslik"><h3 className="bolum-baslik">Tüm {kategoriBasligi}</h3><small>{digerUrunler.length} ürün</small></div>
             <AnimatePresence mode="wait">
               <motion.div className="urun-grid" key={`diger-${aktifKategori}-${siralama}-${arama}`} {...siraliKonteyner} initial="initial" animate="animate">
                 {digerUrunler.map((u) => <UrunKarti key={u.id} urun={u} indirim={indirimliFiyat(u)} git={git} sepeteEkle={sepeteEkle} />)}
@@ -246,7 +244,7 @@ export default function Home() {
         )}
 
         {gosterilen.length === 0 && (
-          <p className="bos-sonuc">{arama ? t("home.noResult", `“${arama}” için sonuç bulunamadı.`, { query: arama }) : t("home.empty", "Menü ürünleri yönetim panelinden eklenmeyi bekliyor.")}</p>
+          <p className="bos-sonuc">{arama ? `“${arama}” için sonuç bulunamadı.` : "Menü ürünleri yönetim panelinden eklenmeyi bekliyor."}</p>
         )}
       </div>
     </div>
@@ -254,11 +252,10 @@ export default function Home() {
 }
 
 function UrunKarti({ urun, indirim, git, sepeteEkle }) {
-  const { t } = useDil();
   const standartBoyut = urun.boyutSecenekleri?.find((boyut) => boyut.varsayilan) || urun.boyutSecenekleri?.[0];
   const stoktaYok = urun.stokta === false;
   return <motion.article className={`urun-kart ${stoktaYok ? "urun-kart--tukendi" : ""}`} variants={siraliOge} onClick={() => git(`/urun/${urun.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") git(`/urun/${urun.id}`); }}>
-    <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urun.ad} loading="lazy" />{stoktaYok && <span className="stok-tukendi-rozet">{t("home.soldOut", "Tükendi")}</span>}</div>
+    <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urun.ad} loading="lazy" />{stoktaYok && <span className="stok-tukendi-rozet">Tükendi</span>}</div>
     <div className="urun-alt"><h4 className="urun-ad">{urun.ad}</h4>{urun.gramajOpsiyonu?.goster !== false && urun.temelMiktar > 0 && <span className="urun-standart-miktar">{urun.gramajOpsiyonu?.etiket || "Miktar"}: {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || "gr"}</span>}{standartBoyut && <span className="urun-standart-miktar">Standart {standartBoyut.etiket} · {standartBoyut.miktar} {standartBoyut.birim}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span><span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span></span> : <span className="urun-fiyat">₺{urun.fiyat.toFixed(2)}</span>}<motion.button className="ekle-btn" disabled={stoktaYok} onClick={(e) => { e.stopPropagation(); if (stoktaYok) return; if (urun.urunTipi === "menu" || standartBoyut || urun.ekstraMalzemeAyari?.aktif) git(`/urun/${urun.id}`); else sepeteEkle(urun); }} aria-label={stoktaYok ? `${urun.ad} stokta yok` : `${urun.ad} sepete ekle`} whileTap={stoktaYok ? undefined : { scale: 0.85 }} whileHover={stoktaYok ? undefined : { scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
   </motion.article>;
 }
