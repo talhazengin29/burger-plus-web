@@ -50,7 +50,7 @@ export default function Home() {
     const liste = urunler.filter(
       (u) =>
         (aktifKategori === "tum" || u.kategoriId === seciliKategori?.id || u.kategori === seciliKategori?.ad) &&
-        (q === "" || yerellestir(u.ad, u.ceviriler, "ad").toLocaleLowerCase(dil).includes(q))
+        (q === "" || yerellestir(u.ad, u.ceviriler, "ad", `product.${u.id}.name`).toLocaleLowerCase(dil).includes(q))
     );
     if (siralama === "artan") return [...liste].sort((a, b) => a.fiyat - b.fiyat);
     if (siralama === "azalan") return [...liste].sort((a, b) => b.fiyat - a.fiyat);
@@ -58,7 +58,7 @@ export default function Home() {
     return [...liste].sort((a, b) =>
       (aktifKategori === "tum" ? (kategoriSirasi.get(a.kategori) ?? 999) - (kategoriSirasi.get(b.kategori) ?? 999) : 0)
       || Number(a.sira ?? 100) - Number(b.sira ?? 100)
-      || yerellestir(a.ad, a.ceviriler, "ad").localeCompare(yerellestir(b.ad, b.ceviriler, "ad"), dil)
+      || yerellestir(a.ad, a.ceviriler, "ad", `product.${a.id}.name`).localeCompare(yerellestir(b.ad, b.ceviriler, "ad", `product.${b.id}.name`), dil)
     );
   }, [aktifKategori, arama, dil, siralama, urunler, kategoriler, yerellestir]);
 
@@ -71,9 +71,12 @@ export default function Home() {
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const seciliKategori = kategoriler.find((kategori) => String(kategori.id) === String(aktifKategori) || kategori.ad === aktifKategori);
-  const kategoriBasligi = aktifKategori === "tum" ? t("home.products") : yerellestir(seciliKategori?.ad, seciliKategori?.ceviriler, "ad");
-  const sloganVurguIndex = metinler.slogan.lastIndexOf(metinler.sloganVurgu);
-  const sloganBaslangici = sloganVurguIndex >= 0 ? metinler.slogan.slice(0, sloganVurguIndex).trim() : metinler.slogan;
+  const damgaKategorisi = kategoriler.find((kategori) => kategori.ad === damgaKarti.kategori);
+  const kategoriBasligi = aktifKategori === "tum" ? t("home.products") : yerellestir(seciliKategori?.ad, seciliKategori?.ceviriler, "ad", `category.${seciliKategori?.id}.name`);
+  const slogan = yerellestir(metinler.slogan, metinler.ceviriler, "slogan", "business.slogan");
+  const sloganVurgu = yerellestir(metinler.sloganVurgu, metinler.ceviriler, "sloganVurgu", "business.sloganVurgu");
+  const sloganVurguIndex = slogan.lastIndexOf(sloganVurgu);
+  const sloganBaslangici = sloganVurguIndex >= 0 ? slogan.slice(0, sloganVurguIndex).trim() : slogan;
 
   return (
     <div className="ekran home">
@@ -88,7 +91,7 @@ export default function Home() {
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
           {sloganBaslangici}
-          {sloganVurguIndex >= 0 && <><br /><span className="vurgu">{metinler.sloganVurgu}</span></>}
+          {sloganVurguIndex >= 0 && <><br /><span className="vurgu">{sloganVurgu}</span></>}
         </motion.h1>
 
         {/* Ye Kazan damga kartı */}
@@ -100,9 +103,9 @@ export default function Home() {
         >
           <div className="damga-ust">
             <div>
-              <span className="damga-rozet">{damgaKarti.kartEtiketi}</span>
-              <h2 className="damga-baslik">{damgaKarti.baslik}</h2>
-              <p className="damga-aciklama">{damgaKarti.aciklama}</p>
+              <span className="damga-rozet">{yerellestir(damgaKarti.kartEtiketi, damgaKarti.ceviriler, "kartEtiketi", "loyalty.kartEtiketi")}</span>
+              <h2 className="damga-baslik">{yerellestir(damgaKarti.baslik, damgaKarti.ceviriler, "baslik", "loyalty.baslik")}</h2>
+              <p className="damga-aciklama">{yerellestir(damgaKarti.aciklama, damgaKarti.ceviriler, "aciklama", "loyalty.aciklama")}</p>
             </div>
             {!misafir && (
               <div className="damga-sayac"><strong>{gorunenDamga}</strong><span>/{burgerDamgaHedef}</span><small>{t("stamp.completed")}</small></div>
@@ -119,9 +122,9 @@ export default function Home() {
           </div>
 
           {misafir ? (
-            <div className="damga-misafir-not"><span>{t("stamp.membersOnly")}</span><p>{t("stamp.guestInfo", { category: damgaKarti.kategori })}</p></div>
+            <div className="damga-misafir-not"><span>{t("stamp.membersOnly")}</span><p>{t("stamp.guestInfo", { category: yerellestir(damgaKarti.kategori, damgaKategorisi?.ceviriler, "ad", `category.${damgaKategorisi?.id}.name`) })}</p></div>
           ) : (
-            <div className="damga-alt"><div><small>{t("stamp.nextReward")}</small><strong>{yerellestir(damgaKarti.odulMetni, damgaKarti.ceviriler, "odulMetni")}</strong></div><p>{kalanDamga === 0 ? yerellestir(damgaKarti.tamamlanmaMetni, damgaKarti.ceviriler, "tamamlanmaMetni") : t("stamp.remaining", { count: kalanDamga, unit: damgaKarti.damgaBirimi })}</p></div>
+            <div className="damga-alt"><div><small>{t("stamp.nextReward")}</small><strong>{yerellestir(damgaKarti.odulMetni, damgaKarti.ceviriler, "odulMetni", "loyalty.odulMetni")}</strong></div><p>{kalanDamga === 0 ? yerellestir(damgaKarti.tamamlanmaMetni, damgaKarti.ceviriler, "tamamlanmaMetni", "loyalty.tamamlanmaMetni") : t("stamp.remaining", { count: kalanDamga, unit: yerellestir(damgaKarti.damgaBirimi, damgaKarti.ceviriler, "damgaBirimi", "loyalty.damgaBirimi") })}</p></div>
           )}
         </motion.section>}
 
@@ -129,7 +132,7 @@ export default function Home() {
         <div className="kategori-satir" ref={chipRef}>
           {kategoriler.map((kategori) => {
             const k = kategori.ad === "Tümü" ? "tum" : kategori.id ? String(kategori.id) : kategori.ad;
-            const kategoriAdi = k === "tum" ? t("home.all") : yerellestir(kategori.ad, kategori.ceviriler, "ad");
+            const kategoriAdi = k === "tum" ? t("home.all") : yerellestir(kategori.ad, kategori.ceviriler, "ad", `category.${kategori.id}.name`);
             return (
             <motion.button
               key={kategori.id || k}
@@ -167,8 +170,8 @@ export default function Home() {
               type="search"
               value={arama}
               onChange={(e) => setArama(guvenliMetin(e.target.value, 80))}
-              placeholder={metinler.aramaPlaceholder}
-              aria-label={metinler.aramaPlaceholder}
+              placeholder={yerellestir(metinler.aramaPlaceholder, metinler.ceviriler, "aramaPlaceholder", "business.aramaPlaceholder")}
+              aria-label={yerellestir(metinler.aramaPlaceholder, metinler.ceviriler, "aramaPlaceholder", "business.aramaPlaceholder")}
               maxLength="80"
             />
             <motion.button
@@ -216,7 +219,7 @@ export default function Home() {
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         {populerUrunler.length > 0 && <div className="bolum-satir">
-          <h3 className="bolum-baslik">{aktifKategori === "tum" ? yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik") : `${yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik")}: ${kategoriBasligi}`}</h3>
+          <h3 className="bolum-baslik">{aktifKategori === "tum" ? yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik", "business.urunBolumBaslik") : `${yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik", "business.urunBolumBaslik")}: ${kategoriBasligi}`}</h3>
         </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
@@ -256,7 +259,7 @@ export default function Home() {
 
 function UrunKarti({ urun, indirim, git, sepeteEkle }) {
   const { t, yerellestir, para } = useDil();
-  const urunAdi = yerellestir(urun.ad, urun.ceviriler, "ad");
+  const urunAdi = yerellestir(urun.ad, urun.ceviriler, "ad", `product.${urun.id}.name`);
   const standartBoyut = urun.boyutSecenekleri?.find((boyut) => boyut.varsayilan) || urun.boyutSecenekleri?.[0];
   const stoktaYok = urun.stokta === false;
   return <motion.article className={`urun-kart ${stoktaYok ? "urun-kart--tukendi" : ""}`} variants={siraliOge} onClick={() => git(`/urun/${urun.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") git(`/urun/${urun.id}`); }}>

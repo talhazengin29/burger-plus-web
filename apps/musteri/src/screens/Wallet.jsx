@@ -52,7 +52,7 @@ export default function Wallet() {
         {ayar.aktif && (
           <section className="wallet-kampanya">
             <span className="wallet-kampanya-oran">{ayar.bonusAktif ? `%${ayar.bonusYuzde}` : "KASA"}</span>
-            <div><h2>{yerellestir(ayar.kampanyaBasligi, ayar.ceviriler, "kampanyaBasligi")}</h2><p>{yerellestir(ayar.kampanyaAciklamasi, ayar.ceviriler, "kampanyaAciklamasi")}</p></div>
+            <div><h2>{yerellestir(ayar.kampanyaBasligi, ayar.ceviriler, "kampanyaBasligi", "wallet.kampanyaBasligi")}</h2><p>{yerellestir(ayar.kampanyaAciklamasi, ayar.ceviriler, "kampanyaAciklamasi", "wallet.kampanyaAciklamasi")}</p></div>
             <small>{t("wallet.cashOnly", { min: para(ayar.minYukleme), max: para(ayar.maxYukleme) })}</small>
           </section>
         )}

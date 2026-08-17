@@ -89,10 +89,10 @@ export default function Campaigns() {
 
           <motion.div className="camp-liste" {...siraliKonteyner} initial="initial" animate="animate">
             {kampanyalar.map((k) => {
-              const etiket = yerellestir(k.etiket, k.ceviriler, "etiket");
-              const baslik = yerellestir(k.baslik, k.ceviriler, "baslik");
-              const aciklama = yerellestir(k.aciklama, k.ceviriler, "aciklama");
-              const buton = yerellestir(k.buton, k.ceviriler, "buton");
+              const etiket = yerellestir(k.etiket, k.ceviriler, "etiket", `campaign.${k.id}.etiket`);
+              const baslik = yerellestir(k.baslik, k.ceviriler, "baslik", `campaign.${k.id}.baslik`);
+              const aciklama = yerellestir(k.aciklama, k.ceviriler, "aciklama", `campaign.${k.id}.aciklama`);
+              const buton = yerellestir(k.buton, k.ceviriler, "buton", `campaign.${k.id}.buton`);
               const durum = kampanyaDurumu(k, simdi);
               const davetKampanyasi = k.kod === "davet-et" || k.etiket === "Davet Et";
               const siparisVerilebilir = !davetKampanyasi;

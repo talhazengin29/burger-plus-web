@@ -200,7 +200,7 @@ export default function OrtakHeader({ selamlama = false }) {
                 <header><b>Bildirimler</b><span>{okunmamisSayisi ? `${okunmamisSayisi} okunmamış` : "Güncelsin"}</span></header>
                 {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => {
                   const okundu = okunanDuyurular.includes(String(duyuru.id));
-                  return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{yerellestir(duyuru.baslik, duyuru.ceviriler, "baslik")}</b><small>{yerellestir(duyuru.mesaj, duyuru.ceviriler, "mesaj")}</small></span><em>›</em></button>;
+                  return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{yerellestir(duyuru.baslik, duyuru.ceviriler, "baslik", `announcement.${duyuru.id}.title`)}</b><small>{yerellestir(duyuru.mesaj, duyuru.ceviriler, "mesaj", `announcement.${duyuru.id}.message`)}</small></span><em>›</em></button>;
                 })}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
               </motion.section>
             </div>

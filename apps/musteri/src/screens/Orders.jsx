@@ -18,7 +18,7 @@ import { useDil } from "../i18n/DilContext";
 
 // Tek bir sipariş kartı
 function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
-  const { t, tarihSaat, para, yerellestir } = useDil();
+  const { dil, t, tarihSaat, para, yerellestir } = useDil();
   return (
     <article className={"siparis-kart" + (gecmis ? " siparis-kart--gecmis" : "")}>
       <div className="siparis-kart-ust">
@@ -40,9 +40,9 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
               ? <img className="siparis-urun-gorsel" src={u.gorsel} alt={u.ad} />
               : <span className="siparis-urun-gorsel siparis-urun-gorselsiz">{u.ad?.charAt(0) || "?"}</span>}
             <div className="siparis-urun-orta">
-              <span className="siparis-urun-ad">{yerellestir(u.ad, u.ceviriler, "ad")}</span>
+              <span className="siparis-urun-ad">{yerellestir(u.ad, u.ceviriler, "ad", `product.${u.id}.name`)}</span>
               <span className="siparis-urun-birim">{para(u.fiyat)}</span>
-              {gramajMetni(u.secimler) && <span className="siparis-urun-secim">{gramajMetni(u.secimler)}</span>}
+              {gramajMetni(u.secimler, dil) && <span className="siparis-urun-secim">{gramajMetni(u.secimler, dil)}</span>}
               {haricMalzemeleriGetir(u).length > 0 && (
                 <span className="siparis-urun-haric">{t("orders.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</span>
               )}

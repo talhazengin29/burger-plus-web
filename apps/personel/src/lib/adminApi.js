@@ -257,6 +257,10 @@ export function i18nSozlukleriniKaydet(sozlukler) {
   return adminIstek("/i18n", jsonGonder("PUT", { sozlukler }));
 }
 
+export function i18nHazirlikRaporunuGetir(dil = "en") {
+  return adminIstek(`/i18n/hazirlik?dil=${encodeURIComponent(dil)}`);
+}
+
 const DESTEKLENEN_LOGOLAR = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
 export async function logoYukle(dosya) {
   if (!dosya || !DESTEKLENEN_LOGOLAR.has(dosya.type)) throw new Error("Logo PNG, JPG/JPEG, WebP veya SVG formatında olmalı.");

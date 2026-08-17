@@ -7,7 +7,7 @@ import "./Cart.css";
 import { useDil } from "../i18n/DilContext";
 
 export default function Cart() {
-  const { t, yerellestir, para } = useDil();
+  const { dil, t, yerellestir, para } = useDil();
   const { metinler } = useTema();
   const git = useIsletmeNavigate();
   const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
@@ -36,16 +36,16 @@ export default function Cart() {
             <div className="cart-liste">
               {sepet.map((u) => (
                 <article key={u.sepetAnahtari || u.id} className="cart-satir">
-                  <img className="cart-gorsel" src={u.gorsel} alt={yerellestir(u.ad, u.ceviriler, "ad")} />
+                  <img className="cart-gorsel" src={u.gorsel} alt={yerellestir(u.ad, u.ceviriler, "ad", `product.${u.id}.name`)} />
                   <div className="cart-orta">
-                    <h3 className="cart-ad">{yerellestir(u.ad, u.ceviriler, "ad")}</h3>
+                    <h3 className="cart-ad">{yerellestir(u.ad, u.ceviriler, "ad", `product.${u.id}.name`)}</h3>
                     {u.hediyeMi ? (
                       <span className="cart-hediye-etiket">{t("cart.gift")}</span>
                     ) : (
                       <span className="cart-birim">{para(u.fiyat)}</span>
                     )}
-                    {gramajMetni(u.secimler) && (
-                      <span className="cart-gramaj">{gramajMetni(u.secimler)}</span>
+                    {gramajMetni(u.secimler, dil) && (
+                      <span className="cart-gramaj">{gramajMetni(u.secimler, dil)}</span>
                     )}
                     {haricMalzemeleriGetir(u).length > 0 && (
                       <span className="cart-haric-malzeme">{t("orders.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</span>

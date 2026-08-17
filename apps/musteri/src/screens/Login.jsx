@@ -102,7 +102,7 @@ export default function Login() {
       >
         <DilSecici />
         <MarkaLogosu className="login-logo" />
-        <p className="login-slogan">{isletmeSlug === "burger-plus" ? yerellestir("Lezzet ve puanlar seni bekliyor", { en: "Great taste and rewards await" }) : yerellestir(metinler.slogan, metinler.ceviriler, "slogan")}</p>
+        <p className="login-slogan">{isletmeSlug === "burger-plus" ? yerellestir("Lezzet ve puanlar seni bekliyor", { en: "Great taste and rewards await" }) : yerellestir(metinler.slogan, metinler.ceviriler, "slogan", "business.slogan")}</p>
       </motion.div>
 
       {/* Form — aşağıdan yukarı kayarak gelir */}
