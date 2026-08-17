@@ -56,6 +56,7 @@ function kategorileriBirlestir(uzakKategoriler, isletmeSlug) {
     .map((kategori, sira) => ({
       id: kategori.id ?? `uzak-${sira}`,
       ad: String(kategori.ad).trim(),
+      ceviriler: kategori.ceviriler || {},
       gorsel: kategori.gorsel || (isletmeSlug === "burger-plus" ? kategoriGorseller[kategori.ad] : null) || null,
       sira: Number.isFinite(Number(kategori.sira)) ? Number(kategori.sira) : sira + 1,
     }));

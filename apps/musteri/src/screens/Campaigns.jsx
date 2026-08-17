@@ -9,6 +9,7 @@ import SayfaSarici from "../components/SayfaSarici";
 import { siraliKonteyner, siraliOge, fadeIn, asagiAcilma } from "../lib/animasyonlar";
 import { davetOzetiniGetir } from "../lib/authApi";
 import "./Campaigns.css";
+import { useDil } from "../i18n/DilContext";
 
 // Etikete göre küçük ikon seçimi (saat / davet / öğrenci)
 function EtiketIkon({ ikon, etiket }) {
@@ -19,9 +20,9 @@ function EtiketIkon({ ikon, etiket }) {
 }
 
 // Canlı durum rozeti: AKTİF (yeşil) / BAŞLAMADI / SONA ERDİ (gri)
-const durumMetni = { aktif: "AKTİF", baslamadi: "BAŞLAMADI", sonaerdi: "SONA ERDİ" };
-
 export default function Campaigns() {
+  const { t, yerellestir } = useDil();
+  const durumMetni = { aktif: t("campaigns.active"), baslamadi: t("campaigns.notStarted"), sonaerdi: t("campaigns.ended") };
   const git = useIsletmeNavigate();
   const { misafir, kullanici, kampanyalar } = useApp();
 
@@ -83,11 +84,15 @@ export default function Campaigns() {
       <OrtakHeader />
       <SayfaSarici>
         <div className="camp-govde">
-          <h1 className="camp-baslik">Özel Fırsatlar ve Kampanyalar</h1>
-          <p className="camp-alt">Sana özel hazırladığımız lezzetli fırsatları kaçırma.</p>
+          <h1 className="camp-baslik">{t("campaigns.title")}</h1>
+          <p className="camp-alt">{t("campaigns.subtitle")}</p>
 
           <motion.div className="camp-liste" {...siraliKonteyner} initial="initial" animate="animate">
             {kampanyalar.map((k) => {
+              const etiket = yerellestir(k.etiket, k.ceviriler, "etiket");
+              const baslik = yerellestir(k.baslik, k.ceviriler, "baslik");
+              const aciklama = yerellestir(k.aciklama, k.ceviriler, "aciklama");
+              const buton = yerellestir(k.buton, k.ceviriler, "buton");
               const durum = kampanyaDurumu(k, simdi);
               const davetKampanyasi = k.kod === "davet-et" || k.etiket === "Davet Et";
               const siparisVerilebilir = !davetKampanyasi;
@@ -95,10 +100,10 @@ export default function Campaigns() {
               return (
                 <motion.article key={k.id} className="camp-kart" variants={siraliOge}>
                   <div className="camp-gorsel-wrap">
-                    <img className="camp-gorsel" src={k.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=500&fit=crop"} alt={k.baslik} />
+                    <img className="camp-gorsel" src={k.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=500&fit=crop"} alt={baslik} />
                     <span className="camp-rozet">
-                      <EtiketIkon ikon={k.ikon} etiket={k.etiket} />
-                      {k.etiket}
+                      <EtiketIkon ikon={k.ikon} etiket={etiket} />
+                      {etiket}
                     </span>
                     {durum !== "pasif" && (
                       <span className={"camp-durum-rozet camp-durum-rozet--" + durum}>
@@ -108,12 +113,12 @@ export default function Campaigns() {
                   </div>
                   <div className="camp-icerik">
                     <div className="camp-baslik-satir">
-                      <h3 className="camp-kart-baslik">{k.baslik}</h3>
+                      <h3 className="camp-kart-baslik">{baslik}</h3>
                       {k.indirimYuzde > 0 && <span className="camp-fiyat">%{k.indirimYuzde}</span>}
                     </div>
-                    <p className="camp-aciklama">{k.aciklama}</p>
+                    <p className="camp-aciklama">{aciklama}</p>
                     {siparisVerilebilir && misafir && (
-                      <span className="camp-uye-rozet">🔒 Üyelere Özel</span>
+                      <span className="camp-uye-rozet">🔒 {t("campaigns.membersOnly")}</span>
                     )}
                     {davetKampanyasi && davetAcik ? (
                       <div className="davet-kodu-kutu">
@@ -133,7 +138,7 @@ export default function Campaigns() {
                         disabled={pasif}
                         onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKodunuGoster : undefined}
                       >
-                        {k.buton}
+                        {buton}
                       </motion.button>
                     )}
                   </div>
@@ -148,11 +153,11 @@ export default function Campaigns() {
         {modalAcik && (
           <motion.div className="uye-modal-perde" {...fadeIn} onClick={() => setModalAcik(false)}>
             <motion.div className="uye-modal" {...asagiAcilma} onClick={(e) => e.stopPropagation()}>
-              <h3 className="uye-modal-baslik">Üyelere Özel Kampanya</h3>
-              <p className="uye-modal-metin">Bu kampanyadan faydalanmak için üye olmalısın.</p>
+              <h3 className="uye-modal-baslik">{t("campaigns.memberTitle")}</h3>
+              <p className="uye-modal-metin">{t("campaigns.memberInfo")}</p>
               <div className="uye-modal-butonlar">
-                <button className="camp-btn camp-btn--charcoal" onClick={() => setModalAcik(false)}>Kapat</button>
-                <button className="camp-btn camp-btn--primary" onClick={() => git("/kayit")}>Üye Ol</button>
+                <button className="camp-btn camp-btn--charcoal" onClick={() => setModalAcik(false)}>{t("common.close")}</button>
+                <button className="camp-btn camp-btn--primary" onClick={() => git("/kayit")}>{t("campaigns.join")}</button>
               </div>
             </motion.div>
           </motion.div>

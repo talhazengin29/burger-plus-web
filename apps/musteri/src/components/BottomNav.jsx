@@ -5,20 +5,24 @@ import { NavLink } from "react-router-dom";
 import { IconHome, IconTag, IconCutlery, IconStar, IconUser } from "./Icons";
 import { useIsletme } from "../context/IsletmeContext";
 import "./BottomNav.css";
+import { useDil } from "../i18n/DilContext";
 
 const sekmeler = [
-  { yol: "/anasayfa", etiket: "Ana Sayfa", Ikon: IconHome, pasif: false },
-  { yol: "/kampanyalar", etiket: "Kampanyalar", Ikon: IconTag, pasif: false },
-  { yol: "/siparislerim", etiket: "Sipariş", Ikon: IconCutlery, pasif: false },
-  { yol: "/puanlarim", etiket: "Puanlarım", Ikon: IconStar, pasif: false },
-  { yol: "/profil", etiket: "Profil", Ikon: IconUser, pasif: false },
+  { yol: "/anasayfa", anahtar: "nav.home", Ikon: IconHome, pasif: false },
+  { yol: "/kampanyalar", anahtar: "nav.campaigns", Ikon: IconTag, pasif: false },
+  { yol: "/siparislerim", anahtar: "nav.orders", Ikon: IconCutlery, pasif: false },
+  { yol: "/puanlarim", anahtar: "nav.rewards", Ikon: IconStar, pasif: false },
+  { yol: "/profil", anahtar: "nav.profile", Ikon: IconUser, pasif: false },
 ];
 
 export default function BottomNav() {
   const { isletmeSlug } = useIsletme();
+  const { t } = useDil();
   return (
     <nav className="bottom-nav">
-      {sekmeler.map(({ yol, etiket, Ikon, pasif }) =>
+      {sekmeler.map(({ yol, anahtar, Ikon, pasif }) => {
+        const etiket = t(anahtar);
+        return (
         pasif ? (
           <span key={yol} className="nav-item nav-item--pasif" title="Yakında">
             <Ikon className="nav-icon" />
@@ -37,8 +41,8 @@ export default function BottomNav() {
             </span>
             <span className="nav-label">{etiket}</span>
           </NavLink>
-        )
-      )}
+        ));
+      })}
     </nav>
   );
 }

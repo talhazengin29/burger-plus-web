@@ -9,6 +9,8 @@ import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import { useIsletme } from "../context/IsletmeContext";
 import MarkaLogosu from "./MarkaLogosu";
+import DilSecici from "./DilSecici";
+import { useDil } from "../i18n/DilContext";
 
 const okunanlariGetir = (anahtar) => {
   try {
@@ -30,6 +32,7 @@ const okunanlariKaydet = (anahtar, duyuruIdleri) => {
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
+  const { t, yerellestir } = useDil();
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
   const {
@@ -47,7 +50,7 @@ export default function OrtakHeader({ selamlama = false }) {
     [duyurular, okunanDuyurular]
   );
 
-  const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
+  const ad = kullanici ? kullanici.ad : misafir ? t("common.guest") : t("common.friend");
   const aktifCagri = ["bekliyor", "goruldu"].includes(personelCagrisi?.durum);
   const cagriDurumMetni = personelCagrisi?.durum === "goruldu"
     ? "Personel çağrınızı gördü ve masanıza geliyor."
@@ -107,7 +110,7 @@ export default function OrtakHeader({ selamlama = false }) {
     <header className="home-header">
       {selamlama ? (
         <div className="selam">
-          <span className="selam-ust">Merhaba,</span>
+          <span className="selam-ust">{t("common.hello")}</span>
           <span className="selam-ad">
             {ad} <span aria-hidden="true">👋</span>
           </span>
@@ -118,10 +121,11 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
       )}
       <div className="home-header-sag">
+        <DilSecici kompakt />
         {ozetMasaNo && (
           <motion.button
             className={`ikon-btn personel-cagir-btn${aktifCagri ? " personel-cagir-btn--aktif" : ""}`}
-            aria-label="Personel çağır"
+            aria-label={t("header.staff")}
             onClick={() => { setBildirimlerAcik(false); setPersonelPaneliAcik(true); }}
             whileTap={{ scale: 0.88 }}
           >
@@ -132,7 +136,7 @@ export default function OrtakHeader({ selamlama = false }) {
         <div className="bildirim-sarici">
           <motion.button
             className="ikon-btn bildirim-btn"
-            aria-label="Bildirimler"
+            aria-label={t("header.notifications")}
             aria-expanded={bildirimlerAcik}
             onClick={bildirimleriAcKapat}
             whileTap={{ scale: 0.88 }}
@@ -143,7 +147,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
         <motion.button
           className="ikon-btn sepet-btn"
-          aria-label="Sepet"
+          aria-label={t("header.cart")}
           onClick={() => git("/sepet")}
           whileTap={{ scale: 0.88 }}
         >
@@ -164,10 +168,10 @@ export default function OrtakHeader({ selamlama = false }) {
           <motion.button
             className="avatar-sm avatar-harf"
             onClick={() => git("/profil")}
-            aria-label="Profil"
+            aria-label={t("header.profile")}
             whileTap={{ scale: 0.9 }}
           >
-            {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
+            {avatar ? <img className="avatar-gorsel" src={avatar} alt={t("header.profile")} /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
           </motion.button>
         )}
       </div>
@@ -196,7 +200,7 @@ export default function OrtakHeader({ selamlama = false }) {
                 <header><b>Bildirimler</b><span>{okunmamisSayisi ? `${okunmamisSayisi} okunmamış` : "Güncelsin"}</span></header>
                 {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => {
                   const okundu = okunanDuyurular.includes(String(duyuru.id));
-                  return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>;
+                  return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{yerellestir(duyuru.baslik, duyuru.ceviriler, "baslik")}</b><small>{yerellestir(duyuru.mesaj, duyuru.ceviriler, "mesaj")}</small></span><em>›</em></button>;
                 })}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
               </motion.section>
             </div>

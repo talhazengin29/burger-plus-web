@@ -9,8 +9,11 @@ import { usePerde } from "../hooks/usePerde";
 import MarkaLogosu from "../components/MarkaLogosu";
 import { useTema } from "../context/TemaContext";
 import "./Login.css";
+import DilSecici from "../components/DilSecici";
+import { useDil } from "../i18n/DilContext";
 
 export default function Login() {
+  const { t, yerellestir } = useDil();
   const { metinler, isletmeSlug } = useTema();
   const git = useIsletmeNavigate();
   const { girisiTamamla, kullanici, authYuklendi, setMisafir } = useApp();
@@ -97,8 +100,9 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
+        <DilSecici />
         <MarkaLogosu className="login-logo" />
-        <p className="login-slogan">{isletmeSlug === "burger-plus" ? "Lezzet ve puanlar seni bekliyor" : metinler.slogan}</p>
+        <p className="login-slogan">{isletmeSlug === "burger-plus" ? yerellestir("Lezzet ve puanlar seni bekliyor", { en: "Great taste and rewards await" }) : yerellestir(metinler.slogan, metinler.ceviriler, "slogan")}</p>
       </motion.div>
 
       {/* Form — aşağıdan yukarı kayarak gelir */}
@@ -110,12 +114,12 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
       >
-        <h2 className="login-baslik">{ikiFaktorToken ? "Güvenlik Kodu" : "Giriş Yap"}</h2>
+        <h2 className="login-baslik">{ikiFaktorToken ? t("auth.securityCode") : t("auth.login")}</h2>
 
         {ikiFaktorToken ? (
           <>
-            <p className="login-2fa-aciklama">Authenticator uygulamandaki 6 haneli kodu gir. Telefonuna erişemiyorsan kurtarma kodlarından birini kullanabilirsin.</p>
-            <label className="login-etiket">Doğrulama kodu</label>
+            <p className="login-2fa-aciklama">{t("auth.twoFactorInfo")}</p>
+            <label className="login-etiket">{t("auth.verificationCode")}</label>
             <input
               className="login-input login-2fa-input"
               value={ikiFaktorKodu}
@@ -126,13 +130,13 @@ export default function Login() {
               autoFocus
             />
             <button type="button" className="login-sifremi-unuttum" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>
-              Şifre ekranına dön
+              {t("auth.backPassword")}
             </button>
           </>
         ) : (
           <>
 
-        <label className="login-etiket">E-posta</label>
+        <label className="login-etiket">{t("auth.email")}</label>
         <input
           type="email"
           className="login-input"
@@ -148,7 +152,7 @@ export default function Login() {
         />
         {alanHatalari.email && <small id="login-email-hata" className="alan-hata">{alanHatalari.email}</small>}
 
-        <label className="login-etiket">Şifre</label>
+        <label className="login-etiket">{t("auth.password")}</label>
         <div className="sifre-alani">
           <input
             type={sifreGorunur ? "text" : "password"}
@@ -163,14 +167,14 @@ export default function Login() {
             aria-invalid={Boolean(alanHatalari.sifre)}
             aria-describedby={alanHatalari.sifre ? "login-sifre-hata" : undefined}
           />
-          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
+          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? t("auth.hidePassword") : t("auth.showPassword")} title={sifreGorunur ? t("auth.hidePassword") : t("auth.showPassword")}>
             {sifreGorunur ? <IconEyeOff /> : <IconEye />}
           </button>
         </div>
         {alanHatalari.sifre && <small id="login-sifre-hata" className="alan-hata alan-hata--sifre">{alanHatalari.sifre}</small>}
 
         <button type="button" className="login-sifremi-unuttum" onClick={() => git("/sifremi-unuttum")}>
-          Şifremi unuttum
+          {t("auth.forgot")}
         </button>
 
         {/* Beni hatırla */}
@@ -180,7 +184,7 @@ export default function Login() {
             checked={beniHatirla}
             onChange={(e) => setBeniHatirla(e.target.checked)}
           />
-          <span>Beni hatırla</span>
+          <span>{t("auth.remember")}</span>
         </label>
           </>
         )}
@@ -188,7 +192,7 @@ export default function Login() {
         {hata && <p className="login-hata">{hata}</p>}
 
         <button type="submit" className="login-giris-btn" disabled={yukleniyor}>
-          {yukleniyor ? "Doğrulanıyor..." : ikiFaktorToken ? "Kodu Doğrula" : "Giriş Yap"}
+          {yukleniyor ? t("auth.verifying") : ikiFaktorToken ? t("auth.verify") : t("auth.login")}
         </button>
       </motion.form>
 
@@ -199,9 +203,9 @@ export default function Login() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        Hesabın yok mu?{" "}
+        {t("auth.noAccount")}{" "}
         <button className="login-kayit-link" onClick={() => git("/kayit")}>
-          Kayıt Ol
+          {t("auth.register")}
         </button>
       </motion.p>
 
@@ -212,7 +216,7 @@ export default function Login() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        Misafir olarak devam et
+        {t("auth.guestContinue")}
       </motion.button>
     </div>
   );

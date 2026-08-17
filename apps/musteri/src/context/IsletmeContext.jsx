@@ -6,6 +6,7 @@ import { PerdeSaglayici } from "../hooks/usePerde";
 import { isletmeBilgisiniGetir } from "../lib/authApi";
 import { socket, socketIsletmesiniAyarla } from "../lib/socket";
 import BurgerPlusLogosu from "../components/BurgerPlusLogosu";
+import { DilSaglayici } from "../i18n/DilContext";
 
 const IsletmeContext = createContext(null);
 const ONIZLEME_ANAHTARI = "burger-plus-isletme-onizleme";
@@ -144,11 +145,13 @@ export function IsletmeSarici() {
   return (
     <IsletmeContext.Provider value={deger}>
       <TemaSaglayici tema={durum.isletme.tema} isletme={durum.isletme}>
-        <PerdeSaglayici>
-          <AppProvider key={durum.isletme.slug}>
-            <Outlet />
-          </AppProvider>
-        </PerdeSaglayici>
+        <DilSaglayici>
+          <PerdeSaglayici>
+            <AppProvider key={durum.isletme.slug}>
+              <Outlet />
+            </AppProvider>
+          </PerdeSaglayici>
+        </DilSaglayici>
       </TemaSaglayici>
     </IsletmeContext.Provider>
   );
