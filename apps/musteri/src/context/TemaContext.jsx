@@ -20,8 +20,6 @@ const VARSAYILAN_TEMA = {
     urunBolumBaslik: "Popüler Ürünler",
     aramaPlaceholder: "Menüde ara...",
   },
-  metinCevirileri: {},
-  dilAyarlari: { etkinDiller: ["tr", "en"], varsayilanDil: "tr" },
   konsept: "burger",
   gorunum: "koyu",
   logoUrl: null,
@@ -86,7 +84,6 @@ export function TemaSaglayici({ tema, isletme, children }) {
 
   const deger = useMemo(() => ({
     ...aktifTema,
-    metinler: { ...aktifTema.metinler, ceviriler: aktifTema.metinCevirileri || {} },
     logoUrl,
     isletmeAdi: isletme.ad,
     isletmeSlug: isletme.slug,

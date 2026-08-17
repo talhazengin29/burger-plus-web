@@ -9,14 +9,13 @@ import OrtakHeader from "../components/OrtakHeader";
 import { siraliKonteyner, siraliOge, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
 import { useTema } from "../context/TemaContext";
-import { useDil } from "../i18n/DilContext";
 import "./Home.css";
 
 // Arama çubuğundaki filtre düğmesinin sıralama seçenekleri
 const siralamalar = [
-  { id: "onerilen", anahtar: "home.recommended" },
-  { id: "artan", anahtar: "home.priceAsc" },
-  { id: "azalan", anahtar: "home.priceDesc" },
+  { id: "onerilen", etiket: "Önerilen" },
+  { id: "artan", etiket: "Fiyat: Artan" },
+  { id: "azalan", etiket: "Fiyat: Azalan" },
 ];
 
 function sayfaYenilendiMi() {
@@ -26,11 +25,12 @@ function sayfaYenilendiMi() {
 
 export default function Home() {
   const { metinler } = useTema();
-  const { dil, t, tc, yerellestir } = useDil();
   const location = useLocation();
   // Kampanyalar'dan "Sipariş Ver" ile gelinirse ilgili kategori otomatik seçili açılır.
   // Tarayıcı yenilemesinde history state geri gelse bile menü her zaman Tümü'nden başlar.
-  const [aktifKategori, setAktifKategori] = useState(() => sayfaYenilendiMi() ? "tum" : (location.state?.kategoriId || location.state?.kategori || "tum"));
+  const [aktifKategori, setAktifKategori] = useState(
+    sayfaYenilendiMi() ? "Tümü" : (location.state?.kategori || "Tümü")
+  );
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
@@ -39,28 +39,27 @@ export default function Home() {
   const chipRef = useSuruklenebilir();
 
   useEffect(() => {
-    if (aktifKategori === "tum" || kategoriler.some((kategori) => String(kategori.id) === String(aktifKategori) || kategori.ad === aktifKategori)) return;
-    setAktifKategori("tum");
+    if (kategoriler.some((kategori) => kategori.ad === aktifKategori)) return;
+    setAktifKategori(kategoriler.find((kategori) => kategori.ad === "Tümü")?.ad || kategoriler[0]?.ad || "Tümü");
   }, [aktifKategori, kategoriler]);
 
   // Kategori + arama + sıralama; hepsi yalnızca listelemeyi etkiler
   const gosterilen = useMemo(() => {
-    const q = arama.trim().toLocaleLowerCase(dil);
-    const seciliKategori = kategoriler.find((kategori) => String(kategori.id) === String(aktifKategori) || kategori.ad === aktifKategori);
+    const q = arama.trim().toLocaleLowerCase("tr");
     const liste = urunler.filter(
       (u) =>
-        (aktifKategori === "tum" || u.kategoriId === seciliKategori?.id || u.kategori === seciliKategori?.ad) &&
-        (q === "" || yerellestir(u.ad, u.ceviriler, "ad", `product.${u.id}.name`).toLocaleLowerCase(dil).includes(q))
+        (aktifKategori === "Tümü" || u.kategori === aktifKategori) &&
+        (q === "" || u.ad.toLocaleLowerCase("tr").includes(q))
     );
     if (siralama === "artan") return [...liste].sort((a, b) => a.fiyat - b.fiyat);
     if (siralama === "azalan") return [...liste].sort((a, b) => b.fiyat - a.fiyat);
     const kategoriSirasi = new Map(kategoriler.map((kategori, index) => [kategori.ad, index]));
     return [...liste].sort((a, b) =>
-      (aktifKategori === "tum" ? (kategoriSirasi.get(a.kategori) ?? 999) - (kategoriSirasi.get(b.kategori) ?? 999) : 0)
+      (aktifKategori === "Tümü" ? (kategoriSirasi.get(a.kategori) ?? 999) - (kategoriSirasi.get(b.kategori) ?? 999) : 0)
       || Number(a.sira ?? 100) - Number(b.sira ?? 100)
-      || yerellestir(a.ad, a.ceviriler, "ad", `product.${a.id}.name`).localeCompare(yerellestir(b.ad, b.ceviriler, "ad", `product.${b.id}.name`), dil)
+      || a.ad.localeCompare(b.ad, "tr")
     );
-  }, [aktifKategori, arama, dil, siralama, urunler, kategoriler, yerellestir]);
+  }, [aktifKategori, arama, siralama, urunler, kategoriler]);
 
   const gorunenDamga = Math.min(burgerDamga, burgerDamgaHedef);
   const kalanDamga = Math.max(burgerDamgaHedef - burgerDamga, 0);
@@ -70,13 +69,9 @@ export default function Home() {
   const sonDamgaSatiriBaslangici = burgerDamgaHedef - sonDamgaSatiriAdedi;
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
-  const seciliKategori = kategoriler.find((kategori) => String(kategori.id) === String(aktifKategori) || kategori.ad === aktifKategori);
-  const damgaKategorisi = kategoriler.find((kategori) => kategori.ad === damgaKarti.kategori);
-  const kategoriBasligi = aktifKategori === "tum" ? t("home.products") : yerellestir(seciliKategori?.ad, seciliKategori?.ceviriler, "ad", `category.${seciliKategori?.id}.name`);
-  const slogan = yerellestir(metinler.slogan, metinler.ceviriler, "slogan", "business.slogan");
-  const sloganVurgu = yerellestir(metinler.sloganVurgu, metinler.ceviriler, "sloganVurgu", "business.sloganVurgu");
-  const sloganVurguIndex = slogan.lastIndexOf(sloganVurgu);
-  const sloganBaslangici = sloganVurguIndex >= 0 ? slogan.slice(0, sloganVurguIndex).trim() : slogan;
+  const kategoriBasligi = aktifKategori === "Tümü" ? "Ürünler" : aktifKategori;
+  const sloganVurguIndex = metinler.slogan.lastIndexOf(metinler.sloganVurgu);
+  const sloganBaslangici = sloganVurguIndex >= 0 ? metinler.slogan.slice(0, sloganVurguIndex).trim() : metinler.slogan;
 
   return (
     <div className="ekran home">
@@ -91,7 +86,7 @@ export default function Home() {
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
           {sloganBaslangici}
-          {sloganVurguIndex >= 0 && <><br /><span className="vurgu">{sloganVurgu}</span></>}
+          {sloganVurguIndex >= 0 && <><br /><span className="vurgu">{metinler.sloganVurgu}</span></>}
         </motion.h1>
 
         {/* Ye Kazan damga kartı */}
@@ -103,12 +98,12 @@ export default function Home() {
         >
           <div className="damga-ust">
             <div>
-              <span className="damga-rozet">{yerellestir(damgaKarti.kartEtiketi, damgaKarti.ceviriler, "kartEtiketi", "loyalty.kartEtiketi")}</span>
-              <h2 className="damga-baslik">{yerellestir(damgaKarti.baslik, damgaKarti.ceviriler, "baslik", "loyalty.baslik")}</h2>
-              <p className="damga-aciklama">{yerellestir(damgaKarti.aciklama, damgaKarti.ceviriler, "aciklama", "loyalty.aciklama")}</p>
+              <span className="damga-rozet">{damgaKarti.kartEtiketi}</span>
+              <h2 className="damga-baslik">{damgaKarti.baslik}</h2>
+              <p className="damga-aciklama">{damgaKarti.aciklama}</p>
             </div>
             {!misafir && (
-              <div className="damga-sayac"><strong>{gorunenDamga}</strong><span>/{burgerDamgaHedef}</span><small>{t("stamp.completed")}</small></div>
+              <div className="damga-sayac"><strong>{gorunenDamga}</strong><span>/{burgerDamgaHedef}</span><small>TAMAMLANDI</small></div>
             )}
           </div>
 
@@ -117,22 +112,21 @@ export default function Home() {
               const dolu = !misafir && indeks < gorunenDamga;
               const siradaki = !misafir && indeks === gorunenDamga;
               const ortalanmisSonSatir = sonDamgaSatiriEksik && indeks >= sonDamgaSatiriBaslangici;
-              return <motion.span key={indeks} className={`${dolu ? "dolu" : ""} ${siradaki ? "siradaki" : ""} ${ortalanmisSonSatir ? "damga-son-satir" : ""}`} initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .08 + indeks * .035 }}><i>{dolu ? damgaKarti.ikon : indeks + 1}</i><small>{dolu ? t("stamp.stamp") : indeks + 1 === burgerDamgaHedef ? t("stamp.reward") : ""}</small></motion.span>;
+              return <motion.span key={indeks} className={`${dolu ? "dolu" : ""} ${siradaki ? "siradaki" : ""} ${ortalanmisSonSatir ? "damga-son-satir" : ""}`} initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .08 + indeks * .035 }}><i>{dolu ? damgaKarti.ikon : indeks + 1}</i><small>{dolu ? "Damga" : indeks + 1 === burgerDamgaHedef ? "Hediye" : ""}</small></motion.span>;
             })}
           </div>
 
           {misafir ? (
-            <div className="damga-misafir-not"><span>{t("stamp.membersOnly")}</span><p>{t("stamp.guestInfo", { category: yerellestir(damgaKarti.kategori, damgaKategorisi?.ceviriler, "ad", `category.${damgaKategorisi?.id}.name`) })}</p></div>
+            <div className="damga-misafir-not"><span>Üyelere özel</span><p>Giriş yap veya üye ol; {damgaKarti.kategori} kategorisindeki alışverişlerinle damga biriktir.</p></div>
           ) : (
-            <div className="damga-alt"><div><small>{t("stamp.nextReward")}</small><strong>{yerellestir(damgaKarti.odulMetni, damgaKarti.ceviriler, "odulMetni", "loyalty.odulMetni")}</strong></div><p>{kalanDamga === 0 ? yerellestir(damgaKarti.tamamlanmaMetni, damgaKarti.ceviriler, "tamamlanmaMetni", "loyalty.tamamlanmaMetni") : t("stamp.remaining", { count: kalanDamga, unit: yerellestir(damgaKarti.damgaBirimi, damgaKarti.ceviriler, "damgaBirimi", "loyalty.damgaBirimi") })}</p></div>
+            <div className="damga-alt"><div><small>SIRADAKİ ÖDÜL</small><strong>{damgaKarti.odulMetni}</strong></div><p>{kalanDamga === 0 ? damgaKarti.tamamlanmaMetni : <><b>{kalanDamga}</b> {damgaKarti.damgaBirimi} daha</>}</p></div>
           )}
         </motion.section>}
 
         {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
         <div className="kategori-satir" ref={chipRef}>
           {kategoriler.map((kategori) => {
-            const k = kategori.ad === "Tümü" ? "tum" : kategori.id ? String(kategori.id) : kategori.ad;
-            const kategoriAdi = k === "tum" ? t("home.all") : yerellestir(kategori.ad, kategori.ceviriler, "ad", `category.${kategori.id}.name`);
+            const k = kategori.ad;
             return (
             <motion.button
               key={kategori.id || k}
@@ -150,7 +144,7 @@ export default function Home() {
                   </span>
                 )}
               </span>
-              <span className="kategori-ad">{kategoriAdi}</span>
+              <span className="kategori-ad">{k}</span>
             </motion.button>
             );
           })}
@@ -170,15 +164,15 @@ export default function Home() {
               type="search"
               value={arama}
               onChange={(e) => setArama(guvenliMetin(e.target.value, 80))}
-              placeholder={yerellestir(metinler.aramaPlaceholder, metinler.ceviriler, "aramaPlaceholder", "business.aramaPlaceholder")}
-              aria-label={yerellestir(metinler.aramaPlaceholder, metinler.ceviriler, "aramaPlaceholder", "business.aramaPlaceholder")}
+              placeholder={metinler.aramaPlaceholder}
+              aria-label={metinler.aramaPlaceholder}
               maxLength="80"
             />
             <motion.button
               type="button"
               className={"filtre-btn" + (filtreAcik ? " filtre-btn--acik" : "")}
               onClick={() => setFiltreAcik((v) => !v)}
-              aria-label={t("home.sort")}
+              aria-label="Sıralama seçenekleri"
               aria-expanded={filtreAcik}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -194,7 +188,7 @@ export default function Home() {
                 <button
                   type="button"
                   className="filtre-perde"
-                  aria-label={t("home.sortClose")}
+                  aria-label="Sıralama menüsünü kapat"
                   onClick={() => setFiltreAcik(false)}
                 />
                 <motion.div className="filtre-menu" {...asagiAcilma}>
@@ -208,7 +202,7 @@ export default function Home() {
                         setFiltreAcik(false);
                       }}
                     >
-                      {t(s.anahtar)}
+                      {s.etiket}
                     </button>
                   ))}
                 </motion.div>
@@ -219,7 +213,7 @@ export default function Home() {
 
         {/* Kategoriye göre öne çıkan ilk beş ürün — yatay kaydırılabilir. */}
         {populerUrunler.length > 0 && <div className="bolum-satir">
-          <h3 className="bolum-baslik">{aktifKategori === "tum" ? yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik", "business.urunBolumBaslik") : `${yerellestir(metinler.urunBolumBaslik, metinler.ceviriler, "urunBolumBaslik", "business.urunBolumBaslik")}: ${kategoriBasligi}`}</h3>
+          <h3 className="bolum-baslik">{aktifKategori === "Tümü" ? metinler.urunBolumBaslik : `${metinler.urunBolumBaslik}: ${kategoriBasligi}`}</h3>
         </div>}
 
         {/* Popüler ürünler — kategori değişince yeniden sıralanır. */}
@@ -240,7 +234,7 @@ export default function Home() {
 
         {digerUrunler.length > 0 && (
           <section className="diger-urunler">
-            <div className="bolum-satir diger-urunler-baslik"><h3 className="bolum-baslik">{t("home.allProducts", { category: kategoriBasligi })}</h3><small>{tc("home.productCount", digerUrunler.length)}</small></div>
+            <div className="bolum-satir diger-urunler-baslik"><h3 className="bolum-baslik">Tüm {kategoriBasligi}</h3><small>{digerUrunler.length} ürün</small></div>
             <AnimatePresence mode="wait">
               <motion.div className="urun-grid" key={`diger-${aktifKategori}-${siralama}-${arama}`} {...siraliKonteyner} initial="initial" animate="animate">
                 {digerUrunler.map((u) => <UrunKarti key={u.id} urun={u} indirim={indirimliFiyat(u)} git={git} sepeteEkle={sepeteEkle} />)}
@@ -250,7 +244,7 @@ export default function Home() {
         )}
 
         {gosterilen.length === 0 && (
-          <p className="bos-sonuc">{arama ? t("home.noSearch", { query: arama }) : t("home.noProducts")}</p>
+          <p className="bos-sonuc">{arama ? `“${arama}” için sonuç bulunamadı.` : "Menü ürünleri yönetim panelinden eklenmeyi bekliyor."}</p>
         )}
       </div>
     </div>
@@ -258,12 +252,10 @@ export default function Home() {
 }
 
 function UrunKarti({ urun, indirim, git, sepeteEkle }) {
-  const { t, yerellestir, para } = useDil();
-  const urunAdi = yerellestir(urun.ad, urun.ceviriler, "ad", `product.${urun.id}.name`);
   const standartBoyut = urun.boyutSecenekleri?.find((boyut) => boyut.varsayilan) || urun.boyutSecenekleri?.[0];
   const stoktaYok = urun.stokta === false;
   return <motion.article className={`urun-kart ${stoktaYok ? "urun-kart--tukendi" : ""}`} variants={siraliOge} onClick={() => git(`/urun/${urun.id}`)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") git(`/urun/${urun.id}`); }}>
-    <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urunAdi} loading="lazy" />{stoktaYok && <span className="stok-tukendi-rozet">{t("home.soldOut")}</span>}</div>
-    <div className="urun-alt"><h4 className="urun-ad">{urunAdi}</h4>{urun.gramajOpsiyonu?.goster !== false && urun.temelMiktar > 0 && <span className="urun-standart-miktar">{urun.gramajOpsiyonu?.etiket || t("home.amount")}: {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || "gr"}</span>}{standartBoyut && <span className="urun-standart-miktar">{standartBoyut.etiket} · {standartBoyut.miktar} {standartBoyut.birim}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">{para(indirim.orijinalFiyat)}</span><span className="urun-fiyat urun-fiyat--indirim">{para(indirim.fiyat)}</span></span> : <span className="urun-fiyat">{para(urun.fiyat)}</span>}<motion.button className="ekle-btn" disabled={stoktaYok} onClick={(e) => { e.stopPropagation(); if (stoktaYok) return; if (urun.urunTipi === "menu" || standartBoyut || urun.ekstraMalzemeAyari?.aktif) git(`/urun/${urun.id}`); else sepeteEkle(urun); }} aria-label={t("home.addToCart", { product: urunAdi })} whileTap={stoktaYok ? undefined : { scale: 0.85 }} whileHover={stoktaYok ? undefined : { scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
+    <div className="urun-gorsel-wrap"><img className="urun-gorsel" src={urun.gorsel} alt={urun.ad} loading="lazy" />{stoktaYok && <span className="stok-tukendi-rozet">Tükendi</span>}</div>
+    <div className="urun-alt"><h4 className="urun-ad">{urun.ad}</h4>{urun.gramajOpsiyonu?.goster !== false && urun.temelMiktar > 0 && <span className="urun-standart-miktar">{urun.gramajOpsiyonu?.etiket || "Miktar"}: {urun.temelMiktar} {urun.gramajOpsiyonu?.birim || "gr"}</span>}{standartBoyut && <span className="urun-standart-miktar">Standart {standartBoyut.etiket} · {standartBoyut.miktar} {standartBoyut.birim}</span>}<div className="urun-fiyat-satir">{indirim ? <span className="urun-fiyat-grup"><span className="urun-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span><span className="urun-fiyat urun-fiyat--indirim">₺{indirim.fiyat.toFixed(2)}</span></span> : <span className="urun-fiyat">₺{urun.fiyat.toFixed(2)}</span>}<motion.button className="ekle-btn" disabled={stoktaYok} onClick={(e) => { e.stopPropagation(); if (stoktaYok) return; if (urun.urunTipi === "menu" || standartBoyut || urun.ekstraMalzemeAyari?.aktif) git(`/urun/${urun.id}`); else sepeteEkle(urun); }} aria-label={stoktaYok ? `${urun.ad} stokta yok` : `${urun.ad} sepete ekle`} whileTap={stoktaYok ? undefined : { scale: 0.85 }} whileHover={stoktaYok ? undefined : { scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}><IconPlus className="ekle-ikon" /></motion.button></div></div>
   </motion.article>;
 }

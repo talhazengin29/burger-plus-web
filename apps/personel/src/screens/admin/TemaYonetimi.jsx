@@ -3,7 +3,6 @@ import { useIsletme } from "../../context/IsletmeContext";
 import { logoYukle, temaKaydet } from "../../lib/adminApi";
 import { hexRgba, KONSEPTLER, METIN_ALANLARI } from "../../data/konseptler";
 import "./TemaYonetimi.css";
-import SozlukYonetimi from "./SozlukYonetimi";
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -18,13 +17,10 @@ function baslangicFormu(isletme, tema) {
     logoOlcegi: Math.min(180, Math.max(60, Number(tema?.logoOlcegi) || 100)),
     logoKonumX: Math.min(80, Math.max(-80, Number(tema?.logoKonumX) || 0)),
     logoKonumY: Math.min(30, Math.max(-30, Number(tema?.logoKonumY) || 0)),
-    etkinDiller: Array.isArray(tema?.dilAyarlari?.etkinDiller) ? tema.dilAyarlari.etkinDiller : ["tr", "en"],
-    varsayilanDil: tema?.dilAyarlari?.varsayilanDil === "en" ? "en" : "tr",
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [
       alan,
       tema?.metinler?.[alan] && tema.metinler[alan] !== varsayilan.metinler[alan] ? tema.metinler[alan] : "",
     ])),
-    metinCevirileri: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, tema?.metinCevirileri?.[alan]?.en || ""])),
   };
 }
 
@@ -65,8 +61,6 @@ export default function TemaYonetimi() {
     renkler: onizleme.renkler,
     font: varsayilan.font,
     metinler: onizleme.metinler,
-    metinCevirileri: Object.fromEntries(Object.entries(form.metinCevirileri).map(([alan, en]) => [alan, { en: en.trim() }]).filter(([, deger]) => deger.en)),
-    dilAyarlari: { etkinDiller: form.etkinDiller, varsayilanDil: form.varsayilanDil },
     logoUrl: logoOnizleme || tema?.logoUrl || isletme.logoUrl || null,
     logoOlcegi: form.logoOlcegi,
     logoKonumX: form.logoKonumX,
@@ -98,9 +92,6 @@ export default function TemaYonetimi() {
     logoKonumX: form.logoKonumX,
     logoKonumY: form.logoKonumY,
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
-    metinCevirileri: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
-    etkinDiller: form.etkinDiller,
-    varsayilanDil: form.varsayilanDil,
   });
 
   const kaydet = async (e) => {
@@ -122,8 +113,6 @@ export default function TemaYonetimi() {
         logoKonumX: form.logoKonumX,
         logoKonumY: form.logoKonumY,
         metinler: form.metinler,
-        metinCevirileri: Object.fromEntries(Object.entries(form.metinCevirileri).map(([alan, en]) => [alan, { en: en.trim() }]).filter(([, deger]) => deger.en)),
-        dilAyarlari: { etkinDiller: form.etkinDiller, varsayilanDil: form.varsayilanDil },
       });
       isletmeyiGuncelle(yanit.isletme, yanit.tema);
       setBildirim("Tema kaydedildi ve müşteri uygulamasına yansıtıldı.");
@@ -216,19 +205,10 @@ export default function TemaYonetimi() {
         </fieldset>
 
         <fieldset className="tema-kutu">
-          <legend>Dil ayarları</legend>
-          <p>Müşterinin seçebileceği dilleri ve uygulamanın ilk açılış dilini belirle.</p>
-          <div className="tema-dil-ayarlari">
-            <label className="tema-toggle"><input type="checkbox" checked={form.etkinDiller.includes("en")} onChange={(e) => { const etkinDiller = e.target.checked ? ["tr", "en"] : ["tr"]; setForm({ ...form, etkinDiller, varsayilanDil: etkinDiller.includes(form.varsayilanDil) ? form.varsayilanDil : "tr" }); }} /><span /><b>English seçeneğini göster</b></label>
-            <label><span>Varsayılan dil</span><select value={form.varsayilanDil} onChange={(e) => setForm({ ...form, varsayilanDil: e.target.value })}><option value="tr">Türkçe</option>{form.etkinDiller.includes("en") && <option value="en">English</option>}</select></label>
-          </div>
-        </fieldset>
-
-        <fieldset className="tema-kutu">
           <legend>Metin özelleştirme</legend>
-          <p>Türkçe alan boşsa konsept metni kullanılır. English alanları eksikse sözlük bölümünde uyarı gösterilir; müşteri ekranı Türkçeye geri düşmez.</p>
+          <p>Boş bıraktığın alanlarda seçilen konseptin varsayılan metni kullanılır.</p>
           <div className="tema-metinleri">
-            {METIN_ALANLARI.map(([alan, etiket]) => <div className="tema-cok-dilli-alan" key={alan}><b>{etiket}</b><label><span>TR</span><input maxLength="120" value={form.metinler[alan]} placeholder={varsayilan.metinler[alan]} onChange={(e) => setForm({ ...form, metinler: { ...form.metinler, [alan]: e.target.value } })} /><small>{form.metinler[alan].length}/120</small></label>{form.etkinDiller.includes("en") && <label><span>EN</span><input maxLength="120" value={form.metinCevirileri[alan]} placeholder="English translation" onChange={(e) => setForm({ ...form, metinCevirileri: { ...form.metinCevirileri, [alan]: e.target.value } })} /><small>{form.metinCevirileri[alan].length}/120</small></label>}</div>)}
+            {METIN_ALANLARI.map(([alan, etiket]) => <label key={alan}><span>{etiket}</span><input maxLength="120" value={form.metinler[alan]} placeholder={varsayilan.metinler[alan]} onChange={(e) => setForm({ ...form, metinler: { ...form.metinler, [alan]: e.target.value } })} /><small>{form.metinler[alan].length}/120</small></label>)}
           </div>
         </fieldset>
       </section>
@@ -239,7 +219,6 @@ export default function TemaYonetimi() {
         </div>
         <p>Canlı önizleme</p><small>Müşterinin gördüğü gerçek uygulama ekranıdır.</small>
       </aside>
-      <SozlukYonetimi />
     </form>
   );
 }

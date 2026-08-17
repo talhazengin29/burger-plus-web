@@ -8,7 +8,6 @@ import { IconBack, IconMinus, IconPlus, IconWarning } from "../components/Icons"
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
 import { varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
 import "./UrunDetay.css";
-import { useDil } from "../i18n/DilContext";
 
 // Besin değerleri sabit sırayla gösterilir
 const besinEtiketleri = [
@@ -19,7 +18,6 @@ const besinEtiketleri = [
 ];
 
 export default function UrunDetay() {
-  const { dil, t, para, yerellestir } = useDil();
   const { id } = useParams();
   const git = useIsletmeNavigate();
   const { isletmeSlug } = useIsletme();
@@ -35,8 +33,6 @@ export default function UrunDetay() {
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
-  const urunAdi = yerellestir(urun.ad, urun.ceviriler, "ad", `product.${urun.id}.name`);
-  const urunAciklamasi = yerellestir(urun.aciklama, urun.ceviriler, "aciklama", `product.${urun.id}.description`);
   const stoktaYok = urun.stokta === false;
   const urunOnerileri = (urun.onerilenUrunler || [])
     .map((onerilenId) => urunler.find((aday) => Number(aday.id) === Number(onerilenId)))
@@ -155,8 +151,8 @@ export default function UrunDetay() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <img className="urun-detay-gorsel" src={urun.gorsel} alt={urunAdi} />
-          <button className="urun-detay-geri" onClick={() => git(-1)} aria-label={t("product.back")}>
+          <img className="urun-detay-gorsel" src={urun.gorsel} alt={urun.ad} />
+          <button className="urun-detay-geri" onClick={() => git(-1)} aria-label="Geri">
             <IconBack />
           </button>
         </motion.div>
@@ -169,7 +165,7 @@ export default function UrunDetay() {
         >
           {/* Ad + fiyat + açıklama */}
           <section className="urun-detay-kart urun-detay-ozet">
-            <h1 className="urun-detay-ad">{urunAdi}</h1>
+            <h1 className="urun-detay-ad">{urun.ad}</h1>
             {indirim ? (
               <span className="urun-detay-fiyat-grup">
                 <span className="urun-detay-fiyat-eski">₺{indirim.orijinalFiyat.toFixed(2)}</span>
@@ -178,18 +174,18 @@ export default function UrunDetay() {
             ) : (
               <span className="urun-detay-fiyat">₺{urun.fiyat.toFixed(2)}</span>
             )}
-            {urunAciklamasi && <p className="urun-detay-aciklama">{urunAciklamasi}</p>}
+            {urun.aciklama && <p className="urun-detay-aciklama">{urun.aciklama}</p>}
           </section>
 
           {miktarGoster && (
             <section className="urun-detay-kart gramaj-kart">
               <div className="gramaj-bilgi">
-                <h2 className="urun-detay-baslik">{yerellestir(miktarAyari.etiket, null, null, `product.${gramajKaynagi.id}.amountLabel`) || t("product.amount")}</h2>
+                <h2 className="urun-detay-baslik">{miktarAyari.etiket || "Ürün miktarı"}</h2>
                 <span className="gramaj-deger">
                   {toplamGramaj} {miktarAyari.birim}
                 </span>
-                {gramajOpsiyonu && <span className="gramaj-standart">{t("product.standard")}: {gramajKaynagi.temelMiktar} {miktarAyari.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${miktarAyari.birim}` : ""}</span>}
-                {gramajOpsiyonu && <span className="gramaj-fiyat">{t("product.perIncrease", { amount: `${gramajOpsiyonu.artisMiktari} ${gramajOpsiyonu.birim}`, price: para(gramajOpsiyonu.fiyatArtisi) })}</span>}
+                {gramajOpsiyonu && <span className="gramaj-standart">Standart: {gramajKaynagi.temelMiktar} {miktarAyari.birim}{ekstraGramaj > 0 ? ` · +${ekstraGramaj} ${miktarAyari.birim}` : ""}</span>}
+                {gramajOpsiyonu && <span className="gramaj-fiyat">Her +{gramajOpsiyonu.artisMiktari} {gramajOpsiyonu.birim} için +₺{gramajOpsiyonu.fiyatArtisi.toFixed(2)}</span>}
               </div>
               {gramajOpsiyonu && <div className="gramaj-kontrol" aria-label={`${gramajOpsiyonu.etiket} seçimi`}>
                 <button
@@ -214,26 +210,26 @@ export default function UrunDetay() {
           )}
 
           {["yan_lezzet", "icecek"].includes(urunTipi) && urun.boyutSecenekleri?.length > 0 && (
-            <BoyutSecici baslik={t("product.sizeSelection")} urun={urun} seciliKod={tekUrunBoyut?.kod} onSec={setBoyutKodu} />
+            <BoyutSecici baslik="Boyut seçimi" urun={urun} seciliKod={tekUrunBoyut?.kod} onSec={setBoyutKodu} />
           )}
 
           {urunTipi === "menu" && menuYanLezzet && menuIcecek && (
             <>
               <section className="urun-detay-kart menu-icerik-ozeti">
-                <h2 className="urun-detay-baslik">{t("product.menuContents")}</h2>
-                <span><b>{yerellestir(menuBurger?.ad, menuBurger?.ceviriler, "ad", `product.${menuBurger?.id}.name`)}</b><small>Burger</small></span>
-                <span><b>{yerellestir(menuYanLezzet.ad, menuYanLezzet.ceviriler, "ad", `product.${menuYanLezzet.id}.name`)}</b><small>{t("product.side")}</small></span>
-                <span><b>{yerellestir(menuIcecek.ad, menuIcecek.ceviriler, "ad", `product.${menuIcecek.id}.name`)}</b><small>{t("product.drink")}</small></span>
+                <h2 className="urun-detay-baslik">Menü İçeriği</h2>
+                <span><b>{menuBurger?.ad}</b><small>Burger</small></span>
+                <span><b>{menuYanLezzet.ad}</b><small>Yan lezzet</small></span>
+                <span><b>{menuIcecek.ad}</b><small>İçecek</small></span>
               </section>
-              <BoyutSecici baslik={t("product.sizeOf", { product: yerellestir(menuYanLezzet.ad, menuYanLezzet.ceviriler, "ad", `product.${menuYanLezzet.id}.name`) })} urun={menuYanLezzet} baslangicKodu={menuYapisi.varsayilanYanBoyut} seciliKod={secilenYanBoyut?.kod} onSec={setYanBoyutKodu} />
-              <BoyutSecici baslik={t("product.sizeOf", { product: yerellestir(menuIcecek.ad, menuIcecek.ceviriler, "ad", `product.${menuIcecek.id}.name`) })} urun={menuIcecek} baslangicKodu={menuYapisi.varsayilanIcecekBoyut} seciliKod={secilenIcecekBoyut?.kod} onSec={setIcecekBoyutKodu} />
+              <BoyutSecici baslik={`${menuYanLezzet.ad} boyutu`} urun={menuYanLezzet} baslangicKodu={menuYapisi.varsayilanYanBoyut} seciliKod={secilenYanBoyut?.kod} onSec={setYanBoyutKodu} />
+              <BoyutSecici baslik={`${menuIcecek.ad} boyutu`} urun={menuIcecek} baslangicKodu={menuYapisi.varsayilanIcecekBoyut} seciliKod={secilenIcecekBoyut?.kod} onSec={setIcecekBoyutKodu} />
             </>
           )}
 
           {/* Besin değerleri — sıralı animasyonla gelir */}
           {urun.besinDegerleri && (
             <section className="urun-detay-kart">
-              <h2 className="urun-detay-baslik">{t("product.nutrition")}</h2>
+              <h2 className="urun-detay-baslik">Besin Değerleri</h2>
               <motion.div
                 className="besin-grid"
                 {...siraliKonteyner}
@@ -243,7 +239,7 @@ export default function UrunDetay() {
                 {besinEtiketleri.map(({ anahtar, etiket }) => (
                   <motion.div key={anahtar} className="besin-hucre" variants={siraliOge}>
                     <span className="besin-deger">{urun.besinDegerleri[anahtar]}</span>
-                    <span className="besin-etiket">{dil === "en" ? ({ kalori: "Calories", protein: "Protein", karbonhidrat: "Carbs", yag: "Fat" }[anahtar]) : etiket}</span>
+                    <span className="besin-etiket">{etiket}</span>
                   </motion.div>
                 ))}
               </motion.div>
@@ -253,12 +249,12 @@ export default function UrunDetay() {
           {/* Alerjen bilgisi */}
           {urun.alerjenler && urun.alerjenler.length > 0 && (
             <section className="urun-detay-kart urun-detay-alerjen">
-              <h2 className="urun-detay-baslik">{t("product.allergens")}</h2>
+              <h2 className="urun-detay-baslik">Alerjen Bilgisi</h2>
               <ul className="alerjen-liste">
-                {urun.alerjenler.map((a, index) => (
+                {urun.alerjenler.map((a) => (
                   <li key={a} className="alerjen-satir">
                     <IconWarning className="alerjen-ikon" aria-hidden="true" />
-                    {yerellestir(a, null, null, `product.${urun.id}.allergen.${index}`)}
+                    {a}
                   </li>
                 ))}
               </ul>
@@ -268,10 +264,10 @@ export default function UrunDetay() {
           {/* İçindekiler — tıklayınca çıkarılabilir malzeme özelleştirmesi */}
           {malzemeListesi.length > 0 && (
             <section className="urun-detay-kart">
-              <h2 className="urun-detay-baslik">{t("product.ingredients")}</h2>
-              <p className="urun-detay-malzeme-not">{t("product.tapToRemove")}</p>
+              <h2 className="urun-detay-baslik">İçindekiler</h2>
+              <p className="urun-detay-malzeme-not">İstemediğin malzemeye dokun</p>
               <div className="malzeme-liste">
-                {malzemeListesi.map((m, index) => {
+                {malzemeListesi.map((m) => {
                   const haric = haricMalzemeler.includes(m);
                   return (
                     <motion.button
@@ -282,7 +278,7 @@ export default function UrunDetay() {
                       whileTap={{ scale: 0.95 }}
                     >
                       <span className="malzeme-ikon">{haric ? "✕" : "✓"}</span>
-                      {yerellestir(m, null, null, `product.${gramajKaynagi.id}.ingredient.${index}`)}
+                      {m}
                     </motion.button>
                   );
                 })}
@@ -293,19 +289,19 @@ export default function UrunDetay() {
           {ekstraMalzemeAyari && ekstraSecenekler.length > 0 && (
             <section className="urun-detay-kart ekstra-malzeme-secici">
               <div className="ekstra-malzeme-secici-baslik">
-                <div><h2 className="urun-detay-baslik">{yerellestir(ekstraMalzemeAyari.baslik, null, null, `product.${urun.id}.extrasTitle`) || t("product.chooseExtras")}</h2><p>{t("product.selectionRange", { min: minimumEkstraSecimi > 0 ? (dil === "en" ? `At least ${minimumEkstraSecimi}, ` : `En az ${minimumEkstraSecimi}, `) : "", max: maksimumEkstraSecimi })}</p></div>
+                <div><h2 className="urun-detay-baslik">{ekstraMalzemeAyari.baslik || "Ekstra malzeme seç"}</h2><p>{minimumEkstraSecimi > 0 ? `En az ${minimumEkstraSecimi}, ` : ""}en fazla {maksimumEkstraSecimi} seçim</p></div>
                 <span>{ekstraMalzemeIdleri.length}/{maksimumEkstraSecimi}</span>
               </div>
               <div className="ekstra-malzeme-secenekleri">
-                {ekstraSecenekler.map((secenek, index) => {
+                {ekstraSecenekler.map((secenek) => {
                   const secili = ekstraMalzemeIdleri.includes(String(secenek.id));
                   const siniraUlasti = !secili && ekstraMalzemeIdleri.length >= maksimumEkstraSecimi;
                   return <button type="button" key={secenek.id} className={secili ? "secili" : ""} disabled={siniraUlasti} onClick={() => ekstraMalzemeToggle(secenek.id)}>
-                    <i aria-hidden="true">{secili ? "✓" : ""}</i><b>{yerellestir(secenek.ad, null, null, `product.${urun.id}.extra.${index}`)}</b><span>{Number(secenek.fiyat) > 0 ? `+${para(secenek.fiyat)}` : t("product.free")}</span>
+                    <i aria-hidden="true">{secili ? "✓" : ""}</i><b>{secenek.ad}</b><span>{Number(secenek.fiyat) > 0 ? `+₺${Number(secenek.fiyat).toFixed(2)}` : "Ücretsiz"}</span>
                   </button>;
                 })}
               </div>
-              {ekstraSecimiEksik && <p className="ekstra-malzeme-zorunlu">{t("product.minimumRequired", { count: minimumEkstraSecimi })}</p>}
+              {ekstraSecimiEksik && <p className="ekstra-malzeme-zorunlu">Devam etmek için en az {minimumEkstraSecimi} seçim yapmalısın.</p>}
             </section>
           )}
 
@@ -318,8 +314,8 @@ export default function UrunDetay() {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.22 }}
               >
-                <span className="urun-detay-oneri-etiket">{t("product.pairsWell")}</span>
-                <h2 className="urun-detay-baslik">{t("product.completeOrder")}</h2>
+                <span className="urun-detay-oneri-etiket">YANINDA İYİ GİDER</span>
+                <h2 className="urun-detay-baslik">Siparişini tamamla</h2>
                 <div className="urun-detay-oneri-listesi">
                   <AnimatePresence mode="popLayout">
                     {gorunenUrunOnerileri.map((onerilen) => (
@@ -334,7 +330,7 @@ export default function UrunDetay() {
                       >
                         <img src={onerilen.gorsel} alt="" />
                         <div className="urun-detay-oneri-bilgi">
-                          <b>{yerellestir(onerilen.ad, onerilen.ceviriler, "ad", `product.${onerilen.id}.name`)}</b>
+                          <b>{onerilen.ad}</b>
                           <small>₺{Number(onerilen.fiyat).toFixed(2)}</small>
                         </div>
                         <motion.button
@@ -344,7 +340,7 @@ export default function UrunDetay() {
                           whileTap={{ scale: 0.88 }}
                         >
                           <IconPlus />
-                          <span>{t("product.add")}</span>
+                          <span>Ekle</span>
                         </motion.button>
                       </motion.article>
                     ))}
@@ -375,7 +371,7 @@ export default function UrunDetay() {
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          {stoktaYok ? t("home.soldOut") : ekstraSecimiEksik ? t("product.chooseExtras") : t("product.addToCart", { price: para(birimFiyat * adet) })}
+          {stoktaYok ? "Stokta yok" : ekstraSecimiEksik ? "Ekstra malzeme seç" : `Sepete Ekle — ₺${(birimFiyat * adet).toFixed(2)}`}
         </motion.button>
       </div>
     </div>
@@ -383,7 +379,6 @@ export default function UrunDetay() {
 }
 
 function BoyutSecici({ baslik, urun, baslangicKodu, seciliKod, onSec }) {
-  const { t, para, yerellestir } = useDil();
   const boyutlar = urun.boyutSecenekleri || [];
   const baslangicIndex = Math.max(0, boyutlar.findIndex((boyut) => boyut.kod === baslangicKodu || (!baslangicKodu && boyut.varsayilan)));
   const izinliBoyutlar = boyutlar.slice(baslangicIndex);
@@ -392,9 +387,9 @@ function BoyutSecici({ baslik, urun, baslangicKodu, seciliKod, onSec }) {
     <section className="urun-detay-kart boyut-secici">
       <h2 className="urun-detay-baslik">{baslik}</h2>
       <div className="boyut-secenekleri">
-        {izinliBoyutlar.map((boyut, index) => {
+        {izinliBoyutlar.map((boyut) => {
           const fark = Number(boyut.fiyatFarki || 0) - baslangicFiyati;
-          return <button type="button" key={boyut.kod} className={boyut.kod === seciliKod ? "aktif" : ""} onClick={() => onSec(boyut.kod)}><b>{yerellestir(boyut.etiket, null, null, `product.${urun.id}.size.${index}`)}</b><span>{boyut.miktar} {boyut.birim}</span><small>{fark > 0 ? `+${para(fark)}` : t("product.included")}</small></button>;
+          return <button type="button" key={boyut.kod} className={boyut.kod === seciliKod ? "aktif" : ""} onClick={() => onSec(boyut.kod)}><b>{boyut.etiket}</b><span>{boyut.miktar} {boyut.birim}</span><small>{fark > 0 ? `+₺${fark.toFixed(2)}` : "Dahil"}</small></button>;
         })}
       </div>
     </section>

@@ -10,19 +10,17 @@ import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
 import { davetOzetiniGetir, ikiFaktorKurulumBaslat, ikiFaktorKurulumOnayla, ikiFaktorKapat } from "../lib/authApi";
 import "./Profile.css";
-import { useDil } from "../i18n/DilContext";
 
 const menuSatirlari = [
-  { anahtar: "profile.wallet", Ikon: IconWallet, yol: "/cuzdanim" },
-  { anahtar: "profile.personal", Ikon: IconUser, yol: "/profil-duzenle" },
-  { anahtar: "profile.rewards", Ikon: IconGift, yol: "/hediyelerim" },
-  { anahtar: "profile.history", Ikon: IconReceipt, yol: "/siparislerim" },
-  { anahtar: "profile.complaint", Ikon: IconChat, yol: "/sikayet" },
-  { anahtar: "profile.help", Ikon: IconHelp, yol: null },
+  { ad: "Cüzdanım", Ikon: IconWallet, yol: "/cuzdanim" },
+  { ad: "Kişisel Bilgiler", Ikon: IconUser, yol: "/profil-duzenle" },
+  { ad: "Hediyelerim", Ikon: IconGift, yol: "/hediyelerim" },
+  { ad: "Sipariş Geçmişi", Ikon: IconReceipt, yol: "/siparislerim" },
+  { ad: "Şikayet ve Geri Bildirim", Ikon: IconChat, yol: "/sikayet" },
+  { ad: "Yardım & Destek", Ikon: IconHelp, yol: null },
 ];
 
 export default function Profile() {
-  const { t } = useDil();
   const { misafir, adminMi, kullanici, cikisYap, avatar, kullaniciyiYenile } = useApp();
   const git = useIsletmeNavigate();
   const [yardimAcik, setYardimAcik] = useState(false);
@@ -117,7 +115,7 @@ export default function Profile() {
             <button className="profil-duzenle" aria-label="Düzenle" onClick={() => git("/profil-duzenle")}><IconEdit /></button>
           </div>
           <h2 className="profil-ad">
-            {kullanici ? `${kullanici.ad} ${kullanici.soyad}` : t("common.guest")}
+            {kullanici ? `${kullanici.ad} ${kullanici.soyad}` : "Misafir"}
           </h2>
           <p className="profil-uyelik">
             {kullanici ? kullanici.email : "Giriş yapmadınız"}
@@ -127,14 +125,14 @@ export default function Profile() {
         {kullanici && (
           <section className="profil-davet-kart">
             <div className="profil-davet-ust">
-              <div><span>{t("profile.inviteCode")}</span><strong>{davetOzeti?.davetKodu || kullanici.davetKodu || "—"}</strong></div>
-              <button type="button" onClick={davetKodunuKopyala} disabled={!davetOzeti?.davetKodu && !kullanici.davetKodu}>{davetKopyalandi ? t("profile.copied") : t("profile.copy")}</button>
+              <div><span>Davet kodun</span><strong>{davetOzeti?.davetKodu || kullanici.davetKodu || "—"}</strong></div>
+              <button type="button" onClick={davetKodunuKopyala} disabled={!davetOzeti?.davetKodu && !kullanici.davetKodu}>{davetKopyalandi ? "Kopyalandı" : "Kopyala"}</button>
             </div>
             <p>Kodunla kayıt olan arkadaşlarının her alışverişinden %5 puan kazanırsın.</p>
             <div className="profil-davet-ozet">
-              <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b>{t("profile.invited")}</span>
-              <span><b>{davetOzeti?.odulluSiparisSayisi ?? 0}</b>{t("profile.rewardedOrders")}</span>
-              <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b>{t("profile.earnedPoints")}</span>
+              <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b>Davet edilen</span>
+              <span><b>{davetOzeti?.odulluSiparisSayisi ?? 0}</b>Ödüllü sipariş</span>
+              <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b>Kazanılan puan</span>
             </div>
           </section>
         )}
@@ -142,12 +140,12 @@ export default function Profile() {
         {/* İşletme bölümü — SADECE ADMIN görür */}
         {adminMi && (
           <>
-            <div className="profil-isletme-baslik">{t("profile.business")}</div>
+            <div className="profil-isletme-baslik">İşletme</div>
             <button className="profil-menu isletme-satir" onClick={() => git("/qr-uret")}>
               <span className="profil-menu-ikon-daire isletme-ikon"><IconQr /></span>
               <div className="isletme-metin">
-                <span className="profil-menu-ad">{t("profile.tableQr")}</span>
-                <span className="isletme-alt">{t("profile.tableQrInfo")}</span>
+                <span className="profil-menu-ad">Masa QR Kodları</span>
+                <span className="isletme-alt">Masalar için QR üret ve yazdır</span>
               </div>
               <IconChevron className="profil-menu-ok" />
             </button>
@@ -158,17 +156,17 @@ export default function Profile() {
         <div className="profil-menu">
           <button className="profil-menu-satir" onClick={ikiFaktorPenceresiniAc}>
             <span className="profil-menu-ikon-daire profil-2fa-ikon" aria-hidden="true">🛡️</span>
-            <span className="profil-menu-ad">{t("profile.twoFactor")}<small className="profil-2fa-durum">{kullanici?.ikiFaktorAktif ? t("profile.active") : t("profile.inactive")}</small></span>
+            <span className="profil-menu-ad">İki Adımlı Doğrulama<small className="profil-2fa-durum">{kullanici?.ikiFaktorAktif ? "Aktif" : "Kapalı"}</small></span>
             <IconChevron className="profil-menu-ok" />
           </button>
-          {menuSatirlari.map(({ anahtar, Ikon, yol }) => (
+          {menuSatirlari.map(({ ad, Ikon, yol }) => (
             <button
-              key={anahtar}
+              key={ad}
               className="profil-menu-satir"
               onClick={() => yol ? git(yol) : setYardimAcik(true)}
             >
               <span className="profil-menu-ikon-daire"><Ikon /></span>
-              <span className="profil-menu-ad">{t(anahtar)}</span>
+              <span className="profil-menu-ad">{ad}</span>
               <IconChevron className="profil-menu-ok" />
             </button>
           ))}
@@ -177,7 +175,7 @@ export default function Profile() {
         {/* Çıkış */}
         <button className="cikis-btn" onClick={() => { cikisYap(); git("/"); }}>
           <IconLogout className="cikis-ikon" />
-          {t("profile.logout")}
+          Çıkış Yap
         </button>
         {yardimAcik && <div className="destek-perde" onClick={() => setYardimAcik(false)}><section className="destek-modal" onClick={(e) => e.stopPropagation()}><span>BURGER PLUS DESTEK</span><h3>Nasıl yardımcı olabiliriz?</h3><p>Siparişin, kampanyalar veya hesabınla ilgili desteğe ihtiyaç duyarsan ekibimize ulaşabilirsin. Sipariş numaranı ve masa bilgini paylaşman çözümü hızlandırır.</p><p className="destek-not">Destek saatleri: Her gün 10:00 – 23:00</p><a href="mailto:destek@burgerplus.com">destek@burgerplus.com</a><button onClick={() => setYardimAcik(false)}>Kapat</button></section></div>}
         {ikiFaktorModal && (

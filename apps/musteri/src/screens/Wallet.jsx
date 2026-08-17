@@ -4,10 +4,10 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { cuzdanOzetiniGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import "./Wallet.css";
-import { useDil } from "../i18n/DilContext";
+
+const para = (deger) => `₺${Number(deger || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function Wallet() {
-  const { t, tc, para, tarihSaat, yerellestir } = useDil();
   const git = useIsletmeNavigate();
   const [cuzdan, setCuzdan] = useState(null);
   const [hata, setHata] = useState("");
@@ -37,34 +37,34 @@ export default function Wallet() {
     <div className="ekran wallet">
       <header className="alt-header">
         <button className="geri-btn" onClick={() => git(-1)} aria-label="Geri"><IconBack /></button>
-        <h1 className="alt-header-baslik">{t("wallet.title")}</h1>
+        <h1 className="alt-header-baslik">Cüzdanım</h1>
         <span className="alt-header-bosluk" />
       </header>
       <main className="wallet-govde">
         {hata && <p className="wallet-hata" role="alert">{hata}</p>}
         <section className="wallet-bakiye-karti">
           <div className="wallet-parilti" />
-          <div className="wallet-kart-ust"><span><IconWallet /> {t("wallet.balance")}</span><small>{t("wallet.onlyHere")}</small></div>
+          <div className="wallet-kart-ust"><span><IconWallet /> Uygulama bakiyesi</span><small>SADECE BU İŞLETMEDE</small></div>
           <strong>{cuzdan ? para(cuzdan.bakiye) : "—"}</strong>
-          <p>{t("wallet.balanceInfo")}</p>
+          <p>Bakiyeni sipariş ödemelerinde güvenle kullanabilirsin.</p>
         </section>
 
         {ayar.aktif && (
           <section className="wallet-kampanya">
             <span className="wallet-kampanya-oran">{ayar.bonusAktif ? `%${ayar.bonusYuzde}` : "KASA"}</span>
-            <div><h2>{yerellestir(ayar.kampanyaBasligi, ayar.ceviriler, "kampanyaBasligi", "wallet.kampanyaBasligi")}</h2><p>{yerellestir(ayar.kampanyaAciklamasi, ayar.ceviriler, "kampanyaAciklamasi", "wallet.kampanyaAciklamasi")}</p></div>
-            <small>{t("wallet.cashOnly", { min: para(ayar.minYukleme), max: para(ayar.maxYukleme) })}</small>
+            <div><h2>{ayar.kampanyaBasligi}</h2><p>{ayar.kampanyaAciklamasi}</p></div>
+            <small>Yükleme yalnızca kasadan ve nakit yapılır · {para(ayar.minYukleme)}–{para(ayar.maxYukleme)}</small>
           </section>
         )}
 
         <section className="wallet-gecmis">
-          <div className="wallet-bolum-baslik"><h2>{t("wallet.transactions")}</h2><span>{tc("wallet.transactionCount", cuzdan?.hareketler?.length || 0)}</span></div>
-          {!cuzdan ? <p className="wallet-bos">{t("common.loading")}</p> : cuzdan.hareketler.length === 0 ? (
-            <div className="wallet-bos"><span>₺</span><b>{t("wallet.empty")}</b><p>{t("wallet.emptyInfo")}</p></div>
+          <div className="wallet-bolum-baslik"><h2>Bakiye hareketleri</h2><span>{cuzdan?.hareketler?.length || 0} işlem</span></div>
+          {!cuzdan ? <p className="wallet-bos">Yükleniyor…</p> : cuzdan.hareketler.length === 0 ? (
+            <div className="wallet-bos"><span>₺</span><b>Henüz bakiye hareketin yok</b><p>Kasada telefon numaranı söyleyerek nakit bakiye yükleyebilirsin.</p></div>
           ) : cuzdan.hareketler.map((hareket) => (
             <article className="wallet-hareket" key={hareket.id}>
               <span className={`wallet-hareket-ikon ${hareket.tutar > 0 ? "arti" : "eksi"}`}>{hareket.tutar > 0 ? "+" : "−"}</span>
-              <div><b>{hareket.aciklama}</b><small>{tarihSaat(hareket.tarih, { dateStyle: "short", timeStyle: "short" })}{hareket.personelAdi ? ` · ${hareket.personelAdi}` : ""}</small>{hareket.bonusTutar > 0 && <em>{para(hareket.nakitTutar)} nakit + {para(hareket.bonusTutar)} hediye</em>}</div>
+              <div><b>{hareket.aciklama}</b><small>{new Date(hareket.tarih).toLocaleString("tr-TR")}{hareket.personelAdi ? ` · ${hareket.personelAdi}` : ""}</small>{hareket.bonusTutar > 0 && <em>{para(hareket.nakitTutar)} nakit + {para(hareket.bonusTutar)} hediye</em>}</div>
               <strong className={hareket.tutar > 0 ? "arti" : "eksi"}>{hareket.tutar > 0 ? "+" : ""}{para(hareket.tutar)}</strong>
             </article>
           ))}

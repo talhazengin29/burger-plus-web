@@ -1,6 +1,0 @@
-.dil-secici{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 10px;border:1px solid var(--border-color);border-radius:999px;background:var(--bg-card);color:var(--text-primary)}
-.dil-secici select{appearance:none;border:0;outline:0;background:transparent;color:inherit;font:700 12px/1 inherit;cursor:pointer}
-.dil-secici option{background:var(--bg-card);color:var(--text-primary)}
-.dil-secici--kompakt{min-height:34px;padding:0 8px}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-@media(max-width:390px){.home-header{gap:6px;padding-inline:12px}.home-header-sag{gap:2px}.home-header-sag .ikon-btn,.home-header-sag .avatar-sm{width:38px;height:38px}.home-header-sag .dil-secici{min-height:32px;padding:0 5px;gap:2px}.home-header-sag .dil-secici>span[aria-hidden]{display:none}.home-header-sag .dil-secici select{font-size:11px}.selam-ad{max-width:78px}.brand-logo{width:86px}}
