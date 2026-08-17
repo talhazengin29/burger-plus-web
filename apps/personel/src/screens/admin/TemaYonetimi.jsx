@@ -3,6 +3,7 @@ import { useIsletme } from "../../context/IsletmeContext";
 import { logoYukle, temaKaydet } from "../../lib/adminApi";
 import { hexRgba, KONSEPTLER, METIN_ALANLARI } from "../../data/konseptler";
 import "./TemaYonetimi.css";
+import SozlukYonetimi from "./SozlukYonetimi";
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -238,6 +239,7 @@ export default function TemaYonetimi() {
         </div>
         <p>Canlı önizleme</p><small>Müşterinin gördüğü gerçek uygulama ekranıdır.</small>
       </aside>
+      <SozlukYonetimi />
     </form>
   );
 }
