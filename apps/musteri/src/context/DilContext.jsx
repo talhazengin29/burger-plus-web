@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { ARAYUZ_CEVIRILERI, ARAYUZ_DESEN_CEVIRILERI } from "./arayuzCevirileri";
 
 const SOZLUK = {
   en: {
@@ -79,6 +80,78 @@ const SOZLUK = {
 
 const DilContext = createContext(null);
 
+const kaynakMetinler = new WeakMap();
+const kaynakNitelikler = new WeakMap();
+const CEVRILECEK_NITELIKLER = ["placeholder", "aria-label", "title"];
+
+function metniCevir(metin) {
+  const tam = metin.trim();
+  if (!tam) return metin;
+  let ceviri = ARAYUZ_CEVIRILERI[tam];
+  if (!ceviri) {
+    for (const [desen, karsilik] of ARAYUZ_DESEN_CEVIRILERI) {
+      if (desen.test(tam)) {
+        ceviri = tam.replace(desen, karsilik);
+        break;
+      }
+    }
+  }
+  return ceviri ? metin.replace(tam, ceviri) : metin;
+}
+
+function elemanNitelikleriniCevir(eleman, dil) {
+  if (eleman.nodeType !== Node.ELEMENT_NODE) return;
+  for (const nitelik of CEVRILECEK_NITELIKLER) {
+    const deger = eleman.getAttribute(nitelik);
+    if (!deger) continue;
+    let kayitlar = kaynakNitelikler.get(eleman);
+    if (!kayitlar) { kayitlar = {}; kaynakNitelikler.set(eleman, kayitlar); }
+    if (dil === "en") {
+      const ceviri = metniCevir(deger);
+      if (ceviri !== deger) { kayitlar[nitelik] = deger; eleman.setAttribute(nitelik, ceviri); }
+    } else if (kayitlar[nitelik]) {
+      eleman.setAttribute(nitelik, kayitlar[nitelik]);
+      delete kayitlar[nitelik];
+    }
+  }
+}
+
+function dugumuCevir(kok, dil) {
+  if (kok.nodeType === Node.TEXT_NODE) {
+    if (dil === "en") {
+      const ceviri = metniCevir(kok.nodeValue);
+      if (ceviri !== kok.nodeValue) { kaynakMetinler.set(kok, kok.nodeValue); kok.nodeValue = ceviri; }
+    } else if (kaynakMetinler.has(kok)) {
+      kok.nodeValue = kaynakMetinler.get(kok);
+      kaynakMetinler.delete(kok);
+    }
+    return;
+  }
+  if (kok.nodeType !== Node.ELEMENT_NODE || kok.matches("script, style")) return;
+  elemanNitelikleriniCevir(kok, dil);
+  kok.querySelectorAll("*:not(script):not(style)").forEach((eleman) => {
+    elemanNitelikleriniCevir(eleman, dil);
+    eleman.childNodes.forEach((alt) => { if (alt.nodeType === Node.TEXT_NODE) dugumuCevir(alt, dil); });
+  });
+}
+
+function ArayuzCeviriKatmani({ dil }) {
+  useEffect(() => {
+    const kok = document.querySelector(".telefon-ekran") || document.body;
+    dugumuCevir(kok, dil);
+    const gozlemci = new MutationObserver((degisiklikler) => {
+      for (const degisiklik of degisiklikler) {
+        if (degisiklik.type === "characterData") dugumuCevir(degisiklik.target, dil);
+        else if (degisiklik.type === "attributes") elemanNitelikleriniCevir(degisiklik.target, dil);
+        else degisiklik.addedNodes.forEach((dugum) => dugumuCevir(dugum, dil));
+      }
+    });
+    gozlemci.observe(kok, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: CEVRILECEK_NITELIKLER });
+    return () => gozlemci.disconnect();
+  }, [dil]);
+  return null;
+}
+
 export function DilProvider({ children }) {
   const [dil, setDilState] = useState(() => localStorage.getItem("bp_dil") === "en" ? "en" : "tr");
   const setDil = (deger) => setDilState(deger === "en" ? "en" : "tr");
@@ -94,7 +167,7 @@ export function DilProvider({ children }) {
       return Object.entries(degiskenler).reduce((sonuc, [ad, deger]) => sonuc.replaceAll(`{${ad}}`, String(deger)), metin);
     },
   }), [dil]);
-  return <DilContext.Provider value={deger}>{children}</DilContext.Provider>;
+  return <DilContext.Provider value={deger}><ArayuzCeviriKatmani dil={dil} />{children}</DilContext.Provider>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
