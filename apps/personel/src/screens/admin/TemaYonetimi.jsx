@@ -226,7 +226,7 @@ export default function TemaYonetimi() {
 
         <fieldset className="tema-kutu">
           <legend>Metin özelleştirme</legend>
-          <p>Türkçe alan boşsa konsept metni kullanılır. English boşsa güvenli şekilde Türkçe metne düşer.</p>
+          <p>Türkçe alan boşsa konsept metni kullanılır. English alanları eksikse sözlük bölümünde uyarı gösterilir; müşteri ekranı Türkçeye geri düşmez.</p>
           <div className="tema-metinleri">
             {METIN_ALANLARI.map(([alan, etiket]) => <div className="tema-cok-dilli-alan" key={alan}><b>{etiket}</b><label><span>TR</span><input maxLength="120" value={form.metinler[alan]} placeholder={varsayilan.metinler[alan]} onChange={(e) => setForm({ ...form, metinler: { ...form.metinler, [alan]: e.target.value } })} /><small>{form.metinler[alan].length}/120</small></label>{form.etkinDiller.includes("en") && <label><span>EN</span><input maxLength="120" value={form.metinCevirileri[alan]} placeholder="English translation" onChange={(e) => setForm({ ...form, metinCevirileri: { ...form.metinCevirileri, [alan]: e.target.value } })} /><small>{form.metinCevirileri[alan].length}/120</small></label>}</div>)}
           </div>

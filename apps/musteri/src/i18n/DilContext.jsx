@@ -26,14 +26,16 @@ export function DilSaglayici({ children }) {
     return etkinDiller.length ? etkinDiller : ["tr"];
   }, [ayarlar.etkinDiller]);
   const [hazirlik, setHazirlik] = useState({ yuklendi: false, en: false });
-  const diller = useMemo(() => adayDiller.filter((adayDil) => adayDil === "tr" || (hazirlik.yuklendi && hazirlik[adayDil])), [adayDiller, hazirlik]);
+  // İşletmenin açtığı dil müşteri arayüzünde her zaman görünür. Hazırlık
+  // raporu panelde kalite uyarısıdır; ağ/API hatası dil seçiciyi yok etmez.
+  const diller = adayDiller;
   const varsayilanDil = diller.includes(ayarlar.varsayilanDil) ? ayarlar.varsayilanDil : "tr";
   const depoAnahtari = `bp_dil_${isletme.slug}`;
   const [dil, diliAyarla] = useState(() => {
     const kayitli = localStorage.getItem(depoAnahtari);
     return adayDiller.includes(kayitli) ? kayitli : (adayDiller.includes(ayarlar.varsayilanDil) ? ayarlar.varsayilanDil : "tr");
   });
-  const etkinDil = hazirlik.yuklendi && diller.includes(dil) ? dil : "tr";
+  const etkinDil = diller.includes(dil) ? dil : varsayilanDil;
   const sozlukDepoAnahtari = `bp_i18n_${isletme.slug}_${etkinDil}`;
   const [dbSozluk, setDbSozluk] = useState(() => onbellektenOku(`bp_i18n_${isletme.slug}_tr`));
 
