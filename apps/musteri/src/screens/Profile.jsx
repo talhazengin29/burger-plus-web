@@ -3,7 +3,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import QRCode from "qrcode";
 import { useApp } from "../context/AppContext";
 import {
-  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift, IconWallet, IconChat,
+  IconEdit, IconUser, IconReceipt, IconHelp, IconLogout, IconChevron, IconQr, IconGift, IconWallet, IconChat, IconShield,
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
@@ -155,7 +155,7 @@ export default function Profile() {
         {/* Menü satırları */}
         <div className="profil-menu">
           <button className="profil-menu-satir" onClick={ikiFaktorPenceresiniAc}>
-            <span className="profil-menu-ikon-daire profil-2fa-ikon" aria-hidden="true">🛡️</span>
+          <span className="profil-menu-ikon-daire profil-2fa-ikon" aria-hidden="true"><IconShield /></span>
             <span className="profil-menu-ad">İki Adımlı Doğrulama<small className="profil-2fa-durum">{kullanici?.ikiFaktorAktif ? "Aktif" : "Kapalı"}</small></span>
             <IconChevron className="profil-menu-ok" />
           </button>

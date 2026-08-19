@@ -160,6 +160,13 @@ export const IconWallet = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H5a2 2 0 0 0-2 2z" /><path d="M3 9h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><circle cx="16" cy="14" r="1.3" fill="currentColor" stroke="none" /></svg>
 );
 
+export const IconShield = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}>
+    <path d="M12 3 19 6v5c0 4.8-2.9 8-7 10-4.1-2-7-5.2-7-10V6z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+
 export const IconGoogle = (p) => (
   <svg viewBox="0 0 24 24" width="20" height="20" {...p}>
     <path fill="#4285F4" d="M22 12.2c0-.7-.1-1.4-.2-2H12v4h5.6a4.8 4.8 0 0 1-2 3.2v2.6h3.3c1.9-1.8 3-4.4 3-7.8z" />

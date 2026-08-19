@@ -8,6 +8,7 @@
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
+
 .salon-etiket {
   font-size: 13px;
   font-weight: 800;
@@ -254,3 +255,19 @@
   .nakit-siparis-onay { grid-template-columns: 1fr 1fr; }
   .nakit-siparis-onay span { grid-column: 1 / -1; }
 }
+
+/* Canlı krokide kapasiteye göre sandalyeli masa görünümü. */
+.salon-kroki-masa{--masa-renk:#64748b;display:block;padding:0;border:0;background:transparent;color:var(--masa-renk);overflow:visible}
+.salon-kroki-masa-yuzeyi{position:absolute;inset:15%;z-index:2;display:grid!important;place-content:center;gap:2px;padding:4px;border:2px solid var(--masa-renk);border-radius:12px;background:var(--panel-2);color:var(--metin);box-shadow:0 5px 14px #0004}
+.salon-kroki-masa--yuvarlak .salon-kroki-masa-yuzeyi{border-radius:50%}
+.salon-kroki-masa--dikdortgen .salon-kroki-masa-yuzeyi{inset:20% 10%;border-radius:7px}
+.salon-kroki-sandalye{position:absolute;z-index:1;width:17%;min-width:7px;max-width:20px;aspect-ratio:1.65;border:2px solid currentColor;border-radius:4px;background:var(--panel-3);box-shadow:0 2px 5px #0004;pointer-events:none}
+.salon-kroki-masa--bos{--masa-renk:#64748b;background:transparent}
+.salon-kroki-masa--dolu{--masa-renk:var(--uyari);background:transparent}
+.salon-kroki-masa--rezerve{--masa-renk:var(--info);background:transparent}
+.salon-kroki-masa--cagri{--masa-renk:var(--tehlike);background:transparent;animation:kroki-cagri 1.3s ease-in-out infinite}
+.salon-kroki-masa--dolu .salon-kroki-masa-yuzeyi{background:color-mix(in srgb,var(--uyari) 12%,var(--panel-2))}
+.salon-kroki-masa--rezerve .salon-kroki-masa-yuzeyi{background:color-mix(in srgb,var(--info) 13%,var(--panel-2))}
+.salon-kroki-masa--cagri .salon-kroki-masa-yuzeyi{background:color-mix(in srgb,var(--tehlike) 16%,var(--panel-2))}
+.salon-kroki-masa:hover,.salon-kroki-masa.secili{box-shadow:none}
+.salon-kroki-masa:hover .salon-kroki-masa-yuzeyi,.salon-kroki-masa.secili .salon-kroki-masa-yuzeyi{box-shadow:0 0 0 3px color-mix(in srgb,currentColor 22%,transparent),0 9px 25px #0007}

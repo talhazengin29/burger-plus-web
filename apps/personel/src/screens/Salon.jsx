@@ -47,6 +47,14 @@ const KROKI_ALANLARI = {
   giris: ["↳", "Giriş"], cikis: ["↗", "Çıkış"], merdiven: ["≋", "Merdiven"],
   bar: ["▰", "Bar"], servis: ["◇", "Servis Alanı"], ic_mekan: ["⌂", "İç Mekân"], dis_mekan: ["☀", "Dış Mekân"],
 };
+const sandalyeKonumlari = (kapasite) => Array.from({ length: Math.min(12, Math.max(1, kapasite || 1)) }, (_, index, liste) => {
+  const aci = ((Math.PI * 2) / liste.length) * index - Math.PI / 2;
+  return {
+    left: `${50 + Math.cos(aci) * 44}%`,
+    top: `${50 + Math.sin(aci) * 43}%`,
+    transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
+  };
+});
 
 function boyutMetinleri(secimler) {
   return [
@@ -252,7 +260,7 @@ export default function Salon() {
           {(aktifKat.alanlar || []).filter((alan) => alan.aktif).map((alan) => { const [ikon, varsayilanAd] = KROKI_ALANLARI[alan.tur] || KROKI_ALANLARI.servis; return <div key={alan.id} className={`salon-kroki-alan salon-kroki-alan--${alan.tur}${["ic_mekan", "dis_mekan"].includes(alan.tur) ? " salon-kroki-alan--bolge" : ""}`} style={{ left: `${alan.x}%`, top: `${alan.y}%`, width: `${alan.genislik}%`, height: `${alan.yukseklik}%` }}><i>{ikon}</i><b>{alan.ad || varsayilanAd}</b></div>; })}
           {aktifKat.masalar.filter((masa) => masa.aktif).map((masa) => {
             const durum = masaDurumu(masa.masaNo);
-            return <button key={masa.id} title={`${masa.ad} · ${durum.etiket}`} className={`salon-kroki-masa salon-kroki-masa--${masa.sekil} salon-kroki-masa--${durum.tur}${seciliKrokiMasasi === masa.id ? " secili" : ""}`} style={{ left: `${masa.x}%`, top: `${masa.y}%`, width: `${masa.genislik}%`, height: `${masa.yukseklik}%` }} onClick={() => setSeciliKrokiMasasi(masa.id)}><b>{masa.ad}</b><span>{durum.etiket}</span><small>{masa.kapasite} kişi</small></button>;
+            return <button key={masa.id} title={`${masa.ad} · ${durum.etiket}`} className={`salon-kroki-masa salon-kroki-masa--${masa.sekil} salon-kroki-masa--${durum.tur}${seciliKrokiMasasi === masa.id ? " secili" : ""}`} style={{ left: `${masa.x}%`, top: `${masa.y}%`, width: `${masa.genislik}%`, height: `${masa.yukseklik}%` }} onClick={() => setSeciliKrokiMasasi(masa.id)}><span className="salon-kroki-masa-yuzeyi"><b>{masa.ad}</b><span>{durum.etiket}</span><small>{masa.kapasite} kişi</small></span>{sandalyeKonumlari(masa.kapasite).map((stil, index) => <i key={index} className="salon-kroki-sandalye" style={stil} />)}</button>;
           })}
         </div>
         <div className="salon-kroki-aciklama"><span><i className="bos"/>Boş</span><span><i className="dolu"/>Dolu</span><span><i className="rezerve"/>Rezerve</span><span><i className="cagri"/>Personel çağrısı</span></div>

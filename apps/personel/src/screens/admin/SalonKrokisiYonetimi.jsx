@@ -5,6 +5,14 @@ import "./SalonKrokisiAlanlari.css";
 
 const kimlik = (onEk) => `${onEk}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`}`;
 const sinirla = (deger, alt, ust) => Math.min(ust, Math.max(alt, deger));
+const sandalyeKonumlari = (kapasite) => Array.from({ length: Math.min(12, Math.max(1, kapasite || 1)) }, (_, index, liste) => {
+  const aci = ((Math.PI * 2) / liste.length) * index - Math.PI / 2;
+  return {
+    left: `${50 + Math.cos(aci) * 44}%`,
+    top: `${50 + Math.sin(aci) * 43}%`,
+    transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
+  };
+});
 const ALAN_TURLERI = {
   mutfak: { ad: "Mutfak", ikon: "♨", genislik: 24, yukseklik: 20 },
   wc: { ad: "WC", ikon: "WC", genislik: 12, yukseklik: 14 },
@@ -116,7 +124,7 @@ export default function SalonKrokisiYonetimi() {
         <div className="kroki-oge-ekle"><label>Yerleşim öğesi<select value={eklenecekTur} onChange={(e) => setEklenecekTur(e.target.value)}>{Object.entries(ALAN_TURLERI).map(([id, oge]) => <option key={id} value={id}>{oge.ad}</option>)}</select></label><button onClick={alanEkle}>+ Plana ekle</button><span>Mutfak, WC, kasa, giriş, servis ve iç/dış mekân bölgeleri ekleyebilirsiniz.</span></div>
         <div className={`kroki-tuval kroki-tuval--${kat.mekanTuru || "ic_mekan"}`} ref={alanRef} onPointerMove={surukle} onPointerUp={() => { surukleme.current = null; }} onPointerCancel={() => { surukleme.current = null; }}>
           {(kat.alanlar || []).map((oge) => { const sablon = ALAN_TURLERI[oge.tur] || ALAN_TURLERI.servis; return <button key={oge.id} className={`kroki-alan kroki-alan--${oge.tur}${sablon.bolge ? " kroki-alan--bolge" : ""}${oge.id === alanId ? " secili" : ""}${!oge.aktif ? " pasif" : ""}`} style={{ left: `${oge.x}%`, top: `${oge.y}%`, width: `${oge.genislik}%`, height: `${oge.yukseklik}%` }} onPointerDown={(e) => suruklemeyiBaslat(e, oge)}><i>{sablon.ikon}</i><b>{oge.ad}</b></button>; })}
-          {kat.masalar.map((oge) => <button key={oge.id} className={`kroki-masa kroki-masa--${oge.sekil}${oge.id === masaId ? " secili" : ""}${!oge.aktif ? " pasif" : ""}`} style={{ left: `${oge.x}%`, top: `${oge.y}%`, width: `${oge.genislik}%`, height: `${oge.yukseklik}%` }} onPointerDown={(e) => suruklemeyiBaslat(e, oge)}><b>{oge.ad}</b><span>{oge.kapasite} kişi</span></button>)}
+          {kat.masalar.map((oge) => <button key={oge.id} className={`kroki-masa kroki-masa--${oge.sekil}${oge.id === masaId ? " secili" : ""}${!oge.aktif ? " pasif" : ""}`} style={{ left: `${oge.x}%`, top: `${oge.y}%`, width: `${oge.genislik}%`, height: `${oge.yukseklik}%` }} onPointerDown={(e) => suruklemeyiBaslat(e, oge)}><span className="kroki-masa-yuzeyi"><b>{oge.ad}</b><small>{oge.kapasite} kişi</small></span>{sandalyeKonumlari(oge.kapasite).map((stil, index) => <i key={index} className="kroki-sandalye" style={stil} />)}</button>)}
         </div>
       </section>
       <aside className="kroki-ayarlar">
