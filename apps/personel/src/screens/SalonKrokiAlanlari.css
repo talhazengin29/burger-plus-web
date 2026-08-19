@@ -1,0 +1,16 @@
+.salon-kroki-tuval--dis_mekan { background-color:#17231b; }
+.salon-kroki-tuval--karma { background:linear-gradient(90deg,var(--panel) 0 50%,#17231b 50%); }
+.salon-kroki-alan { position:absolute; z-index:1; display:grid; grid-template-columns:auto minmax(0,1fr); place-content:center; align-items:center; gap:5px; min-width:42px; min-height:30px; padding:6px; overflow:hidden; border:1px solid #64748b; border-radius:8px; background:#27313cdd; color:#e2e8f0; }
+.salon-kroki-alan i { font-size:12px; font-style:normal; font-weight:900; }
+.salon-kroki-alan b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:9px; }
+.salon-kroki-alan--bolge { z-index:0; place-content:start; align-content:start; border-style:dashed; background:transparent; }
+.salon-kroki-alan--ic_mekan { border-color:#64748b; background:#64748b0e; }
+.salon-kroki-alan--dis_mekan { border-color:#22c55e; background:#22c55e0d; }
+.salon-kroki-alan--mutfak { border-color:#ef4444; background:#7f1d1dcc; }
+.salon-kroki-alan--wc { border-color:#38bdf8; background:#0c4a6edd; }
+.salon-kroki-alan--kasa { border-color:#10b981; background:#064e3bdd; }
+.salon-kroki-alan--giris,.salon-kroki-alan--cikis { border-color:#a3e635; background:#365314cc; }
+.salon-kroki-alan--merdiven { border-color:#a78bfa; background:#4c1d95cc; }
+.salon-kroki-alan--bar { border-color:#f59e0b; background:#78350fcc; }
+.salon-kroki-alan--servis { border-color:#f472b6; background:#831843cc; }
+.salon-kroki-masa { z-index:2; }

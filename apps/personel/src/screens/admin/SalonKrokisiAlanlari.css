@@ -1,0 +1,26 @@
+.kroki-kat-bilgileri { display:grid!important; grid-template-columns:minmax(140px,1fr) minmax(140px,1fr); gap:9px; flex:1; }
+.kroki-oge-ekle { display:grid; grid-template-columns:minmax(180px,260px) auto 1fr; align-items:end; gap:10px; margin:0 0 12px; padding:11px; border:1px solid var(--border); border-radius:12px; background:var(--panel-2); }
+.kroki-oge-ekle button { min-height:42px; padding:9px 14px; border-radius:10px; background:var(--primary); color:white; font-weight:800; }
+.kroki-oge-ekle > span { align-self:center; color:var(--metin-soluk); font-size:10px; }
+.kroki-tuval--dis_mekan { background-color:#17231b; }
+.kroki-tuval--karma { background:linear-gradient(90deg,#151515 0 50%,#17231b 50%); }
+.kroki-alan { position:absolute; z-index:2; display:grid; grid-template-columns:auto minmax(0,1fr); place-content:center; align-items:center; gap:6px; min-width:45px; min-height:34px; padding:7px; border:1px solid #64748b; border-radius:9px; background:#27313cdd; color:#e2e8f0; cursor:grab; user-select:none; touch-action:none; overflow:hidden; }
+.kroki-alan i { font-size:13px; font-style:normal; font-weight:900; }
+.kroki-alan b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; }
+.kroki-alan.secili { z-index:5; border-color:var(--primary); box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 24%,transparent); }
+.kroki-alan.pasif { opacity:.4; }
+.kroki-alan--bolge { z-index:1; place-content:start; align-content:start; border-style:dashed; background:transparent; }
+.kroki-alan--ic_mekan { border-color:#64748b; background:#64748b13; }
+.kroki-alan--dis_mekan { border-color:#22c55e; background:#22c55e12; }
+.kroki-alan--mutfak { border-color:#ef4444; background:#7f1d1dcc; }
+.kroki-alan--wc { border-color:#38bdf8; background:#0c4a6edd; }
+.kroki-alan--kasa { border-color:#10b981; background:#064e3bdd; }
+.kroki-alan--giris,.kroki-alan--cikis { border-color:#a3e635; background:#365314cc; }
+.kroki-alan--merdiven { border-color:#a78bfa; background:#4c1d95cc; }
+.kroki-alan--bar { border-color:#f59e0b; background:#78350fcc; }
+.kroki-alan--servis { border-color:#f472b6; background:#831843cc; }
+.kroki-masa { z-index:3; }
+.kroki-alan-tur { display:flex; align-items:center; gap:10px; padding:11px; border:1px solid var(--border); border-radius:10px; background:var(--panel-2); color:var(--metin); }
+.kroki-alan-tur i { width:34px; height:34px; display:grid; place-items:center; border-radius:8px; background:var(--panel-3); color:var(--primary); font-style:normal; font-weight:900; }
+.kroki-alan-tur span { font-size:12px; font-weight:800; }
+@media (max-width:700px) { .kroki-oge-ekle { grid-template-columns:1fr auto; } .kroki-oge-ekle > span { grid-column:1/-1; } .kroki-kat-bilgileri { grid-template-columns:1fr; } }

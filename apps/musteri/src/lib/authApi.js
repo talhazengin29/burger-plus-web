@@ -215,6 +215,13 @@ export async function siparisGecmisiniGetir() {
   return (await jsonIstegi("/api/siparislerim", {}, "Sipariş geçmişi alınamadı.")).siparisler || [];
 }
 
+export async function siparisDegerlendirmesiGonder(siparisId, veri) {
+  if (!tokeniAl()) throw new Error("Değerlendirme için giriş yapmalısınız.");
+  return (await jsonIstegi(`/api/siparislerim/${encodeURIComponent(siparisId)}/degerlendirme`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri),
+  }, "Değerlendirme kaydedilemedi.")).degerlendirme;
+}
+
 export async function sadakatOzetiniGetir() {
   if (!tokeniAl()) return null;
   return (await jsonIstegi("/api/sadakat", {}, "Sadakat bilgileri alınamadı.")).sadakat;

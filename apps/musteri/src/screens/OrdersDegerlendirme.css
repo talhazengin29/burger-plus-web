@@ -1,0 +1,30 @@
+.siparis-degerlendir-btn { width:100%; margin-top:9px; padding:11px 16px; border:1px solid color-mix(in srgb,var(--accent) 48%,transparent); border-radius:var(--r-lg); background:color-mix(in srgb,var(--accent) 8%,transparent); color:var(--primary-container); font-size:13px; font-weight:750; }
+.siparis-degerlendirildi { display:flex; justify-content:center; align-items:center; gap:7px; margin-top:10px; padding:9px; border-radius:var(--r-md); background:rgba(74,222,128,.08); color:var(--basari); font-size:12px; font-weight:700; }
+.siparis-degerlendirildi span { color:#f59e0b; letter-spacing:1px; }
+.degerlendirme-perde { position:fixed; inset:0; z-index:300; display:grid; place-items:center; padding:18px; background:#080604d9; backdrop-filter:blur(12px); }
+.degerlendirme-modal { width:min(560px,100%); max-height:92vh; display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--glass-border); border-radius:24px; background:color-mix(in srgb,var(--surface) 94%,transparent); box-shadow:0 30px 90px #000c,var(--glow); }
+.degerlendirme-modal > header { display:flex; justify-content:space-between; gap:12px; padding:20px 22px 16px; border-bottom:1px solid var(--hairline); }
+.degerlendirme-modal header small { color:var(--primary-container); font-size:9px; font-weight:850; letter-spacing:.14em; }
+.degerlendirme-modal header h2 { margin:4px 0; color:var(--on-surface); font-family:var(--font-baslik); font-size:21px; }
+.degerlendirme-modal header p { color:var(--outline); font-size:11px; }
+.degerlendirme-modal header > button { width:34px; height:34px; border-radius:10px; background:var(--glass-bg-soft); color:var(--on-surface-variant); font-size:24px; }
+.degerlendirme-icerik { overflow:auto; padding:18px 22px; scrollbar-width:thin; scrollbar-color:var(--accent) transparent; }
+.degerlendirme-icerik section + section { margin-top:22px; }
+.degerlendirme-icerik h3 { margin:0 0 4px; color:var(--on-surface); font-size:15px; }
+.degerlendirme-aciklama { margin:0 0 12px; color:var(--outline); font-size:11px; }
+.degerlendirme-urun { display:grid; grid-template-columns:42px minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--hairline); }
+.degerlendirme-urun img,.degerlendirme-urun > span { width:42px; height:42px; display:grid; place-items:center; border-radius:10px; object-fit:cover; background:var(--glass-bg-soft); color:var(--primary-container); font-weight:850; }
+.degerlendirme-urun b { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--on-surface); font-size:12px; }
+.degerlendirme-yildizlar { display:flex; gap:1px; }
+.degerlendirme-yildizlar button { width:28px; height:32px; color:color-mix(in srgb,var(--outline) 45%,transparent); font-size:24px; line-height:1; transition:.15s; }
+.degerlendirme-yildizlar button.aktif { color:#ffb300; filter:drop-shadow(0 0 5px #ff980066); }
+.degerlendirme-kriterler > div { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--hairline); }
+.degerlendirme-kriterler label { color:var(--on-surface-variant); font-size:12px; font-weight:650; }
+.degerlendirme-yorum { position:relative; display:flex; flex-direction:column; gap:7px; margin-top:20px; color:var(--on-surface); font-size:12px; font-weight:700; }
+.degerlendirme-yorum textarea { width:100%; resize:vertical; padding:12px; border:1px solid var(--glass-border); border-radius:12px; background:var(--glass-bg-soft); color:var(--on-surface); font:inherit; font-weight:400; outline:none; }
+.degerlendirme-yorum textarea:focus { border-color:var(--accent); }
+.degerlendirme-yorum > span { align-self:flex-end; color:var(--outline); font-size:9px; font-weight:500; }
+.degerlendirme-modal > footer { display:grid; grid-template-columns:.7fr 1.3fr; gap:9px; padding:14px 22px 20px; border-top:1px solid var(--hairline); }
+.degerlendirme-modal footer button { min-height:45px; border-radius:13px; background:var(--glass-bg-soft); color:var(--on-surface-variant); font-weight:750; }
+.degerlendirme-modal footer .degerlendirme-kaydet { background:linear-gradient(135deg,var(--primary-grad-start),var(--primary-grad-end)); color:#fff; box-shadow:var(--glow-sm); }
+@media(max-width:520px){.degerlendirme-perde{padding:8px}.degerlendirme-modal{max-height:96vh;border-radius:20px}.degerlendirme-urun{grid-template-columns:38px minmax(0,1fr)}.degerlendirme-urun img,.degerlendirme-urun>span{width:38px;height:38px}.degerlendirme-urun .degerlendirme-yildizlar{grid-column:1/-1;justify-self:end}.degerlendirme-yildizlar button{width:32px}.degerlendirme-modal>header,.degerlendirme-icerik,.degerlendirme-modal>footer{padding-left:17px;padding-right:17px}}

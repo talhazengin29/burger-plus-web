@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { IconBag } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
-import { istekAt } from "../lib/authApi";
+import { istekAt, siparisDegerlendirmesiGonder } from "../lib/authApi";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import "./Orders.css";
+import "./OrdersDegerlendirme.css";
 
 /*
   Siparişlerim ekranı — KİŞİSEL, iki bölüm:
@@ -23,8 +24,29 @@ function tarihGoster(iso) {
   });
 }
 
+const urunAnahtari = (urun) => String(urun.sepetAnahtari || urun.id || urun.ad);
+const benzersizUrunler = (urunler) => [...new Map((urunler || []).map((urun) => [urunAnahtari(urun), urun])).values()];
+
+function YildizSecimi({ puan, onChange, etiket }) {
+  return <div className="degerlendirme-yildizlar" role="group" aria-label={etiket}>{[1,2,3,4,5].map((yildiz) => <button type="button" key={yildiz} className={yildiz <= puan ? "aktif" : ""} onClick={() => onChange(yildiz)} aria-label={`${etiket}: ${yildiz} yıldız`}>★</button>)}</div>;
+}
+
+function DegerlendirmeModal({ form, setForm, onKapat, onKaydet, kaydediliyor }) {
+  const siparisUrunleri = benzersizUrunler(form.siparis.urunler);
+  const kriterler = [["genelPuan","Genel deneyim"],["servisHiziPuani","Servis hızı"],["personelPuani","Personel ve hizmet"],["siparisDogruluguPuani","Sipariş doğruluğu"]];
+  return <div className="degerlendirme-perde" onMouseDown={(e) => { if (e.target === e.currentTarget && !kaydediliyor) onKapat(); }}><form className="degerlendirme-modal" onSubmit={onKaydet}>
+    <header><div><small>SİPARİŞ DENEYİMİ</small><h2>Deneyimini değerlendir</h2><p>Sipariş #{form.siparis.siparisNo}</p></div><button type="button" onClick={onKapat} disabled={kaydediliyor}>×</button></header>
+    <div className="degerlendirme-icerik">
+      <section><h3>Ürünler nasıldı?</h3><p className="degerlendirme-aciklama">Siparişindeki her ürünü ayrı ayrı puanla.</p>{siparisUrunleri.map((urun) => <div className="degerlendirme-urun" key={urunAnahtari(urun)}>{urun.gorsel ? <img src={urun.gorsel} alt="" /> : <span>{urun.ad?.charAt(0)}</span>}<b>{urun.ad}</b><YildizSecimi etiket={urun.ad} puan={form.urunPuanlari[urunAnahtari(urun)] || 0} onChange={(puan) => setForm((onceki) => ({ ...onceki, urunPuanlari: { ...onceki.urunPuanlari, [urunAnahtari(urun)]: puan } }))} /></div>)}</section>
+      <section className="degerlendirme-kriterler"><h3>Servis deneyimi</h3>{kriterler.map(([alan, ad]) => <div key={alan}><label>{ad}</label><YildizSecimi etiket={ad} puan={form[alan]} onChange={(puan) => setForm((onceki) => ({ ...onceki, [alan]: puan }))} /></div>)}</section>
+      <label className="degerlendirme-yorum">Eklemek istediğin bir yorum var mı?<textarea maxLength="1000" rows="4" value={form.yorum} onChange={(e) => setForm((onceki) => ({ ...onceki, yorum: e.target.value }))} placeholder="Ürün, servis veya genel deneyimin hakkında yazabilirsin…" /><span>{form.yorum.length}/1000</span></label>
+    </div>
+    <footer><button type="button" onClick={onKapat} disabled={kaydediliyor}>Daha sonra</button><button className="degerlendirme-kaydet" disabled={kaydediliyor}>{kaydediliyor ? "Gönderiliyor…" : "Değerlendirmeyi Gönder"}</button></footer>
+  </form></div>;
+}
+
 // Tek bir sipariş kartı
-function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
+function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
   return (
     <article className={"siparis-kart" + (gecmis ? " siparis-kart--gecmis" : "")}>
       <div className="siparis-kart-ust">
@@ -71,6 +93,7 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer }) {
       <button className="siparis-tekrar-btn" onClick={() => onTekrarSiparisVer(s)}>
         🔁 Tekrar Sipariş Ver
       </button>
+      {gecmis && !s.misafir && (s.degerlendirildi ? <div className="siparis-degerlendirildi"><span>{"★".repeat(s.degerlendirmePuani || 5)}</span> Değerlendirmen alındı</div> : <button className="siparis-degerlendir-btn" onClick={() => onDegerlendir(s)}>☆ Siparişi Değerlendir</button>)}
     </article>
   );
 }
@@ -80,6 +103,9 @@ export default function Orders() {
   const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo, ozetMasaTokeni, sepeteEkle, urunler } = useApp();
 
   const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
+  const [degerlendirmeFormu, setDegerlendirmeFormu] = useState(null);
+  const [degerlendirmeKaydediliyor, setDegerlendirmeKaydediliyor] = useState(false);
+  const oncekiTamamlananlar = useRef(null);
   useEffect(() => {
     if (!mesaj) return;
     const t = setTimeout(() => setMesaj(null), 2500);
@@ -104,6 +130,21 @@ export default function Orders() {
       return;
     }
     git("/sepet");
+  };
+
+  const degerlendirmeyiAc = (siparis) => setDegerlendirmeFormu({ siparis, urunPuanlari: {}, genelPuan: 0, servisHiziPuani: 0, personelPuani: 0, siparisDogruluguPuani: 0, yorum: "" });
+  const degerlendirmeyiKaydet = async (event) => {
+    event.preventDefault();
+    const form = degerlendirmeFormu; const urunler = benzersizUrunler(form.siparis.urunler);
+    if (urunler.some((urun) => !form.urunPuanlari[urunAnahtari(urun)]) || [form.genelPuan,form.servisHiziPuani,form.personelPuani,form.siparisDogruluguPuani].some((puan) => !puan)) {
+      setMesaj({ tip: "hata", metin: "Lütfen ürünlerin ve servis kriterlerinin tamamını puanla." }); return;
+    }
+    setDegerlendirmeKaydediliyor(true);
+    try {
+      await siparisDegerlendirmesiGonder(form.siparis.id, { genelPuan: form.genelPuan, servisHiziPuani: form.servisHiziPuani, personelPuani: form.personelPuani, siparisDogruluguPuani: form.siparisDogruluguPuani, yorum: form.yorum, urunler: urunler.map((urun) => ({ urunAnahtari: urunAnahtari(urun), puan: form.urunPuanlari[urunAnahtari(urun)] })) });
+      setDegerlendirmeFormu(null); setMesaj({ tip: "basari", metin: "Değerlendirmen için teşekkür ederiz." }); await siparisleriYenile();
+    } catch (e) { setMesaj({ tip: "hata", metin: e.message || "Değerlendirme kaydedilemedi." }); }
+    finally { setDegerlendirmeKaydediliyor(false); }
   };
 
   useEffect(() => {
@@ -177,6 +218,15 @@ export default function Orders() {
   const aktifler = siparislerim.filter((s) => !tamamlandiMi(s));
   const gecmisler = siparislerim.filter((s) => tamamlandiMi(s));
 
+  useEffect(() => {
+    const simdi = new Set(gecmisler.map((siparis) => siparis.id));
+    if (oncekiTamamlananlar.current) {
+      const yeniTamamlanan = gecmisler.find((siparis) => !oncekiTamamlananlar.current.has(siparis.id) && !siparis.misafir && !siparis.degerlendirildi);
+      if (yeniTamamlanan && !degerlendirmeFormu) degerlendirmeyiAc(yeniTamamlanan);
+    }
+    oncekiTamamlananlar.current = simdi;
+  }, [gecmisler, degerlendirmeFormu]);
+
   // Durumu henüz bilinmeyen (poll edilmemiş) masa siparişi varsa bölümleri
   // gösterme — aksi halde sipariş yanlış bölümde görünüp sonra sıçrar.
   const bekleniyor = siparislerim.some(
@@ -225,7 +275,7 @@ export default function Orders() {
                 <h2 className="orders-bolum-baslik">Aktif Siparişler</h2>
                 <div className="orders-liste">
                   {aktifler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} onTekrarSiparisVer={tekrarSiparisVer} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} />
                   ))}
                 </div>
               </section>
@@ -237,7 +287,7 @@ export default function Orders() {
                 <h2 className="orders-bolum-baslik">Geçmiş Siparişler</h2>
                 <div className="orders-liste">
                   {gecmisler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} onTekrarSiparisVer={tekrarSiparisVer} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} />
                   ))}
                 </div>
               </section>
@@ -246,6 +296,7 @@ export default function Orders() {
         )}
       </div>
       </SayfaSarici>
+      {degerlendirmeFormu && <DegerlendirmeModal form={degerlendirmeFormu} setForm={setDegerlendirmeFormu} onKapat={() => setDegerlendirmeFormu(null)} onKaydet={degerlendirmeyiKaydet} kaydediliyor={degerlendirmeKaydediliyor} />}
     </div>
   );
 }
