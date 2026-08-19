@@ -64,6 +64,7 @@ const MENU_GRUPLARI = [
 const KAYIT_BOLUMLERI = ["satislar", "gecmis-siparisler", "mutfak-kayitlari", "musteriler", "personel-kayitlari", "revizyonlar"];
 
 const para = (n) => `₺${Number(n || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const gelAlSiparisiMi = (deger) => ["algotur", "algötür", "gelal"].includes(String(deger || "").toLocaleLowerCase("tr-TR").replace(/[\s_-]+/g, ""));
 const kategoriyeGoreUrunTipi = (kategori) => {
   const ad = String(kategori || "").toLocaleLowerCase("tr");
   if (ad.includes("menü") || ad.includes("menu")) return "menu";
@@ -674,7 +675,7 @@ export default function Admin({ onCikis }) {
                 <Panel baslik="Haftalık ritim" alt="Hangi gün daha yoğun?"><MiniCizgiGrafigi veriler={haftayiDoldur(rapor.haftalik || [])} deger="adet" etiket={(g) => haftaAdi(g.gun)} renk="mor" /></Panel>
               </section>
               <Panel baslik="Canlı satış akışı" alt="Yeni ödemeler otomatik görünür">
-                <div className="dashboard-canli-akis">{canliSatislar.slice(0, 5).map((satis, index) => <button type="button" key={`${satis.siparisNo || satis.siparis_no}-${index}`} onClick={() => git("/yonetim/satislar")}><i /><span><b>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</b><small>{(Array.isArray(satis.urunler) ? satis.urunler : []).map((urun) => `${urun.ad} x${urun.adet}`).join(", ") || `${satis.urunAdedi || satis.urun_adedi || 0} ürün`}</small></span><em>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</em><strong>{para(satis.tutar)}</strong><time>{tarihSaat(satis.olusturma)}</time></button>)}{!canliSatislar.length && <Bos yazi="Henüz satış kaydı yok." />}</div>
+                <div className="dashboard-canli-akis">{canliSatislar.slice(0, 5).map((satis, index) => <button type="button" key={`${satis.siparisNo || satis.siparis_no}-${index}`} onClick={() => git("/yonetim/satislar")}><i /><span><b>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</b><small>{(Array.isArray(satis.urunler) ? satis.urunler : []).map((urun) => `${urun.ad} x${urun.adet}`).join(", ") || `${satis.urunAdedi || satis.urun_adedi || 0} ürün`}</small></span><em>{gelAlSiparisiMi(satis.masaNo || satis.masa_no || "algotur") ? "Gel Al" : `Masa ${satis.masaNo || satis.masa_no}`}</em><strong>{para(satis.tutar)}</strong><time>{tarihSaat(satis.olusturma)}</time></button>)}{!canliSatislar.length && <Bos yazi="Henüz satış kaydı yok." />}</div>
               </Panel>
             </>}
 
@@ -919,7 +920,7 @@ export default function Admin({ onCikis }) {
               </section>
               <KayitFiltreleri tur="mutfak" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
               <Panel baslik="Hazırlık geçmişi" alt={`${mutfakKayitlari.length} kayıt`}>
-                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu mutfak-zaman-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>İşlem zamanları</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{String(kayit.masa_no).toLowerCase() === "algotur" ? "Al Götür" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><MutfakSureAkisi kayit={kayit} /></td></tr>)}</tbody></table></div>
+                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu mutfak-zaman-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>İşlem zamanları</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{gelAlSiparisiMi(kayit.masa_no) ? "Gel Al" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><MutfakSureAkisi kayit={kayit} /></td></tr>)}</tbody></table></div>
               </Panel>
             </>}
 
@@ -1365,7 +1366,7 @@ function SatisKartlari({ satislar, gecmis = false }) {
       const urunlerListesi = Array.isArray(satis.urunler) ? satis.urunler : [];
       return <article className="canli-satis-karti" key={`${siparisNo}-${index}`}>
         <header><div><span className={gecmis ? "gecmis-nokta" : "canli-nokta"} /> <b>{siparisNo}</b><small>{tarihSaat(satis.olusturma)}</small></div><DurumRozeti durum={satis.durum} /></header>
-        <div className="canli-satis-ozet"><strong>{para(satis.tutar)}</strong><span>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</span><span>{String(satis.masaNo || satis.masa_no || "algotur").toLowerCase() === "algotur" ? "Al Götür" : `Masa ${satis.masaNo || satis.masa_no}`}</span></div>
+        <div className="canli-satis-ozet"><strong>{para(satis.tutar)}</strong><span>{satis.kisiAdi || satis.kisi_adi || "Misafir"}</span><span>{gelAlSiparisiMi(satis.masaNo || satis.masa_no || "algotur") ? "Gel Al" : `Masa ${satis.masaNo || satis.masa_no}`}</span></div>
         <div className="canli-urunler">{urunlerListesi.map((urun, sira) => <span key={`${urun.ad}-${sira}`}><b>{urun.ad}</b> x{urun.adet}</span>)}</div>
         {gecmis && <footer className="gecmis-satis-alt"><span>Masa kapatıldı</span><time>{tarihSaat(satis.kapandi_at)}</time></footer>}
       </article>;

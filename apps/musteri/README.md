@@ -87,7 +87,7 @@ npm run dev
 ```
 
 Masaya servis modunda (QR ile gelince) sepet artık sunucuda tutulur; aynı masaya
-bağlanan tüm telefonların siparişi birleşir ve canlı güncellenir. Al götür modu
+bağlanan tüm telefonların siparişi birleşir ve canlı güncellenir. Gel Al modu
 yerel çalışır (masası olmadığı için).
 
 ### Backend adresi

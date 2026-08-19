@@ -83,7 +83,7 @@ export default function Cart() {
                 </button>
               </>
             ) : (
-              /* Masa seçili değil — Al Götür veya QR ile Masaya Servis */
+              /* Masa seçili değil — Gel Al veya QR ile Masaya Servis */
               <>
                 <p className="cart-secim-baslik">Nasıl sipariş vermek istersin?</p>
                 <div className="cart-secim-butonlar">
@@ -92,7 +92,7 @@ export default function Cart() {
                     onClick={() => git("/odeme")}
                   >
                     <span className="siparis-tip-emoji">🥡</span>
-                    Al Götür
+                    Gel Al
                   </button>
                   <button className="siparis-tip-btn siparis-tip-btn--masa" onClick={() => git("/qr?mod=masa")}>
                     <span className="siparis-tip-emoji">🍽️</span>

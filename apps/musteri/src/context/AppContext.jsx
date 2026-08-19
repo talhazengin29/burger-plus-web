@@ -235,12 +235,12 @@ export function AppProvider({ children }) {
   };
 
   // --- Sepet ---
-  // Al götür (masasız) için YEREL sepet.
+  // Gel Al (masasız) için YEREL sepet.
   const [sepet, setSepet] = useState([]);
   const [oneriler, setOneriler] = useState([]);
 
   // Aktif masa: QR ile karşılama ekranından gelince set edilir.
-  // null ise al götür; dolu ise masaya servis. Sipariş tipini bu belirler.
+  // null ise Gel Al; dolu ise masaya servis. Sipariş tipini bu belirler.
   // sessionStorage'a yazılır → sayfa yenilenince (F5) korunur.
   const [aktifMasa, setAktifMasaState] = useState(
     () => sessionStorage.getItem(tenantDepoAnahtari("bp_aktifMasa", isletmeSlug)) || null

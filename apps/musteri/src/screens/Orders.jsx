@@ -52,7 +52,7 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
       <div className="siparis-kart-ust">
         <div className="siparis-ust-sol">
           <span className="siparis-tip-rozet">
-            {s.tip === "masa" ? `🍽️ Masa ${s.masaNo}` : "🥡 Al Götür"}
+            {s.tip === "masa" ? `🍽️ Masa ${s.masaNo}` : "🥡 Gel Al"}
           </span>
           <span className="siparis-tarih">{tarihGoster(s.tarih)}</span>
         </div>

@@ -10,6 +10,7 @@ const DURUM_BILGI = {
 };
 
 const FILTRELER = [["tumu", "Tüm siparişler"], ["yeni", "Yeni"], ["hazirlaniyor", "Hazırlanıyor"], ["hazir", "Hazır"]];
+const gelAlSiparisiMi = (masaNo) => String(masaNo || "").trim().toLocaleLowerCase("tr-TR").replace(/[\s_-]+/g, "") === "algotur";
 
 function boyutMetinleri(secimler) {
   return [
@@ -155,10 +156,11 @@ export default function Kitchen() {
             const islemde = islemdeSiparisler.has(islemAnahtari);
             const yas = siparisYasi(siparis.olusturma, simdi);
             const gecikiyor = durum !== "hazir" && yas >= 15;
+            const gelAl = gelAlSiparisiMi(siparis.masaNo);
             return (
               <article key={islemAnahtari} className={`masa-kart durum-${dbilgi.renk} ${gecikiyor ? "masa-kart--geciken" : ""}`}>
                 <header className="masa-kart-ust">
-                  <div className="masa-kimlik"><span className="masa-ikon" aria-hidden="true">{siparis.masaNo}</span><div><small>MASA</small><h2>{siparis.masaNo}</h2></div></div>
+                  <div className="masa-kimlik"><span className="masa-ikon" aria-hidden="true">{gelAl ? "GA" : siparis.masaNo}</span><div><small>{gelAl ? "SİPARİŞ TİPİ" : "MASA"}</small><h2>{gelAl ? "Gel Al" : siparis.masaNo}</h2></div></div>
                   <span className={`durum-rozet durum-${dbilgi.renk}`}><i />{dbilgi.etiket}</span>
                 </header>
                 <div className="siparis-meta">

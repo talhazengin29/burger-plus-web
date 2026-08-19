@@ -478,7 +478,7 @@ Bu kural olmazsa kullanıcı `/tost-point/anasayfa` gibi bir route'u doğrudan a
 5. `X-Isletme`, kullanıcı tokenı veya masa tokenı gerekiyor mu?
 6. Backend yetki ve veri doğrulaması yapıyor mu?
 7. Misafir ve üye davranışları ayrı ayrı denendi mi?
-8. Masa siparişi ve normal al-götür akışı kontrol edildi mi?
+8. Masa siparişi ve normal Gel Al akışı kontrol edildi mi?
 9. Açık ve koyu temada görünüm test edildi mi?
 10. Farklı logo oranları ve işletme temaları denendi mi?
 11. Mobil dar ekran ve taşma durumları kontrol edildi mi?
