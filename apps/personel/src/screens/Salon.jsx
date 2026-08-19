@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { socket } from "../lib/socket";
 import {
   nakitMasalariniGetir,
@@ -8,6 +8,8 @@ import {
   nakitSiparisiTahsilEt,
   personelCagrilariniGetir,
   personelCagrisiGuncelle,
+  rezervasyonlariGetir,
+  salonKrokisiniGetir,
 } from "../lib/adminApi";
 import "./Salon.css";
 
@@ -48,6 +50,11 @@ function boyutMetinleri(secimler) {
   ].filter(Boolean);
 }
 
+const bugununTarihi = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
 export default function Salon() {
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
@@ -60,6 +67,22 @@ export default function Salon() {
   const [hata, setHata] = useState("");
   const [personelCagrilari, setPersonelCagrilari] = useState([]);
   const [cagriIslemleri, setCagriIslemleri] = useState(new Set());
+  const [kroki, setKroki] = useState(null);
+  const [aktifKatId, setAktifKatId] = useState("");
+  const [rezervasyonlar, setRezervasyonlar] = useState([]);
+  const [seciliKrokiMasasi, setSeciliKrokiMasasi] = useState("");
+
+  const krokiyiYenile = useCallback(async () => {
+    try {
+      const [krokiVerisi, rezervasyonVerisi] = await Promise.all([
+        salonKrokisiniGetir(),
+        rezervasyonlariGetir({ baslangic: bugununTarihi(), bitis: bugununTarihi() }),
+      ]);
+      setKroki(krokiVerisi);
+      setAktifKatId((onceki) => krokiVerisi.katlar.some((kat) => kat.id === onceki) ? onceki : krokiVerisi.katlar[0]?.id || "");
+      setRezervasyonlar(rezervasyonVerisi);
+    } catch (e) { setHata(e.message || "Salon krokisi alınamadı."); }
+  }, []);
 
   const personelCagrilariniYenile = useCallback(async () => {
     try { setPersonelCagrilari(await personelCagrilariniGetir()); }
@@ -86,16 +109,23 @@ export default function Salon() {
     const guncelle = (yeniMasalar) => setMasalar(yeniMasalar);
     const nakitGuncelle = () => nakitMasalariYenile();
     const cagrilariGuncelle = (cagrilar) => setPersonelCagrilari(Array.isArray(cagrilar) ? cagrilar : []);
+    const krokiGuncelle = (yeniKroki) => {
+      setKroki(yeniKroki);
+      setAktifKatId((onceki) => yeniKroki.katlar.some((kat) => kat.id === onceki) ? onceki : yeniKroki.katlar[0]?.id || "");
+    };
 
     socket.on("connect", acildi);
     socket.on("disconnect", kapandi);
     socket.on("salon-guncellendi", guncelle);
     socket.on("nakit-guncellendi", nakitGuncelle);
     socket.on("personel-cagrilari-guncellendi", cagrilariGuncelle);
+    socket.on("salon-krokisi-guncellendi", krokiGuncelle);
 
     if (socket.connected) acildi();
     nakitMasalariYenile();
     personelCagrilariniYenile();
+    krokiyiYenile();
+    const rezervasyonYenileme = setInterval(krokiyiYenile, 60000);
 
     return () => {
       socket.off("connect", acildi);
@@ -103,8 +133,22 @@ export default function Salon() {
       socket.off("salon-guncellendi", guncelle);
       socket.off("nakit-guncellendi", nakitGuncelle);
       socket.off("personel-cagrilari-guncellendi", cagrilariGuncelle);
+      socket.off("salon-krokisi-guncellendi", krokiGuncelle);
+      clearInterval(rezervasyonYenileme);
     };
-  }, [nakitMasalariYenile, personelCagrilariniYenile]);
+  }, [nakitMasalariYenile, personelCagrilariniYenile, krokiyiYenile]);
+
+  const aktifKat = useMemo(() => kroki?.katlar.find((kat) => kat.id === aktifKatId) || kroki?.katlar[0], [kroki, aktifKatId]);
+  const masaDurumu = useCallback((masaNo) => {
+    const no = String(masaNo);
+    const cagri = personelCagrilari.find((oge) => String(oge.masaNo) === no);
+    if (cagri) return { tur: "cagri", etiket: cagri.durum === "goruldu" ? "İlgileniliyor" : "Personel çağrısı" };
+    const acik = masalar.some((oge) => String(oge.masaNo) === no) || nakitMasalar.some((oge) => String(oge.masaNo) === no && (oge.nakitAcik || oge.siparisler?.length));
+    if (acik) return { tur: "dolu", etiket: "Dolu" };
+    const rezervasyon = rezervasyonlar.find((oge) => String(oge.masaNo) === no && ["bekliyor", "geldi"].includes(oge.durum));
+    if (rezervasyon) return { tur: "rezerve", etiket: `${rezervasyon.saat} · ${rezervasyon.musteriAdi}` };
+    return { tur: "bos", etiket: "Boş" };
+  }, [personelCagrilari, masalar, nakitMasalar, rezervasyonlar]);
 
   const cagriyiGuncelle = async (cagri, durum) => {
     if (cagriIslemleri.has(cagri.id)) return;
@@ -194,6 +238,19 @@ export default function Salon() {
       </header>
 
       {hata && <div className="salon-hata" role="alert">{hata}</div>}
+
+      {aktifKat && <section className="salon-kroki-paneli">
+        <div className="salon-bolum-baslik"><div><small>CANLI YERLEŞİM</small><h2>Salon krokisi</h2></div><span>{aktifKat.masalar.filter((masa) => masa.aktif).length} aktif masa</span></div>
+        <div className="salon-kat-sekmeleri">{kroki.katlar.map((kat) => <button key={kat.id} className={kat.id === aktifKat.id ? "aktif" : ""} onClick={() => { setAktifKatId(kat.id); setSeciliKrokiMasasi(""); }}>{kat.ad}<span>{kat.masalar.length}</span></button>)}</div>
+        <div className="salon-kroki-tuval">
+          <span className="salon-kroki-giris">GİRİŞ</span>
+          {aktifKat.masalar.filter((masa) => masa.aktif).map((masa) => {
+            const durum = masaDurumu(masa.masaNo);
+            return <button key={masa.id} title={`${masa.ad} · ${durum.etiket}`} className={`salon-kroki-masa salon-kroki-masa--${masa.sekil} salon-kroki-masa--${durum.tur}${seciliKrokiMasasi === masa.id ? " secili" : ""}`} style={{ left: `${masa.x}%`, top: `${masa.y}%`, width: `${masa.genislik}%`, height: `${masa.yukseklik}%` }} onClick={() => setSeciliKrokiMasasi(masa.id)}><b>{masa.ad}</b><span>{durum.etiket}</span><small>{masa.kapasite} kişi</small></button>;
+          })}
+        </div>
+        <div className="salon-kroki-aciklama"><span><i className="bos"/>Boş</span><span><i className="dolu"/>Dolu</span><span><i className="rezerve"/>Rezerve</span><span><i className="cagri"/>Personel çağrısı</span></div>
+      </section>}
 
       <section className={`personel-cagri-paneli${personelCagrilari.length ? " personel-cagri-paneli--aktif" : ""}`}>
         <div className="salon-bolum-baslik">

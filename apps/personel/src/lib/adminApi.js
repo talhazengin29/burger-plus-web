@@ -98,6 +98,14 @@ export const rezervasyonDurumuGuncelle = async (id, durum) => (await rezervasyon
 })).rezervasyon;
 export const rezervasyonSil = async (id) => rezervasyonIstegi(`/${encodeURIComponent(id)}`, { method: "DELETE" });
 
+async function salonKrokisiIstegi() {
+  const r = await istekAt("/api/personel/salon-krokisi");
+  const veri = await jsonOku(r);
+  if (!r.ok) throw new Error(veri.hata || "Salon krokisi alınamadı.");
+  return veri.kroki;
+}
+export const salonKrokisiniGetir = salonKrokisiIstegi;
+
 async function kasaCuzdanIstegi(yol, secenekler = {}) {
   const r = await istekAt(`/api/kasa/cuzdan${yol}`, secenekler);
   const veri = await jsonOku(r);

@@ -154,6 +154,18 @@
   color: #fecaca;
   font-size: 13px;
 }
+.salon-kroki-paneli{padding:24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 5%,transparent),transparent)}
+.salon-kat-sekmeleri{display:flex;gap:8px;overflow:auto;margin-bottom:12px;padding:2px}
+.salon-kat-sekmeleri button{display:flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--metin-soluk);font-size:12px;font-weight:750;white-space:nowrap}
+.salon-kat-sekmeleri button span{min-width:20px;height:20px;display:grid;place-items:center;border-radius:7px;background:var(--panel-3);font-size:9px}
+.salon-kat-sekmeleri button.aktif{border-color:var(--primary);background:var(--primary-hafif);color:var(--primary)}
+.salon-kroki-tuval{position:relative;min-height:430px;aspect-ratio:16/7;overflow:hidden;border:1px solid var(--border);border-radius:16px;background-color:var(--panel);background-image:linear-gradient(color-mix(in srgb,var(--metin) 4%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--metin) 4%,transparent) 1px,transparent 1px);background-size:32px 32px}
+.salon-kroki-giris{position:absolute;bottom:0;left:45%;z-index:2;padding:5px 18px;border-radius:9px 9px 0 0;background:var(--panel-3);color:var(--metin-soluk);font-size:9px;font-weight:900;letter-spacing:.14em}
+.salon-kroki-masa{position:absolute;display:grid;place-content:center;gap:2px;min-width:50px;min-height:43px;padding:5px;border:2px solid var(--border);border-radius:13px;background:var(--panel-2);color:var(--metin);text-align:center;transition:.15s;overflow:hidden}
+.salon-kroki-masa:hover,.salon-kroki-masa.secili{z-index:3;transform:scale(1.04);box-shadow:0 9px 25px #0007}
+.salon-kroki-masa b,.salon-kroki-masa span,.salon-kroki-masa small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.salon-kroki-masa b{font-size:12px}.salon-kroki-masa span{font-size:9px}.salon-kroki-masa small{font-size:8px;color:var(--metin-soluk)}
+.salon-kroki-masa--yuvarlak{border-radius:50%}.salon-kroki-masa--dikdortgen{border-radius:7px}.salon-kroki-masa--bos{border-color:#64748b}.salon-kroki-masa--bos span{color:#94a3b8}.salon-kroki-masa--dolu{border-color:var(--uyari);background:rgba(245,158,11,.12)}.salon-kroki-masa--dolu span{color:var(--uyari)}.salon-kroki-masa--rezerve{border-color:var(--info);background:rgba(59,130,246,.13)}.salon-kroki-masa--rezerve span{color:#93c5fd}.salon-kroki-masa--cagri{border-color:var(--tehlike);background:rgba(239,68,68,.16);animation:kroki-cagri 1.3s ease-in-out infinite}.salon-kroki-masa--cagri span{color:#fca5a5}.salon-kroki-aciklama{display:flex;flex-wrap:wrap;gap:14px;margin-top:11px}.salon-kroki-aciklama span{display:flex;align-items:center;gap:6px;color:var(--metin-soluk);font-size:10px}.salon-kroki-aciklama i{width:9px;height:9px;border-radius:50%;background:#64748b}.salon-kroki-aciklama i.dolu{background:var(--uyari)}.salon-kroki-aciklama i.rezerve{background:var(--info)}.salon-kroki-aciklama i.cagri{background:var(--tehlike)}
+@keyframes kroki-cagri{50%{box-shadow:0 0 0 5px rgba(239,68,68,.12)}}
 .nakit-masa-paneli, .nakit-siparis-paneli, .personel-cagri-paneli { padding: 24px 24px 0; }
 .salon-bolum-baslik { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 13px; }
 .salon-bolum-baslik div { min-width: 0; }
@@ -234,6 +246,7 @@
   .salon-header { padding: 14px 16px; }
   .salon-header-sag { gap: 9px; }
   .nakit-masa-paneli, .nakit-siparis-paneli, .personel-cagri-paneli { padding: 18px 16px 0; }
+  .salon-kroki-paneli{padding:18px 16px}.salon-kroki-tuval{min-height:360px;aspect-ratio:auto}.salon-kroki-masa b{font-size:10px}.salon-kroki-masa span{font-size:7px}.salon-kroki-masa small{display:none}
   .personel-cagri-paneli { padding-bottom:18px }
   .nakit-masa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nakit-siparis-liste { grid-template-columns: 1fr; }

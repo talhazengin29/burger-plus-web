@@ -7,6 +7,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useIsletme } from "../context/IsletmeContext";
 import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 import TemaYonetimi from "./admin/TemaYonetimi";
+import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { goster: false, aktif: false, etiket: "Ürün miktarı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
@@ -41,6 +42,7 @@ const BOLUMLER = [
   ["cuzdan", "Uygulama Cüzdanı", "₺", "cuzdan"],
   ["duyurular", "Duyurular", "●", "duyurular"],
   ["sikayetler", "Şikayetler", "!", "sikayetler"],
+  ["salon-krokisi", "Salon Krokisi", "▦", "salon-krokisi"],
   ["satislar", "Canlı Satışlar", "◉", "satislar"],
   ["gecmis-siparisler", "Geçmiş Siparişler", "◷", "gecmis-siparisler"],
   ["mutfak-kayitlari", "Mutfak Kayıtları", "◫", "mutfak-kayitlari"],
@@ -53,7 +55,7 @@ const BOLUMLER = [
 
 const MENU_GRUPLARI = [
   { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
-  { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["satislar", "mutfak-kayitlari", "personel"] },
+  { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar"] },
 ];
@@ -643,6 +645,7 @@ export default function Admin({ onCikis }) {
           <div className="admin-icerik">
             {KAYIT_BOLUMLERI.includes(bolum) && <KayitGezgini aktif={bolum} sayilar={kayitSayilari} git={git} />}
             {bolum === "tema" && <TemaYonetimi />}
+            {bolum === "salon-krokisi" && <SalonKrokisiYonetimi />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
