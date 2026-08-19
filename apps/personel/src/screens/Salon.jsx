@@ -47,14 +47,17 @@ const KROKI_ALANLARI = {
   giris: ["↳", "Giriş"], cikis: ["↗", "Çıkış"], merdiven: ["≋", "Merdiven"],
   bar: ["▰", "Bar"], servis: ["◇", "Servis Alanı"], ic_mekan: ["⌂", "İç Mekân"], dis_mekan: ["☀", "Dış Mekân"],
 };
-const sandalyeKonumlari = (kapasite) => Array.from({ length: Math.min(12, Math.max(1, kapasite || 1)) }, (_, index, liste) => {
-  const aci = ((Math.PI * 2) / liste.length) * index - Math.PI / 2;
-  return {
-    left: `${50 + Math.cos(aci) * 44}%`,
-    top: `${50 + Math.sin(aci) * 43}%`,
-    transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
-  };
-});
+const sandalyeKonumlari = (kapasite) => {
+  const adet = Math.min(12, Math.max(1, kapasite || 1));
+  return Array.from({ length: adet }, (_, index) => {
+    const aci = ((Math.PI * 2) / adet) * index - Math.PI / 2;
+    return {
+      left: `${50 + Math.cos(aci) * 44}%`,
+      top: `${50 + Math.sin(aci) * 43}%`,
+      transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
+    };
+  });
+};
 
 function boyutMetinleri(secimler) {
   return [

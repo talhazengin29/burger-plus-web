@@ -5,14 +5,17 @@ import "./SalonKrokisiAlanlari.css";
 
 const kimlik = (onEk) => `${onEk}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`}`;
 const sinirla = (deger, alt, ust) => Math.min(ust, Math.max(alt, deger));
-const sandalyeKonumlari = (kapasite) => Array.from({ length: Math.min(12, Math.max(1, kapasite || 1)) }, (_, index, liste) => {
-  const aci = ((Math.PI * 2) / liste.length) * index - Math.PI / 2;
-  return {
-    left: `${50 + Math.cos(aci) * 44}%`,
-    top: `${50 + Math.sin(aci) * 43}%`,
-    transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
-  };
-});
+const sandalyeKonumlari = (kapasite) => {
+  const adet = Math.min(12, Math.max(1, kapasite || 1));
+  return Array.from({ length: adet }, (_, index) => {
+    const aci = ((Math.PI * 2) / adet) * index - Math.PI / 2;
+    return {
+      left: `${50 + Math.cos(aci) * 44}%`,
+      top: `${50 + Math.sin(aci) * 43}%`,
+      transform: `translate(-50%, -50%) rotate(${(aci * 180) / Math.PI + 90}deg)`,
+    };
+  });
+};
 const ALAN_TURLERI = {
   mutfak: { ad: "Mutfak", ikon: "♨", genislik: 24, yukseklik: 20 },
   wc: { ad: "WC", ikon: "WC", genislik: 12, yukseklik: 14 },
