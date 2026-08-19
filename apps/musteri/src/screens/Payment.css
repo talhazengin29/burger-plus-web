@@ -2,6 +2,10 @@
 .payment-govde { flex: 1; padding: 16px var(--margin); padding-bottom: 170px; }
 
 .odeme-masa-rozet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--primary-fixed);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--on-surface);
@@ -13,6 +17,7 @@
   text-align: center;
   box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
+.odeme-masa-rozet svg { width: 22px; height: 22px; stroke-width: 1.8; }
 .misafir-rozet {
   background: var(--glass-bg);
   -webkit-backdrop-filter: var(--glass-blur-sm);

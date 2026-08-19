@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
-import { IconBag } from "../components/Icons";
+import { IconBag, IconTakeaway, IconTableService } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
@@ -52,7 +52,7 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
       <div className="siparis-kart-ust">
         <div className="siparis-ust-sol">
           <span className="siparis-tip-rozet">
-            {s.tip === "masa" ? `🍽️ Masa ${s.masaNo}` : "🥡 Gel Al"}
+            {s.tip === "masa" ? <><IconTableService /> Masa {s.masaNo}</> : <><IconTakeaway /> Gel Al</>}
           </span>
           <span className="siparis-tarih">{tarihGoster(s.tarih)}</span>
         </div>

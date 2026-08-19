@@ -1,6 +1,6 @@
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
-import { IconBack, IconPlus, IconMinus, IconTrash, IconBag } from "../components/Icons";
+import { IconBack, IconPlus, IconMinus, IconTrash, IconBag, IconTakeaway, IconTableService } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { useTema } from "../context/TemaContext";
 import "./Cart.css";
@@ -74,7 +74,7 @@ export default function Cart() {
             {aktifMasa ? (
               /* QR ile masa seçili — doğrudan o masaya ödeme */
               <>
-                <div className="cart-masa-bilgi">🍽️ Masa {aktifMasa}'desin</div>
+                <div className="cart-masa-bilgi"><IconTableService /> Masa {aktifMasa}'desin</div>
                 <button
                   className="odeme-gec-btn"
                   onClick={() => git(`/odeme?masa=${aktifMasa}`)}
@@ -91,11 +91,11 @@ export default function Cart() {
                     className="siparis-tip-btn siparis-tip-btn--algotur"
                     onClick={() => git("/odeme")}
                   >
-                    <span className="siparis-tip-emoji">🥡</span>
+                    <IconTakeaway className="siparis-tip-ikon" />
                     Gel Al
                   </button>
                   <button className="siparis-tip-btn siparis-tip-btn--masa" onClick={() => git("/qr?mod=masa")}>
-                    <span className="siparis-tip-emoji">🍽️</span>
+                    <IconTableService className="siparis-tip-ikon" />
                     Masaya Servis
                   </button>
                 </div>

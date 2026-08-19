@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { puanHesapla } from "../data/mockData";
-import { IconBack, IconCard, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck } from "../components/Icons";
+import { IconBack, IconCard, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck, IconTableService } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { cuzdanlaOdemeyiOnayla, cuzdanOzetiniGetir, iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
 import { socket } from "../lib/socket";
@@ -271,7 +271,7 @@ export default function Payment() {
 
       <div className="payment-govde">
         {masaModu && (
-          <div className="odeme-masa-rozet">🍽️ Masa {masaNo} — Masaya Servis</div>
+          <div className="odeme-masa-rozet"><IconTableService /> Masa {masaNo} — Masaya Servis</div>
         )}
 
         {misafir && (

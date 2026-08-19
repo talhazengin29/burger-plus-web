@@ -178,6 +178,10 @@
   margin-bottom: 12px;
 }
 .cart-masa-bilgi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--primary-fixed);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--on-surface);
@@ -188,6 +192,7 @@
   text-align: center;
   margin-bottom: 12px;
 }
+.cart-masa-bilgi svg { width: 22px; height: 22px; }
 /* Masadayken tek buton: doğrudan ödemeye geç (orijinalde stilsizdi) */
 .odeme-gec-btn {
   width: 100%;
@@ -222,7 +227,7 @@
   transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
 }
 .siparis-tip-btn:active { transform: scale(0.97); }
-.siparis-tip-emoji { font-size: 26px; }
+.siparis-tip-ikon { width: 34px; height: 34px; stroke-width: 1.8; }
 /* İkincil — cam efektli */
 .siparis-tip-btn--algotur {
   background: rgba(255, 255, 255, 0.08);

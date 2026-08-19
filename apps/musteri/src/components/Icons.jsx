@@ -132,6 +132,14 @@ export const IconBag = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M6 7h12l1 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg>
 );
 
+export const IconTakeaway = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M7 7h10l1 14H6zM8 7l1-4h6l1 4M8 12h8" /><path d="M10 16h4" /></svg>
+);
+
+export const IconTableService = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><circle cx="12" cy="12" r="5.5" /><path d="M3 3v6a2 2 0 0 0 2 2v10M7 3v6a2 2 0 0 1-2 2M20 3v18M17 3v6a3 3 0 0 0 3 3" /></svg>
+);
+
 export const IconTrash = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
 );
