@@ -35,7 +35,8 @@ test("müşteri sipariş akışında kullanılan sabit çeviri anahtarları söz
   const dosyalar = [
     "App.jsx", "components/BottomNav.jsx", "components/OrtakHeader.jsx", "components/DilSecici.jsx",
     "screens/TableWelcome.jsx", "screens/Home.jsx", "screens/Campaigns.jsx", "screens/UrunDetay.jsx", "screens/Cart.jsx",
-    "screens/QrScan.jsx", "screens/Payment.jsx", "screens/PaymentSuccess.jsx",
+    "screens/QrScan.jsx", "screens/Payment.jsx", "screens/PaymentSuccess.jsx", "screens/Wallet.jsx",
+    "screens/ProfilDuzenle.jsx", "screens/Sikayet.jsx",
   ];
   const anahtarlar = new Set(duzlestir(SOZLUK.tr).map(([anahtar]) => anahtar));
 

@@ -5,21 +5,23 @@ import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { useApp } from "../context/AppContext";
 import { sikayetGonder, sikayetGorseliYukle, sikayetleriGetir } from "../lib/authApi";
+import { useDil } from "../dil/DilContext";
 import "./Sikayet.css";
 
 const KATEGORILER = [
-  ["siparis", "Sipariş"], ["urun", "Ürün / Lezzet"], ["personel", "Personel"],
-  ["odeme", "Ödeme"], ["uygulama", "Uygulama"], ["diger", "Diğer"],
+  ["siparis", "order"], ["urun", "product"], ["personel", "staff"],
+  ["odeme", "payment"], ["uygulama", "app"], ["diger", "other"],
 ];
 const DURUMLAR = {
-  yeni: ["Alındı", "Başvurunuz işletmeye ulaştı."],
-  inceleniyor: ["İnceleniyor", "İşletme başvurunuzu inceliyor."],
-  cozuldu: ["Çözüldü", "Başvurunuz sonuçlandırıldı."],
-  reddedildi: ["Kapatıldı", "Başvurunuz değerlendirilerek kapatıldı."],
+  yeni: "received",
+  inceleniyor: "reviewing",
+  cozuldu: "resolved",
+  reddedildi: "closed",
 };
 
 export default function Sikayet() {
   const git = useIsletmeNavigate();
+  const { locale, t } = useDil();
   const { kullanici } = useApp();
   const [form, setForm] = useState({ kategori: "siparis", baslik: "", aciklama: "" });
   const [gorsel, setGorsel] = useState(null);
@@ -39,16 +41,16 @@ export default function Sikayet() {
   const gorselSec = (dosya) => {
     setHata("");
     if (!dosya) return setGorsel(null);
-    if (!["image/png", "image/jpeg", "image/webp"].includes(dosya.type)) return setHata("PNG, JPG veya WebP formatında bir görsel seçin.");
-    if (dosya.size > 5 * 1024 * 1024) return setHata("Görsel en fazla 5 MB olabilir.");
+    if (!["image/png", "image/jpeg", "image/webp"].includes(dosya.type)) return setHata(t("complaint.imageFormatError"));
+    if (dosya.size > 5 * 1024 * 1024) return setHata(t("complaint.imageSizeError"));
     setGorsel(dosya);
   };
 
   const gonder = async (e) => {
     e.preventDefault();
     setHata(""); setBasarili("");
-    if (form.baslik.trim().length < 5) return setHata("Konu en az 5 karakter olmalıdır.");
-    if (form.aciklama.trim().length < 20) return setHata("Açıklama en az 20 karakter olmalıdır.");
+    if (form.baslik.trim().length < 5) return setHata(t("complaint.subjectError"));
+    if (form.aciklama.trim().length < 20) return setHata(t("complaint.descriptionError"));
     setGonderiliyor(true);
     try {
       const gorselUrl = gorsel ? await sikayetGorseliYukle(gorsel) : null;
@@ -56,8 +58,8 @@ export default function Sikayet() {
       setSikayetler((onceki) => [sikayet, ...onceki]);
       setForm({ kategori: "siparis", baslik: "", aciklama: "" });
       setGorsel(null);
-      setBasarili("Şikayetiniz işletmeye iletildi. Durumunu bu ekrandan takip edebilirsiniz.");
-    } catch (err) { setHata(err.message || "Şikayet gönderilemedi."); }
+      setBasarili(t("complaint.sentSuccess"));
+    } catch (err) { setHata(err.message || t("complaint.sendFailed")); }
     finally { setGonderiliyor(false); }
   };
 
@@ -66,40 +68,40 @@ export default function Sikayet() {
       <OrtakHeader />
       <SayfaSarici>
         <header className="sikayet-baslik">
-          <button onClick={() => git("/profil")} aria-label="Profile dön"><IconBack /></button>
-          <div><small>GERİ BİLDİRİM MERKEZİ</small><h1>Şikayet ve öneri</h1><p>Yaşadığınız durumu doğrudan işletme yöneticisine iletin.</p></div>
+          <button onClick={() => git("/profil")} aria-label={t("complaint.backToProfile")}><IconBack /></button>
+          <div><small>{t("complaint.center")}</small><h1>{t("complaint.title")}</h1><p>{t("complaint.intro")}</p></div>
         </header>
 
         <form className="sikayet-form" onSubmit={gonder}>
-          <div className="sikayet-form-ust"><span><IconChat /></span><div><b>Yeni başvuru</b><small>Açıklayıcı bilgi çözüm süresini hızlandırır.</small></div></div>
+          <div className="sikayet-form-ust"><span><IconChat /></span><div><b>{t("complaint.newRequest")}</b><small>{t("complaint.newRequestHint")}</small></div></div>
           <fieldset className="sikayet-kategori-secimi">
-            <legend>Kategori</legend>
-            <div>{KATEGORILER.map(([id, ad]) => <button type="button" className={form.kategori === id ? "aktif" : ""} aria-pressed={form.kategori === id} onClick={() => setForm({ ...form, kategori: id })} key={id}>{ad}</button>)}</div>
+            <legend>{t("complaint.category")}</legend>
+            <div>{KATEGORILER.map(([id, anahtar]) => <button type="button" className={form.kategori === id ? "aktif" : ""} aria-pressed={form.kategori === id} onClick={() => setForm({ ...form, kategori: id })} key={id}>{t(`complaint.categories.${anahtar}`)}</button>)}</div>
           </fieldset>
-          <label>Konu<input required maxLength="120" value={form.baslik} onChange={(e) => setForm({ ...form, baslik: e.target.value })} placeholder="Kısaca ne oldu?" /></label>
-          <label>Açıklama<textarea required minLength="20" maxLength="3000" value={form.aciklama} onChange={(e) => setForm({ ...form, aciklama: e.target.value })} placeholder="Tarih, masa veya sipariş bilgisiyle birlikte yaşadığınız durumu anlatın." /><small>{form.aciklama.length}/3000</small></label>
+          <label>{t("complaint.subject")}<input required maxLength="120" value={form.baslik} onChange={(e) => setForm({ ...form, baslik: e.target.value })} placeholder={t("complaint.subjectPlaceholder")} /></label>
+          <label>{t("complaint.description")}<textarea required minLength="20" maxLength="3000" value={form.aciklama} onChange={(e) => setForm({ ...form, aciklama: e.target.value })} placeholder={t("complaint.descriptionPlaceholder")} /><small>{form.aciklama.length}/3000</small></label>
           <label className={`sikayet-gorsel-sec${onizleme ? " dolu" : ""}`}>
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => gorselSec(e.target.files?.[0])} />
-            {onizleme ? <img src={onizleme} alt="Şikayet görseli önizleme" /> : <span>＋</span>}
-            <div><b>{gorsel ? gorsel.name : "Görsel ekle"}</b><small>İsteğe bağlı · PNG, JPG veya WebP · en fazla 5 MB</small></div>
+            {onizleme ? <img src={onizleme} alt={t("complaint.imagePreviewAlt")} /> : <span>＋</span>}
+            <div><b>{gorsel ? gorsel.name : t("complaint.addImage")}</b><small>{t("complaint.imageHint")}</small></div>
           </label>
-          {gorsel && <button type="button" className="sikayet-gorsel-kaldir" onClick={() => setGorsel(null)}>Görseli kaldır</button>}
+          {gorsel && <button type="button" className="sikayet-gorsel-kaldir" onClick={() => setGorsel(null)}>{t("complaint.removeImage")}</button>}
           {hata && <p className="sikayet-mesaj hata" role="alert">{hata}</p>}
           {basarili && <p className="sikayet-mesaj basarili">{basarili}</p>}
-          <button className="sikayet-gonder" disabled={gonderiliyor}>{gonderiliyor ? "Gönderiliyor…" : "İşletmeye Gönder"}</button>
+          <button className="sikayet-gonder" disabled={gonderiliyor}>{gonderiliyor ? t("complaint.sending") : t("complaint.send")}</button>
         </form>
 
         <section className="sikayet-gecmis">
-          <header><div><small>TAKİP</small><h2>Başvurularım</h2></div><span>{sikayetler.length}</span></header>
-          {yukleniyor ? <p className="sikayet-bos">Başvurular yükleniyor…</p> : sikayetler.length ? sikayetler.map((sikayet) => {
+          <header><div><small>{t("complaint.tracking")}</small><h2>{t("complaint.myRequests")}</h2></div><span>{sikayetler.length}</span></header>
+          {yukleniyor ? <p className="sikayet-bos">{t("complaint.loading")}</p> : sikayetler.length ? sikayetler.map((sikayet) => {
             const durum = DURUMLAR[sikayet.durum] || DURUMLAR.yeni;
             return <article key={sikayet.id} className={`sikayet-gecmis-kart ${sikayet.durum}`}>
-              <header><span>{KATEGORILER.find(([id]) => id === sikayet.kategori)?.[1] || "Diğer"}</span><time>{new Date(sikayet.olusturma).toLocaleDateString("tr-TR")}</time></header>
+              <header><span>{t(`complaint.categories.${KATEGORILER.find(([id]) => id === sikayet.kategori)?.[1] || "other"}`)}</span><time>{new Date(sikayet.olusturma).toLocaleDateString(locale)}</time></header>
               <h3>{sikayet.baslik}</h3><p>{sikayet.aciklama}</p>
-              {sikayet.gorselUrl && <img src={sikayet.gorselUrl} alt="Başvuru eki" />}
-              <footer><b>{durum[0]}</b><small>{durum[1]}</small></footer>
+              {sikayet.gorselUrl && <img src={sikayet.gorselUrl} alt={t("complaint.attachmentAlt")} />}
+              <footer><b>{t(`complaint.status.${durum}.title`)}</b><small>{t(`complaint.status.${durum}.text`)}</small></footer>
             </article>;
-          }) : <p className="sikayet-bos">Henüz bir başvurunuz bulunmuyor.</p>}
+          }) : <p className="sikayet-bos">{t("complaint.empty")}</p>}
         </section>
       </SayfaSarici>
     </div>
