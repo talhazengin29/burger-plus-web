@@ -101,6 +101,17 @@
 }
 .tema-dugmesi:hover { border-color: color-mix(in srgb,var(--primary) 38%,var(--border)); background: var(--panel-3); transform: translateY(-1px); }
 .tema-dugmesi-ikon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--primary-hafif); color: var(--primary); font-size: 16px; }
+.tema-dugmesi--global {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 2000;
+  margin: 0;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  box-shadow: var(--golge-hafif);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
 .cuzdan-sekme-ekrani {
   width: min(1320px, calc(100% - 32px));
   margin: 0 auto;
@@ -152,6 +163,7 @@
   .sekme-cikis { flex: none; margin-left: 0; }
   .tema-dugmesi { flex:none; margin-left:0; padding-right:7px; }
   .tema-dugmesi-metin { display:none; }
+  .tema-dugmesi--global { top: 10px; right: 10px; }
   .sekme-cikis span { display: none; }
 }
 

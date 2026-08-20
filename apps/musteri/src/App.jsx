@@ -24,7 +24,6 @@ import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { IsletmeSarici } from "./context/IsletmeContext";
 import { useIsletme } from "./context/IsletmeContext";
-import MusteriDilSecici from "./components/MusteriDilSecici";
 import "./App.css";
 
 const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil", "/hediyelerim", "/cuzdanim"];
@@ -47,7 +46,6 @@ function TelefonYerlesimi() {
   return (
     <div className="telefon">
       <div className="telefon-ekran">
-        <MusteriDilSecici />
         <Outlet />
         {altMenuGoster && <BottomNav />}
       </div>

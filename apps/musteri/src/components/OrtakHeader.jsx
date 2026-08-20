@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useTranslation } from "react-i18next";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -31,7 +30,6 @@ const okunanlariKaydet = (anahtar, duyuruIdleri) => {
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
-  const { t } = useTranslation();
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
   const {
@@ -49,7 +47,7 @@ export default function OrtakHeader({ selamlama = false }) {
     [duyurular, okunanDuyurular]
   );
 
-  const ad = kullanici ? kullanici.ad : misafir ? t("header.guest") : t("header.friend");
+  const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
   const aktifCagri = ["bekliyor", "goruldu"].includes(personelCagrisi?.durum);
   const cagriDurumMetni = personelCagrisi?.durum === "goruldu"
     ? "Personel çağrınızı gördü ve masanıza geliyor."
@@ -109,7 +107,7 @@ export default function OrtakHeader({ selamlama = false }) {
     <header className="home-header">
       {selamlama ? (
         <div className="selam">
-          <span className="selam-ust">{t("header.hello")}</span>
+          <span className="selam-ust">Merhaba,</span>
           <span className="selam-ad">
             {ad} <span aria-hidden="true">👋</span>
           </span>
@@ -123,7 +121,7 @@ export default function OrtakHeader({ selamlama = false }) {
         {ozetMasaNo && (
           <motion.button
             className={`ikon-btn personel-cagir-btn${aktifCagri ? " personel-cagir-btn--aktif" : ""}`}
-            aria-label={t("header.callStaff")}
+            aria-label="Personel çağır"
             onClick={() => { setBildirimlerAcik(false); setPersonelPaneliAcik(true); }}
             whileTap={{ scale: 0.88 }}
           >
@@ -134,7 +132,7 @@ export default function OrtakHeader({ selamlama = false }) {
         <div className="bildirim-sarici">
           <motion.button
             className="ikon-btn bildirim-btn"
-            aria-label={t("header.notifications")}
+            aria-label="Bildirimler"
             aria-expanded={bildirimlerAcik}
             onClick={bildirimleriAcKapat}
             whileTap={{ scale: 0.88 }}
@@ -145,7 +143,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
         <motion.button
           className="ikon-btn sepet-btn"
-          aria-label={t("header.cart")}
+          aria-label="Sepet"
           onClick={() => git("/sepet")}
           whileTap={{ scale: 0.88 }}
         >
@@ -166,10 +164,10 @@ export default function OrtakHeader({ selamlama = false }) {
           <motion.button
             className="avatar-sm avatar-harf"
             onClick={() => git("/profil")}
-            aria-label={t("header.profile")}
+            aria-label="Profil"
             whileTap={{ scale: 0.9 }}
           >
-            {avatar ? <img className="avatar-gorsel" src={avatar} alt={t("header.profile")} /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
+            {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
           </motion.button>
         )}
       </div>

@@ -98,4 +98,7 @@
 .login-bilgi { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--panel-2); color: var(--metin-soluk); font-size: 11px; line-height: 1.5; }
 .login-2fa-input { text-align:center; font-size:24px; font-weight:800; letter-spacing:.16em; }
 
+[data-tema="acik"] .login-kart { box-shadow: var(--golge); }
+[data-tema="acik"] .login-logo--burger-plus { filter: none; }
+
 .login-input--email { margin-bottom: 16px; text-align: left; letter-spacing: 0; font-size: 15px; }

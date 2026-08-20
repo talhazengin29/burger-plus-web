@@ -136,7 +136,7 @@ const urunuFormaCevir = (urun) => ({
   menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
 });
 
-export default function Admin({ onCikis, tema, temaDegistir }) {
+export default function Admin({ onCikis }) {
   const konum = useLocation();
   const git = useIsletmeNavigate();
   const { isletme, isletmeyiGuncelle } = useIsletme();
@@ -638,7 +638,7 @@ export default function Admin({ onCikis, tema, temaDegistir }) {
       <main className="admin-main">
         <header className="admin-ust">
           <div><span className="admin-kicker">İŞLETME YÖNETİMİ</span><h1>{BOLUMLER.find(([id]) => id === bolum)?.[1]}</h1></div>
-          <div className="admin-ust-sag"><button onClick={verileriYukle}>↻ Yenile</button><button className="admin-tema-dugmesi" onClick={temaDegistir} aria-label={tema === "acik" ? "Karanlık temaya geç" : "Aydınlık temaya geç"}><span>{tema === "acik" ? "☾" : "☀"}</span><b>{tema === "acik" ? "Karanlık" : "Aydınlık"}</b></button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
+          <div className="admin-ust-sag"><button onClick={verileriYukle}>↻ Yenile</button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
         </header>
 
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}
