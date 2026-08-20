@@ -15,6 +15,7 @@ import {
 import { socket, socketIsletmesiniAyarla } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
 import { useIsletme } from "./IsletmeContext";
+import { useDil } from "../dil/DilContext";
 import {
   beniGetir, tokeniAl, tokeniSil, profilGuncelle, siparisGecmisiniGetir,
   sadakatOzetiniGetir, puanlaOdulSatinAl, kullaniciHediyesiniKullan,
@@ -79,6 +80,7 @@ function kategorileriUrunlerdenTamamla(mevcut, urunler) {
 
 export function AppProvider({ children }) {
   const { isletmeSlug, tema } = useIsletme();
+  const { dil } = useDil();
   const temaOnizlemeModu = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("temaOnizleme") === "1";
   const depoAnahtari = useCallback((anahtar) => tenantDepoAnahtari(anahtar, isletmeSlug), [isletmeSlug]);
   const [puan, setPuan] = useState(0);
@@ -116,7 +118,7 @@ export function AppProvider({ children }) {
     damgaKartiAyariniGetir()
       .then((ayar) => { if (ayar) setDamgaKarti({ ...VARSAYILAN_DAMGA_KARTI, ...ayar }); })
       .catch(() => {});
-  }, [isletmeSlug]);
+  }, [isletmeSlug, dil]);
 
   // İşletme "Tümü" rozeti için kendi görselini ayarladıysa (yönetim panelinden),
   // konseptin genel varsayılan görselinin önüne geçer. State üzerinde değil
