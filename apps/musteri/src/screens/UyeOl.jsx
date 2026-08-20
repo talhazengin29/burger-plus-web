@@ -1,5 +1,7 @@
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { IconStar } from "../components/Icons";
+import DilSecici from "../components/DilSecici";
+import { useDil } from "../dil/DilContext";
 import "./UyeOl.css";
 
 /*
@@ -8,8 +10,9 @@ import "./UyeOl.css";
   yerine üyeliğe davet eden bir ekran çıkar.
   baslik/aciklama props ile hangi sekmeden gelindiğine göre değişir.
 */
-export default function UyeOl({ baslik, aciklama }) {
+export default function UyeOl({ baslik, aciklama, dilSecici = false }) {
   const git = useIsletmeNavigate();
+  const { t } = useDil();
 
   return (
     <div className="ekran uyeol">
@@ -34,6 +37,12 @@ export default function UyeOl({ baslik, aciklama }) {
         <button className="uyeol-btn-ikincil" onClick={() => git("/anasayfa")}>
           Şimdilik Menüye Dön
         </button>
+        {dilSecici && (
+          <div className="uyeol-dil-satir">
+            <span>{t("language.label")}</span>
+            <DilSecici />
+          </div>
+        )}
       </div>
     </div>
   );

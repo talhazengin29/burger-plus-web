@@ -7,6 +7,7 @@ import {
 } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
+import DilSecici from "../components/DilSecici";
 import UyeOl from "./UyeOl";
 import { davetOzetiniGetir, ikiFaktorKurulumBaslat, ikiFaktorKurulumOnayla, ikiFaktorKapat } from "../lib/authApi";
 import { useDil } from "../dil/DilContext";
@@ -100,6 +101,7 @@ export default function Profile() {
       <UyeOl
         baslik={t("profile.joinTitle")}
         aciklama={t("profile.joinText")}
+        dilSecici
       />
     );
   }
@@ -156,6 +158,11 @@ export default function Profile() {
 
         {/* Menü satırları */}
         <div className="profil-menu">
+          <div className="profil-menu-satir profil-dil-satir">
+            <span className="profil-menu-ikon-daire profil-dil-ikon" aria-hidden="true">文</span>
+            <span className="profil-menu-ad">{t("language.label")}</span>
+            <DilSecici />
+          </div>
           <button className="profil-menu-satir" onClick={ikiFaktorPenceresiniAc}>
           <span className="profil-menu-ikon-daire profil-2fa-ikon" aria-hidden="true"><IconShield /></span>
             <span className="profil-menu-ad">{t("profile.twoFactor")}<small className="profil-2fa-durum">{kullanici?.ikiFaktorAktif ? t("profile.enabled") : t("profile.disabled")}</small></span>
