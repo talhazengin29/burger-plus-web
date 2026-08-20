@@ -58,6 +58,8 @@ function kategorileriBirlestir(uzakKategoriler, isletmeSlug) {
       ad: String(kategori.ad).trim(),
       gorsel: kategori.gorsel || (isletmeSlug === "burger-plus" ? kategoriGorseller[kategori.ad] : null) || null,
       sira: Number.isFinite(Number(kategori.sira)) ? Number(kategori.sira) : sira + 1,
+      ceviriler: kategori.ceviriler || {},
+      ceviriDurumu: kategori.ceviriDurumu || "bekliyor",
     }));
   const benzersiz = Array.from(new Map(liste.map((kategori) => [kategori.ad, kategori])).values());
   return [tumu, ...benzersiz.sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, "tr"))];

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useDil } from "../dil/DilContext";
 import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
@@ -13,6 +14,7 @@ import "./TableWelcome.css";
   Her iki durumda da masa QR'dan biliniyor; ödeme öncesi tekrar QR sorulmaz.
 */
 export default function TableWelcome() {
+  const { t } = useDil();
   const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("no");
@@ -40,9 +42,9 @@ export default function TableWelcome() {
       <div className="ekran table-welcome">
         <div className="tw-icerik">
           <span className="tw-emoji">❓</span>
-          <h1 className="tw-baslik">Geçersiz QR</h1>
-          <p className="tw-alt">Masadaki QR kodu tekrar okutmayı dene.</p>
-          <button className="tw-btn" onClick={() => git("/anasayfa")}>Ana Sayfaya Git</button>
+          <h1 className="tw-baslik">{t("welcome.invalidQr")}</h1>
+          <p className="tw-alt">{t("welcome.invalidQrHelp")}</p>
+          <button className="tw-btn" onClick={() => git("/anasayfa")}>{t("welcome.goHome")}</button>
         </div>
       </div>
     );
@@ -50,12 +52,12 @@ export default function TableWelcome() {
 
   const misafirDevam = () => {
     setMisafir(true);
-    perdeIleGit(() => git("/anasayfa"), "normal", `Masa ${masaNo}`);
+    perdeIleGit(() => git("/anasayfa"), "normal", t("common.table", { number: masaNo }));
   };
 
   const girisYap = () => {
     setMisafir(false); // daimi kullanıcı
-    perdeIleGit(() => git("/anasayfa"), "normal", `Masa ${masaNo}`);
+    perdeIleGit(() => git("/anasayfa"), "normal", t("common.table", { number: masaNo }));
   };
 
   return (
@@ -64,25 +66,22 @@ export default function TableWelcome() {
         <div className="tw-masa-daire">
           <span className="tw-masa-no">{masaNo}</span>
         </div>
-        <span className="tw-hosgeldin-etiket">MASA {masaNo}</span>
-        <h1 className="tw-baslik">Hoş Geldin! 👋</h1>
-        <p className="tw-alt">
-          Nasıl devam etmek istersin? Üyeysen giriş yap, puan kazanmaya
-          devam et. İlk kez geldiysen misafir olarak hemen sipariş verebilirsin.
-        </p>
+        <span className="tw-hosgeldin-etiket">{t("welcome.tableLabel", { number: masaNo })}</span>
+        <h1 className="tw-baslik">{t("welcome.title")}</h1>
+        <p className="tw-alt">{t("welcome.intro")}</p>
 
         <div className="tw-butonlar">
           <button className="tw-btn tw-btn--uye" onClick={girisYap}>
-            Giriş Yap
-            <span className="tw-btn-alt">Üyeyim, puan kazanayım</span>
+            {t("welcome.signIn")}
+            <span className="tw-btn-alt">{t("welcome.memberHint")}</span>
           </button>
           <button className="tw-btn tw-btn--misafir" onClick={misafirDevam}>
-            Misafir Olarak Devam Et
-            <span className="tw-btn-alt">Üye olmadan sipariş ver</span>
+            {t("welcome.guest")}
+            <span className="tw-btn-alt">{t("welcome.guestHint")}</span>
           </button>
         </div>
 
-        <p className="tw-not">Siparişin Masa {masaNo}'ye servis edilecek</p>
+        <p className="tw-not">{t("welcome.serviceNote", { number: masaNo })}</p>
       </div>
     </div>
   );

@@ -8,12 +8,13 @@ import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { cuzdanlaOdemeyiOnayla, cuzdanOzetiniGetir, iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import { emailTemizle, formuDogrula, guvenliMetin, ilkHata, kurallar, telefonTemizle, temizMetin } from "../lib/dogrulama";
+import { useDil } from "../dil/DilContext";
 import "./Payment.css";
 
 const YONTEMLER = [
-  { id: "tam", ad: "Tamamını Öde", Ikon: IconWallet, aciklama: "Hesabın tamamını sen öde" },
-  { id: "esit", ad: "Eşit Böl", Ikon: IconUsers, aciklama: "Çoklu ödeme oturumu ile yakında", devreDisi: true },
-  { id: "urun", ad: "Ürüne Göre", Ikon: IconBag, aciklama: "Sadece kendi ürünlerini öde" },
+  { id: "tam", ad: "payment.full", Ikon: IconWallet, aciklama: "payment.fullHint" },
+  { id: "esit", ad: "payment.equal", Ikon: IconUsers, aciklama: "payment.equalHint", devreDisi: true },
+  { id: "urun", ad: "payment.byProduct", Ikon: IconBag, aciklama: "payment.byProductHint" },
 ];
 
 const ODEME_SEMASI = {
@@ -24,6 +25,7 @@ const ODEME_SEMASI = {
 };
 
 export default function Payment() {
+  const { locale, t, yerelAlan } = useDil();
   const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const masaNo = params.get("masa");
@@ -92,19 +94,19 @@ export default function Payment() {
           <span className={"nakit-sonuc-ikon " + (reddedildi ? "nakit-sonuc-ikon--hata" : onaylandi ? "nakit-sonuc-ikon--tamam" : "") }>
             {reddedildi ? "×" : onaylandi ? "✓" : <span className="durum-spinner" />}
           </span>
-          <small>Masa {nakitSiparis.masaNo}</small>
-          <h1>{reddedildi ? "Sipariş Onaylanmadı" : onaylandi ? "Sipariş Mutfağa İletildi" : "Personel Onayı Bekleniyor"}</h1>
+          <small>{t("common.table", { number: nakitSiparis.masaNo })}</small>
+          <h1>{reddedildi ? t("payment.rejected") : onaylandi ? t("payment.sent") : t("payment.waiting")}</h1>
           <p>{reddedildi
-            ? "Sipariş personel tarafından reddedildi. Detay için personelden yardım isteyebilirsin."
+            ? t("payment.rejectedInfo")
             : onaylandi
-              ? "Siparişin hazırlanıyor. Nakit ödemeyi yemeğin sonunda personele yapabilirsin."
-              : "Personel siparişini kontrol ediyor. Onaylanmadan mutfağa iletilmeyecek."}</p>
+              ? t("payment.sentInfo")
+              : t("payment.waitingInfo")}</p>
           <div className="nakit-sonuc-ozet">
-            <span>Sipariş no</span><strong>{nakitSiparis.siparisNo}</strong>
-            <span>Masada ödenecek</span><strong>₺{Number(nakitSiparis.tutar).toFixed(2)}</strong>
+            <span>{t("payment.orderNo")}</span><strong>{nakitSiparis.siparisNo}</strong>
+            <span>{t("payment.tablePayable")}</span><strong>₺{Number(nakitSiparis.tutar).toFixed(2)}</strong>
           </div>
-          {onaylandi && <button className="ode-btn" onClick={() => git("/anasayfa")}>Menüye Dön</button>}
-          {reddedildi && <button className="ode-btn" onClick={() => { setNakitSiparis(null); git("/anasayfa"); }}>Menüye Dön</button>}
+          {onaylandi && <button className="ode-btn" onClick={() => git("/anasayfa")}>{t("common.menu")}</button>}
+          {reddedildi && <button className="ode-btn" onClick={() => { setNakitSiparis(null); git("/anasayfa"); }}>{t("common.menu")}</button>}
         </div>
       </div>
     );
@@ -124,13 +126,13 @@ export default function Payment() {
     return (
       <div className="ekran payment">
         <header className="alt-header">
-          <button className="geri-btn" onClick={() => git("/anasayfa")} aria-label="Geri"><IconBack /></button>
-          <h1 className="alt-header-baslik">Ödeme</h1>
+          <button className="geri-btn" onClick={() => git("/anasayfa")} aria-label={t("common.back")}><IconBack /></button>
+          <h1 className="alt-header-baslik">{t("payment.title")}</h1>
           <span className="alt-header-bosluk" />
         </header>
         <div className="odeme-bos">
-          <p>Sepetin boş, önce ürün ekle.</p>
-          <button onClick={() => git("/anasayfa")}>Menüye Dön</button>
+          <p>{t("payment.empty")}</p>
+          <button onClick={() => git("/anasayfa")}>{t("common.menu")}</button>
         </div>
       </div>
     );
@@ -264,35 +266,35 @@ export default function Payment() {
   return (
     <div className="ekran payment">
       <header className="alt-header">
-        <button className="geri-btn" onClick={() => git(-1)} aria-label="Geri"><IconBack /></button>
-        <h1 className="alt-header-baslik">Ödeme</h1>
+        <button className="geri-btn" onClick={() => git(-1)} aria-label={t("common.back")}><IconBack /></button>
+        <h1 className="alt-header-baslik">{t("payment.title")}</h1>
         <span className="alt-header-bosluk" />
       </header>
 
       <div className="payment-govde">
         {masaModu && (
-          <div className="odeme-masa-rozet"><IconTableService /> Masa {masaNo} — Masaya Servis</div>
+          <div className="odeme-masa-rozet"><IconTableService /> {t("payment.tableService", { number: masaNo })}</div>
         )}
 
         {misafir && (
-          <div className="misafir-rozet">👤 Misafir olarak devam ediyorsun</div>
+          <div className="misafir-rozet">{t("payment.guest")}</div>
         )}
 
         <section className="secim-kutu odeme-urun-ozeti">
-          <h3 className="secim-baslik">Sipariş özeti</h3>
+          <h3 className="secim-baslik">{t("payment.summary")}</h3>
           {sepet.map((u) => (
             <div key={u.sepetAnahtari || u.id} className="odeme-ozet-satir">
               <span className="odeme-ozet-ad">
-                {u.ad} ×{u.adet}
+                {yerelAlan(u, "ad", u.ad)} ×{u.adet}
                 {gramajMetni(u.secimler) && <small>{gramajMetni(u.secimler)}</small>}
-                {haricMalzemeleriGetir(u).length > 0 && <small>Haric: {haricMalzemeleriGetir(u).join(", ")}</small>}
+                {haricMalzemeleriGetir(u).length > 0 && <small>{t("common.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</small>}
               </span>
               <strong>₺{(u.fiyat * u.adet).toFixed(2)}</strong>
             </div>
           ))}
         </section>
 
-        <h2 className="odeme-bolum-baslik">Ödeme türü</h2>
+        <h2 className="odeme-bolum-baslik">{t("payment.type")}</h2>
         <div className="odeme-tipi-grid">
           <button
             type="button"
@@ -300,7 +302,7 @@ export default function Payment() {
             onClick={() => setOdemeTipi("kart")}
           >
             <IconCard />
-            <span><b>Online ödeme</b><small>Şimdi güvenle öde</small></span>
+            <span><b>{t("payment.online")}</b><small>{t("payment.onlineHint")}</small></span>
           </button>
           <button
             type="button"
@@ -309,7 +311,7 @@ export default function Payment() {
             disabled={!kullanici?.id || !cuzdan?.ayar?.aktif}
           >
             <IconWallet />
-            <span><b>Cüzdan bakiyesi</b><small>{!kullanici?.id ? "Üye girişi gerekli" : !cuzdan?.ayar?.aktif ? "Şu anda kullanılamıyor" : `${Number(cuzdan?.bakiye || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL kullanılabilir`}</small></span>
+            <span><b>{t("payment.wallet")}</b><small>{!kullanici?.id ? t("payment.loginRequired") : !cuzdan?.ayar?.aktif ? t("payment.unavailable") : t("payment.available", { amount: Number(cuzdan?.bakiye || 0).toLocaleString(locale, { minimumFractionDigits: 2 }) })}</small></span>
           </button>
           <button
             type="button"
@@ -318,28 +320,28 @@ export default function Payment() {
             disabled={!nakitKullanilabilir}
           >
             <IconWallet />
-            <span><b>Nakit ödeme</b><small>{!masaModu ? "Yalnızca masada" : nakitMasa.yukleniyor ? "Masa kontrol ediliyor" : nakitMasa.nakitAcik ? "Yemek sonunda öde" : "Personelin masayı açması gerekli"}</small></span>
+            <span><b>{t("payment.cash")}</b><small>{!masaModu ? t("payment.tableOnly") : nakitMasa.yukleniyor ? t("payment.checkingTable") : nakitMasa.nakitAcik ? t("payment.payAfterMeal") : t("payment.staffMustOpen")}</small></span>
           </button>
         </div>
         {masaModu && !nakitMasa.yukleniyor && !nakitMasa.nakitAcik && (
-          <p className="nakit-masa-uyari">Nakit sipariş için personelden Masa {masaNo}'yi açmasını iste.</p>
+          <p className="nakit-masa-uyari">{t("payment.cashWarning", { number: masaNo })}</p>
         )}
 
         {odemeTipi === "kart" && <section className="secim-kutu odeme-bilgi-kutu">
-          <h3 className="secim-baslik">İletişim bilgileri</h3>
-          <p className="odeme-bilgi-not">Kart bilgilerin İyzico’nun güvenli ödeme sayfasında girilir. Normal siparişte T.C. kimlik ve adres bilgisi istenmez.</p>
+          <h3 className="secim-baslik">{t("payment.contact")}</h3>
+          <p className="odeme-bilgi-not">{t("payment.contactHint")}</p>
           <div className="odeme-bilgi-grid">
-            <label>Ad<input value={alici.ad} onChange={(e) => aliciDegistir("ad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("ad")} autoComplete="given-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.ad)} />{alanHatalari.ad && <small className="alan-hata">{alanHatalari.ad}</small>}</label>
-            <label>Soyad<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("soyad")} autoComplete="family-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.soyad)} />{alanHatalari.soyad && <small className="alan-hata">{alanHatalari.soyad}</small>}</label>
-            <label className="tam-genislik">E-posta<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value.slice(0, 254))} onBlur={() => alaniDogrula("email")} autoComplete="email" maxLength="254" required aria-invalid={Boolean(alanHatalari.email)} />{alanHatalari.email && <small className="alan-hata">{alanHatalari.email}</small>}</label>
-            <label className="tam-genislik">Telefon<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value.slice(0, 20))} onBlur={() => alaniDogrula("telefon")} autoComplete="tel" maxLength="20" required aria-invalid={Boolean(alanHatalari.telefon)} />{alanHatalari.telefon && <small className="alan-hata">{alanHatalari.telefon}</small>}</label>
+            <label>{t("payment.firstName")}<input value={alici.ad} onChange={(e) => aliciDegistir("ad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("ad")} autoComplete="given-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.ad)} />{alanHatalari.ad && <small className="alan-hata">{alanHatalari.ad}</small>}</label>
+            <label>{t("payment.lastName")}<input value={alici.soyad} onChange={(e) => aliciDegistir("soyad", guvenliMetin(e.target.value, 60))} onBlur={() => alaniDogrula("soyad")} autoComplete="family-name" maxLength="60" required aria-invalid={Boolean(alanHatalari.soyad)} />{alanHatalari.soyad && <small className="alan-hata">{alanHatalari.soyad}</small>}</label>
+            <label className="tam-genislik">{t("payment.email")}<input type="email" value={alici.email} onChange={(e) => aliciDegistir("email", e.target.value.slice(0, 254))} onBlur={() => alaniDogrula("email")} autoComplete="email" maxLength="254" required aria-invalid={Boolean(alanHatalari.email)} />{alanHatalari.email && <small className="alan-hata">{alanHatalari.email}</small>}</label>
+            <label className="tam-genislik">{t("payment.phone")}<input inputMode="tel" placeholder="+905XXXXXXXXX" value={alici.telefon} onChange={(e) => aliciDegistir("telefon", e.target.value.slice(0, 20))} onBlur={() => alaniDogrula("telefon")} autoComplete="tel" maxLength="20" required aria-invalid={Boolean(alanHatalari.telefon)} />{alanHatalari.telefon && <small className="alan-hata">{alanHatalari.telefon}</small>}</label>
           </div>
         </section>}
 
         {/* Yöntem seçimi — misafir sadece tamamını öder */}
         {(odemeTipi === "kart" || odemeTipi === "cuzdan") && !misafir && (
           <>
-            <h2 className="odeme-bolum-baslik">Nasıl ödemek istersin?</h2>
+            <h2 className="odeme-bolum-baslik">{t("payment.how")}</h2>
             <div className="yontem-grid">
               {YONTEMLER.map(({ id, ad, Ikon, aciklama, devreDisi }) => (
                 <button
@@ -349,34 +351,34 @@ export default function Payment() {
                   disabled={devreDisi}
                 >
                   <Ikon className="yontem-ikon" />
-                  <span className="yontem-ad">{ad}</span>
-                  <span className="yontem-aciklama">{aciklama}</span>
+                  <span className="yontem-ad">{t(ad)}</span>
+                  <span className="yontem-aciklama">{t(aciklama)}</span>
                 </button>
               ))}
             </div>
           </>
         )}
         {odemeTipi === "cuzdan" && Number(cuzdan?.bakiye || 0) < odenecek && (
-          <p className="nakit-masa-uyari">Cüzdan bakiyen bu sipariş için yetersiz. Kasadan nakit yükleme yapabilirsin.</p>
+          <p className="nakit-masa-uyari">{t("payment.insufficient")}</p>
         )}
 
         {/* Eşit böl: kişi sayısı */}
         {odemeTipi === "kart" && !misafir && yontem === "esit" && (
           <section className="secim-kutu">
-            <h3 className="secim-baslik">Kaç kişi paylaşıyor?</h3>
+            <h3 className="secim-baslik">{t("payment.people")}</h3>
             <div className="kisi-secici">
-              <button onClick={() => setKisiSayisi((k) => Math.max(2, k - 1))} aria-label="Azalt"><IconMinus /></button>
+              <button onClick={() => setKisiSayisi((k) => Math.max(2, k - 1))} aria-label={t("common.decrease")}><IconMinus /></button>
               <span className="kisi-sayi">{kisiSayisi}</span>
-              <button onClick={() => setKisiSayisi((k) => Math.min(20, k + 1))} aria-label="Artır"><IconPlus /></button>
+              <button onClick={() => setKisiSayisi((k) => Math.min(20, k + 1))} aria-label={t("common.increase")}><IconPlus /></button>
             </div>
-            <p className="kisi-not">Kişi başı ₺{(sepetToplam / kisiSayisi).toFixed(2)}</p>
+            <p className="kisi-not">{t("payment.perPerson", { amount: `₺${(sepetToplam / kisiSayisi).toFixed(2)}` })}</p>
           </section>
         )}
 
         {/* Ürüne göre: adet bazlı seçim */}
         {odemeTipi === "kart" && !misafir && yontem === "urun" && (
           <section className="secim-kutu">
-            <h3 className="secim-baslik">Ödeyeceğin ürünleri seç</h3>
+            <h3 className="secim-baslik">{t("payment.chooseProducts")}</h3>
             <div className="urun-sec-liste">
               {sepet.map((u) => {
                 const anahtar = u.sepetAnahtari;
@@ -396,9 +398,9 @@ export default function Payment() {
                         {secili && <IconCheck />}
                       </span>
                       <span className="urun-sec-ad">
-                        {u.ad}
+                        {yerelAlan(u, "ad", u.ad)}
                         {gramajMetni(u.secimler) && <small>{gramajMetni(u.secimler)}</small>}
-                        {haricMalzemeleriGetir(u).length > 0 && <small>Haric: {haricMalzemeleriGetir(u).join(", ")}</small>}
+                        {haricMalzemeleriGetir(u).length > 0 && <small>{t("common.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</small>}
                       </span>
                     </button>
 
@@ -438,7 +440,7 @@ export default function Payment() {
         {!misafir && (
           <div className="puan-bilgi">
             <span className="puan-bilgi-ikon">⭐</span>
-            <span>{odemeTipi === "nakit" ? "Nakit tahsil edildiğinde" : "Bu ödemeden"} <strong>{kazanilacakPuan} puan</strong> kazanacaksın</span>
+            <span>{odemeTipi === "nakit" ? t("payment.pointsCash") : t("payment.pointsPayment")} <strong>{t("payment.pointsEarn", { points: kazanilacakPuan })}</strong></span>
           </div>
         )}
         {odemeHatasi && <p className="odeme-hata" role="alert">{odemeHatasi}</p>}
@@ -447,7 +449,7 @@ export default function Payment() {
       {/* Alt sabit ödeme bar */}
       <div className="payment-alt-bar">
         <div className="odenecek-satir">
-          <span>Ödenecek Tutar</span>
+          <span>{t("payment.payable")}</span>
           <span className="odenecek-tutar">₺{odenecek.toFixed(2)}</span>
         </div>
         <button
@@ -456,8 +458,8 @@ export default function Payment() {
           disabled={!odemeAktif || islemde}
         >
           {islemde
-            ? odemeTipi === "nakit" ? "Sipariş gönderiliyor…" : "Güvenli ödeme hazırlanıyor…"
-            : odemeTipi === "nakit" ? "Personel Onayına Gönder" : "Ödeme Yap"}
+            ? odemeTipi === "nakit" ? t("payment.sending") : t("payment.preparing")
+            : odemeTipi === "nakit" ? t("payment.sendOrder") : t("payment.pay")}
         </button>
       </div>
     </div>
