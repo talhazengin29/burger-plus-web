@@ -1,4 +1,5 @@
 import { createContext, useContext, useLayoutEffect, useMemo } from "react";
+import { useDil } from "../dil/DilContext";
 
 const TemaContext = createContext(null);
 
@@ -39,8 +40,12 @@ function googleFontAgirliklari() {
 }
 
 export function TemaSaglayici({ tema, isletme, children }) {
+  const { dil } = useDil();
   const aktifTema = tema || VARSAYILAN_TEMA;
   const logoUrl = aktifTema.logoUrl || isletme.logoUrl || null;
+  const yerelMetinler = useMemo(() => dil === "en"
+    ? { ...aktifTema.metinler, ...(aktifTema.ceviriler?.en?.metinler || {}) }
+    : aktifTema.metinler, [aktifTema, dil]);
 
   useLayoutEffect(() => {
     const kok = document.documentElement;
@@ -84,10 +89,11 @@ export function TemaSaglayici({ tema, isletme, children }) {
 
   const deger = useMemo(() => ({
     ...aktifTema,
+    metinler: yerelMetinler,
     logoUrl,
     isletmeAdi: isletme.ad,
     isletmeSlug: isletme.slug,
-  }), [aktifTema, isletme, logoUrl]);
+  }), [aktifTema, isletme, logoUrl, yerelMetinler]);
 
   return <TemaContext.Provider value={deger}>{children}</TemaContext.Provider>;
 }

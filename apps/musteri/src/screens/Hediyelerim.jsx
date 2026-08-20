@@ -7,16 +7,18 @@ import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
+import { useDil } from "../dil/DilContext";
 import "./Hediyelerim.css";
 
-function kaynakMetni(h) {
-  return h.tip === "puan" ? `${h.puan} Puan ile kazanıldı` : "Ye Kazan ile kazanıldı";
+function kaynakMetni(h, t) {
+  return h.tip === "puan" ? t("gifts.earnedWithPoints", { points: h.puan }) : t("gifts.earnedWithStamp");
 }
-function tarihGoster(iso) {
-  return new Date(iso).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+function tarihGoster(iso, locale) {
+  return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 }
 
-function HediyeKart({ h, kullanilmis, onKullan, islemde }) {
+function HediyeKart({ h, kullanilmis, onKullan, islemde, t, locale, yerelAlan }) {
+  const ad = yerelAlan(h, "ad", h.ad);
   return (
     <motion.article
       className={"hediye-kart" + (kullanilmis ? " hediye-kart--kullanilmis" : "")}
@@ -24,20 +26,20 @@ function HediyeKart({ h, kullanilmis, onKullan, islemde }) {
     >
       <div className="hediye-gorsel-wrap">
         {h.gorsel ? (
-          <img className="hediye-gorsel" src={h.gorsel} alt={h.ad} />
+          <img className="hediye-gorsel" src={h.gorsel} alt={ad} />
         ) : (
           <div className="hediye-gorsel-yer"><IconGift /></div>
         )}
       </div>
       <div className="hediye-icerik">
-        <h3 className="hediye-ad">{h.ad}</h3>
-        <span className="hediye-kaynak">{kaynakMetni(h)}</span>
-        <span className="hediye-tarih">{tarihGoster(h.tarih)}</span>
+        <h3 className="hediye-ad">{ad}</h3>
+        <span className="hediye-kaynak">{kaynakMetni(h, t)}</span>
+        <span className="hediye-tarih">{tarihGoster(h.tarih, locale)}</span>
         {kullanilmis ? (
-          <span className="hediye-kullanildi-rozet">Kullanıldı ✓</span>
+          <span className="hediye-kullanildi-rozet">{t("gifts.used")}</span>
         ) : (
           <button className="hediye-sepet-btn" disabled={islemde} onClick={() => onKullan(h)}>
-            {islemde ? "İşleniyor…" : "Hediyeyi Kullan"}
+            {islemde ? t("gifts.processing") : t("gifts.use")}
           </button>
         )}
       </div>
@@ -46,6 +48,7 @@ function HediyeKart({ h, kullanilmis, onKullan, islemde }) {
 }
 
 export default function Hediyelerim() {
+  const { t, locale, yerelAlan } = useDil();
   const { misafir, hediyeler, hediyeKullan, odemeyiTamamla } = useApp();
   const git = useIsletmeNavigate();
   const [islemde, setIslemde] = useState(null);
@@ -54,8 +57,8 @@ export default function Hediyelerim() {
   if (misafir) {
     return (
       <UyeOl
-        baslik="Hediyelerini Gör"
-        aciklama="Hediyeler üyelere özel. Üye ol, Ye Kazan ve puan ödüllerini burada topla."
+        baslik={t("gifts.joinTitle")}
+        aciklama={t("gifts.joinText")}
       />
     );
   }
@@ -72,7 +75,7 @@ export default function Hediyelerim() {
       odemeyiTamamla(odeme);
       git("/odeme-sonuc");
     } catch (e) {
-      setHata(e.message || "Hediye kullanılamadı.");
+      setHata(e.message || t("gifts.failed"));
     } finally {
       setIslemde(null);
     }
@@ -83,27 +86,27 @@ export default function Hediyelerim() {
       <OrtakHeader />
       <SayfaSarici>
         <div className="hediyelerim-govde">
-          <h1 className="hediyelerim-baslik">Hediyelerim</h1>
+          <h1 className="hediyelerim-baslik">{t("gifts.title")}</h1>
           {hata && <p className="hediyelerim-bos" role="alert">{hata}</p>}
 
-          <h2 className="hediyelerim-bolum-baslik">Kullanılabilir Hediyeler</h2>
+          <h2 className="hediyelerim-bolum-baslik">{t("gifts.available")}</h2>
           {kullanilabilir.length === 0 ? (
-            <p className="hediyelerim-bos">Henüz hediye kazanmadın</p>
+            <p className="hediyelerim-bos">{t("gifts.noneAvailable")}</p>
           ) : (
             <motion.div className="hediye-liste" {...siraliKonteyner} initial="initial" animate="animate">
               {kullanilabilir.map((h) => (
-                <HediyeKart key={h.id} h={h} kullanilmis={false} onKullan={hediyeyiKullan} islemde={islemde === h.id} />
+                <HediyeKart key={h.id} h={h} kullanilmis={false} onKullan={hediyeyiKullan} islemde={islemde === h.id} t={t} locale={locale} yerelAlan={yerelAlan} />
               ))}
             </motion.div>
           )}
 
-          <h2 className="hediyelerim-bolum-baslik">Kullanılmış Hediyeler</h2>
+          <h2 className="hediyelerim-bolum-baslik">{t("gifts.usedTitle")}</h2>
           {kullanilmis.length === 0 ? (
-            <p className="hediyelerim-bos">Henüz kullanılmış hediye yok</p>
+            <p className="hediyelerim-bos">{t("gifts.noneUsed")}</p>
           ) : (
             <motion.div className="hediye-liste" {...siraliKonteyner} initial="initial" animate="animate">
               {kullanilmis.map((h) => (
-                <HediyeKart key={h.id} h={h} kullanilmis={true} />
+                <HediyeKart key={h.id} h={h} kullanilmis={true} t={t} locale={locale} yerelAlan={yerelAlan} />
               ))}
             </motion.div>
           )}
