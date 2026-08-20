@@ -1,0 +1,300 @@
+/*
+ * Musteri uygulamasi tablet yerlesimi
+ *
+ * Telefon tasarimi 599px ve altinda aynen korunur. 600-1366px araliginda
+ * telefon maketi kaldirilir, sayfalar cihaz ekranini ve yatay alani kullanir.
+ */
+@media (min-width: 600px) and (max-width: 1366px) {
+  :root {
+    --margin: clamp(24px, 4vw, 48px);
+    --gap-section: 32px;
+  }
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .telefon {
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-items: stretch;
+    padding: 0;
+    background: var(--bg-page);
+  }
+
+  .telefon-ekran {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .ekran {
+    padding-bottom: 112px;
+  }
+
+  /* Ana sayfa ve ikincil ekranlar ayni okunabilir icerik eksenini kullanir. */
+  .home-govde,
+  .camp-govde,
+  .profile-govde,
+  .rewards-govde,
+  .orders-govde,
+  .cart-govde,
+  .payment-govde,
+  .table-govde,
+  .hediyelerim-govde,
+  .wallet-govde,
+  .qr-gen-govde,
+  .qrscan-govde {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
+  }
+
+  .home-govde,
+  .camp-govde,
+  .profile-govde,
+  .rewards-govde,
+  .orders-govde,
+  .hediyelerim-govde,
+  .wallet-govde {
+    padding-top: 28px;
+  }
+
+  .home-hero {
+    max-width: 680px;
+    font-size: clamp(34px, 4.2vw, 48px);
+    margin-bottom: 24px;
+  }
+
+  .arama-sarici {
+    max-width: 760px;
+    margin-bottom: 26px;
+  }
+
+  .arama-input {
+    font-size: 16px;
+  }
+
+  .kategori-satir {
+    gap: 22px;
+    padding-block: 12px;
+    margin-bottom: 18px;
+  }
+
+  .kategori {
+    width: 86px;
+    gap: 8px;
+  }
+
+  .kategori-daire {
+    width: 74px;
+    height: 74px;
+  }
+
+  .kategori-ad {
+    font-size: 13px;
+  }
+
+  .damga-kart {
+    padding: 26px 28px;
+  }
+
+  .damga-noktalar > span {
+    max-height: 92px;
+  }
+
+  .populer-urun-listesi,
+  .urun-grid,
+  .odul-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .urun-alt,
+  .odul-alt {
+    padding: 16px;
+  }
+
+  .urun-ad,
+  .odul-ad {
+    font-size: 16px;
+  }
+
+  .camp-baslik {
+    font-size: clamp(30px, 4vw, 42px);
+  }
+
+  .camp-alt {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .camp-liste {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 22px;
+  }
+
+  .camp-kart {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .camp-icerik {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .camp-aciklama {
+    flex: 1;
+  }
+
+  .orders-liste,
+  .hediye-liste {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+  }
+
+  .puan-kart {
+    padding: 32px;
+  }
+
+  /* Alt menuyu tablet ekraninda ulasilabilir, kontrollu bir genislikte tut. */
+  .bottom-nav {
+    right: auto;
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    width: min(720px, calc(100% - 48px));
+    min-height: 72px;
+    padding: 9px 12px;
+    transform: translateX(-50%);
+  }
+
+  .nav-item {
+    gap: 5px;
+    font-size: 12px;
+  }
+
+  .nav-icon-wrap {
+    width: 48px;
+    height: 34px;
+  }
+
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Sepet/odeme gibi sabit aksiyonlar genis ekranda gereksiz uzamaz. */
+  .cart-alt-bar,
+  .payment-alt-bar,
+  .table-alt-bar,
+  .urun-detay-alt-bar {
+    right: auto;
+    left: 50%;
+    width: min(920px, 100%);
+    transform: translateX(-50%);
+  }
+
+  /* Giris ve kayit ekranlarinda form satir uzunlugunu sinirla. */
+  .login {
+    align-items: center;
+    padding-inline: var(--margin);
+  }
+
+  .login-ust,
+  .login-form,
+  .login-kayit-yonlendir,
+  .login-misafir-link {
+    width: min(560px, 100%);
+  }
+
+  .login-ust {
+    padding-top: clamp(54px, 9vh, 88px);
+  }
+
+  .login-form {
+    padding: 30px;
+  }
+
+  /* Dikey tablette urun fotografi ekranin tamamini yutmasin. */
+  .urun-detay-govde {
+    width: 100%;
+    max-width: 820px;
+    margin-inline: auto;
+  }
+
+  .urun-detay-gorsel-wrap {
+    aspect-ratio: 16 / 9;
+    border-radius: 0 0 var(--r-xl) var(--r-xl);
+  }
+
+  .urun-detay-icerik {
+    padding-top: 28px;
+  }
+
+  .urun-detay-kart {
+    padding: 22px 24px;
+  }
+}
+
+/* Yatay tablet: urun detayini gercek iki kolonlu alisveris duzenine cevir. */
+@media (min-width: 900px) and (max-width: 1366px) {
+  .urun-detay-govde {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+    align-items: start;
+    gap: 28px;
+    max-width: 1120px;
+    padding: 28px var(--margin) 150px;
+  }
+
+  .urun-detay-gorsel-wrap {
+    position: sticky;
+    top: 28px;
+    aspect-ratio: 1;
+    border-radius: var(--r-xl);
+  }
+
+  .urun-detay-icerik {
+    padding: 0;
+  }
+}
+
+/* 11-13 inc yatay tabletlerde urun ve odul kartlari dort kolona sigar. */
+@media (min-width: 1100px) and (max-width: 1366px) {
+  .populer-urun-listesi,
+  .urun-grid,
+  .odul-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Kucuk tabletlerde kartlari sikistirmak yerine iki okunabilir kolon kullan. */
+@media (min-width: 600px) and (max-width: 699px) {
+  .populer-urun-listesi,
+  .urun-grid,
+  .odul-grid,
+  .camp-liste,
+  .orders-liste,
+  .hediye-liste {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

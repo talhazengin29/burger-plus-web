@@ -26,6 +26,7 @@ import { IsletmeSarici } from "./context/IsletmeContext";
 import { useIsletme } from "./context/IsletmeContext";
 import DilSecici from "./components/DilSecici";
 import "./App.css";
+import "./tablet.css";
 
 const altMenuluYollar = ["/anasayfa", "/kampanyalar", "/siparislerim", "/puanlarim", "/profil", "/hediyelerim", "/cuzdanim"];
 
