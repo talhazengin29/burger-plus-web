@@ -21,21 +21,21 @@ export default function UyeOl({ baslik, aciklama, dilSecici = false }) {
           <IconStar className="uyeol-ikon" />
         </div>
 
-        <h1 className="uyeol-baslik">{baslik || "Üye Ol"}</h1>
-        <p className="uyeol-alt">{aciklama || "Bu bölümü kullanmak için üye olman gerekiyor."}</p>
+        <h1 className="uyeol-baslik">{baslik || t("membership.title")}</h1>
+        <p className="uyeol-alt">{aciklama || t("membership.intro")}</p>
 
         <ul className="uyeol-avantaj">
-          <li>🎁 Her siparişte puan kazan</li>
-          <li>🍔 Puanlarını ürünlerle takas et</li>
-          <li>⭐ 5 al 1 bedava gibi ödüller</li>
-          <li>📋 Sipariş geçmişini gör</li>
+          <li>🎁 {t("membership.benefitPoints")}</li>
+          <li>🍔 {t("membership.benefitRedeem")}</li>
+          <li>⭐ {t("membership.benefitRewards")}</li>
+          <li>📋 {t("membership.benefitHistory")}</li>
         </ul>
 
         <button className="uyeol-btn" onClick={() => git("/")}>
-          Üye Ol / Giriş Yap
+          {t("membership.joinOrSignIn")}
         </button>
         <button className="uyeol-btn-ikincil" onClick={() => git("/anasayfa")}>
-          Şimdilik Menüye Dön
+          {t("membership.backToMenu")}
         </button>
         {dilSecici && (
           <div className="uyeol-dil-satir">

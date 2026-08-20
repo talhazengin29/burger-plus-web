@@ -6,16 +6,18 @@ import { sifreSifirla, tokenDogrula as tokenSunucudaDogrula } from "../lib/authA
 import { IconCheck, IconEye, IconEyeOff, IconWarning } from "../components/Icons";
 import { kurallar } from "../lib/dogrulama";
 import MarkaLogosu from "../components/MarkaLogosu";
+import { useDil } from "../dil/DilContext";
 import "./Login.css";
 
-function sifreGucu(sifre) {
-  if (sifre.length < 8) return { etiket: "Zayıf", sinif: "zayif", oran: 0.33 };
-  if (sifre.length < 12) return { etiket: "Orta", sinif: "orta", oran: 0.66 };
-  return { etiket: "Güçlü", sinif: "guclu", oran: 1 };
+function sifreGucu(sifre, t) {
+  if (sifre.length < 8) return { etiket: t("passwordReset.weak"), sinif: "zayif", oran: 0.33 };
+  if (sifre.length < 12) return { etiket: t("passwordReset.medium"), sinif: "orta", oran: 0.66 };
+  return { etiket: t("passwordReset.strong"), sinif: "guclu", oran: 1 };
 }
 
 export default function SifreSifirla() {
   const git = useIsletmeNavigate();
+  const { t } = useDil();
   const [parametreler] = useSearchParams();
   const token = parametreler.get("token") || "";
 
@@ -37,8 +39,8 @@ export default function SifreSifirla() {
     e.preventDefault();
     setHata("");
     const sifreHatasi = kurallar.yeniSifre(sifre);
-    if (sifreHatasi) { setHata(sifreHatasi); return; }
-    if (sifre !== sifreTekrar) { setHata("Şifreler eşleşmiyor."); return; }
+    if (sifreHatasi) { setHata(t("passwordReset.invalidPassword")); return; }
+    if (sifre !== sifreTekrar) { setHata(t("passwordReset.passwordMismatch")); return; }
 
     setYukleniyor(true);
     try {
@@ -50,13 +52,13 @@ export default function SifreSifirla() {
         setTimeout(() => git("/"), 2000);
       }
     } catch {
-      setHata("Sunucuya ulaşılamadı. Backend çalışıyor mu?");
+      setHata(t("passwordReset.serverError"));
     } finally {
       setYukleniyor(false);
     }
   };
 
-  const guc = sifre ? sifreGucu(sifre) : null;
+  const guc = sifre ? sifreGucu(sifre, t) : null;
 
   return (
     <div className="ekran login">
@@ -67,11 +69,11 @@ export default function SifreSifirla() {
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <MarkaLogosu className="login-logo" />
-        <p className="login-slogan">Yeni şifreni belirle</p>
+        <p className="login-slogan">{t("passwordReset.chooseSlogan")}</p>
       </motion.div>
 
       {durum === "kontrol" && (
-        <div className="login-form sifirlama-yukleniyor">Bağlantı kontrol ediliyor…</div>
+        <div className="login-form sifirlama-yukleniyor">{t("passwordReset.checkingLink")}</div>
       )}
 
       {durum === "gecersiz" && (
@@ -82,12 +84,12 @@ export default function SifreSifirla() {
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <span className="sifirlama-basari-ikon sifirlama-hata-ikon"><IconWarning /></span>
-          <h2 className="login-baslik">Bağlantı geçersiz</h2>
+          <h2 className="login-baslik">{t("passwordReset.invalidLink")}</h2>
           <p className="sifirlama-basari-metin">
-            Bu sıfırlama bağlantısının süresi dolmuş veya daha önce kullanılmış.
+            {t("passwordReset.invalidLinkText")}
           </p>
           <button type="button" className="login-giris-btn" onClick={() => git("/sifremi-unuttum")}>
-            Yeni bağlantı iste
+            {t("passwordReset.requestNewLink")}
           </button>
         </motion.div>
       )}
@@ -100,8 +102,8 @@ export default function SifreSifirla() {
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <span className="sifirlama-basari-ikon"><IconCheck /></span>
-          <h2 className="login-baslik">Şifren güncellendi</h2>
-          <p className="sifirlama-basari-metin">Giriş ekranına yönlendiriliyorsun…</p>
+          <h2 className="login-baslik">{t("passwordReset.updated")}</h2>
+          <p className="sifirlama-basari-metin">{t("passwordReset.redirecting")}</p>
         </motion.div>
       )}
 
@@ -114,9 +116,9 @@ export default function SifreSifirla() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <h2 className="login-baslik">Yeni şifre belirle</h2>
+          <h2 className="login-baslik">{t("passwordReset.setNew")}</h2>
 
-          <label className="login-etiket">Yeni şifre</label>
+          <label className="login-etiket">{t("passwordReset.newPassword")}</label>
           <div className="sifre-alani">
             <input
               type={sifreGorunur ? "text" : "password"}
@@ -130,7 +132,7 @@ export default function SifreSifirla() {
               autoFocus
               required
             />
-            <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((o) => !o)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
+            <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((o) => !o)} aria-label={sifreGorunur ? t("login.hidePassword") : t("login.showPassword")}>
               {sifreGorunur ? <IconEyeOff /> : <IconEye />}
             </button>
           </div>
@@ -141,7 +143,7 @@ export default function SifreSifirla() {
             </div>
           )}
 
-          <label className="login-etiket">Yeni şifre (tekrar)</label>
+          <label className="login-etiket">{t("passwordReset.repeatPassword")}</label>
           <div className="sifre-alani">
             <input
               type={sifreGorunur ? "text" : "password"}
@@ -155,12 +157,12 @@ export default function SifreSifirla() {
               required
             />
           </div>
-          {sifreTekrar && sifre !== sifreTekrar && <small className="alan-hata">Şifreler eşleşmiyor.</small>}
+          {sifreTekrar && sifre !== sifreTekrar && <small className="alan-hata">{t("passwordReset.passwordMismatch")}</small>}
 
           {hata && <p className="login-hata">{hata}</p>}
 
           <button type="submit" className="login-giris-btn" disabled={yukleniyor}>
-            {yukleniyor ? "Güncelleniyor..." : "Şifremi Güncelle"}
+            {yukleniyor ? t("passwordReset.updating") : t("passwordReset.updatePassword")}
           </button>
         </motion.form>
       )}

@@ -5,10 +5,12 @@ import { sifirlamaTalep } from "../lib/authApi";
 import { IconCheck } from "../components/Icons";
 import { emailTemizle, formuDogrula, ilkHata, kurallar } from "../lib/dogrulama";
 import MarkaLogosu from "../components/MarkaLogosu";
+import { useDil } from "../dil/DilContext";
 import "./Login.css";
 
 export default function SifremiUnuttum() {
   const git = useIsletmeNavigate();
+  const { t } = useDil();
   const [email, setEmail] = useState("");
   const [alanHatalari, setAlanHatalari] = useState({});
   const [hata, setHata] = useState("");
@@ -18,10 +20,10 @@ export default function SifremiUnuttum() {
   const gonder = async (e) => {
     e.preventDefault();
     setHata("");
-    const hatalar = formuDogrula({ email }, { email: kurallar.email });
+    const hatalar = formuDogrula({ email }, { email: (deger) => kurallar.email(deger) ? t("passwordReset.invalidEmail") : "" });
     setAlanHatalari(hatalar);
     if (ilkHata(hatalar)) {
-      setHata("Lütfen geçerli bir e-posta adresi gir.");
+      setHata(t("passwordReset.invalidEmail"));
       return;
     }
     setYukleniyor(true);
@@ -30,7 +32,7 @@ export default function SifremiUnuttum() {
       if (sonuc?.hata) setHata(sonuc.hata);
       else setGonderildi(true);
     } catch {
-      setHata("Sunucuya ulaşılamadı. Backend çalışıyor mu?");
+      setHata(t("passwordReset.serverError"));
     } finally {
       setYukleniyor(false);
     }
@@ -45,7 +47,7 @@ export default function SifremiUnuttum() {
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <MarkaLogosu className="login-logo" />
-        <p className="login-slogan">Şifreni mi unuttun?</p>
+        <p className="login-slogan">{t("passwordReset.forgotSlogan")}</p>
       </motion.div>
 
       {gonderildi ? (
@@ -56,9 +58,9 @@ export default function SifremiUnuttum() {
           transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
         >
           <span className="sifirlama-basari-ikon"><IconCheck /></span>
-          <h2 className="login-baslik">Bağlantı gönderildi</h2>
+          <h2 className="login-baslik">{t("passwordReset.linkSent")}</h2>
           <p className="sifirlama-basari-metin">
-            E-posta adresin kayıtlıysa, gelen kutuna şifreni sıfırlaman için bir bağlantı gönderdik.
+            {t("passwordReset.linkSentText")}
           </p>
         </motion.div>
       ) : (
@@ -70,17 +72,17 @@ export default function SifremiUnuttum() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
         >
-          <h2 className="login-baslik">Şifreni sıfırla</h2>
-          <p className="sifirlama-aciklama">E-posta adresini gir, sıfırlama bağlantısı gönderelim.</p>
+          <h2 className="login-baslik">{t("passwordReset.title")}</h2>
+          <p className="sifirlama-aciklama">{t("passwordReset.intro")}</p>
 
-          <label className="login-etiket">E-posta</label>
+          <label className="login-etiket">{t("login.email")}</label>
           <input
             type="email"
             className="login-input"
             value={email}
             onChange={(e) => { setEmail(e.target.value.slice(0, 254)); setHata(""); setAlanHatalari((o) => ({ ...o, email: "" })); }}
-            onBlur={() => setAlanHatalari((o) => ({ ...o, email: kurallar.email(email) }))}
-            placeholder="ornek@eposta.com"
+            onBlur={() => setAlanHatalari((o) => ({ ...o, email: kurallar.email(email) ? t("passwordReset.invalidEmail") : "" }))}
+            placeholder={t("login.emailPlaceholder")}
             autoComplete="email"
             maxLength="254"
             autoFocus
@@ -93,7 +95,7 @@ export default function SifremiUnuttum() {
           {hata && <p className="login-hata">{hata}</p>}
 
           <button type="submit" className="login-giris-btn" disabled={yukleniyor}>
-            {yukleniyor ? "Gönderiliyor..." : "Bağlantı Gönder"}
+            {yukleniyor ? t("passwordReset.sending") : t("passwordReset.sendLink")}
           </button>
         </motion.form>
       )}
@@ -105,7 +107,7 @@ export default function SifremiUnuttum() {
         transition={{ delay: 0.4 }}
       >
         <button className="login-kayit-link" onClick={() => git("/")}>
-          Giriş ekranına dön
+          {t("passwordReset.backToLogin")}
         </button>
       </motion.p>
     </div>
