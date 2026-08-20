@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { adminIstek, gorselYukle, jsonGonder, temaKaydet } from "../lib/adminApi";
 import { socket } from "../lib/socket";
 import { yuzdeliToplamiHesapla } from "../lib/yuzde";
@@ -9,6 +10,7 @@ import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
 import TemaYonetimi from "./admin/TemaYonetimi";
 import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import DegerlendirmeRaporu from "./admin/DegerlendirmeRaporu";
+import DilSecici from "../components/DilSecici";
 import "./Admin.css";
 
 const BOS_GRAMAJ = { goster: false, aktif: false, etiket: "Ürün miktarı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
@@ -136,7 +138,8 @@ const urunuFormaCevir = (urun) => ({
   menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
 });
 
-export default function Admin({ onCikis }) {
+export default function Admin({ onCikis, tema, temaDegistir }) {
+  const { t } = useTranslation();
   const konum = useLocation();
   const git = useIsletmeNavigate();
   const { isletme, isletmeyiGuncelle } = useIsletme();
@@ -638,7 +641,7 @@ export default function Admin({ onCikis }) {
       <main className="admin-main">
         <header className="admin-ust">
           <div><span className="admin-kicker">İŞLETME YÖNETİMİ</span><h1>{BOLUMLER.find(([id]) => id === bolum)?.[1]}</h1></div>
-          <div className="admin-ust-sag"><button onClick={verileriYukle}>↻ Yenile</button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
+          <div className="admin-ust-sag"><button onClick={verileriYukle}>↻ Yenile</button><DilSecici /><button className="admin-tema-dugmesi" onClick={temaDegistir} aria-label={t(tema === "acik" ? "common.switchToDark" : "common.switchToLight")}><span>{tema === "acik" ? "☾" : "☀"}</span><b>{t(tema === "acik" ? "common.dark" : "common.light")}</b></button><button onClick={onCikis}>{t("common.exit")}</button><span className="admin-avatar">A</span></div>
         </header>
 
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}

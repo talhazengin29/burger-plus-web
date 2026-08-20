@@ -84,6 +84,23 @@
 .sekme-tema:hover { background: var(--border); }
 /* Tema butonu geldiği için çıkış artık margin-left:auto olmasın */
 .sekme-cikis { margin-left: 8px; }
+.tema-dugmesi {
+  margin-left: auto;
+  min-height: 42px;
+  padding: 7px 12px 7px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-2);
+  color: var(--metin);
+  font-size: 12px;
+  font-weight: 750;
+  transition: border-color .18s, background .18s, transform .18s;
+}
+.tema-dugmesi:hover { border-color: color-mix(in srgb,var(--primary) 38%,var(--border)); background: var(--panel-3); transform: translateY(-1px); }
+.tema-dugmesi-ikon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--primary-hafif); color: var(--primary); font-size: 16px; }
 .cuzdan-sekme-ekrani {
   width: min(1320px, calc(100% - 32px));
   margin: 0 auto;
@@ -133,5 +150,19 @@
   .sekme-grup { flex: none; }
   .sekme { padding: 5px 8px; }
   .sekme-cikis { flex: none; margin-left: 0; }
+  .tema-dugmesi { flex:none; margin-left:0; padding-right:7px; }
+  .tema-dugmesi-metin { display:none; }
   .sekme-cikis span { display: none; }
 }
+
+/* Daha okunaklı, ferah personel arayüzü */
+@media (min-width: 641px) {
+  .sekme-bar { min-height: 78px; }
+  .sekme { min-height: 44px; padding: 9px 15px; font-size: 12px; }
+  .sekme-ikon { width: 25px; height: 25px; font-size: 10px; }
+  .personel-kimlik strong { font-size: 14px; }
+  .personel-kimlik small { font-size: 9px; }
+}
+
+[data-tema="acik"] .sekme-bar { box-shadow: 0 1px 0 rgba(24,32,43,.03), var(--golge-hafif); }
+[data-tema="acik"] .sekme--aktif { box-shadow: var(--golge-hafif); }

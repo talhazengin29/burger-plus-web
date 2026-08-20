@@ -15,23 +15,27 @@
   --basari: #10b981;
   --tehlike: #ef4444;
   --info: #3b82f6;
+  --golge: 0 16px 44px rgba(0, 0, 0, .24);
+  --golge-hafif: 0 7px 22px rgba(0, 0, 0, .16);
 }
 
 /* AÇIK TEMA */
 [data-tema="acik"] {
-  --bg: #f5f6f8;
+  --bg: #f4f6f9;
   --panel: #ffffff;
   --panel-2: #f0f1f4;
   --panel-3: #e4e6eb;
-  --border: #d9dce2;
-  --metin: #1a1d24;
-  --metin-soluk: #6b7280;
+  --border: #dfe3e8;
+  --metin: #18202b;
+  --metin-soluk: #667085;
   --primary: #ff6b00;
   --primary-hafif: color-mix(in srgb, var(--primary) 14%, transparent);
   --uyari: #d97706;
   --basari: #059669;
   --tehlike: #dc2626;
   --info: #2563eb;
+  --golge: 0 16px 44px rgba(24, 32, 43, .09);
+  --golge-hafif: 0 7px 22px rgba(24, 32, 43, .07);
 }
 
 :root {
@@ -51,6 +55,23 @@ body {
   min-height: 100vh;
   transition: background 0.2s, color 0.2s;
 }
+
+button, input, select, textarea { font-size: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  outline-offset: 2px;
+}
+
+/* Durum renkleri açık zeminde de erişilebilir kontrastta kalır. */
+[data-tema="acik"] .durum-bekliyor .rezervasyon-durum,
+[data-tema="acik"] .durum-rozeti.hazirlaniyor,
+[data-tema="acik"] .sure-rozeti.uyari { color: #a15c00; }
+[data-tema="acik"] .durum-geldi .rezervasyon-durum,
+[data-tema="acik"] .rezervasyon-islemler .olumlu,
+[data-tema="acik"] .durum-rozeti.hazir,
+[data-tema="acik"] .durum-rozeti.tamamlandi { color: #047857; }
+[data-tema="acik"] .rezervasyon-islemler .tehlike,
+[data-tema="acik"] .gecikme-uyarisi { color: #b42318; }
 
 button {
   font-family: inherit;

@@ -2,32 +2,32 @@
 .kasa-cuzdan-baslik { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
 .kasa-cuzdan-baslik small { color: var(--primary); font-weight: 800; letter-spacing: .14em; }
 .kasa-cuzdan-baslik h2 { margin: 4px 0; font-size: 25px; }
-.kasa-cuzdan-baslik p { color: #9298a6; }
+.kasa-cuzdan-baslik p { color: var(--metin-soluk); }
 .kasa-bonus-rozet { padding: 10px 14px; border-radius: 99px; color: #07130d; background: #57df9c; font-weight: 900; white-space: nowrap; box-shadow: 0 0 26px rgba(87,223,156,.2); }
 .kasa-cuzdan-icerik { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(280px,.8fr); gap: 20px; }
 .kasa-cuzdan-form, .kasa-son-yuklemeler { padding: 18px; border: 1px solid var(--border); border-radius: 17px; background: color-mix(in srgb, var(--panel-2) 88%, transparent); }
-.kasa-cuzdan-form label > span { display: block; margin-bottom: 7px; color: #b9bec8; font-size: 12px; font-weight: 700; }
+.kasa-cuzdan-form label > span { display: block; margin-bottom: 7px; color: var(--metin-soluk); font-size: 12px; font-weight: 700; }
 .kasa-arama { position: relative; display: block; }
-.kasa-arama input, .kasa-tutar input { width: 100%; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-3); color: #fff; outline: 0; }
+.kasa-arama input, .kasa-tutar input { width: 100%; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-3); color: var(--metin); outline: 0; }
 .kasa-arama input { padding: 13px 14px; }
 .kasa-arama input:focus, .kasa-tutar div:focus-within { border-color: var(--primary); }
 .kasa-arama > small { position: absolute; right: 12px; bottom: 13px; color: #8e95a3; }
 .kasa-musteri-sonuclari { position: relative; z-index: 3; max-height: 245px; overflow: auto; margin-top: 7px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-3); }
-.kasa-musteri-sonuclari button { width: 100%; display: flex; justify-content: space-between; gap: 12px; padding: 12px; color: #fff; text-align: left; border-bottom: 1px solid var(--border); }
+.kasa-musteri-sonuclari button { width: 100%; display: flex; justify-content: space-between; gap: 12px; padding: 12px; color: var(--metin); text-align: left; border-bottom: 1px solid var(--border); }
 .kasa-musteri-sonuclari button:last-child { border-bottom: 0; }
 .kasa-musteri-sonuclari button:hover { background: var(--primary-hafif); }
 .kasa-musteri-sonuclari span, .kasa-secili-musteri span, .kasa-son-yuklemeler article span { display: flex; flex-direction: column; gap: 3px; }
-.kasa-musteri-sonuclari small, .kasa-secili-musteri em, .kasa-son-yuklemeler small { color: #888f9e; font-size: 11px; font-style: normal; }
+.kasa-musteri-sonuclari small, .kasa-secili-musteri em, .kasa-son-yuklemeler small { color: var(--metin-soluk); font-size: 11px; font-style: normal; }
 .kasa-secili-musteri { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 12px 0 16px; padding: 14px; border-radius: 13px; background: color-mix(in srgb, var(--primary) 11%, var(--panel-3)); border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--border)); }
 .kasa-secili-musteri span > small, .kasa-secili-musteri strong > small { color: var(--primary); font-size: 9px; letter-spacing: .09em; }
 .kasa-secili-musteri strong { display: flex; flex-direction: column; text-align: right; }
 .kasa-tutar > div { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-3); }
 .kasa-tutar div b { padding-left: 14px; color: var(--primary); font-size: 24px; }
 .kasa-tutar input { padding: 12px 12px 12px 7px; border: 0; font-size: 25px; font-weight: 800; }
-.kasa-tutar > small { display: block; margin-top: 6px; color: #777e8b; }
+.kasa-tutar > small { display: block; margin-top: 6px; color: var(--metin-soluk); }
 .kasa-hizli-tutar { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin: 10px 0 15px; }
-.kasa-hizli-tutar button { padding: 8px 5px; border: 1px solid var(--border); border-radius: 9px; color: #c4c8d0; background: var(--panel-3); font-size: 11px; }
-.kasa-yukleme-ozeti { display: grid; gap: 9px; padding: 14px; border-radius: 13px; background: rgba(0,0,0,.18); }
+.kasa-hizli-tutar button { padding: 8px 5px; border: 1px solid var(--border); border-radius: 9px; color: var(--metin); background: var(--panel-3); font-size: 11px; }
+.kasa-yukleme-ozeti { display: grid; gap: 9px; padding: 14px; border-radius: 13px; background: color-mix(in srgb,var(--panel-3) 74%,transparent); }
 .kasa-yukleme-ozeti span, .kasa-yukleme-ozeti strong { display: flex; justify-content: space-between; }
 .kasa-yukleme-ozeti strong { padding-top: 9px; border-top: 1px solid var(--border); font-size: 17px; }
 .kasa-yukleme-ozeti .bonus { color: #57df9c; }
@@ -38,10 +38,10 @@
 .kasa-cuzdan-mesaj.hata { color: #ff8c86; background: rgba(255,80,74,.1); }
 .kasa-cuzdan-butonlar { display: flex; justify-content: flex-end; gap: 9px; margin-top: 14px; }
 .kasa-cuzdan-butonlar button { padding: 12px 17px; border-radius: 11px; color: #090d0b; background: #57df9c; font-weight: 800; }
-.kasa-cuzdan-butonlar button.ikincil { color: #c5c9d1; background: var(--panel-3); }
+.kasa-cuzdan-butonlar button.ikincil { color: var(--metin); background: var(--panel-3); }
 .kasa-cuzdan-butonlar button:disabled { opacity: .4; cursor: not-allowed; }
 .kasa-son-yuklemeler h3 { margin-bottom: 10px; }
-.kasa-son-yuklemeler > p { color: #858b98; }
+.kasa-son-yuklemeler > p { color: var(--metin-soluk); }
 .kasa-son-yuklemeler article { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .kasa-son-yuklemeler article:last-child { border-bottom: 0; }
 .kasa-son-yuklemeler article > strong { color: #57df9c; text-align: right; }
