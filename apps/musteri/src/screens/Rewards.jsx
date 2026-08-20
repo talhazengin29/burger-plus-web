@@ -7,12 +7,14 @@ import SayfaSarici from "../components/SayfaSarici";
 import UyeOl from "./UyeOl";
 import { siraliKonteyner, siraliOge, barDolumu } from "../lib/animasyonlar";
 import { useTema } from "../context/TemaContext";
+import { useDil } from "../dil/DilContext";
 import "./Rewards.css";
 
 const ODUL_IKONLARI = { IconTicket, IconCutlery, IconGift };
 
 export default function Rewards() {
   const { metinler } = useTema();
+  const { locale, t, yerelAlan } = useDil();
   const { puan, misafir, odulSatinAl, oduller, puanGecmisi } = useApp();
   const [mesaj, setMesaj] = useState(null); // { tip: "basari" | "hata", metin }
   const [islemde, setIslemde] = useState(null);
@@ -26,8 +28,8 @@ export default function Rewards() {
   if (misafir) {
     return (
       <UyeOl
-        baslik="Puan Kazanmaya Başla"
-        aciklama="Puanlar üyelere özel. Üye ol, her siparişte puan biriktir, ödüller kazan."
+        baslik={t("rewards.joinTitle")}
+        aciklama={t("rewards.joinText")}
       />
     );
   }
@@ -41,9 +43,9 @@ export default function Rewards() {
     setIslemde(o.id);
     try {
       await odulSatinAl(o);
-      setMesaj({ tip: "basari", metin: `${o.ad} hediyelerine eklendi!` });
+      setMesaj({ tip: "basari", metin: t("rewards.added", { name: yerelAlan(o, "ad", o.ad) }) });
     } catch (e) {
-      setMesaj({ tip: "hata", metin: e.message || "Ödül alınamadı." });
+      setMesaj({ tip: "hata", metin: e.message || t("rewards.failed") });
     } finally {
       setIslemde(null);
     }
@@ -74,24 +76,24 @@ export default function Rewards() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h2 className="puan-kart-baslik">Toplam Puanım</h2>
+            <h2 className="puan-kart-baslik">{t("rewards.total")}</h2>
             <div className="puan-buyuk">
-              <span className="puan-sayi">{puan.toLocaleString("tr-TR")}</span>
-              <span className="puan-etiket">Puan</span>
+              <span className="puan-sayi">{puan.toLocaleString(locale)}</span>
+              <span className="puan-etiket">{t("rewards.point")}</span>
             </div>
             <div className="puan-ilerleme-bilgi">
-              <span>Başlangıç</span>
-              <span className="puan-hedef">Hediye {metinler.damgaBirim} ({hedef.toLocaleString("tr-TR")} Puan)</span>
+              <span>{t("rewards.start")}</span>
+              <span className="puan-hedef">{t("rewards.target", { unit: metinler.damgaBirim, points: hedef.toLocaleString(locale) })}</span>
             </div>
             <div className="puan-ilerleme-ray">
               <motion.div className="puan-ilerleme-dolgu" {...barDolumu(yuzde)} />
             </div>
-            <p className="puan-kalan">Hediyeye sadece <strong>{kalan.toLocaleString("tr-TR")} puan</strong> kaldı!</p>
+            <p className="puan-kalan">{t("rewards.remaining", { points: kalan.toLocaleString(locale) })}</p>
           </motion.section>
 
           {/* Ödül Marketi */}
           <div className="bolum-basrivi">
-            <h3 className="bolum-baslik">Ödül Marketi</h3>
+            <h3 className="bolum-baslik">{t("rewards.market")}</h3>
             <IconShop className="bolum-ikon" />
           </div>
 
@@ -102,16 +104,16 @@ export default function Rewards() {
                 <motion.article key={o.id} className="odul-kart" variants={siraliOge}>
                   <div className="odul-gorsel-wrap">
                     {o.gorsel
-                      ? <img className="odul-gorsel" src={o.gorsel} alt={o.ad} />
+                      ? <img className="odul-gorsel" src={o.gorsel} alt={yerelAlan(o, "ad", o.ad)} />
                       : <div className="odul-gorsel-yer"><Ikon /></div>}
                   </div>
                   <div className="odul-alt">
-                    <h4 className="odul-ad">{o.ad}</h4>
+                    <h4 className="odul-ad">{yerelAlan(o, "ad", o.ad)}</h4>
                     <div className="odul-fiyat-satir">
-                      <span className="odul-puan">{o.puan.toLocaleString("tr-TR")} Puan</span>
+                      <span className="odul-puan">{o.puan.toLocaleString(locale)} {t("rewards.point")}</span>
                       <motion.button
                         className="odul-ekle"
-                        aria-label={`${o.ad} al`}
+                        aria-label={t("rewards.buy", { name: yerelAlan(o, "ad", o.ad) })}
                         onClick={() => odulAlTiklandi(o)}
                         disabled={islemde === o.id}
                         whileTap={{ scale: 0.85 }}
@@ -129,14 +131,14 @@ export default function Rewards() {
 
           {/* Puan geçmişi */}
           <div className="bolum-basrivi">
-            <h3 className="bolum-baslik">Puan Geçmişi</h3>
+            <h3 className="bolum-baslik">{t("rewards.history")}</h3>
           </div>
           <div className="gecmis-liste">
             {puanGecmisi.map((g) => (
               <div key={g.id} className="gecmis-satir">
                 <div className="gecmis-sol">
                   <span className="gecmis-baslik">{g.baslik}</span>
-                  <span className="gecmis-tarih">{new Date(g.tarih).toLocaleDateString("tr-TR")}</span>
+                  <span className="gecmis-tarih">{new Date(g.tarih).toLocaleDateString(locale)}</span>
                 </div>
                 <span className={"gecmis-puan " + (g.tip === "kazanc" ? "arti" : "eksi")}>
                   {g.puan > 0 ? `+${g.puan}` : g.puan}
@@ -144,7 +146,7 @@ export default function Rewards() {
               </div>
             ))}
           </div>
-          <button className="tumunu-gor">Tümünü Gör</button>
+          <button className="tumunu-gor">{t("rewards.seeAll")}</button>
         </div>
       </SayfaSarici>
     </div>

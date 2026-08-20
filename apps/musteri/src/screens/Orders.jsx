@@ -7,6 +7,7 @@ import SayfaSarici from "../components/SayfaSarici";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { istekAt, siparisDegerlendirmesiGonder } from "../lib/authApi";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
+import { useDil } from "../dil/DilContext";
 import "./Orders.css";
 import "./OrdersDegerlendirme.css";
 
@@ -16,9 +17,9 @@ import "./OrdersDegerlendirme.css";
    2) Geçmiş Siparişler: masa kapatıldıktan sonra ("Ödeme tamamlandı" olarak kalır)
 */
 
-function tarihGoster(iso) {
+function tarihGoster(iso, locale) {
   const t = new Date(iso);
-  return t.toLocaleString("tr-TR", {
+  return t.toLocaleString(locale, {
     day: "numeric", month: "long", year: "numeric",
     hour: "2-digit", minute: "2-digit",
   });
@@ -46,15 +47,15 @@ function DegerlendirmeModal({ form, setForm, onKapat, onKaydet, kaydediliyor }) 
 }
 
 // Tek bir sipariş kartı
-function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
+function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir, t, locale }) {
   return (
     <article className={"siparis-kart" + (gecmis ? " siparis-kart--gecmis" : "")}>
       <div className="siparis-kart-ust">
         <div className="siparis-ust-sol">
           <span className="siparis-tip-rozet">
-            {s.tip === "masa" ? <><IconTableService /> Masa {s.masaNo}</> : <><IconTakeaway /> Gel Al</>}
+            {s.tip === "masa" ? <><IconTableService /> {t("orders.table", { number: s.masaNo })}</> : <><IconTakeaway /> {t("orders.pickup")}</>}
           </span>
-          <span className="siparis-tarih">{tarihGoster(s.tarih)}</span>
+          <span className="siparis-tarih">{tarihGoster(s.tarih, locale)}</span>
         </div>
         {!gecmis && (
           <span className={"siparis-durum-rozet " + durum.sinif}>{durum.yazi}</span>
@@ -72,7 +73,7 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
               <span className="siparis-urun-birim">₺{u.fiyat.toFixed(2)}</span>
               {gramajMetni(u.secimler) && <span className="siparis-urun-secim">{gramajMetni(u.secimler)}</span>}
               {haricMalzemeleriGetir(u).length > 0 && (
-                <span className="siparis-urun-haric">Haric: {haricMalzemeleriGetir(u).join(", ")}</span>
+                <span className="siparis-urun-haric">{t("orders.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</span>
               )}
             </div>
             <span className="siparis-urun-adet">{u.adet}×</span>
@@ -82,23 +83,24 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir }) {
 
       <div className="siparis-alt">
         <div className="siparis-toplam">
-          <span>Toplam</span>
+          <span>{t("orders.total")}</span>
           <span className="siparis-toplam-tutar">₺{s.tutar.toFixed(2)}</span>
         </div>
         {!s.misafir && s.kazanilanPuan > 0 && (
-          <span className="siparis-puan">+{s.kazanilanPuan} puan</span>
+          <span className="siparis-puan">{t("orders.points", { points: s.kazanilanPuan })}</span>
         )}
       </div>
-      <p className="siparis-not siparis-not--odendi">✓ Ödeme tamamlandı</p>
+      <p className="siparis-not siparis-not--odendi">{t("orders.paid")}</p>
       <button className="siparis-tekrar-btn" onClick={() => onTekrarSiparisVer(s)}>
-        🔁 Tekrar Sipariş Ver
+        {t("orders.reorder")}
       </button>
-      {gecmis && !s.misafir && (s.degerlendirildi ? <div className="siparis-degerlendirildi"><span>{"★".repeat(s.degerlendirmePuani || 5)}</span> Değerlendirmen alındı</div> : <button className="siparis-degerlendir-btn" onClick={() => onDegerlendir(s)}>☆ Siparişi Değerlendir</button>)}
+      {gecmis && !s.misafir && (s.degerlendirildi ? <div className="siparis-degerlendirildi"><span>{"★".repeat(s.degerlendirmePuani || 5)}</span> {t("orders.reviewed")}</div> : <button className="siparis-degerlendir-btn" onClick={() => onDegerlendir(s)}>{t("orders.review")}</button>)}
     </article>
   );
 }
 
 export default function Orders() {
+  const { locale, t } = useDil();
   const git = useIsletmeNavigate();
   const { siparislerim, siparisleriYenile, masaDurumu, ozetMasaNo, ozetMasaTokeni, sepeteEkle, urunler } = useApp();
 
@@ -121,11 +123,11 @@ export default function Orders() {
       eklenen++;
     }
     if (eklenen === 0) {
-      setMesaj({ tip: "hata", metin: "Bu siparişteki ürünler artık mevcut değil." });
+      setMesaj({ tip: "hata", metin: t("orders.unavailable") });
       return;
     }
     if (eksik > 0) {
-      setMesaj({ tip: "hata", metin: `${eksik} ürün artık mevcut değil, eklenemedi.` });
+      setMesaj({ tip: "hata", metin: t("orders.missing", { count: eksik }) });
       setTimeout(() => git("/sepet"), 1200);
       return;
     }
@@ -201,11 +203,11 @@ export default function Orders() {
     if (s.tip === "masa" && s.masaNo) {
       const no = String(s.masaNo);
       const d = (String(ozetMasaNo) === no && masaDurumu) || masaDurumlari[no];
-      if (d === "hazir") return { yazi: "Hazır ✓", sinif: "durum--hazir" };
-      if (d === "hazirlaniyor") return { yazi: "Hazırlanıyor", sinif: "durum--hazirlaniyor" };
-      if (d === "yeni") return { yazi: "Alındı", sinif: "durum--yeni" };
+      if (d === "hazir") return { yazi: t("orders.ready"), sinif: "durum--hazir" };
+      if (d === "hazirlaniyor") return { yazi: t("orders.preparing"), sinif: "durum--hazirlaniyor" };
+      if (d === "yeni") return { yazi: t("orders.received"), sinif: "durum--yeni" };
     }
-    return { yazi: "Hazırlanıyor", sinif: "durum--hazirlaniyor" };
+    return { yazi: t("orders.preparing"), sinif: "durum--hazirlaniyor" };
   };
 
   // Masa kapatıldıysa sipariş geçmişe düşer
@@ -239,7 +241,7 @@ export default function Orders() {
       <SayfaSarici>
 
       <div className="orders-govde">
-        <h1 className="orders-baslik">Siparişlerim</h1>
+        <h1 className="orders-baslik">{t("orders.title")}</h1>
 
         <AnimatePresence>
           {mesaj && (
@@ -257,25 +259,25 @@ export default function Orders() {
         {siparislerim.length === 0 ? (
           <div className="orders-bos">
             <IconBag className="orders-bos-ikon" />
-            <p className="orders-bos-yazi">Henüz siparişin yok</p>
-            <p className="orders-bos-alt">Sipariş verdiğinde burada görünecek.</p>
+            <p className="orders-bos-yazi">{t("orders.empty")}</p>
+            <p className="orders-bos-alt">{t("orders.emptyHint")}</p>
             <button className="orders-bos-btn" onClick={() => git("/anasayfa")}>
-              Menüye Git
+              {t("orders.goMenu")}
             </button>
           </div>
         ) : bekleniyor ? (
           <div className="orders-yukleniyor">
-            <p className="orders-bos-alt">Siparişler yükleniyor…</p>
+            <p className="orders-bos-alt">{t("orders.loading")}</p>
           </div>
         ) : (
           <>
             {/* Aktif siparişler (masa açık) */}
             {aktifler.length > 0 && (
               <section className="orders-bolum">
-                <h2 className="orders-bolum-baslik">Aktif Siparişler</h2>
+                <h2 className="orders-bolum-baslik">{t("orders.active")}</h2>
                 <div className="orders-liste">
                   {aktifler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={false} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} t={t} locale={locale} />
                   ))}
                 </div>
               </section>
@@ -284,10 +286,10 @@ export default function Orders() {
             {/* Geçmiş siparişler (masa kapatıldı) */}
             {gecmisler.length > 0 && (
               <section className="orders-bolum">
-                <h2 className="orders-bolum-baslik">Geçmiş Siparişler</h2>
+                <h2 className="orders-bolum-baslik">{t("orders.history")}</h2>
                 <div className="orders-liste">
                   {gecmisler.map((s) => (
-                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} />
+                    <SiparisKart key={s.id} s={s} durum={durumBilgi(s)} gecmis={true} onTekrarSiparisVer={tekrarSiparisVer} onDegerlendir={degerlendirmeyiAc} t={t} locale={locale} />
                   ))}
                 </div>
               </section>
