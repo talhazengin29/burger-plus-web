@@ -142,12 +142,12 @@ export default function Profile() {
         {/* İşletme bölümü — SADECE ADMIN görür */}
         {adminMi && (
           <>
-            <div className="profil-isletme-baslik">İşletme</div>
+            <div className="profil-isletme-baslik">{t("profile.business")}</div>
             <button className="profil-menu isletme-satir" onClick={() => git("/qr-uret")}>
               <span className="profil-menu-ikon-daire isletme-ikon"><IconQr /></span>
               <div className="isletme-metin">
-                <span className="profil-menu-ad">Masa QR Kodları</span>
-                <span className="isletme-alt">Masalar için QR üret ve yazdır</span>
+                <span className="profil-menu-ad">{t("profile.tableQr")}</span>
+                <span className="isletme-alt">{t("profile.tableQrHint")}</span>
               </div>
               <IconChevron className="profil-menu-ok" />
             </button>
@@ -183,14 +183,14 @@ export default function Profile() {
         {ikiFaktorModal && (
           <div className="destek-perde" onClick={() => ikiFaktorAdim !== "kurtarma" && setIkiFaktorModal(false)}>
             <section className="destek-modal iki-faktor-modal" onClick={(e) => e.stopPropagation()}>
-              <span>HESAP GÜVENLİĞİ</span>
-              <h3>İki Adımlı Doğrulama</h3>
-              {ikiFaktorAdim === "baslangic" && <><p>Google Authenticator, Microsoft Authenticator veya Authy ile girişlerini koru. Devam etmek için mevcut şifreni doğrula.</p><label>Mevcut şifre<input type="password" value={ikiFaktorSifre} onChange={(e) => setIkiFaktorSifre(e.target.value.slice(0, 72))} autoComplete="current-password" /></label><button className="iki-faktor-ana-btn" onClick={ikiFaktorKurulumuBaslat} disabled={!ikiFaktorSifre || ikiFaktorYukleniyor}>Kurulumu Başlat</button></>}
-              {ikiFaktorAdim === "dogrula" && <><p>QR kodunu authenticator uygulamanla okut, ardından oluşan 6 haneli kodu gir.</p><img className="iki-faktor-qr" src={ikiFaktorKurulum?.qrDataUrl} alt="Authenticator kurulum QR kodu" /><code className="iki-faktor-secret">{ikiFaktorKurulum?.secret}</code><label>6 haneli kod<input inputMode="numeric" autoComplete="one-time-code" value={ikiFaktorKod} onChange={(e) => setIkiFaktorKod(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="123456" /></label><button className="iki-faktor-ana-btn" onClick={ikiFaktorKurulumunuOnayla} disabled={ikiFaktorKod.length !== 6 || ikiFaktorYukleniyor}>Etkinleştir</button></>}
-              {ikiFaktorAdim === "kurtarma" && <><p><b>Bu kodları şimdi güvenli bir yere kaydet.</b> Her kod yalnızca bir kez kullanılabilir ve bu ekrandan ayrıldıktan sonra tekrar gösterilmez.</p><div className="iki-faktor-kodlar">{kurtarmaKodlari.map((kod) => <code key={kod}>{kod}</code>)}</div><button className="iki-faktor-ana-btn" onClick={async () => { await navigator.clipboard.writeText(kurtarmaKodlari.join("\n")).catch(() => {}); }}>Kodları Kopyala</button><button onClick={() => setIkiFaktorModal(false)}>Kaydettim, Bitir</button></>}
-              {ikiFaktorAdim === "kapat" && <><p>İki adımlı doğrulamayı kapatmak için mevcut şifreni ve authenticator kodunu doğrula.</p><label>Mevcut şifre<input type="password" value={ikiFaktorSifre} onChange={(e) => setIkiFaktorSifre(e.target.value.slice(0, 72))} autoComplete="current-password" /></label><label>Doğrulama veya kurtarma kodu<input value={ikiFaktorKod} onChange={(e) => setIkiFaktorKod(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 11))} autoComplete="one-time-code" /></label><button className="iki-faktor-tehlike-btn" onClick={ikiFaktoruKapat} disabled={!ikiFaktorSifre || !ikiFaktorKod || ikiFaktorYukleniyor}>İki Adımlı Doğrulamayı Kapat</button></>}
+              <span>{t("profile.security")}</span>
+              <h3>{t("profile.twoFactor")}</h3>
+              {ikiFaktorAdim === "baslangic" && <><p>{t("profile.setupText")}</p><label>{t("profile.currentPassword")}<input type="password" value={ikiFaktorSifre} onChange={(e) => setIkiFaktorSifre(e.target.value.slice(0, 72))} autoComplete="current-password" /></label><button className="iki-faktor-ana-btn" onClick={ikiFaktorKurulumuBaslat} disabled={!ikiFaktorSifre || ikiFaktorYukleniyor}>{t("profile.startSetup")}</button></>}
+              {ikiFaktorAdim === "dogrula" && <><p>{t("profile.scanText")}</p><img className="iki-faktor-qr" src={ikiFaktorKurulum?.qrDataUrl} alt="Authenticator setup QR code" /><code className="iki-faktor-secret">{ikiFaktorKurulum?.secret}</code><label>{t("profile.sixDigitCode")}<input inputMode="numeric" autoComplete="one-time-code" value={ikiFaktorKod} onChange={(e) => setIkiFaktorKod(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="123456" /></label><button className="iki-faktor-ana-btn" onClick={ikiFaktorKurulumunuOnayla} disabled={ikiFaktorKod.length !== 6 || ikiFaktorYukleniyor}>{t("profile.enable")}</button></>}
+              {ikiFaktorAdim === "kurtarma" && <><p>{t("profile.recoveryText")}</p><div className="iki-faktor-kodlar">{kurtarmaKodlari.map((kod) => <code key={kod}>{kod}</code>)}</div><button className="iki-faktor-ana-btn" onClick={async () => { await navigator.clipboard.writeText(kurtarmaKodlari.join("\n")).catch(() => {}); }}>{t("profile.copyCodes")}</button><button onClick={() => setIkiFaktorModal(false)}>{t("profile.savedFinish")}</button></>}
+              {ikiFaktorAdim === "kapat" && <><p>{t("profile.disableText")}</p><label>{t("profile.currentPassword")}<input type="password" value={ikiFaktorSifre} onChange={(e) => setIkiFaktorSifre(e.target.value.slice(0, 72))} autoComplete="current-password" /></label><label>{t("profile.verificationCode")}<input value={ikiFaktorKod} onChange={(e) => setIkiFaktorKod(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 11))} autoComplete="one-time-code" /></label><button className="iki-faktor-tehlike-btn" onClick={ikiFaktoruKapat} disabled={!ikiFaktorSifre || !ikiFaktorKod || ikiFaktorYukleniyor}>{t("profile.disableTwoFactor")}</button></>}
               {ikiFaktorHata && <p className="iki-faktor-hata">{ikiFaktorHata}</p>}
-              {ikiFaktorAdim !== "kurtarma" && <button onClick={() => setIkiFaktorModal(false)}>Vazgeç</button>}
+              {ikiFaktorAdim !== "kurtarma" && <button onClick={() => setIkiFaktorModal(false)}>{t("profile.cancel")}</button>}
             </section>
           </div>
         )}
