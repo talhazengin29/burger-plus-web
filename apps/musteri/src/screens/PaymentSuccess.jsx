@@ -5,6 +5,7 @@ import { useApp } from "../context/AppContext";
 import { IconCheck } from "../components/Icons";
 import { iyzicoOdemesiniDogrula, odemeSonucunuGetir } from "../lib/authApi";
 import { usePerde } from "../hooks/usePerde";
+import { useDil } from "../dil/DilContext";
 import "./PaymentSuccess.css";
 
 const SONUC_DENEME_ADEDI = 8;
@@ -13,6 +14,7 @@ const SONUC_BEKLEME_MS = 1250;
 const bekle = (sure) => new Promise((resolve) => setTimeout(resolve, sure));
 
 export default function PaymentSuccess() {
+  const { locale, t } = useDil();
   const git = useIsletmeNavigate();
   const [params] = useSearchParams();
   const odemeId = params.get("odeme");
@@ -55,7 +57,7 @@ export default function PaymentSuccess() {
         if (iptal || !odeme) return;
         setHata("");
         odemeyiTamamla(odeme);
-        perdeIleGit(() => {}, "kutlama", "Siparişin Alındı 🎉");
+        perdeIleGit(() => {}, "kutlama", t("success.celebration"));
       })
       .catch((e) => {
         if (!iptal) setHata(e.message || "Ödeme sonucu alınamadı. Birkaç saniye sonra tekrar deneyin.");
@@ -67,11 +69,11 @@ export default function PaymentSuccess() {
   }, [odemeId]);
 
   if (yukleniyor) {
-    return <div className="ekran success"><div className="success-icerik"><span className="durum-spinner" /><p className="success-alt">Ödeme sonucun doğrulanıyor…</p></div></div>;
+    return <div className="ekran success"><div className="success-icerik"><span className="durum-spinner" /><p className="success-alt">{t("success.verifying")}</p></div></div>;
   }
 
   if (hata) {
-    return <div className="ekran success"><div className="success-icerik"><p className="odeme-hata">{hata}</p><button className="success-btn-ana" onClick={() => git("/odeme")}>Ödemeye Dön</button></div></div>;
+    return <div className="ekran success"><div className="success-icerik"><p className="odeme-hata">{hata}</p><button className="success-btn-ana" onClick={() => git("/odeme")}>{t("success.backToPayment")}</button></div></div>;
   }
 
   // Doğrudan bu adrese gelinirse (ödeme yapılmadıysa) ana sayfaya yönlendir
@@ -79,17 +81,17 @@ export default function PaymentSuccess() {
     return (
       <div className="ekran success">
         <div className="success-icerik">
-          <p>Görüntülenecek ödeme yok.</p>
-          <button className="success-btn-ana" onClick={() => git("/anasayfa")}>Ana Sayfa</button>
+          <p>{t("success.noPayment")}</p>
+          <button className="success-btn-ana" onClick={() => git("/anasayfa")}>{t("common.home")}</button>
         </div>
       </div>
     );
   }
 
   const yontemAdi =
-    sonOdeme.yontem === "esit" ? "Eşit bölüşüldü" :
-    sonOdeme.yontem === "urun" ? "Ürüne göre ödendi" :
-    "Tamamı ödendi";
+    sonOdeme.yontem === "esit" ? t("success.equal") :
+    sonOdeme.yontem === "urun" ? t("success.byProduct") :
+    t("success.full");
 
   return (
     <div className="ekran success">
@@ -98,46 +100,46 @@ export default function PaymentSuccess() {
           <IconCheck className="success-check" />
         </div>
 
-        <h1 className="success-baslik">Ödeme Başarılı!</h1>
+        <h1 className="success-baslik">{t("success.title")}</h1>
         <p className="success-alt">
-          {sonOdeme.masaNo ? `Masa ${sonOdeme.masaNo} • ${yontemAdi}` : yontemAdi}
+          {sonOdeme.masaNo ? `${t("common.table", { number: sonOdeme.masaNo })} • ${yontemAdi}` : yontemAdi}
         </p>
 
         {/* Sipariş durumu */}
         <div className="siparis-durum-kart">
           <span className="durum-ikon">👨‍🍳</span>
           <div className="durum-metin">
-            <span className="durum-baslik">Siparişin Hazırlanıyor</span>
-            <span className="durum-alt">Mutfağa iletildi, hazırlanıyor.</span>
+            <span className="durum-baslik">{t("success.preparing")}</span>
+            <span className="durum-alt">{t("success.kitchen")}</span>
           </div>
           <span className="durum-spinner" />
         </div>
 
         <div className="success-tutar-kart">
-          <span className="success-tutar-etiket">Ödenen Tutar</span>
+          <span className="success-tutar-etiket">{t("success.paid")}</span>
           <span className="success-tutar">₺{sonOdeme.tutar.toFixed(2)}</span>
         </div>
 
         {/* Kazanılan puan — sadece daimi kullanıcıya */}
         {sonOdeme.misafir ? (
           <div className="success-misafir-not">
-            Afiyet olsun! Üye olsaydın bu ödemeden puan kazanırdın. 🎁
+            {t("success.guestNote")}
           </div>
         ) : (
           <div className="success-puan-kart">
-            <span className="success-puan-ust">Kazandığın Puan</span>
+            <span className="success-puan-ust">{t("success.points")}</span>
             <span className="success-puan-buyuk">+{sonOdeme.kazanilanPuan}</span>
-            <span className="success-puan-toplam">Toplam puanın: {puan.toLocaleString("tr-TR")}</span>
+            <span className="success-puan-toplam">{t("success.totalPoints", { points: puan.toLocaleString(locale) })}</span>
           </div>
         )}
 
         <div className="success-butonlar">
           <button className="success-btn-ana" onClick={() => git("/anasayfa")}>
-            Ana Sayfaya Dön
+            {t("success.backHome")}
           </button>
           {!sonOdeme.misafir && (
             <button className="success-btn-puan" onClick={() => git("/puanlarim")}>
-              Puanlarımı Gör
+              {t("success.seePoints")}
             </button>
           )}
         </div>

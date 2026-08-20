@@ -9,6 +9,7 @@ import { duyurulariGetir } from "../lib/authApi";
 import { socket } from "../lib/socket";
 import { useIsletme } from "../context/IsletmeContext";
 import MarkaLogosu from "./MarkaLogosu";
+import { useDil } from "../dil/DilContext";
 
 const okunanlariGetir = (anahtar) => {
   try {
@@ -30,6 +31,7 @@ const okunanlariKaydet = (anahtar, duyuruIdleri) => {
 /* `selamlama` açıkken sol tarafta marka adı yerine kişisel karşılama görünür
    (ana sayfa). Diğer ekranlar prop vermeden çağırır, görünümleri değişmez. */
 export default function OrtakHeader({ selamlama = false }) {
+  const { t } = useDil();
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
   const {
@@ -47,17 +49,17 @@ export default function OrtakHeader({ selamlama = false }) {
     [duyurular, okunanDuyurular]
   );
 
-  const ad = kullanici ? kullanici.ad : misafir ? "Misafir" : "Dostum";
+  const ad = kullanici ? kullanici.ad : misafir ? t("header.guest") : t("header.friend");
   const aktifCagri = ["bekliyor", "goruldu"].includes(personelCagrisi?.durum);
   const cagriDurumMetni = personelCagrisi?.durum === "goruldu"
-    ? "Personel çağrınızı gördü ve masanıza geliyor."
+    ? t("header.callSeen")
     : personelCagrisi?.durum === "bekliyor"
-      ? "Çağrınız salondaki personele iletildi."
+      ? t("header.callWaiting")
       : personelCagrisi?.durum === "tamamlandi"
-        ? "Son çağrınız tamamlandı."
+        ? t("header.callDone")
         : personelCagrisi?.durum === "masada_yok"
-          ? "Masada müşteri bulunamadığı için çağrı kapatıldı."
-          : "İhtiyacınızı seçin; salon personeli anında bilgilendirilsin.";
+          ? t("header.callAbsent")
+          : t("header.callIntro");
 
   const duyurulariYukle = useCallback(() => {
     return duyurulariGetir().then(setDuyurular).catch(() => setDuyurular([]));
@@ -107,7 +109,7 @@ export default function OrtakHeader({ selamlama = false }) {
     <header className="home-header">
       {selamlama ? (
         <div className="selam">
-          <span className="selam-ust">Merhaba,</span>
+          <span className="selam-ust">{t("header.hello")}</span>
           <span className="selam-ad">
             {ad} <span aria-hidden="true">👋</span>
           </span>
@@ -121,7 +123,7 @@ export default function OrtakHeader({ selamlama = false }) {
         {ozetMasaNo && (
           <motion.button
             className={`ikon-btn personel-cagir-btn${aktifCagri ? " personel-cagir-btn--aktif" : ""}`}
-            aria-label="Personel çağır"
+            aria-label={t("header.callStaff")}
             onClick={() => { setBildirimlerAcik(false); setPersonelPaneliAcik(true); }}
             whileTap={{ scale: 0.88 }}
           >
@@ -132,7 +134,7 @@ export default function OrtakHeader({ selamlama = false }) {
         <div className="bildirim-sarici">
           <motion.button
             className="ikon-btn bildirim-btn"
-            aria-label="Bildirimler"
+            aria-label={t("header.notifications")}
             aria-expanded={bildirimlerAcik}
             onClick={bildirimleriAcKapat}
             whileTap={{ scale: 0.88 }}
@@ -143,7 +145,7 @@ export default function OrtakHeader({ selamlama = false }) {
         </div>
         <motion.button
           className="ikon-btn sepet-btn"
-          aria-label="Sepet"
+          aria-label={t("header.cart")}
           onClick={() => git("/sepet")}
           whileTap={{ scale: 0.88 }}
         >
@@ -164,10 +166,10 @@ export default function OrtakHeader({ selamlama = false }) {
           <motion.button
             className="avatar-sm avatar-harf"
             onClick={() => git("/profil")}
-            aria-label="Profil"
+            aria-label={t("header.profile")}
             whileTap={{ scale: 0.9 }}
           >
-            {avatar ? <img className="avatar-gorsel" src={avatar} alt="Profil" /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
+            {avatar ? <img className="avatar-gorsel" src={avatar} alt={t("header.profile")} /> : kullanici ? kullanici.ad.charAt(0).toUpperCase() : "?"}
           </motion.button>
         )}
       </div>
@@ -178,7 +180,7 @@ export default function OrtakHeader({ selamlama = false }) {
               <motion.button
                 type="button"
                 className="bildirim-perde"
-                aria-label="Bildirimleri kapat"
+                aria-label={t("common.close")}
                 onClick={() => setBildirimlerAcik(false)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -188,16 +190,16 @@ export default function OrtakHeader({ selamlama = false }) {
                 className="bildirim-panel"
                 role="dialog"
                 aria-modal="false"
-                aria-label="Bildirimler"
+                aria-label={t("header.notifications")}
                 initial={{ opacity: 0, y: -10, scale: .98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: .98 }}
               >
-                <header><b>Bildirimler</b><span>{okunmamisSayisi ? `${okunmamisSayisi} okunmamış` : "Güncelsin"}</span></header>
+                <header><b>{t("header.notifications")}</b><span>{okunmamisSayisi ? t("header.unread", { count: okunmamisSayisi }) : t("header.upToDate")}</span></header>
                 {duyurular.length ? <div>{duyurular.slice(0, 6).map((duyuru) => {
                   const okundu = okunanDuyurular.includes(String(duyuru.id));
                   return <button className={okundu ? "okundu" : "okunmadi"} key={duyuru.id} onClick={() => duyuruyaGit(duyuru)}><i>•</i><span><b>{duyuru.baslik}</b><small>{duyuru.mesaj}</small></span><em>›</em></button>;
-                })}</div> : <p>Şu an için yeni bir duyuru yok.</p>}
+                })}</div> : <p>{t("header.noNews")}</p>}
               </motion.section>
             </div>
           )}
@@ -208,17 +210,17 @@ export default function OrtakHeader({ selamlama = false }) {
         <AnimatePresence>
           {personelPaneliAcik && (
             <div className="personel-cagri-katman">
-              <motion.button className="personel-cagri-perde" aria-label="Kapat" onClick={() => setPersonelPaneliAcik(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
-              <motion.section className="personel-cagri-panel" role="dialog" aria-modal="true" aria-label="Personel çağır" initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: .97 }}>
-                <header><div><small>MASA {ozetMasaNo}</small><h2>Personel çağır</h2></div><button onClick={() => setPersonelPaneliAcik(false)} aria-label="Kapat">×</button></header>
+              <motion.button className="personel-cagri-perde" aria-label={t("common.close")} onClick={() => setPersonelPaneliAcik(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+              <motion.section className="personel-cagri-panel" role="dialog" aria-modal="true" aria-label={t("header.callStaff")} initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: .97 }}>
+                <header><div><small>{t("header.tableLabel", { number: ozetMasaNo })}</small><h2>{t("header.callTitle")}</h2></div><button onClick={() => setPersonelPaneliAcik(false)} aria-label={t("common.close")}>×</button></header>
                 <p className={`personel-cagri-durum${aktifCagri ? " personel-cagri-durum--aktif" : ""}`}>{cagriDurumMetni}</p>
                 {!aktifCagri && personelCagrisi?.durum !== "masada_yok" && (
                   <div className="personel-cagri-secenekler">
                     {[
-                      ["siparis", "Sipariş vermek istiyorum", "Menü ve sipariş desteği"],
-                      ["hesap", "Hesap istiyorum", "Ödeme için personel gelsin"],
-                      ["ihtiyac", "Bir ihtiyacım var", "Peçete, çatal veya başka bir istek"],
-                      ["temizlik", "Masa temizliği", "Masanın temizlenmesini istiyorum"],
+                      ["siparis", t("header.callOrder"), t("header.callOrderHint")],
+                      ["hesap", t("header.callBill"), t("header.callBillHint")],
+                      ["ihtiyac", t("header.callNeed"), t("header.callNeedHint")],
+                      ["temizlik", t("header.callClean"), t("header.callCleanHint")],
                     ].map(([neden, baslik, aciklama]) => (
                       <button key={neden} disabled={!personelCagriHazir || personelCagriYukleniyor} onClick={() => personelCagir(neden).catch(() => {})}>
                         <span><b>{baslik}</b><small>{aciklama}</small></span><em>›</em>
@@ -227,7 +229,7 @@ export default function OrtakHeader({ selamlama = false }) {
                   </div>
                 )}
                 {personelCagriHatasi && <div className="personel-cagri-hata" role="alert">{personelCagriHatasi}</div>}
-                {personelCagriYukleniyor && <span className="personel-cagri-yukleniyor">Hazırlanıyor…</span>}
+                {personelCagriYukleniyor && <span className="personel-cagri-yukleniyor">{t("common.loading")}</span>}
               </motion.section>
             </div>
           )}
