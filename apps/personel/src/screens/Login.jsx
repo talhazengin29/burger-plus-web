@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { girisYap, personelIkiFaktorGirisiniTamamla, ilkSifreBelirle, ilkYerelAdminOlustur, yerelAdminDurumu } from "../lib/adminApi";
 import { useIsletme } from "../context/IsletmeContext";
 import logoFull from "../../../musteri/src/assets/logo-full-transparent.png";
-import DilSecici from "../components/DilSecici";
 import "./Login.css";
 
 function PersonelMarkasi() {
-  const { t } = useTranslation();
   const { isletme, isletmeSlug } = useIsletme();
   const yukluLogo = isletme.tema?.logoUrl || isletme.logoUrl || "";
 
@@ -18,13 +15,12 @@ function PersonelMarkasi() {
         : isletmeSlug === "burger-plus"
           ? <img className="login-logo login-logo--burger-plus" src={logoFull} alt={isletme.ad} />
           : <strong className="login-logo-metin">{isletme.ad}</strong>}
-      <span>{t("login.teamPortal")}</span>
+      <span>EKİP PORTALI</span>
     </div>
   );
 }
 
 export default function Login({ onGirisBasarili }) {
-  const { t } = useTranslation();
   const { isletme } = useIsletme();
   const [sifre, setSifre] = useState("");
   const [sifreGorunur, setSifreGorunur] = useState(false);
@@ -53,8 +49,8 @@ export default function Login({ onGirisBasarili }) {
     try {
       let kullanici;
       if (gecisToken) {
-        if (yeniSifre.length < 8) { setHata(t("login.passwordTooShort")); return; }
-        if (yeniSifre !== yeniSifreTekrar) { setHata(t("login.passwordsMismatch")); return; }
+        if (yeniSifre.length < 8) { setHata("Yeni şifre en az 8 karakter olmalıdır."); return; }
+        if (yeniSifre !== yeniSifreTekrar) { setHata("Şifreler uyuşmuyor."); return; }
         kullanici = await ilkSifreBelirle(gecisToken, yeniSifre);
       } else if (ikiFaktorToken) {
         kullanici = await personelIkiFaktorGirisiniTamamla(ikiFaktorToken, ikiFaktorKodu);
@@ -98,33 +94,32 @@ export default function Login({ onGirisBasarili }) {
   if (gecisToken) {
     return (
       <div className="login">
-        <DilSecici sade />
         <form className="login-kart" onSubmit={gonder}>
           <PersonelMarkasi />
-          <h1 className="login-baslik">{t("login.newPasswordTitle")}</h1>
-          <p className="login-alt">{t("login.newPasswordHelp")}</p>
+          <h1 className="login-baslik">Yeni Şifre Belirle</h1>
+          <p className="login-alt">Bu hesap için geçici bir şifreyle giriş yaptın. Devam etmeden önce kendi şifreni belirle.</p>
 
-          <label className="login-etiket">{t("login.newPassword")}</label>
+          <label className="login-etiket">Yeni şifre</label>
           <input
             type="password"
             className="login-input"
             value={yeniSifre}
             onChange={(e) => { setYeniSifre(e.target.value); setHata(""); }}
-            placeholder={t("login.minEight")}
+            placeholder="En az 8 karakter"
             autoFocus
           />
 
-          <label className="login-etiket">{t("login.repeatPassword")}</label>
+          <label className="login-etiket">Yeni şifre (tekrar)</label>
           <input
             type="password"
             className="login-input"
             value={yeniSifreTekrar}
             onChange={(e) => { setYeniSifreTekrar(e.target.value); setHata(""); }}
-            placeholder={t("login.enterAgain")}
+            placeholder="Tekrar gir"
           />
           {hata && <p className="login-hata">{hata}</p>}
-          <button type="submit" className="login-btn" disabled={yeniSifre.length < 8 || !yeniSifreTekrar || yukleniyor}>{t(yukleniyor ? "login.saving" : "login.savePassword")}</button>
-          <button type="button" className="login-kurulum-btn" onClick={() => { setGecisToken(""); setYeniSifre(""); setYeniSifreTekrar(""); setHata(""); }}>{t("login.backToPassword")}</button>
+          <button type="submit" className="login-btn" disabled={yeniSifre.length < 8 || !yeniSifreTekrar || yukleniyor}>{yukleniyor ? "Kaydediliyor…" : "Şifreyi Belirle ve Giriş Yap"}</button>
+          <button type="button" className="login-kurulum-btn" onClick={() => { setGecisToken(""); setYeniSifre(""); setYeniSifreTekrar(""); setHata(""); }}>Şifre ekranına dön</button>
         </form>
       </div>
     );
@@ -133,11 +128,10 @@ export default function Login({ onGirisBasarili }) {
   if (ikiFaktorToken) {
     return (
       <div className="login">
-        <DilSecici sade />
         <form className="login-kart" onSubmit={gonder}>
           <PersonelMarkasi />
-          <h1 className="login-baslik">{t("login.securityCode")}</h1>
-          <p className="login-alt">{t("login.securityCodeHelp")}</p>
+          <h1 className="login-baslik">Güvenlik Kodu</h1>
+          <p className="login-alt">Authenticator kodunu veya kurtarma kodunu gir</p>
           <input
             className="login-input login-2fa-input"
             value={ikiFaktorKodu}
@@ -148,8 +142,8 @@ export default function Login({ onGirisBasarili }) {
             autoFocus
           />
           {hata && <p className="login-hata">{hata}</p>}
-          <button type="submit" className="login-btn" disabled={!ikiFaktorKodu || yukleniyor}>{t(yukleniyor ? "login.verifying" : "login.verifyCode")}</button>
-          <button type="button" className="login-kurulum-btn" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>{t("login.backToPassword")}</button>
+          <button type="submit" className="login-btn" disabled={!ikiFaktorKodu || yukleniyor}>{yukleniyor ? "Doğrulanıyor…" : "Kodu Doğrula"}</button>
+          <button type="button" className="login-kurulum-btn" onClick={() => { setIkiFaktorToken(""); setIkiFaktorKodu(""); setHata(""); }}>Şifre ekranına dön</button>
         </form>
       </div>
     );
@@ -157,13 +151,12 @@ export default function Login({ onGirisBasarili }) {
 
   return (
     <div className="login">
-      <DilSecici sade />
       <form className="login-kart" onSubmit={gonder}>
         <PersonelMarkasi />
         <h1 className="login-baslik">{isletme.ad}</h1>
-        <p className="login-alt">{t("login.staffLogin")}</p>
+        <p className="login-alt">Personel Girişi</p>
 
-        <label className="login-etiket">{t("login.email")}</label>
+        <label className="login-etiket">E-posta</label>
         <input
           type="email"
           className="login-input login-input--email"
@@ -173,7 +166,7 @@ export default function Login({ onGirisBasarili }) {
           placeholder="personel@isletme.com"
         />
 
-        <label className="login-etiket">{t("login.password")}</label>
+        <label className="login-etiket">Şifre</label>
         <div className="sifre-alani">
           <input
             type={sifreGorunur ? "text" : "password"}
@@ -182,23 +175,23 @@ export default function Login({ onGirisBasarili }) {
             onChange={(e) => { setSifre(e.target.value); setHata(""); }}
             placeholder="••••"
           />
-          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={t(sifreGorunur ? "login.hidePassword" : "login.showPassword")} title={t(sifreGorunur ? "login.hidePassword" : "login.showPassword")}>
+          <button type="button" className="sifre-goster-btn" onClick={() => setSifreGorunur((onceki) => !onceki)} aria-label={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"} title={sifreGorunur ? "Şifreyi gizle" : "Şifreyi göster"}>
             <GozIkonu kapali={sifreGorunur} />
           </button>
         </div>
         {hata && <p className="login-hata">{hata}</p>}
 
-        <button type="button" className="login-sifremi-unuttum" onClick={() => setSifremiUnuttumGoster((onceki) => !onceki)}>{t("login.forgotPassword")}</button>
+        <button type="button" className="login-sifremi-unuttum" onClick={() => setSifremiUnuttumGoster((onceki) => !onceki)}>Şifremi unuttum</button>
         {sifremiUnuttumGoster && (
-          <p className="login-bilgi">{t("login.forgotPasswordHelp")}</p>
+          <p className="login-bilgi">Personel hesaplarının şifresi yöneticin tarafından belirlenir; sana e-posta ile sıfırlama bağlantısı gönderemiyoruz. Şifreni unuttuysan işletme yöneticinden Personel ekranından yeni bir geçici şifre görüntülemesini ya da tanımlamasını iste.</p>
         )}
 
         <button type="submit" className="login-btn" disabled={!sifre || !email || yukleniyor}>
-          {t(yukleniyor ? "login.verifying" : "login.signIn")}
+          {yukleniyor ? "Doğrulanıyor…" : "Giriş Yap"}
         </button>
         {adminKurulumGoster && (
           <button type="button" className="login-kurulum-btn" onClick={ilkAdminiKur} disabled={!email || sifre.length < 8 || yukleniyor}>
-            {t("login.createFirstAdmin")}
+            İlk yerel yöneticiyi oluştur
           </button>
         )}
       </form>

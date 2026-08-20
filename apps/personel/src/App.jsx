@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import Login from "./screens/Login";
 import GenelGiris from "./screens/GenelGiris";
 import Kitchen from "./screens/Kitchen";
@@ -8,7 +7,6 @@ import Salon from "./screens/Salon";
 import Admin from "./screens/Admin";
 import CuzdanYukleme from "./components/CuzdanYukleme";
 import Rezervasyonlar from "./screens/Rezervasyonlar";
-import DilSecici from "./components/DilSecici";
 import { adminToken, erisimTokeniniCoz, personelOturumunuDogrula } from "./lib/adminApi";
 import { personelSocketiniBagla, personelSocketiniKes } from "./lib/socket";
 import { IsletmeSarici, useIsletme } from "./context/IsletmeContext";
@@ -29,14 +27,13 @@ const OTURUM = "burger-plus-personel";
 const TEMA_ANAHTARI = "burger-plus-personel-tema";
 
 function TemaButonu({ tema, onDegistir, className = "" }) {
-  const { t } = useTranslation();
   const acikTema = tema === "acik";
   return (
     <button type="button" className={`tema-dugmesi ${className}`.trim()} onClick={onDegistir}
-      aria-label={t(acikTema ? "common.switchToDark" : "common.switchToLight")}
-      title={t(acikTema ? "common.switchToDark" : "common.switchToLight")}>
+      aria-label={acikTema ? "Karanlık temaya geç" : "Aydınlık temaya geç"}
+      title={acikTema ? "Karanlık temaya geç" : "Aydınlık temaya geç"}>
       <span className="tema-dugmesi-ikon" aria-hidden="true">{acikTema ? "☾" : "☀"}</span>
-      <span className="tema-dugmesi-metin">{t(acikTema ? "common.dark" : "common.light")}</span>
+      <span className="tema-dugmesi-metin">{acikTema ? "Karanlık" : "Aydınlık"}</span>
     </button>
   );
 }
@@ -46,7 +43,6 @@ function TemaButonu({ tema, onDegistir, className = "" }) {
 // giriş ekranını (GenelGiris) gösterir — belirli bir işletmeye sabitlenmez,
 // çünkü bu platformda artık birden fazla işletme var.
 function KokEkrani() {
-  const { t } = useTranslation();
   const [arama] = useSearchParams();
   const token = arama.get("erisim") || "";
   const [hedef, setHedef] = useState(null);
@@ -64,13 +60,12 @@ function KokEkrani() {
     setKontrolEdildi(true);
   }, [token]);
 
-  if (!kontrolEdildi) return <main className="tenant-durum">{t("session.verifyingAccess")}</main>;
+  if (!kontrolEdildi) return <main className="tenant-durum">Erişim doğrulanıyor…</main>;
   if (hedef) return <Navigate to={hedef} replace />;
   return <GenelGiris />;
 }
 
 function PersonelPaneli({ tema, temaDegistir }) {
-  const { t } = useTranslation();
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
   const oturumAnahtari = `${OTURUM}_${isletmeSlug}`;
@@ -144,14 +139,14 @@ function PersonelPaneli({ tema, temaDegistir }) {
     return () => window.removeEventListener("personel-oturum-bitti", cikis);
   });
 
-  if (oturumYukleniyor) return <main className="tenant-durum">{t("session.verifyingSession")}</main>;
+  if (oturumYukleniyor) return <main className="tenant-durum">Oturum doğrulanıyor…</main>;
   if (!rol) return <Login onGirisBasarili={girisBasarili} />;
   if (rol === "admin") return (
     <div className={impersonation ? "impersonation-oturumu" : ""}>
       {impersonation && (
         <aside className="impersonation-bandi" role="status">
-          <span>⚠️ {t("session.impersonation", { business: isletme?.ad || isletmeSlug })}</span>
-          <button type="button" onClick={cikis}>{t("common.exit")}</button>
+          <span>⚠️ Super admin erişimi — <b>{isletme?.ad || isletmeSlug}</b> adına işlem yapıyorsunuz.</span>
+          <button type="button" onClick={cikis}>Çık</button>
         </aside>
       )}
       <Admin onCikis={cikis} tema={tema} temaDegistir={temaDegistir} />
@@ -163,7 +158,7 @@ function PersonelPaneli({ tema, temaDegistir }) {
       <nav className="sekme-bar">
         <div className="personel-kimlik">
           <span className="personel-kimlik-ikon">{String(isletme?.ad || "İ").slice(0, 1).toUpperCase()}</span>
-          <div><strong>{isletme?.ad || t("common.business")}</strong><small>{t("common.personnelCenter")}</small></div>
+          <div><strong>{isletme?.ad || "İşletme"}</strong><small>Personel merkezi</small></div>
         </div>
         <div className="sekme-grup">
         {(rol === "mutfak" || rol === "admin") && (
@@ -171,7 +166,7 @@ function PersonelPaneli({ tema, temaDegistir }) {
           className={"sekme " + (aktifSekme === "mutfak" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("mutfak"); git("/mutfak"); }}
         >
-          <span className="sekme-ikon">M</span>{t("nav.kitchen")}
+          <span className="sekme-ikon">M</span>Mutfak
         </button>
         )}
         {(rol === "salon" || rol === "admin") && (
@@ -179,7 +174,7 @@ function PersonelPaneli({ tema, temaDegistir }) {
           className={"sekme " + (aktifSekme === "rezervasyon" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("rezervasyon"); git("/rezervasyonlar"); }}
         >
-          <span className="sekme-ikon">R</span>{t("nav.reservations")}
+          <span className="sekme-ikon">R</span>Rezervasyonlar
         </button>
         )}
         {(rol === "salon" || rol === "admin") && (
@@ -187,7 +182,7 @@ function PersonelPaneli({ tema, temaDegistir }) {
           className={"sekme " + (aktifSekme === "salon" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("salon"); git("/salon"); }}
         >
-          <span className="sekme-ikon">S</span>{t("nav.floor")}
+          <span className="sekme-ikon">S</span>Salon
         </button>
         )}
         {(rol === "salon" || rol === "admin") && (
@@ -195,13 +190,12 @@ function PersonelPaneli({ tema, temaDegistir }) {
           className={"sekme " + (aktifSekme === "cuzdan" ? "sekme--aktif" : "")}
           onClick={() => { setAktifSekme("cuzdan"); git("/cuzdan-yukleme"); }}
         >
-          <span className="sekme-ikon">₺</span>{t("nav.wallet")}
+          <span className="sekme-ikon">₺</span>Cüzdan yükleme
         </button>
         )}
         </div>
-        <DilSecici />
         <TemaButonu tema={tema} onDegistir={temaDegistir} />
-        <button className="sekme-cikis" onClick={cikis}><span>↗</span>{t("common.exit")}</button>
+        <button className="sekme-cikis" onClick={cikis}><span>↗</span>Çıkış</button>
       </nav>
 
       <div className="sekme-icerik">

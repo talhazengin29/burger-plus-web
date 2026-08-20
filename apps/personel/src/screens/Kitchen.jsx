@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useIsletme } from "../context/IsletmeContext";
 import { socket } from "../lib/socket";
 import "./Kitchen.css";
 
 const DURUM_BILGI = {
-  yeni: { etiket: "kitchen.statusNew", renk: "info" },
-  hazirlaniyor: { etiket: "kitchen.statusPreparing", renk: "uyari" },
-  hazir: { etiket: "kitchen.statusReady", renk: "basari" },
+  yeni: { etiket: "Yeni sipariş", renk: "info" },
+  hazirlaniyor: { etiket: "Hazırlanıyor", renk: "uyari" },
+  hazir: { etiket: "Servise hazır", renk: "basari" },
 };
 
-const FILTRELER = [["tumu", "kitchen.allOrders"], ["yeni", "kitchen.new"], ["hazirlaniyor", "kitchen.preparing"], ["hazir", "kitchen.ready"]];
+const FILTRELER = [["tumu", "Tüm siparişler"], ["yeni", "Yeni"], ["hazirlaniyor", "Hazırlanıyor"], ["hazir", "Hazır"]];
 const gelAlSiparisiMi = (masaNo) => String(masaNo || "").trim().toLocaleLowerCase("tr-TR").replace(/[\s_-]+/g, "") === "algotur";
 
 function boyutMetinleri(secimler) {
@@ -21,12 +20,12 @@ function boyutMetinleri(secimler) {
   ].filter(Boolean);
 }
 
-function gecenSure(tarih, simdi, t) {
-  if (!tarih) return t("kitchen.timeUnavailable");
+function gecenSure(tarih, simdi) {
+  if (!tarih) return "Zaman bilgisi yok";
   const fark = Math.max(0, Math.floor((simdi - new Date(tarih).getTime()) / 60000));
-  if (fark < 1) return t("kitchen.justNow");
-  if (fark < 60) return t("kitchen.minutesAgo", { count: fark });
-  return t("kitchen.hoursMinutesAgo", { hours: Math.floor(fark / 60), minutes: fark % 60 });
+  if (fark < 1) return "Az önce";
+  if (fark < 60) return `${fark} dk önce`;
+  return `${Math.floor(fark / 60)} sa ${fark % 60} dk önce`;
 }
 
 function siparisYasi(tarih, simdi) {
@@ -34,12 +33,11 @@ function siparisYasi(tarih, simdi) {
   return Math.max(0, Math.floor((simdi - new Date(tarih).getTime()) / 60000));
 }
 
-function saatMetni(tarih, dil) {
-  return new Intl.DateTimeFormat(dil, { hour: "2-digit", minute: "2-digit" }).format(tarih);
+function saatMetni(tarih) {
+  return new Intl.DateTimeFormat("tr-TR", { hour: "2-digit", minute: "2-digit" }).format(tarih);
 }
 
 export default function Kitchen() {
-  const { t, i18n } = useTranslation();
   const { isletme } = useIsletme();
   const [masalar, setMasalar] = useState([]);
   const [bagli, setBagli] = useState(socket.connected);
@@ -117,36 +115,36 @@ export default function Kitchen() {
     <main className="mutfak">
       <header className="mutfak-header">
         <div className="mutfak-baslik-alani">
-          <span className="mutfak-ust-etiket">{t("kitchen.liveOperation")}</span>
-          <h1>{t("kitchen.title")}</h1>
-          <p>{t("kitchen.subtitle", { business: isletme?.ad || t("common.business") })}</p>
+          <span className="mutfak-ust-etiket">CANLI OPERASYON</span>
+          <h1>Mutfak sipariş akışı</h1>
+          <p>{isletme?.ad || "İşletme"} · Siparişleri geliş sırasına göre yönetin.</p>
         </div>
         <div className="mutfak-canli-bilgi">
-          <div className="mutfak-saat"><small>{t("kitchen.now")}</small><strong>{saatMetni(new Date(simdi), i18n.resolvedLanguage)}</strong></div>
-          <span className={`baglanti ${bagli ? "baglanti--acik" : "baglanti--kapali"}`}><i />{t(bagli ? "kitchen.connected" : "kitchen.disconnected")}</span>
+          <div className="mutfak-saat"><small>Şu an</small><strong>{saatMetni(new Date(simdi))}</strong></div>
+          <span className={`baglanti ${bagli ? "baglanti--acik" : "baglanti--kapali"}`}><i />{bagli ? "Canlı bağlantı" : "Bağlantı kesildi"}</span>
         </div>
       </header>
 
-      <section className="mutfak-ozet" aria-label={t("kitchen.summaryLabel")}>
-        <button type="button" className={`ozet-kart ozet-kart--toplam ${aktifFiltre === "tumu" ? "aktif" : ""}`} onClick={() => setAktifFiltre("tumu")}><span>{t("kitchen.activeOrders")}</span><strong>{sayilar.tumu}</strong><small>{t("kitchen.allFlow")}</small></button>
-        <button type="button" className={`ozet-kart ozet-kart--yeni ${aktifFiltre === "yeni" ? "aktif" : ""}`} onClick={() => setAktifFiltre("yeni")}><span>{t("kitchen.new")}</span><strong>{sayilar.yeni}</strong><small>{t("kitchen.waitingAction")}</small></button>
-        <button type="button" className={`ozet-kart ozet-kart--hazirlaniyor ${aktifFiltre === "hazirlaniyor" ? "aktif" : ""}`} onClick={() => setAktifFiltre("hazirlaniyor")}><span>{t("kitchen.preparing")}</span><strong>{sayilar.hazirlaniyor}</strong><small>{t("kitchen.inKitchen")}</small></button>
-        <button type="button" className={`ozet-kart ozet-kart--hazir ${aktifFiltre === "hazir" ? "aktif" : ""}`} onClick={() => setAktifFiltre("hazir")}><span>{t("kitchen.ready")}</span><strong>{sayilar.hazir}</strong><small>{t("kitchen.waitingService")}</small></button>
+      <section className="mutfak-ozet" aria-label="Sipariş özeti">
+        <button type="button" className={`ozet-kart ozet-kart--toplam ${aktifFiltre === "tumu" ? "aktif" : ""}`} onClick={() => setAktifFiltre("tumu")}><span>Aktif sipariş</span><strong>{sayilar.tumu}</strong><small>Tüm akış</small></button>
+        <button type="button" className={`ozet-kart ozet-kart--yeni ${aktifFiltre === "yeni" ? "aktif" : ""}`} onClick={() => setAktifFiltre("yeni")}><span>Yeni</span><strong>{sayilar.yeni}</strong><small>İşlem bekliyor</small></button>
+        <button type="button" className={`ozet-kart ozet-kart--hazirlaniyor ${aktifFiltre === "hazirlaniyor" ? "aktif" : ""}`} onClick={() => setAktifFiltre("hazirlaniyor")}><span>Hazırlanıyor</span><strong>{sayilar.hazirlaniyor}</strong><small>Mutfakta</small></button>
+        <button type="button" className={`ozet-kart ozet-kart--hazir ${aktifFiltre === "hazir" ? "aktif" : ""}`} onClick={() => setAktifFiltre("hazir")}><span>Hazır</span><strong>{sayilar.hazir}</strong><small>Servis bekliyor</small></button>
       </section>
 
       <section className="mutfak-araclar">
-        <div className="mutfak-filtreler" role="group" aria-label={t("kitchen.filtersLabel")}>
-          {FILTRELER.map(([kod, etiket]) => <button type="button" key={kod} className={aktifFiltre === kod ? "aktif" : ""} aria-pressed={aktifFiltre === kod} onClick={() => setAktifFiltre(kod)}>{t(etiket)}<span>{sayilar[kod]}</span></button>)}
+        <div className="mutfak-filtreler" role="group" aria-label="Sipariş durumuna göre filtrele">
+          {FILTRELER.map(([kod, etiket]) => <button type="button" key={kod} className={aktifFiltre === kod ? "aktif" : ""} aria-pressed={aktifFiltre === kod} onClick={() => setAktifFiltre(kod)}>{etiket}<span>{sayilar[kod]}</span></button>)}
         </div>
-        <p><i /> {t("kitchen.oldestFirst")}</p>
+        <p><i /> En eski siparişler önce gösterilir</p>
       </section>
 
       {gorunenSiparisler.length === 0 ? (
         <section className="bos-durum">
           <div className="bos-ikon" aria-hidden="true"><span /><span /><span /></div>
-          <h2>{t(siraliSiparisler.length ? "kitchen.noOrderInStatus" : "kitchen.quiet")}</h2>
-          <p>{t(siraliSiparisler.length ? "kitchen.chooseOtherFilter" : "kitchen.newOrderHint")}</p>
-          {!bagli && <strong>{t("kitchen.checkConnection")}</strong>}
+          <h2>{siraliSiparisler.length ? "Bu durumda sipariş yok" : "Mutfak şu an sakin"}</h2>
+          <p>{siraliSiparisler.length ? "Başka bir durum filtresi seçebilirsiniz." : "Yeni sipariş geldiğinde kartı otomatik olarak burada görünecek."}</p>
+          {!bagli && <strong>Canlı bağlantıyı kontrol edin.</strong>}
         </section>
       ) : (
         <section className="masa-liste" aria-live="polite">
@@ -162,15 +160,15 @@ export default function Kitchen() {
             return (
               <article key={islemAnahtari} className={`masa-kart durum-${dbilgi.renk} ${gecikiyor ? "masa-kart--geciken" : ""}`}>
                 <header className="masa-kart-ust">
-                  <div className="masa-kimlik"><span className="masa-ikon" aria-hidden="true">{gelAl ? "GA" : siparis.masaNo}</span><div><small>{t(gelAl ? "kitchen.orderType" : "kitchen.table")}</small><h2>{gelAl ? t("kitchen.pickup") : siparis.masaNo}</h2></div></div>
-                  <span className={`durum-rozet durum-${dbilgi.renk}`}><i />{t(dbilgi.etiket)}</span>
+                  <div className="masa-kimlik"><span className="masa-ikon" aria-hidden="true">{gelAl ? "GA" : siparis.masaNo}</span><div><small>{gelAl ? "SİPARİŞ TİPİ" : "MASA"}</small><h2>{gelAl ? "Gel Al" : siparis.masaNo}</h2></div></div>
+                  <span className={`durum-rozet durum-${dbilgi.renk}`}><i />{dbilgi.etiket}</span>
                 </header>
                 <div className="siparis-meta">
-                  <span><small>{t("kitchen.order")}</small><b>{gonderilenSiparisNo ? `#${gonderilenSiparisNo}` : t("kitchen.legacy")}</b></span>
-                  <span className={gecikiyor ? "gecikiyor" : ""}><small>{t("kitchen.wait")}</small><b>{gecenSure(siparis.olusturma, simdi, t)}</b></span>
-                  <span><small>{t("kitchen.product")}</small><b>{t("kitchen.quantity", { count: siparis.urunAdedi })}</b></span>
+                  <span><small>Sipariş</small><b>{gonderilenSiparisNo ? `#${gonderilenSiparisNo}` : "Eski kayıt"}</b></span>
+                  <span className={gecikiyor ? "gecikiyor" : ""}><small>Bekleme</small><b>{gecenSure(siparis.olusturma, simdi)}</b></span>
+                  <span><small>Ürün</small><b>{siparis.urunAdedi} adet</b></span>
                 </div>
-                {gecikiyor && <div className="gecikme-uyarisi"><i>!</i> {t("kitchen.delayed", { count: yas })}</div>}
+                {gecikiyor && <div className="gecikme-uyarisi"><i>!</i> Sipariş {yas} dakikadır bekliyor</div>}
                 <ul className="kalem-liste">
                   {siparis.kalemler.map((k) => {
                     const secimler = k.secimler || {};
@@ -187,20 +185,20 @@ export default function Kitchen() {
                         <div className="kalem-bilgi">
                           <strong className="kalem-ad">{k.urun_ad}</strong>
                           {(gramaj || boyutlar.length > 0) && <div className="kalem-ozellikler">{gramaj && <span>{gramaj}</span>}{boyutlar.map((boyut) => <span key={boyut}>{boyut}</span>)}</div>}
-                          {ekstralar.length > 0 && <span className="kalem-not kalem-ekstra"><b>{t("kitchen.extra")}</b>{ekstralar.map((ekstra) => ekstra.ad).join(", ")}</span>}
-                          {dahil.length > 0 && <span className="kalem-not"><b>{t("kitchen.included")}</b>{dahil.join(", ")}</span>}
-                          {haric?.length > 0 && <span className="kalem-not kalem-haric"><b>{t("kitchen.remove")}</b>{haric.join(", ")}</span>}
-                          {k.kisi_adi && <span className="kalem-kisi">{t("kitchen.person", { name: k.kisi_adi })}</span>}
+                          {ekstralar.length > 0 && <span className="kalem-not kalem-ekstra"><b>EKSTRA</b>{ekstralar.map((ekstra) => ekstra.ad).join(", ")}</span>}
+                          {dahil.length > 0 && <span className="kalem-not"><b>DAHİL</b>{dahil.join(", ")}</span>}
+                          {haric?.length > 0 && <span className="kalem-not kalem-haric"><b>ÇIKAR</b>{haric.join(", ")}</span>}
+                          {k.kisi_adi && <span className="kalem-kisi">Kişi: {k.kisi_adi}</span>}
                         </div>
                       </li>
                     );
                   })}
                 </ul>
                 <footer className="masa-alt">
-                  <div className="masa-toplam"><small>{t("kitchen.orderTotal")}</small><strong>{new Intl.NumberFormat(i18n.resolvedLanguage, { style: "currency", currency: "TRY" }).format(Number(siparis.toplam))}</strong></div>
-                  {durum === "yeni" && <button className="siparis-aksiyon siparis-aksiyon--baslat" disabled={islemde} onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazirlaniyor")}>{t(islemde ? "kitchen.updating" : "kitchen.startPreparing")}<span>→</span></button>}
-                  {durum === "hazirlaniyor" && <button className="siparis-aksiyon siparis-aksiyon--hazir" disabled={islemde} onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazir")}>{t(islemde ? "kitchen.updating" : "kitchen.markReady")}<span>✓</span></button>}
-                  {durum === "hazir" && <div className="hazir-not"><span>✓</span><div><strong>{t("kitchen.statusReady")}</strong><small>{t("kitchen.sentToFloor")}</small></div></div>}
+                  <div className="masa-toplam"><small>Sipariş toplamı</small><strong>₺{Number(siparis.toplam).toFixed(2)}</strong></div>
+                  {durum === "yeni" && <button className="siparis-aksiyon siparis-aksiyon--baslat" disabled={islemde} onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazirlaniyor")}>{islemde ? "Güncelleniyor…" : "Hazırlamaya başla"}<span>→</span></button>}
+                  {durum === "hazirlaniyor" && <button className="siparis-aksiyon siparis-aksiyon--hazir" disabled={islemde} onClick={() => durumDegistir(siparis.masaNo, gonderilenSiparisNo, "hazir")}>{islemde ? "Güncelleniyor…" : "Hazır olarak işaretle"}<span>✓</span></button>}
+                  {durum === "hazir" && <div className="hazir-not"><span>✓</span><div><strong>Servise hazır</strong><small>Salon ekibine iletildi</small></div></div>}
                 </footer>
               </article>
             );

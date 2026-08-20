@@ -1,6 +1,0 @@
-.dil-secici{min-height:42px;padding:6px 8px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:12px;background:var(--panel-2);color:var(--metin)}
-.dil-secici-ikon{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--info) 12%,transparent);color:var(--info);font-size:13px;font-weight:900}
-.dil-secici-etiket{color:var(--metin-soluk);font-size:10px;font-weight:750}
-.dil-secici select{padding:4px 22px 4px 5px;border:0;outline:0;background:transparent;color:var(--metin);font-size:11px;font-weight:800;cursor:pointer}
-.dil-secici--sade{position:absolute;top:18px;right:18px;z-index:5;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(14px)}
-@media(max-width:640px){.dil-secici-etiket{display:none}.dil-secici{padding-right:4px}.dil-secici--sade{top:10px;right:10px}.dil-secici select{width:44px;padding-right:2px}}

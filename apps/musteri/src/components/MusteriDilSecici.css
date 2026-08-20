@@ -1,0 +1,4 @@
+.musteri-dil-secici{position:absolute;z-index:90;top:12px;left:50%;transform:translateX(-50%);display:flex;padding:3px;border:1px solid var(--border-glass);border-radius:999px;background:color-mix(in srgb,var(--bg-card) 90%,transparent);box-shadow:0 8px 24px #0005;backdrop-filter:blur(14px)}
+.musteri-dil-secici button{min-width:37px;height:29px;padding:0 8px;border:0;border-radius:999px;background:transparent;color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.04em;cursor:pointer}
+.musteri-dil-secici button.aktif{background:var(--accent);color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 35%,transparent)}
+.musteri-dil-secici button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}

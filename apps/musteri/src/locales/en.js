@@ -1,0 +1,31 @@
+export default {
+  language: { label: "Select language", turkish: "TR", english: "EN" },
+  common: { back: "Back", close: "Close", home: "Home", menu: "Back to Menu", decrease: "Decrease", increase: "Increase", remove: "Remove", excluded: "No: {{items}}", table: "Table {{number}}" },
+  welcome: {
+    invalidQr: "Invalid QR Code",
+    invalidQrHelp: "Please scan the QR code on your table again.",
+    goHome: "Go to Home",
+    tableLabel: "TABLE {{number}}",
+    title: "Welcome! 👋",
+    intro: "How would you like to continue? Sign in to keep earning points, or order immediately as a guest if this is your first visit.",
+    signIn: "Sign In",
+    memberHint: "I'm a member, earn points",
+    guest: "Continue as Guest",
+    guestHint: "Order without an account",
+    serviceNote: "Your order will be served to Table {{number}}",
+  },
+  nav: { home: "Home", campaigns: "Offers", orders: "Orders", points: "My Points", profile: "Profile", soon: "Coming soon" },
+  header: { hello: "Hello,", guest: "Guest", friend: "Friend", callStaff: "Call staff", notifications: "Notifications", cart: "Cart", profile: "Profile" },
+  login: {
+    slogan: "Great taste and rewards await", title: "Sign In", securityCode: "Security Code",
+    securityHelp: "Enter the 6-digit code from your authenticator app. You can use a recovery code if you cannot access your phone.",
+    verificationCode: "Verification code", backToPassword: "Back to password", email: "Email", password: "Password",
+    showPassword: "Show password", hidePassword: "Hide password", forgotPassword: "Forgot password", rememberMe: "Remember me",
+    verifying: "Verifying...", verifyCode: "Verify Code", noAccount: "Don't have an account?", register: "Register", guest: "Continue as guest",
+    invalidCode: "Enter the 6-digit verification code or a recovery code.", checkFields: "Please check the highlighted fields.", serverError: "Could not reach the server. Please try again.",
+  },
+  cart: {
+    title: "My Cart", empty: "Your cart is empty.", backToMenu: "Back to Menu", gift: "GIFT 🎁", total: "Total",
+    atTable: "You're at Table {{number}}", checkout: "Proceed to Payment", orderType: "How would you like to order?", pickup: "Pickup", tableService: "Table Service",
+  },
+};

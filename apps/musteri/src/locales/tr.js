@@ -1,0 +1,31 @@
+export default {
+  language: { label: "Dil seçimi", turkish: "TR", english: "EN" },
+  common: { back: "Geri", close: "Kapat", home: "Ana Sayfa", menu: "Menüye Dön", decrease: "Azalt", increase: "Artır", remove: "Kaldır", excluded: "Haric: {{items}}", table: "Masa {{number}}" },
+  welcome: {
+    invalidQr: "Geçersiz QR",
+    invalidQrHelp: "Masadaki QR kodu tekrar okutmayı dene.",
+    goHome: "Ana Sayfaya Git",
+    tableLabel: "MASA {{number}}",
+    title: "Hoş Geldin! 👋",
+    intro: "Nasıl devam etmek istersin? Üyeysen giriş yapıp puan kazanmaya devam edebilirsin. İlk kez geldiysen misafir olarak hemen sipariş verebilirsin.",
+    signIn: "Giriş Yap",
+    memberHint: "Üyeyim, puan kazanayım",
+    guest: "Misafir Olarak Devam Et",
+    guestHint: "Üye olmadan sipariş ver",
+    serviceNote: "Siparişin Masa {{number}}'ye servis edilecek",
+  },
+  nav: { home: "Ana Sayfa", campaigns: "Kampanyalar", orders: "Sipariş", points: "Puanlarım", profile: "Profil", soon: "Yakında" },
+  header: { hello: "Merhaba,", guest: "Misafir", friend: "Dostum", callStaff: "Personel çağır", notifications: "Bildirimler", cart: "Sepet", profile: "Profil" },
+  login: {
+    slogan: "Lezzet ve puanlar seni bekliyor", title: "Giriş Yap", securityCode: "Güvenlik Kodu",
+    securityHelp: "Authenticator uygulamandaki 6 haneli kodu gir. Telefonuna erişemiyorsan kurtarma kodlarından birini kullanabilirsin.",
+    verificationCode: "Doğrulama kodu", backToPassword: "Şifre ekranına dön", email: "E-posta", password: "Şifre",
+    showPassword: "Şifreyi göster", hidePassword: "Şifreyi gizle", forgotPassword: "Şifremi unuttum", rememberMe: "Beni hatırla",
+    verifying: "Doğrulanıyor...", verifyCode: "Kodu Doğrula", noAccount: "Hesabın yok mu?", register: "Kayıt Ol", guest: "Misafir olarak devam et",
+    invalidCode: "6 haneli doğrulama kodunu veya kurtarma kodunu gir.", checkFields: "Lütfen işaretli alanları kontrol et.", serverError: "Sunucuya ulaşılamadı. Lütfen tekrar dene.",
+  },
+  cart: {
+    title: "Sepetim", empty: "Sepetin boş.", backToMenu: "Menüye Dön", gift: "HEDİYE 🎁", total: "Toplam",
+    atTable: "Masa {{number}}'desin", checkout: "Ödemeye Geç", orderType: "Nasıl sipariş vermek istersin?", pickup: "Gel Al", tableService: "Masaya Servis",
+  },
+};

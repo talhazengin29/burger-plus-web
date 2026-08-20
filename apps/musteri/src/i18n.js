@@ -3,21 +3,17 @@ import { initReactI18next } from "react-i18next";
 import tr from "./locales/tr";
 import en from "./locales/en";
 
-export const DIL_ANAHTARI = "burger-plus-personel-dil";
-export const DESTEKLENEN_DILLER = ["tr", "en"];
-
-function ilkDil() {
-  const kayitli = localStorage.getItem(DIL_ANAHTARI);
-  if (DESTEKLENEN_DILLER.includes(kayitli)) return kayitli;
-  const tarayiciDili = navigator.language?.split("-")[0];
-  return DESTEKLENEN_DILLER.includes(tarayiciDili) ? tarayiciDili : "tr";
-}
+const DIL_ANAHTARI = "burger-plus-musteri-dil";
+const desteklenenDiller = ["tr", "en"];
+const kayitliDil = localStorage.getItem(DIL_ANAHTARI);
+const tarayiciDili = navigator.language?.split("-")[0];
+const ilkDil = desteklenenDiller.includes(kayitliDil) ? kayitliDil : desteklenenDiller.includes(tarayiciDili) ? tarayiciDili : "tr";
 
 i18n.use(initReactI18next).init({
   resources: { tr: { translation: tr }, en: { translation: en } },
-  lng: ilkDil(),
+  lng: ilkDil,
   fallbackLng: "tr",
-  supportedLngs: DESTEKLENEN_DILLER,
+  supportedLngs: desteklenenDiller,
   interpolation: { escapeValue: false },
   returnEmptyString: false,
 });
