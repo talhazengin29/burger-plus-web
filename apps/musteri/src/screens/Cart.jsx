@@ -2,30 +2,30 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag, IconTakeaway, IconTableService } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
-import { useDil } from "../dil/DilContext";
+import { useTema } from "../context/TemaContext";
 import "./Cart.css";
 
 export default function Cart() {
-  const { t } = useDil();
+  const { metinler } = useTema();
   const git = useIsletmeNavigate();
   const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
 
   return (
     <div className="ekran cart">
       <header className="alt-header">
-        <button className="geri-btn" onClick={() => git(-1)} aria-label={t("common.back")}>
+        <button className="geri-btn" onClick={() => git(-1)} aria-label="Geri">
           <IconBack />
         </button>
-        <h1 className="alt-header-baslik">{t("cart.title")}</h1>
+        <h1 className="alt-header-baslik">Sepetim</h1>
         <span className="alt-header-bosluk" />
       </header>
 
       {sepet.length === 0 ? (
         <div className="sepet-bos">
           <IconBag className="sepet-bos-ikon" />
-          <p className="sepet-bos-yazi">{t("cart.empty")}</p>
+          <p className="sepet-bos-yazi">{metinler.sepetBos}</p>
           <button className="sepet-bos-btn" onClick={() => git("/anasayfa")}>
-            {t("cart.backToMenu")}
+            Menüye Dön
           </button>
         </div>
       ) : (
@@ -38,7 +38,7 @@ export default function Cart() {
                   <div className="cart-orta">
                     <h3 className="cart-ad">{u.ad}</h3>
                     {u.hediyeMi ? (
-                      <span className="cart-hediye-etiket">{t("cart.gift")}</span>
+                      <span className="cart-hediye-etiket">HEDİYE 🎁</span>
                     ) : (
                       <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
                     )}
@@ -46,17 +46,17 @@ export default function Cart() {
                       <span className="cart-gramaj">{gramajMetni(u.secimler)}</span>
                     )}
                     {haricMalzemeleriGetir(u).length > 0 && (
-                      <span className="cart-haric-malzeme">{t("common.excluded", { items: haricMalzemeleriGetir(u).join(", ") })}</span>
+                      <span className="cart-haric-malzeme">Haric: {haricMalzemeleriGetir(u).join(", ")}</span>
                     )}
                   </div>
                   <div className="cart-sag">
-                    <button className="cart-sil" onClick={() => sepettenCikar(u.sepetAnahtari)} aria-label={t("common.remove")}>
+                    <button className="cart-sil" onClick={() => sepettenCikar(u.sepetAnahtari)} aria-label="Kaldır">
                       <IconTrash />
                     </button>
                     <div className="adet-kontrol">
-                      <button onClick={() => adetAzalt(u.sepetAnahtari)} aria-label={t("common.decrease")}><IconMinus /></button>
+                      <button onClick={() => adetAzalt(u.sepetAnahtari)} aria-label="Azalt"><IconMinus /></button>
                       <span className="adet-sayi">{u.adet}</span>
-                      <button onClick={() => adetArtir(u.sepetAnahtari)} aria-label={t("common.increase")}><IconPlus /></button>
+                      <button onClick={() => adetArtir(u.sepetAnahtari)} aria-label="Artır"><IconPlus /></button>
                     </div>
                   </div>
                 </article>
@@ -67,36 +67,36 @@ export default function Cart() {
           {/* Alt sabit özet + sipariş tipi seçimi */}
           <div className="cart-alt-bar">
             <div className="cart-toplam-satir">
-              <span>{t("cart.total")}</span>
+              <span>Toplam</span>
               <span className="cart-toplam-tutar">₺{sepetToplam.toFixed(2)}</span>
             </div>
 
             {aktifMasa ? (
               /* QR ile masa seçili — doğrudan o masaya ödeme */
               <>
-                <div className="cart-masa-bilgi"><IconTableService /> {t("cart.atTable", { number: aktifMasa })}</div>
+                <div className="cart-masa-bilgi"><IconTableService /> Masa {aktifMasa}'desin</div>
                 <button
                   className="odeme-gec-btn"
                   onClick={() => git(`/odeme?masa=${aktifMasa}`)}
                 >
-                  {t("cart.checkout")}
+                  Ödemeye Geç
                 </button>
               </>
             ) : (
               /* Masa seçili değil — Gel Al veya QR ile Masaya Servis */
               <>
-                <p className="cart-secim-baslik">{t("cart.orderType")}</p>
+                <p className="cart-secim-baslik">Nasıl sipariş vermek istersin?</p>
                 <div className="cart-secim-butonlar">
                   <button
                     className="siparis-tip-btn siparis-tip-btn--algotur"
                     onClick={() => git("/odeme")}
                   >
                     <IconTakeaway className="siparis-tip-ikon" />
-                    {t("cart.pickup")}
+                    Gel Al
                   </button>
                   <button className="siparis-tip-btn siparis-tip-btn--masa" onClick={() => git("/qr?mod=masa")}>
                     <IconTableService className="siparis-tip-ikon" />
-                    {t("cart.tableService")}
+                    Masaya Servis
                   </button>
                 </div>
               </>

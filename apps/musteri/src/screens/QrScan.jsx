@@ -4,7 +4,6 @@ import QrScanner from "qr-scanner";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack } from "../components/Icons";
-import { useDil } from "../dil/DilContext";
 import "./QrScan.css";
 
 /*
@@ -17,7 +16,6 @@ import "./QrScan.css";
   ?mod=masa     → okutunca masa siparişi ekranına git (QR'dan gelen masa no ile)
 */
 export default function QrScan() {
-  const { t } = useDil();
   const git = useIsletmeNavigate();
   const { setAktifMasa } = useApp();
   const [params] = useSearchParams();
@@ -82,6 +80,7 @@ export default function QrScan() {
 
   const manuelGonder = (e) => {
     e.preventDefault();
+    const no = manuelNo.trim();
     if (masaModu) {
       return;
     } else {
@@ -94,16 +93,16 @@ export default function QrScan() {
   return (
     <div className="ekran qrscan">
       <header className="alt-header alt-header--seffaf">
-        <button className="geri-btn" onClick={() => git(-1)} aria-label={t("common.back")}><IconBack /></button>
-        <h1 className="alt-header-baslik">{t("qr.title")}</h1>
+        <button className="geri-btn" onClick={() => git(-1)} aria-label="Geri"><IconBack /></button>
+        <h1 className="alt-header-baslik">QR Okut</h1>
         <span className="alt-header-bosluk" />
       </header>
 
       <div className="qrscan-govde">
         <p className="qrscan-aciklama">
           {masaModu
-            ? t("qr.tableHelp")
-            : t("qr.counterHelp")}
+            ? "Masandaki QR kodu çerçeveye getir, siparişini o masaya iletelim."
+            : "Kasadaki QR kodu çerçeveye getirerek siparişini başlat."}
         </p>
 
         <div className="qr-cerceve">
@@ -119,14 +118,14 @@ export default function QrScan() {
           )}
         </div>
 
-        {durum === "baslatiliyor" && <p className="qrscan-not">{t("qr.opening")}</p>}
-        {durum === "tariyor" && <p className="qrscan-not">{t("qr.align")}</p>}
-        {durum === "gecersiz-qr" && <p className="qrscan-not qrscan-not--hata">{t("qr.invalid")}</p>}
+        {durum === "baslatiliyor" && <p className="qrscan-not">Kamera açılıyor…</p>}
+        {durum === "tariyor" && <p className="qrscan-not">QR kodu çerçeve içine hizala</p>}
+        {durum === "gecersiz-qr" && <p className="qrscan-not qrscan-not--hata">Bu QR güvenli bir masa erişim anahtarı içermiyor. Masadaki güncel QR kodunu okut.</p>}
         {durum === "izin-yok" && (
-          <p className="qrscan-not qrscan-not--hata">{t("qr.permission")}</p>
+          <p className="qrscan-not qrscan-not--hata">Kamera izni verilmedi. Tarayıcı ayarlarından bu sayfa için kameraya izin verip yeniden dene.</p>
         )}
         {durum === "kamera-yok" && (
-          <p className="qrscan-not qrscan-not--hata">{t("qr.unavailable")}</p>
+          <p className="qrscan-not qrscan-not--hata">Kameraya erişilemedi. Güvenli masa erişimi için masadaki QR kodunun okutulması gerekir.</p>
         )}
 
         {kameraSorunuVar && !masaModu && (
@@ -142,7 +141,7 @@ export default function QrScan() {
                 onChange={(e) => setManuelNo(e.target.value)}
               />
             )}
-            <button type="submit" className="qr-okut-btn">{t("qr.continue")}</button>
+            <button type="submit" className="qr-okut-btn">Devam Et</button>
           </form>
         )}
       </div>
