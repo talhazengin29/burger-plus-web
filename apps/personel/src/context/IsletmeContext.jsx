@@ -5,10 +5,10 @@ import { socket } from "../lib/socket";
 
 const IsletmeContext = createContext(null);
 const TEMA_DEGISKENLERI = [
-  "--bg", "--panel", "--panel-2", "--panel-3", "--border",
   "--primary", "--primary-hafif", "--accent", "--accent-glow",
   "--font-baslik", "--font-govde", "--logo-olcegi",
 ];
+const PERSONEL_ZEMIN_DEGISKENLERI = ["--bg", "--panel", "--panel-2", "--panel-3", "--border", "--metin", "--metin-soluk"];
 
 export function IsletmeSarici({ children }) {
   const { isletmeSlug } = useParams();
@@ -35,18 +35,15 @@ export function IsletmeSarici({ children }) {
     const kok = document.documentElement;
     const isletme = durum.isletme;
     const renkler = isletme?.tema?.renkler;
+    // Personel arayüzünün açık/koyu zemini işletme temasından bağımsızdır.
+    // Önceki sürümlerden veya canlı tema güncellemesinden kalan inline
+    // değişkenler CSS'teki [data-tema] değerlerini ezmesin.
+    PERSONEL_ZEMIN_DEGISKENLERI.forEach((ad) => kok.style.removeProperty(ad));
     if (!isletme || !renkler) return undefined;
 
     const accent = renkler.accent || "#8B5CF6";
-    const bg = renkler.bgPrimary || "#0F1115";
-    const panel = renkler.bgCard || `color-mix(in srgb, ${bg} 88%, white)`;
     const font = isletme.tema?.font || {};
     const degiskenler = {
-      "--bg": bg,
-      "--panel": panel,
-      "--panel-2": `color-mix(in srgb, ${bg} 82%, white)`,
-      "--panel-3": `color-mix(in srgb, ${bg} 76%, white)`,
-      "--border": `color-mix(in srgb, ${bg} 68%, white)`,
       "--primary": accent,
       "--primary-hafif": `color-mix(in srgb, ${accent} 20%, transparent)`,
       "--accent": accent,

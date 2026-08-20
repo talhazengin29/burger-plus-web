@@ -32,8 +32,8 @@ function TemaButonu({ tema, onDegistir, className = "" }) {
     <button type="button" className={`tema-dugmesi ${className}`.trim()} onClick={onDegistir}
       aria-label={acikTema ? "Karanlık temaya geç" : "Aydınlık temaya geç"}
       title={acikTema ? "Karanlık temaya geç" : "Aydınlık temaya geç"}>
-      <span className="tema-dugmesi-ikon" aria-hidden="true">{acikTema ? "☾" : "☀"}</span>
-      <span className="tema-dugmesi-metin">{acikTema ? "Karanlık" : "Aydınlık"}</span>
+      <span className="tema-dugmesi-ikon" aria-hidden="true">{acikTema ? "☀" : "☾"}</span>
+      <span className="tema-dugmesi-metin">{acikTema ? "Aydınlık" : "Karanlık"}</span>
     </button>
   );
 }
