@@ -174,7 +174,7 @@ export default function Profile() {
               className="profil-menu-satir"
               onClick={() => yol ? git(yol) : setYardimAcik(true)}
             >
-              <span className="profil-menu-ikon-daire"><Ikon /></span>
+              <span className={`profil-menu-ikon-daire${etiket === "profile.feedback" ? " profil-menu-ikon-daire--chat" : ""}`}><Ikon /></span>
               <span className="profil-menu-ad">{t(etiket)}</span>
               <IconChevron className="profil-menu-ok" />
             </button>

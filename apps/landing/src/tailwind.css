@@ -908,7 +908,8 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
   font-size: 0.875rem;
   font-weight: 700;
 }
-.chatbot-ac svg { width: 1.55rem; height: 1.55rem; }
+.chatbot-ac svg { width: 1.55rem; height: 1.55rem; transform: translate(1px, -1px); }
+.chatbot-ac span { display: block; line-height: 1; }
 .chatbot-kok--acik .chatbot-ac { display: none; }
 
 .chatbot-panel {
