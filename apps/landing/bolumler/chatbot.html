@@ -1,0 +1,41 @@
+<!-- Landing satış asistanı: API anahtarı istemcide değil, backend endpoint'indedir. -->
+<aside class="chatbot-kok" id="chatbot-kok" aria-label="Burger Plus satış asistanı">
+  <section class="chatbot-panel" id="chatbot-panel" aria-labelledby="chatbot-baslik" hidden>
+    <header class="chatbot-baslik-satiri">
+      <span class="chatbot-avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 10h.01M16 10h.01M9 15c.8.65 1.8 1 3 1s2.2-.35 3-1M12 3v2M5 8.5A3.5 3.5 0 0 1 8.5 5h7A3.5 3.5 0 0 1 19 8.5v7a3.5 3.5 0 0 1-3.5 3.5h-7A3.5 3.5 0 0 1 5 15.5v-7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </span>
+      <div>
+        <h2 id="chatbot-baslik">Burger Plus Asistan</h2>
+        <p><span aria-hidden="true"></span> Çevrimiçi</p>
+      </div>
+      <button class="chatbot-kapat" id="chatbot-kapat" type="button" aria-label="Sohbeti kapat">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <div class="chatbot-mesajlar" id="chatbot-mesajlar" role="log" aria-live="polite" aria-relevant="additions">
+      <div class="chatbot-mesaj chatbot-mesaj--asistan">Merhaba! Fiyatlar, özellikler, kurulum veya ücretsiz deneme hakkında yardımcı olabilirim.</div>
+    </div>
+
+    <div class="chatbot-oneriler" id="chatbot-oneriler" aria-label="Önerilen sorular">
+      <button type="button" data-chat-soru="Paket fiyatları ne kadar?">Paket fiyatları</button>
+      <button type="button" data-chat-soru="14 gün ücretsiz deneme nasıl çalışıyor?">Ücretsiz deneme</button>
+      <button type="button" data-chat-soru="Kurulum nasıl yapılıyor?">Kurulum</button>
+    </div>
+
+    <form class="chatbot-form" id="chatbot-form">
+      <label class="sr-only" for="chatbot-girdi">Mesajınız</label>
+      <textarea id="chatbot-girdi" name="mesaj" rows="1" maxlength="600" placeholder="Bir şey sorun..." required></textarea>
+      <button type="submit" aria-label="Mesajı gönder">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 4 16 8-16 8 2.5-8L4 4Zm2.5 8H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+    <p class="chatbot-not">AI desteklidir; özel veya finansal bilgi paylaşmayın.</p>
+  </section>
+
+  <button class="chatbot-ac" id="chatbot-ac" type="button" aria-expanded="false" aria-controls="chatbot-panel">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H7l-4 2 1.35-4.05A7.5 7.5 0 1 1 20 11.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <span>Yardım</span>
+  </button>
+</aside>

@@ -386,6 +386,108 @@ function talepFormu() {
   });
 }
 
+/* ------------------------------------------------------- AI satış asistanı */
+function satisAsistani() {
+  const kok = document.getElementById("chatbot-kok");
+  const acDugmesi = document.getElementById("chatbot-ac");
+  const kapatDugmesi = document.getElementById("chatbot-kapat");
+  const panel = document.getElementById("chatbot-panel");
+  const form = document.getElementById("chatbot-form");
+  const girdi = document.getElementById("chatbot-girdi");
+  const mesajlar = document.getElementById("chatbot-mesajlar");
+  const oneriler = document.getElementById("chatbot-oneriler");
+  if (!kok || !acDugmesi || !kapatDugmesi || !panel || !form || !girdi || !mesajlar) return;
+
+  const backend = String(import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+  const gecmis = [];
+  let istekVar = false;
+
+  function paneliAyarla(acik) {
+    panel.hidden = !acik;
+    acDugmesi.setAttribute("aria-expanded", String(acik));
+    kok.classList.toggle("chatbot-kok--acik", acik);
+    if (acik) window.setTimeout(() => girdi.focus(), 60);
+    else acDugmesi.focus();
+  }
+
+  function mesajiEkle(metin, rol, gecmiseEkle = true) {
+    const balon = document.createElement("div");
+    balon.className = `chatbot-mesaj chatbot-mesaj--${rol}`;
+    balon.textContent = metin;
+    mesajlar.appendChild(balon);
+    mesajlar.scrollTop = mesajlar.scrollHeight;
+    if (gecmiseEkle) {
+      gecmis.push({ rol, metin });
+      if (gecmis.length > 8) gecmis.splice(0, gecmis.length - 8);
+    }
+    return balon;
+  }
+
+  async function sor(metin) {
+    const temiz = String(metin || "").trim().slice(0, 600);
+    if (!temiz || istekVar) return;
+    const oncekiGecmis = gecmis.slice(-6);
+    mesajiEkle(temiz, "kullanici");
+    girdi.value = "";
+    girdi.style.height = "auto";
+    oneriler?.setAttribute("hidden", "");
+    istekVar = true;
+    girdi.disabled = true;
+    form.querySelector('button[type="submit"]')?.setAttribute("disabled", "");
+    const bekleme = mesajiEkle("Yanıt hazırlanıyor…", "yukleniyor", false);
+    const denetleyici = new AbortController();
+    const zamanlayici = window.setTimeout(() => denetleyici.abort(), 20_000);
+    try {
+      const yanit = await fetch(`${backend}/api/landing/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: denetleyici.signal,
+        body: JSON.stringify({ mesaj: temiz, gecmis: oncekiGecmis }),
+      });
+      const veri = await yanit.json().catch(() => ({}));
+      if (!yanit.ok || !veri.cevap) throw new Error(veri.hata || "Yanıt alınamadı.");
+      bekleme.remove();
+      mesajiEkle(veri.cevap, "asistan");
+    } catch (hata) {
+      bekleme.remove();
+      const zamanAsimi = hata?.name === "AbortError";
+      mesajiEkle(zamanAsimi
+        ? "Yanıt biraz uzun sürdü. Lütfen tekrar deneyin veya iletişim bölümünden bize ulaşın."
+        : "Şu anda bağlantı kuramadım. Fiyat ve özellikleri sayfadan inceleyebilir, iletişim bölümünden bize ulaşabilirsiniz.", "asistan");
+    } finally {
+      window.clearTimeout(zamanlayici);
+      istekVar = false;
+      girdi.disabled = false;
+      form.querySelector('button[type="submit"]')?.removeAttribute("disabled");
+      girdi.focus();
+    }
+  }
+
+  acDugmesi.addEventListener("click", () => paneliAyarla(panel.hidden));
+  kapatDugmesi.addEventListener("click", () => paneliAyarla(false));
+  form.addEventListener("submit", (olay) => {
+    olay.preventDefault();
+    sor(girdi.value);
+  });
+  girdi.addEventListener("keydown", (olay) => {
+    if (olay.key === "Enter" && !olay.shiftKey) {
+      olay.preventDefault();
+      form.requestSubmit();
+    }
+  });
+  girdi.addEventListener("input", () => {
+    girdi.style.height = "auto";
+    girdi.style.height = `${Math.min(girdi.scrollHeight, 110)}px`;
+  });
+  oneriler?.addEventListener("click", (olay) => {
+    const dugme = olay.target.closest("[data-chat-soru]");
+    if (dugme) sor(dugme.dataset.chatSoru);
+  });
+  document.addEventListener("keydown", (olay) => {
+    if (olay.key === "Escape" && !panel.hidden) paneliAyarla(false);
+  });
+}
+
 /* ------------------------------------------------------------------ Başlangıç */
 mobilMenu();
 sssAkordiyonu();
@@ -393,3 +495,4 @@ temaAnahtari();
 fiyatAnahtari();
 aktifBolumIsaretle();
 talepFormu();
+satisAsistani();

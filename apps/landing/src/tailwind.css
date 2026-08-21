@@ -876,3 +876,97 @@
     box-shadow: 0 0 46px -4px rgba(255, 107, 0, 0.5);
   }
 }
+
+/* ==========================================================================
+   Landing AI satış asistanı
+   ========================================================================== */
+.chatbot-kok {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  font-family: theme("fontFamily.govde");
+}
+
+body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(safe-area-inset-bottom))); }
+
+.chatbot-ac {
+  display: inline-flex;
+  min-height: 3.5rem;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--marka-turuncu-500), var(--marka-turuncu-400));
+  padding: 0.75rem 1.1rem;
+  color: #fff;
+  box-shadow: 0 12px 34px rgba(255, 107, 0, 0.28);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.chatbot-ac svg { width: 1.55rem; height: 1.55rem; }
+.chatbot-kok--acik .chatbot-ac { display: none; }
+
+.chatbot-panel {
+  width: min(24rem, calc(100vw - 2rem));
+  height: min(36rem, calc(100dvh - 2rem));
+  overflow: hidden;
+  border: 1px solid var(--marka-cizgi);
+  border-radius: 1.35rem;
+  background: color-mix(in srgb, var(--marka-kart) 96%, transparent);
+  color: var(--marka-metin);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+}
+.chatbot-panel:not([hidden]) { display: flex; flex-direction: column; }
+
+.chatbot-baslik-satiri {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--marka-cizgi);
+  background: color-mix(in srgb, var(--marka-turuncu-500) 8%, transparent);
+}
+.chatbot-avatar { display: grid; width: 2.65rem; height: 2.65rem; flex: none; place-items: center; border-radius: 0.85rem; background: var(--marka-turuncu-500); color: #fff; box-shadow: 0 6px 18px rgba(255,107,0,.25); }
+.chatbot-avatar svg { width: 1.6rem; height: 1.6rem; }
+.chatbot-baslik-satiri > div { min-width: 0; flex: 1; }
+.chatbot-baslik-satiri h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+.chatbot-baslik-satiri p { display: flex; align-items: center; gap: .35rem; margin: .15rem 0 0; color: var(--marka-gri-400); font-size: .72rem; }
+.chatbot-baslik-satiri p span { width: .45rem; height: .45rem; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.12); }
+.chatbot-kapat { display: grid; width: 2.35rem; height: 2.35rem; flex: none; place-items: center; border-radius: 50%; color: var(--marka-gri-300); }
+.chatbot-kapat:hover { background: color-mix(in srgb, var(--marka-metin) 7%, transparent); }
+.chatbot-kapat svg { width: 1.2rem; height: 1.2rem; }
+
+.chatbot-mesajlar { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 1rem; scrollbar-width: thin; }
+.chatbot-mesaj { width: fit-content; max-width: 88%; margin-bottom: .7rem; padding: .72rem .85rem; border-radius: 1rem; font-size: .82rem; line-height: 1.5; overflow-wrap: anywhere; }
+.chatbot-mesaj--asistan, .chatbot-mesaj--yukleniyor { border: 1px solid var(--marka-cizgi); border-bottom-left-radius: .3rem; background: color-mix(in srgb, var(--marka-metin) 5%, transparent); color: var(--marka-gri-300); }
+.chatbot-mesaj--kullanici { margin-left: auto; border-bottom-right-radius: .3rem; background: var(--marka-turuncu-500); color: #fff; }
+.chatbot-mesaj--yukleniyor { opacity: .7; animation: chatbot-bekle 1.2s ease-in-out infinite; }
+
+.chatbot-oneriler { display: flex; gap: .45rem; overflow-x: auto; padding: 0 1rem .75rem; scrollbar-width: none; }
+.chatbot-oneriler[hidden] { display: none; }
+.chatbot-oneriler::-webkit-scrollbar { display: none; }
+.chatbot-oneriler button { flex: none; border: 1px solid color-mix(in srgb, var(--marka-turuncu-500) 42%, var(--marka-cizgi)); border-radius: 999px; padding: .48rem .68rem; color: var(--marka-turuncu-500); font-size: .7rem; font-weight: 600; }
+.chatbot-oneriler button:hover { background: color-mix(in srgb, var(--marka-turuncu-500) 9%, transparent); }
+
+.chatbot-form { display: flex; align-items: flex-end; gap: .55rem; margin: 0 .8rem; border: 1px solid var(--marka-cizgi); border-radius: 1rem; background: color-mix(in srgb, var(--marka-metin) 4%, transparent); padding: .42rem; }
+.chatbot-form:focus-within { border-color: var(--marka-turuncu-500); box-shadow: 0 0 0 3px rgba(255,107,0,.1); }
+.chatbot-form textarea { min-height: 2.5rem; max-height: 6.9rem; flex: 1; resize: none; border: 0; background: transparent; padding: .62rem .55rem; color: var(--marka-metin); font: inherit; font-size: .82rem; line-height: 1.35; outline: 0; }
+.chatbot-form textarea::placeholder { color: var(--marka-gri-400); }
+.chatbot-form button { display: grid; width: 2.55rem; height: 2.55rem; flex: none; place-items: center; border-radius: .78rem; background: var(--marka-turuncu-500); color: #fff; }
+.chatbot-form button:disabled { opacity: .45; cursor: wait; }
+.chatbot-form button svg { width: 1.25rem; height: 1.25rem; }
+.chatbot-not { margin: .55rem .9rem .75rem; color: var(--marka-gri-400); font-size: .62rem; text-align: center; }
+
+@keyframes chatbot-bekle { 50% { opacity: .4; } }
+
+@media (max-width: 480px) {
+  .chatbot-kok { right: .65rem; bottom: max(.65rem, env(safe-area-inset-bottom)); }
+  body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.25rem, calc(.65rem + env(safe-area-inset-bottom))); }
+  .chatbot-panel { width: calc(100vw - 1.3rem); height: min(38rem, calc(100dvh - 1.3rem)); border-radius: 1.2rem; }
+}
