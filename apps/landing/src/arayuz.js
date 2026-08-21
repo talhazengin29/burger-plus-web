@@ -326,7 +326,7 @@ function talepFormu() {
   function mesajiKur() {
     const oku = (ad) => String(form.elements[ad]?.value || "").trim();
     const satirlar = [
-      "Merhaba, QR Menü Pro için kurulum talebim var.",
+      "Merhaba, orQRestro için kurulum talebim var.",
       "",
       `Ad Soyad: ${oku("ad")}`,
       `İşletme: ${oku("isletme")}`,
@@ -354,7 +354,7 @@ function talepFormu() {
     const adres =
       kanal === "whatsapp"
         ? `https://wa.me/${hedef}?text=${encodeURIComponent(mesaj)}`
-        : `mailto:${hedef}?subject=${encodeURIComponent("QR Menü Pro — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
+        : `mailto:${hedef}?subject=${encodeURIComponent("orQRestro — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
 
     if (durum) {
       durum.textContent =

@@ -70,6 +70,12 @@
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 
+  .marka-qr-vurgu,
+  .chatbot-marka > span {
+    color: var(--marka-turuncu-500);
+    text-shadow: 0 0 18px rgba(255, 107, 0, 0.22);
+  }
+
   h1,
   h2,
   h3,

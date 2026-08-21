@@ -111,7 +111,7 @@ export const WHATSAPP = {
     return ILETISIM.whatsapp;
   },
   // Sohbet açıldığında mesaj kutusuna hazır gelen metin.
-  hazirMesaj: "Merhaba, QR Menü Pro hakkında bilgi almak istiyorum.",
+  hazirMesaj: "Merhaba, orQRestro hakkında bilgi almak istiyorum.",
   etiket: "WhatsApp'tan yazın",
 };
 
@@ -161,16 +161,17 @@ const YIL = new Date().getFullYear();
 
 export const ICERIK = {
   // --- Marka ---------------------------------------------------------------
-  markaAdi: "QR Menü Pro",
+  markaAdi: "orQRestro",
+  markaAdiHtml: 'or<span class="marka-qr-vurgu">QR</span>estro',
   markaAciklamasi: "Yeni nesil dijital restoran yönetim sistemi.",
-  telifSatiri: `© ${YIL} QR Menü Pro. Tüm hakları saklıdır.`,
+  telifSatiri: `© ${YIL} orQRestro. Tüm hakları saklıdır.`,
 
   // --- SEO / Open Graph ----------------------------------------------------
-  sayfaBasligi: "QR Menü Pro | Restoranın İçin Dijital Sipariş Sistemi",
+  sayfaBasligi: "orQRestro | QR Menü ve Restoran Yönetimi",
   sayfaAciklamasi:
     "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoranınızın siparişten ödemeye tüm akışını tek sistemde yönetin.",
   ogGorsel: "/gorseller/hero-telefon.jpg",
-  ogGorselAlt: "QR Menü Pro müşteri uygulamasının telefon ekranındaki görünümü",
+  ogGorselAlt: "orQRestro müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
   heroRozet: "Sipariş, mutfak ve ödeme tek akışta",
