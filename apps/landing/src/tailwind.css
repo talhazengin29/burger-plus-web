@@ -964,6 +964,8 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
 .chatbot-form { display: flex; align-items: flex-end; gap: .55rem; margin: 0 .8rem; border: 1px solid var(--marka-cizgi); border-radius: 1rem; background: color-mix(in srgb, var(--marka-metin) 4%, transparent); padding: .42rem; }
 .chatbot-form:focus-within { border-color: var(--marka-turuncu-500); box-shadow: 0 0 0 3px rgba(255,107,0,.1); }
 .chatbot-form textarea { min-height: 2.5rem; max-height: 6.9rem; flex: 1; resize: none; border: 0; background: transparent; padding: .62rem .55rem; color: var(--marka-metin); font: inherit; font-size: .82rem; line-height: 1.35; outline: 0; }
+.chatbot-form textarea:focus,
+.chatbot-form textarea:focus-visible { border-color: transparent; outline: none; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
 .chatbot-form textarea::placeholder { color: var(--marka-gri-400); }
 .chatbot-form button { display: grid; width: 2.55rem; height: 2.55rem; flex: none; place-items: center; border-radius: .78rem; background: var(--marka-turuncu-500); color: #fff; }
 .chatbot-form button:disabled { opacity: .45; cursor: wait; }
