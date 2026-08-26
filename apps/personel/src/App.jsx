@@ -65,7 +65,7 @@ function KokEkrani() {
   return <GenelGiris />;
 }
 
-function PersonelPaneli() {
+function PersonelPaneli({ tema, onTemaDegistir }) {
   const git = useIsletmeNavigate();
   const { isletme, isletmeSlug } = useIsletme();
   const oturumAnahtari = `${OTURUM}_${isletmeSlug}`;
@@ -149,7 +149,10 @@ function PersonelPaneli() {
           <button type="button" onClick={cikis}>Çık</button>
         </aside>
       )}
-      <Admin onCikis={cikis} />
+      <Admin
+        onCikis={cikis}
+        temaKontrolu={<TemaButonu tema={tema} onDegistir={onTemaDegistir} className="tema-dugmesi--admin" />}
+      />
     </div>
   );
 
@@ -223,7 +226,7 @@ export default function App() {
     <TemaButonu tema={tema} onDegistir={temaDegistir} className="tema-dugmesi--global" />
     <Routes>
       <Route path="/" element={<KokEkrani />} />
-      <Route path="/:isletmeSlug/*" element={<IsletmeSarici><PersonelPaneli /></IsletmeSarici>} />
+      <Route path="/:isletmeSlug/*" element={<IsletmeSarici><PersonelPaneli tema={tema} onTemaDegistir={temaDegistir} /></IsletmeSarici>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </>;

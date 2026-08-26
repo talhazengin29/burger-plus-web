@@ -136,7 +136,7 @@ const urunuFormaCevir = (urun) => ({
   menuYapisi: { ...BOS_MENU, ...(urun.menuYapisi || {}) },
 });
 
-export default function Admin({ onCikis }) {
+export default function Admin({ onCikis, temaKontrolu }) {
   const konum = useLocation();
   const git = useIsletmeNavigate();
   const { isletme, isletmeyiGuncelle } = useIsletme();
@@ -659,7 +659,7 @@ export default function Admin({ onCikis }) {
       <main className="admin-main">
         <header className="admin-ust">
           <div><span className="admin-kicker">İŞLETME YÖNETİMİ</span><h1>{BOLUMLER.find(([id]) => id === bolum)?.[1]}</h1></div>
-          <div className="admin-ust-sag"><button onClick={verileriYukle}>↻ Yenile</button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
+          <div className="admin-ust-sag">{temaKontrolu}<button onClick={verileriYukle}>↻ Yenile</button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
         </header>
 
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}
