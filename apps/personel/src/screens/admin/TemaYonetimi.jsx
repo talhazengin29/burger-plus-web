@@ -24,7 +24,7 @@ function baslangicFormu(isletme, tema) {
   };
 }
 
-export default function TemaYonetimi() {
+export default function TemaYonetimi({ onKayitDurumu }) {
   const { isletme, tema, isletmeyiGuncelle } = useIsletme();
   const [form, setForm] = useState(() => baslangicFormu(isletme, tema));
   const [logoOnizleme, setLogoOnizleme] = useState(isletme.logoUrl || tema?.logoUrl || "");
@@ -101,6 +101,7 @@ export default function TemaYonetimi() {
       return;
     }
     setKaydediliyor(true);
+    onKayitDurumu?.("Tema kaydediliyor…");
     setHata("");
     setBildirim("");
     try {
@@ -120,6 +121,7 @@ export default function TemaYonetimi() {
       setHata(istekHatasi.message);
     } finally {
       setKaydediliyor(false);
+      onKayitDurumu?.("");
     }
   };
 

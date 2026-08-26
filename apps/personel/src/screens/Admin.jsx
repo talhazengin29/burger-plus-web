@@ -168,6 +168,7 @@ export default function Admin({ onCikis }) {
   const [kayitFiltre, setKayitFiltre] = useState({ arama: "", baslangic: "", bitis: "", durum: "", personelId: "", rol: "", varlikTuru: "", islem: "" });
   const [canliBildirim, setCanliBildirim] = useState("");
   const [yukleniyor, setYukleniyor] = useState(true);
+  const [islemDurumu, setIslemDurumu] = useState("");
   const [hata, setHata] = useState("");
   const [bildirim, setBildirim] = useState("");
   const [urunForm, setUrunForm] = useState(null);
@@ -308,21 +309,23 @@ export default function Admin({ onCikis }) {
     return () => clearTimeout(timer);
   }, [bolum, kayitFiltre]);
 
-  const islem = async (fn, mesaj) => {
+  const islem = async (fn, mesaj, yuklemeMesaji = "Değişiklikler kaydediliyor…") => {
     setHata("");
+    setIslemDurumu(yuklemeMesaji);
     try { await fn(); setBildirim(mesaj); await verileriYukle(); return true; }
     catch (err) { setHata(err.message); return false; }
+    finally { setIslemDurumu(""); }
   };
 
   const sikayetAlaniniGuncelle = (id, alan, deger) => setSikayetler((onceki) => onceki.map((sikayet) => sikayet.id === id ? { ...sikayet, [alan]: deger } : sikayet));
   const sikayetiKaydet = async (sikayet) => {
-    setSikayetIslemId(sikayet.id); setHata("");
+    setSikayetIslemId(sikayet.id); setHata(""); setIslemDurumu("Şikayet kaydediliyor…");
     try {
       const veri = await adminIstek(`/sikayetler/${sikayet.id}`, jsonGonder("PATCH", { durum: sikayet.durum, yoneticiNotu: sikayet.yoneticiNotu || "" }));
       setSikayetler((onceki) => onceki.map((kayit) => kayit.id === sikayet.id ? { ...kayit, ...veri.sikayet } : kayit));
       setBildirim("Şikayet durumu güncellendi.");
     } catch (err) { setHata(err.message); }
-    finally { setSikayetIslemId(null); }
+    finally { setSikayetIslemId(null); setIslemDurumu(""); }
   };
 
   const urunKaydet = async (e) => {
@@ -371,7 +374,10 @@ export default function Admin({ onCikis }) {
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
-    if (await islem(() => adminIstek("/urunler", jsonGonder("POST", veri)), "Ürün kataloğu güncellendi.")) setUrunForm(null);
+    const taslak = urunForm;
+    setUrunForm(null);
+    const basarili = await islem(() => adminIstek("/urunler", jsonGonder("POST", veri)), "Ürün kataloğu güncellendi.", "Ürün kaydediliyor…");
+    if (!basarili) setUrunForm(taslak);
   };
 
   const stokAdediniDegistir = (urun, fark) => {
@@ -495,29 +501,44 @@ export default function Admin({ onCikis }) {
       gorsel: String(kategoriForm.gorsel || "").trim(),
       sira: Number(kategoriForm.sira),
     };
-    if (await islem(() => adminIstek("/kategoriler", jsonGonder("POST", veri)), "Kategori uygulama menüsüne kaydedildi.")) setKategoriForm(null);
+    const taslak = kategoriForm;
+    setKategoriForm(null);
+    const basarili = await islem(() => adminIstek("/kategoriler", jsonGonder("POST", veri)), "Kategori uygulama menüsüne kaydedildi.", "Kategori kaydediliyor…");
+    if (!basarili) setKategoriForm(taslak);
   };
 
   const personelKaydet = async (e) => {
     e.preventDefault();
-    if (await islem(() => adminIstek("/personeller", jsonGonder("POST", personelForm)), "Personel kaydı güncellendi.")) setPersonelForm(null);
+    const taslak = personelForm;
+    setPersonelForm(null);
+    const basarili = await islem(() => adminIstek("/personeller", jsonGonder("POST", taslak)), "Personel kaydı güncellendi.", "Personel kaydediliyor…");
+    if (!basarili) setPersonelForm(taslak);
   };
 
   const duyuruKaydet = async (e) => {
     e.preventDefault();
-    if (await islem(() => adminIstek("/duyurular", jsonGonder("POST", duyuruForm)), "Duyuru yayınlandı.")) setDuyuruForm(null);
+    const taslak = duyuruForm;
+    setDuyuruForm(null);
+    const basarili = await islem(() => adminIstek("/duyurular", jsonGonder("POST", taslak)), "Duyuru yayınlandı.", "Duyuru yayınlanıyor…");
+    if (!basarili) setDuyuruForm(taslak);
   };
 
   const kampanyaKaydet = async (e) => {
     e.preventDefault();
     const veri = { ...kampanyaForm, indirimYuzde: Number(kampanyaForm.indirimYuzde), sira: Number(kampanyaForm.sira), baslangicSaat: Number(kampanyaForm.baslangicSaat), bitisSaat: Number(kampanyaForm.bitisSaat) };
-    if (await islem(() => adminIstek("/kampanyalar", jsonGonder("POST", veri)), "Kampanya uygulamaya kaydedildi.")) setKampanyaForm(null);
+    const taslak = kampanyaForm;
+    setKampanyaForm(null);
+    const basarili = await islem(() => adminIstek("/kampanyalar", jsonGonder("POST", veri)), "Kampanya uygulamaya kaydedildi.", "Kampanya kaydediliyor…");
+    if (!basarili) setKampanyaForm(taslak);
   };
 
   const odulKaydet = async (e) => {
     e.preventDefault();
     const veri = { ...odulForm, puan: Number(odulForm.puan), urunId: Number(odulForm.urunId) };
-    if (await islem(() => adminIstek("/oduller", jsonGonder("POST", veri)), "Puan marketi güncellendi.")) setOdulForm(null);
+    const taslak = odulForm;
+    setOdulForm(null);
+    const basarili = await islem(() => adminIstek("/oduller", jsonGonder("POST", veri)), "Puan marketi güncellendi.", "Ödül kaydediliyor…");
+    if (!basarili) setOdulForm(taslak);
   };
 
   const damgaKartiniKaydet = async (e) => {
@@ -647,8 +668,8 @@ export default function Admin({ onCikis }) {
         {yukleniyor && !dashboard ? <div className="admin-yukleniyor">Veriler hazırlanıyor…</div> : (
           <div className="admin-icerik">
             {KAYIT_BOLUMLERI.includes(bolum) && <KayitGezgini aktif={bolum} sayilar={kayitSayilari} git={git} />}
-            {bolum === "tema" && <TemaYonetimi />}
-            {bolum === "salon-krokisi" && <SalonKrokisiYonetimi />}
+            {bolum === "tema" && <TemaYonetimi onKayitDurumu={setIslemDurumu} />}
+            {bolum === "salon-krokisi" && <SalonKrokisiYonetimi onKayitDurumu={setIslemDurumu} />}
             {bolum === "degerlendirmeler" && <DegerlendirmeRaporu />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
@@ -979,6 +1000,8 @@ export default function Admin({ onCikis }) {
           </div>
         )}
       </main>
+
+      {islemDurumu && <IslemKatmani metin={islemDurumu} />}
 
       {urunForm && (
         <Modal baslik={urunForm.id ? "Ürünü düzenle" : "Yeni ürün"} aciklama="Ürün bilgileri, fiyatlandırma ve porsiyon seçenekleri" sinif="admin-modal--urun" kapat={() => setUrunForm(null)}>
@@ -1430,6 +1453,7 @@ function DurumRozeti({ durum }) {
   return <span className={`durum-rozeti ${durum || "yeni"}`}>{etiketler[durum] || durum || "Yeni"}</span>;
 }
 function Modal({ baslik, aciklama, sinif = "", kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}>×</button></header>{children}</section></div>; }
+function IslemKatmani({ metin }) { return <div className="admin-islem-perde" role="status" aria-live="assertive" aria-label={metin}><div className="admin-islem-karti"><span className="admin-islem-donen" aria-hidden="true" /><strong>{metin}</strong><small>Lütfen bekleyin, ekranı kapatmayın.</small></div></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }
 function FormAlt({ kapat }) { return <div className="form-alt"><button type="button" onClick={kapat}>Vazgeç</button><button className="primary" type="submit">Kaydet</button></div>; }

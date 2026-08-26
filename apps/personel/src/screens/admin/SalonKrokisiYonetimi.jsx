@@ -29,7 +29,7 @@ const ALAN_TURLERI = {
   dis_mekan: { ad: "Dış Mekân", ikon: "☀", genislik: 42, yukseklik: 70, bolge: true },
 };
 
-export default function SalonKrokisiYonetimi() {
+export default function SalonKrokisiYonetimi({ onKayitDurumu }) {
   const [kroki, setKroki] = useState(null);
   const [katId, setKatId] = useState("");
   const [masaId, setMasaId] = useState("");
@@ -104,10 +104,10 @@ export default function SalonKrokisiYonetimi() {
     });
   };
   const kaydet = async () => {
-    setKaydediliyor(true); setDurum("");
+    setKaydediliyor(true); setDurum(""); onKayitDurumu?.("Salon krokisi kaydediliyor…");
     try { const sonuc = await adminIstek("/salon-krokisi", jsonGonder("PUT", { kroki })); setKroki(sonuc.kroki); setDurum("Kroki kaydedildi ve personel ekranına yansıtıldı."); }
     catch (e) { setDurum(e.message); }
-    finally { setKaydediliyor(false); }
+    finally { setKaydediliyor(false); onKayitDurumu?.(""); }
   };
 
   if (!kroki) return <div className="kroki-bildirim">{durum}</div>;
