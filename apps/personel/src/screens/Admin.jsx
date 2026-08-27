@@ -6,10 +6,12 @@ import { yuzdeliToplamiHesapla } from "../lib/yuzde";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useIsletme } from "../context/IsletmeContext";
 import BurgerPlusLogosu from "../../../musteri/src/components/BurgerPlusLogosu";
+import AdminIcon from "../components/AdminIcon";
 import TemaYonetimi from "./admin/TemaYonetimi";
 import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import DegerlendirmeRaporu from "./admin/DegerlendirmeRaporu";
 import "./Admin.css";
+import "./AdminPolish.css";
 
 const BOS_GRAMAJ = { goster: false, aktif: false, etiket: "Ürün miktarı", birim: "gr", artisMiktari: 50, maxAdim: 3, fiyatArtisi: 35 };
 const BOS_BOYUTLAR = (birim = "gr") => [
@@ -34,32 +36,32 @@ const KAMPANYA_IKONLARI = [
 ];
 
 const BOLUMLER = [
-  ["genel", "Genel Bakış", "▦", "genel-bakis"],
-  ["tema", "Tema", "◐", "tema"],
-  ["urunler", "Ürünler", "◆", "urunler"],
-  ["stok", "Stok Takibi", "▤", "stok-takibi"],
-  ["kampanyalar", "Kampanyalar", "%", "kampanyalar"],
-  ["oduller", "Puan Marketi", "★", "puan-marketi"],
-  ["cuzdan", "Uygulama Cüzdanı", "₺", "cuzdan"],
-  ["duyurular", "Duyurular", "●", "duyurular"],
-  ["sikayetler", "Şikayetler", "!", "sikayetler"],
-  ["salon-krokisi", "Salon Krokisi", "▦", "salon-krokisi"],
-  ["satislar", "Canlı Satışlar", "◉", "satislar"],
-  ["gecmis-siparisler", "Geçmiş Siparişler", "◷", "gecmis-siparisler"],
-  ["mutfak-kayitlari", "Mutfak Kayıtları", "◫", "mutfak-kayitlari"],
-  ["musteriler", "Müşteri Kayıtları", "◎", "musteriler"],
-  ["personel", "Personel", "♟", "personel"],
-  ["personel-kayitlari", "Personel Kayıtları", "◷", "personel-kayitlari"],
-  ["revizyonlar", "Revizyon Kayıtları", "↺", "revizyon-kayitlari"],
-  ["raporlar", "Satış Raporları", "↗", "satis-raporlari"],
-  ["degerlendirmeler", "Değerlendirmeler", "★", "degerlendirmeler"],
+  ["genel", "Genel Bakış", "dashboard", "genel-bakis"],
+  ["tema", "Tema", "palette", "tema"],
+  ["urunler", "Ürünler", "products", "urunler"],
+  ["stok", "Stok Takibi", "stock", "stok-takibi"],
+  ["kampanyalar", "Kampanyalar", "percent", "kampanyalar"],
+  ["oduller", "Puan Marketi", "star", "puan-marketi"],
+  ["cuzdan", "Uygulama Cüzdanı", "wallet", "cuzdan"],
+  ["duyurular", "Duyurular", "megaphone", "duyurular"],
+  ["sikayetler", "Şikayetler", "message", "sikayetler"],
+  ["salon-krokisi", "Salon Krokisi", "floor", "salon-krokisi"],
+  ["satislar", "Canlı Satışlar", "activity", "satislar"],
+  ["gecmis-siparisler", "Geçmiş Siparişler", "receipt", "gecmis-siparisler"],
+  ["mutfak-kayitlari", "Mutfak Kayıtları", "kitchen", "mutfak-kayitlari"],
+  ["musteriler", "Müşteri Kayıtları", "users", "musteriler"],
+  ["personel", "Personel", "user", "personel"],
+  ["personel-kayitlari", "Personel Kayıtları", "history", "personel-kayitlari"],
+  ["revizyonlar", "Revizyon Kayıtları", "refresh", "revizyon-kayitlari"],
+  ["raporlar", "Satış Raporları", "chart", "satis-raporlari"],
+  ["degerlendirmeler", "Değerlendirmeler", "star", "degerlendirmeler"],
 ];
 
 const MENU_GRUPLARI = [
-  { id: "uygulama", ad: "Uygulama", ikon: "◇", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
-  { id: "operasyon", ad: "Operasyon", ikon: "◉", aciklama: "Anlık işletme yönetimi", bolumler: ["salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
-  { id: "kayitlar", ad: "Kayıtlar", ikon: "▤", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
-  { id: "analiz", ad: "Analiz", ikon: "↗", aciklama: "Satış ve performans", bolumler: ["raporlar", "degerlendirmeler"] },
+  { id: "uygulama", ad: "Uygulama", ikon: "products", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
+  { id: "operasyon", ad: "Operasyon", ikon: "activity", aciklama: "Anlık işletme yönetimi", bolumler: ["salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
+  { id: "kayitlar", ad: "Kayıtlar", ikon: "receipt", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
+  { id: "analiz", ad: "Analiz", ikon: "chart", aciklama: "Satış ve performans", bolumler: ["raporlar", "degerlendirmeler"] },
 ];
 const KAYIT_BOLUMLERI = ["satislar", "gecmis-siparisler", "mutfak-kayitlari", "musteriler", "personel-kayitlari", "revizyonlar"];
 
@@ -185,6 +187,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
   const [odulForm, setOdulForm] = useState(null);
   const aktifMenuGrubu = MENU_GRUPLARI.find((grup) => grup.bolumler.includes(bolum))?.id;
   const [acikMenuGrubu, setAcikMenuGrubu] = useState(aktifMenuGrubu || "uygulama");
+  const [menuArama, setMenuArama] = useState("");
   const veriYuklemeDevamEdiyor = useRef(false);
 
   const verileriYukle = useCallback(async () => {
@@ -623,6 +626,16 @@ export default function Admin({ onCikis, temaKontrolu }) {
     revizyonlar: revizyonlar.length,
   };
   const filtreliSikayetler = sikayetFiltre === "tumu" ? sikayetler : sikayetler.filter((sikayet) => sikayet.durum === sikayetFiltre);
+  const menuAramaMetni = menuArama.trim().toLocaleLowerCase("tr-TR");
+  const gorunenMenuGruplari = MENU_GRUPLARI.map((grup) => ({
+    ...grup,
+    bolumler: grup.bolumler.filter((id) => {
+      const menu = BOLUMLER.find(([bolumId]) => bolumId === id);
+      return !menuAramaMetni || menu?.[1].toLocaleLowerCase("tr-TR").includes(menuAramaMetni) || grup.ad.toLocaleLowerCase("tr-TR").includes(menuAramaMetni);
+    }),
+  })).filter((grup) => grup.bolumler.length);
+  const kritikStok = urunler.filter((urun) => urun.stokTakibi && Number(urun.stokAdedi) <= 5).length;
+  const acikSikayet = sikayetler.filter((sikayet) => ["yeni", "inceleniyor"].includes(sikayet.durum)).length;
 
   return (
     <div className="admin-shell">
@@ -633,33 +646,49 @@ export default function Admin({ onCikis, temaKontrolu }) {
           {!isletme.tema?.logoUrl && !isletme.logoUrl && isletme.slug !== "burger-plus" && <strong className="admin-marka-metin">{isletme.ad}</strong>}
           <small>{isletme.ad} · Yönetim Merkezi</small>
         </div>
+        <label className="admin-nav-arama">
+          <AdminIcon name="search" size={17} />
+          <input type="search" value={menuArama} onChange={(e) => setMenuArama(e.target.value.slice(0, 50))} placeholder="Bölüm ara…" aria-label="Yönetim bölümünde ara" />
+          {menuArama && <button type="button" onClick={() => setMenuArama("")} aria-label="Aramayı temizle"><AdminIcon name="close" size={15} /></button>}
+        </label>
         <nav aria-label="Yönetim bölümleri">
-          <button type="button" className={`admin-nav-ana ${bolum === "genel" ? "aktif" : ""}`} onClick={() => git("/yonetim/genel-bakis")}><b>▦</b><span>Genel Bakış</span></button>
-          {MENU_GRUPLARI.map((grup) => {
-            const acik = acikMenuGrubu === grup.id;
+          {!menuAramaMetni && <button type="button" className={`admin-nav-ana ${bolum === "genel" ? "aktif" : ""}`} onClick={() => git("/yonetim/genel-bakis")}><b><AdminIcon name="dashboard" /></b><span>Genel Bakış</span></button>}
+          {gorunenMenuGruplari.map((grup) => {
+            const acik = Boolean(menuAramaMetni) || acikMenuGrubu === grup.id;
             const grupSecili = grup.bolumler.includes(bolum);
             return <section className={`admin-menu-grup ${acik ? "acik" : ""} ${grupSecili ? "secili" : ""}`} key={grup.id}>
               <button type="button" className="admin-menu-grup-baslik" aria-expanded={acik} aria-controls={`admin-menu-${grup.id}`} onClick={() => setAcikMenuGrubu((onceki) => onceki === grup.id ? null : grup.id)}>
-                <b>{grup.ikon}</b><span><strong>{grup.ad}</strong><small>{grup.aciklama}</small></span><i>⌄</i>
+                <b><AdminIcon name={grup.ikon} /></b><span><strong>{grup.ad}</strong><small>{grup.aciklama}</small></span><i><AdminIcon name="chevron" /></i>
               </button>
               <div className="admin-menu-alt" id={`admin-menu-${grup.id}`}>
                 {grup.bolumler.map((bolumId) => {
                   const menu = BOLUMLER.find(([id]) => id === bolumId);
                   if (!menu) return null;
                   const [id, ad, ikon, yol] = menu;
-                  return <button type="button" key={id} className={bolum === id ? "aktif" : ""} onClick={() => git(`/yonetim/${yol}`)}><b>{ikon}</b><span>{ad}</span></button>;
+                  return <button type="button" key={id} className={bolum === id ? "aktif" : ""} onClick={() => git(`/yonetim/${yol}`)}><b><AdminIcon name={ikon} /></b><span>{ad}</span></button>;
                 })}
               </div>
             </section>;
           })}
+          {menuAramaMetni && !gorunenMenuGruplari.length && <div className="admin-nav-bos">Eşleşen bölüm bulunamadı.</div>}
         </nav>
         <div className="admin-sidebar-alt"><i className={hata ? "durum-hata" : ""} />{hata ? "Bağlantı sorunu" : "Sistem çevrimiçi"}</div>
       </aside>
 
       <main className="admin-main">
         <header className="admin-ust">
-          <div><span className="admin-kicker">İŞLETME YÖNETİMİ</span><h1>{BOLUMLER.find(([id]) => id === bolum)?.[1]}</h1></div>
-          <div className="admin-ust-sag">{temaKontrolu}<button onClick={verileriYukle}>↻ Yenile</button><button onClick={onCikis}>Çıkış</button><span className="admin-avatar">A</span></div>
+          <div className="admin-ust-baslik"><span className="admin-kicker">İŞLETME YÖNETİMİ</span><h1>{BOLUMLER.find(([id]) => id === bolum)?.[1]}</h1></div>
+          <div className="admin-ust-sag">
+            <div className="admin-hizli-durumlar" aria-label="İşletme özeti">
+              <span className="admin-hizli-durum"><b>{dashboard?.bugunSiparis || 0}</b> sipariş</span>
+              <button type="button" className={`admin-hizli-durum ${kritikStok ? "uyari" : ""}`} onClick={() => git("/yonetim/stok-takibi")}><b>{kritikStok}</b> kritik stok</button>
+              <button type="button" className={`admin-hizli-durum ${acikSikayet ? "tehlike" : ""}`} onClick={() => git("/yonetim/sikayetler")}><b>{acikSikayet}</b> açık şikâyet</button>
+            </div>
+            {temaKontrolu}
+            <button onClick={verileriYukle} title="Verileri yenile"><AdminIcon name="refresh" /><span>Yenile</span></button>
+            <button className="admin-cikis" onClick={onCikis} title="Oturumu kapat"><AdminIcon name="logout" /><span>Çıkış</span></button>
+            <span className="admin-avatar" title={isletme.ad}>{isletme.ad?.charAt(0)?.toLocaleUpperCase("tr-TR") || "İ"}</span>
+          </div>
         </header>
 
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}
@@ -1011,6 +1040,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)}{urunForm.gramajOpsiyonu?.goster ? ` · ${urunForm.temelMiktar || "—"} ${urunForm.gramajOpsiyonu?.birim || "gr"}` : ""}</p></div>
               <i>{urunForm.id ? "DÜZENLENİYOR" : "YENİ KAYIT"}</i>
             </div>
+            <FormBolumu ikon="products" baslik="Temel bilgiler" aciklama="Ürünün adı, kategorisi, fiyatı ve menüdeki sırası." />
             <Ikili>
               <Alan etiket="Ürün adı"><input required maxLength="120" value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan>
               <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select></Alan>
@@ -1020,6 +1050,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               <Alan etiket="Gösterim sırası"><input required type="number" min="0" max="9999" step="1" value={urunForm.sira} onChange={(e) => setUrunForm({ ...urunForm, sira: e.target.value })} /><small>Küçük sayı önce görünür. Örn. 10, 20, 30.</small></Alan>
             </Ikili>
 
+            <FormBolumu ikon="stock" baslik="Satış ve görünürlük" aciklama="Vitrin görünürlüğünü ve paketli ürün stok takibini yönetin." />
             <section className={`urun-vitrin-kart ${urunForm.populer ? "aktif" : ""}`}>
               <header>
                 <div><b>Popüler ürün vitrini</b><small>Açıksa müşteri ana sayfasında bu kategorinin popüler ürünleri arasında gösterilir.</small></div>
@@ -1035,6 +1066,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               {urunForm.stokTakibi && <Alan etiket="Mevcut stok (adet)"><input required type="number" min="0" max="1000000" step="1" value={urunForm.stokAdedi} onChange={(e) => setUrunForm({ ...urunForm, stokAdedi: e.target.value })} /></Alan>}
             </section>
 
+            <FormBolumu ikon="products" baslik="Ürün seçenekleri" aciklama="Müşterinin seçebileceği ekstra malzemeleri ve ürün önerilerini belirleyin." />
             <section className={`ekstra-malzeme-editoru ${urunForm.ekstraMalzemeAyari?.aktif ? "aktif" : ""}`}>
               <header>
                 <div><b>Ekstra malzeme seçenekleri</b><small>Bu ürün için müşterinin ücretli veya ücretsiz ek malzeme seçmesini açıp kapat.</small></div>
@@ -1076,6 +1108,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               {!onerilebilecekUrunler.length && <p>Öneri eklemek için önce başka bir aktif ürün oluşturmalısın.</p>}
             </section>
 
+            <FormBolumu ikon="percent" baslik="Porsiyon ve fiyatlandırma" aciklama="Gramaj, boyut veya menü içeriğine göre fiyat davranışını ayarlayın." />
             {urunForm.urunTipi === "burger" && <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.goster ? "aktif" : ""}`}>
               <header>
                 <div><b>Miktar / gramaj bilgisini göster</b><small>Kapalıysa müşteri ürünün gramajını veya miktarını hiçbir yerde görmez.</small></div>
@@ -1139,6 +1172,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               </section>
             )}
 
+            <FormBolumu ikon="palette" baslik="Müşteriye görünen içerik" aciklama="Ürün görselini, açıklamasını, içeriğini ve alerjen bilgisini tamamlayın." />
             <Alan etiket="Ürün görseli (en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/*" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : urunForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
             <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
             {urunForm.urunTipi !== "menu" ? <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
@@ -1408,16 +1442,16 @@ function MutfakSureAkisi({ kayit }) {
 
 function KayitGezgini({ aktif, sayilar, git }) {
   const sekmeler = [
-    ["satislar", "Canlı Satış", "Ödemeler", "satislar", "◉"],
-    ["gecmis-siparisler", "Geçmiş", "Kapanan masalar", "gecmis-siparisler", "◷"],
-    ["mutfak-kayitlari", "Mutfak", "Hazırlama süreleri", "mutfak-kayitlari", "◇"],
-    ["musteriler", "Müşteriler", "Hesap ve sadakat", "musteriler", "◎"],
-    ["personel-kayitlari", "Personel", "Vardiya ve performans", "personel-kayitlari", "♟"],
-    ["revizyonlar", "Revizyon", "Yönetim hareketleri", "revizyon-kayitlari", "↻"],
+    ["satislar", "Canlı Satış", "Ödemeler", "satislar", "activity"],
+    ["gecmis-siparisler", "Geçmiş", "Kapanan masalar", "gecmis-siparisler", "receipt"],
+    ["mutfak-kayitlari", "Mutfak", "Hazırlama süreleri", "mutfak-kayitlari", "kitchen"],
+    ["musteriler", "Müşteriler", "Hesap ve sadakat", "musteriler", "users"],
+    ["personel-kayitlari", "Personel", "Vardiya ve performans", "personel-kayitlari", "user"],
+    ["revizyonlar", "Revizyon", "Yönetim hareketleri", "revizyon-kayitlari", "refresh"],
   ];
   return <section className="kayit-merkezi-gecis">
     <header><div><span>KAYIT MERKEZİ</span><h2>İşletme hareketleri</h2></div><p>Canlı işleyişten geçmiş değişikliklere kadar bütün kayıtları tek noktadan takip edin.</p></header>
-    <div>{sekmeler.map(([id, ad, aciklama, yol, ikon]) => <button type="button" className={aktif === id ? "aktif" : ""} key={id} onClick={() => git(`/yonetim/${yol}`)}><i>{ikon}</i><span><b>{ad}</b><small>{aciklama}</small></span><strong>{aktif === id ? Number(sayilar[id] || 0).toLocaleString("tr-TR") : "Aç"}</strong></button>)}</div>
+    <div>{sekmeler.map(([id, ad, aciklama, yol, ikon]) => <button type="button" className={aktif === id ? "aktif" : ""} key={id} onClick={() => git(`/yonetim/${yol}`)}><i><AdminIcon name={ikon} /></i><span><b>{ad}</b><small>{aciklama}</small></span><strong>{aktif === id ? Number(sayilar[id] || 0).toLocaleString("tr-TR") : "Aç"}</strong></button>)}</div>
   </section>;
 }
 
@@ -1452,8 +1486,16 @@ function DurumRozeti({ durum }) {
   const etiketler = { yeni: "Yeni", hazirlaniyor: "Hazırlanıyor", hazir: "Hazır", tamamlandi: "Tamamlandı" };
   return <span className={`durum-rozeti ${durum || "yeni"}`}>{etiketler[durum] || durum || "Yeni"}</span>;
 }
-function Modal({ baslik, aciklama, sinif = "", kapat, children }) { return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}>×</button></header>{children}</section></div>; }
+function Modal({ baslik, aciklama, sinif = "", kapat, children }) {
+  useEffect(() => {
+    const klavye = (event) => { if (event.key === "Escape") kapat(); };
+    window.addEventListener("keydown", klavye);
+    return () => window.removeEventListener("keydown", klavye);
+  }, [kapat]);
+  return <div className="admin-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && kapat()}><section className={`admin-modal ${sinif}`} role="dialog" aria-modal="true" aria-label={baslik}><header><div><h2>{baslik}</h2>{aciklama && <p>{aciklama}</p>}</div><button type="button" aria-label="Pencereyi kapat" onClick={kapat}><AdminIcon name="close" /></button></header>{children}</section></div>;
+}
 function IslemKatmani({ metin }) { return <div className="admin-islem-perde" role="status" aria-live="assertive" aria-label={metin}><div className="admin-islem-karti"><span className="admin-islem-donen" aria-hidden="true" /><strong>{metin}</strong><small>Lütfen bekleyin, ekranı kapatmayın.</small></div></div>; }
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }
 function FormAlt({ kapat }) { return <div className="form-alt"><button type="button" onClick={kapat}>Vazgeç</button><button className="primary" type="submit">Kaydet</button></div>; }
+function FormBolumu({ ikon, baslik, aciklama }) { return <div className="urun-form-bolum-baslik"><i><AdminIcon name={ikon} /></i><div><b>{baslik}</b><small>{aciklama}</small></div></div>; }
