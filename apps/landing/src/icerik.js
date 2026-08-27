@@ -121,9 +121,9 @@ export const WHATSAPP = {
 // Otomatik değil: talep geldikten sonra kurulum ekip tarafından yapılıyor.
 export const DENEME = {
   gunSayisi: 0,
-  baslik: "Platform şu anda demo aşamasında",
-  aciklama: "Ticari paketler ve fiyatlar kesinleşmeden önce müşteri deneyimini canlı demoda inceleyebilirsiniz.",
-  buton: "Canlı Demoyu Aç",
+  baslik: "Restoran deneyimini şimdi keşfedin",
+  aciklama: "Müşteri uygulamasından mutfak ve salon operasyonuna kadar tüm ürün akışını doğrudan inceleyebilirsiniz.",
+  buton: "Müşteri Uygulamasını Aç",
 };
 
 // --- Talep formu -------------------------------------------------------------
@@ -132,10 +132,10 @@ export const DENEME = {
 // e-postaya) aktarılır. Gönderim tamamen istemci tarafındadır; hiçbir veri
 // bu sayfada saklanmaz veya üçüncü bir sunucuya iletilmez.
 export const TALEP_FORMU = {
-  etiket: "Demo durumu",
-  baslik: "ŞEFFAF",
-  vurgu: "İLERLİYORUZ",
-  aciklama: "Ürünü bugün inceleyebilirsiniz. Satış ve pilot işletme başvuruları başladığında doğrulanmış iletişim bilgileri bu bölümde yayınlanacak.",
+  etiket: "İletişim",
+  baslik: "BİRLİKTE",
+  vurgu: "BÜYÜYELİM",
+  aciklama: "İşletmenizin ihtiyaçlarını paylaşın; size uygun kurulum ve ürün kapsamını birlikte planlayalım.",
   buton: "Talebi Gönder",
   butonEposta: "E-posta ile Gönder",
   gizlilikNotu: "Formu göndererek {kvkkBaglantisi} okuduğunuzu kabul edersiniz. Bilgileriniz yalnızca size dönüş yapmak için kullanılır.",
@@ -168,18 +168,18 @@ export const ICERIK = {
   // --- SEO / Open Graph ----------------------------------------------------
   sayfaBasligi: "orQRestro | QR Menü ve Restoran Yönetimi",
   sayfaAciklamasi:
-    "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoran yönetim platformunun çalışan demo akışlarını inceleyin.",
+    "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoran yönetiminin tüm akışlarını tek platformda birleştirin.",
   ogGorsel: "/gorseller/hero-telefon.jpg",
   ogGorselAlt: "orQRestro müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
-  heroRozet: "Canlı ürün demosu kullanıma açık",
+  heroRozet: "Yeni nesil restoran işletim sistemi",
   heroBaslikBir: "MASANIZ",
   heroVurguBir: "DİJİTAL",
   heroBaslikIki: "MUTFAĞINIZ",
   heroVurguIki: "CANLI",
-  heroAciklama: "Müşterinin QR menüsünden mutfak ekranına, salon krokisinden işletme raporlarına kadar bütün restoran akışını tek demoda görün.",
-  heroBirincilButon: "Müşteri Demosunu Aç",
+  heroAciklama: "Müşterinin QR menüsünden mutfak ekranına, salon krokisinden işletme raporlarına kadar bütün restoran akışını tek sistemde yönetin.",
+  heroBirincilButon: "Müşteri Uygulamasını Aç",
   heroIkincilButon: "Ürün Turunu İncele",
 
   // --- Panel önizleme (hero altındaki yönetim maketi) ----------------------
@@ -206,7 +206,7 @@ export const ICERIK = {
   fiyatEtiket: "Fiyatlandırma",
   fiyatBaslik: "İHTİYACA GÖRE",
   fiyatVurgu: "PAKETLER",
-  fiyatAciklama: "Paket kapsamları demo geri bildirimleriyle şekilleniyor. Aşağıdaki yapı ürün planını gösterir; fiyatlar henüz satış teklifi değildir.",
+  fiyatAciklama: "İşletmenizin büyüklüğüne ve operasyon ihtiyacına göre şekillenen esnek paketlerden size uygun olanı seçin.",
 
   sssEtiket: "SSS",
   sssBaslik: "SIK SORULAN",
@@ -214,9 +214,9 @@ export const ICERIK = {
 
   ctaBaslik: "ÜRÜNÜ ANLATMAYALIM,",
   ctaVurgu: "GÖSTERELİM",
-  ctaAciklama: "Müşteri uygulamasını tarayıcıda açın ve restoran deneyimini doğrudan test edin. Yetkili demo hesapları personel panelinden giriş yapabilir.",
+  ctaAciklama: "Müşteri uygulamasını tarayıcıda açın ve restoran deneyimini doğrudan inceleyin. Yetkili ekip üyeleri personel panelinden giriş yapabilir.",
   ctaBirincilButon: "Personel Paneline Giriş",
-  ctaIkincilButon: "Canlı Müşteri Demosu",
+  ctaIkincilButon: "Müşteri Uygulaması",
 };
 
 // --- Navigasyon --------------------------------------------------------------
@@ -300,25 +300,26 @@ export const SONUCLAR = [
 ];
 
 // --- Paketler ----------------------------------------------------------------
-// Demo paket kapsamları; ticari fiyatlar anlaşmalar tamamlanınca eklenecek.
 export const PAKETLER = [
   {
     ad: "Başlangıç",
     hedefKitle: "Tek şubeli küçük işletmeler",
-    fiyat: "Fiyat yakında",
+    fiyat: "₺1.490",
+    periyot: "/ ay",
     ozellikler: [
       "Sınırsız QR menü görüntüleme",
       "Temel tema özelleştirme",
       "Ürün ve kategori yönetimi",
       "E-posta desteği",
     ],
-    buton: "Demoyu İncele",
+    buton: "Paketi İncele",
     populer: false,
   },
   {
     ad: "Profesyonel",
     hedefKitle: "Masadan sipariş alan işletmeler",
-    fiyat: "Fiyat yakında",
+    fiyat: "₺2.990",
+    periyot: "/ ay",
     ozellikler: [
       "Başlangıç paketindeki her şey",
       "Masadan canlı sipariş alma",
@@ -326,14 +327,14 @@ export const PAKETLER = [
       "Online ödeme entegrasyonuna hazır altyapı",
       "Sadakat programı ve raporlar",
     ],
-    buton: "Canlı Demoyu Aç",
+    buton: "Ürünü İncele",
     populer: true,
-    rozet: "TAM ÜRÜN DENEYİMİ",
+    rozet: "EN ÇOK TERCİH EDİLEN",
   },
   {
     ad: "Kurumsal",
     hedefKitle: "Çok şubeli zincirler",
-    fiyat: "Planlanıyor",
+    fiyat: "Özel Teklif",
     periyot: "",
     ozellikler: [
       "Profesyonel paketteki her şey",
@@ -362,7 +363,7 @@ export const SORULAR = [
   {
     soru: "Ödeme nasıl alınıyor, güvenli mi?",
     cevap:
-      "Ödeme entegrasyonunda sipariş tutarı istemciden değil sunucuda hesaplanır ve sağlayıcı sonucu ayrıca doğrulanır. Platform demo aşamasındadır; canlı kartlı ödeme ancak ödeme kuruluşu sözleşmesi ve işletmeye özel ayarlar tamamlandıktan sonra etkinleştirilir.",
+      "Ödeme entegrasyonunda sipariş tutarı istemciden değil sunucuda hesaplanır ve sağlayıcı sonucu ayrıca doğrulanır. Kartlı ödeme, işletmeye özel sağlayıcı ayarları tamamlandıktan sonra güvenli biçimde etkinleştirilir.",
   },
   {
     soru: "Menümü ve tasarımı kendim yönetebilir miyim?",
@@ -555,7 +556,7 @@ export function sonucKartlariHtml() {
 }
 
 function fiyatBlokHtml(paket) {
-  return `<p class="mb-8"><span class="font-baslik text-2xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span></p>`;
+  return `<p class="mb-8"><span class="font-baslik text-2xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span>${paket.periyot ? ` <small class="text-xs text-marka-gri-400">${kacis(paket.periyot)}</small>` : ""}</p>`;
 }
 
 export function paketKartlariHtml() {
@@ -632,7 +633,7 @@ export function sorularHtml() {
 // --- Talep formu / demo durumu ----------------------------------------------
 export function talepFormuHtml() {
   if (!iletisimKanaliVarMi()) {
-    return `<div class="demo-iletisim-durumu cam-panel"><span class="demo-rozet">ŞEFFAF DEMO SÜRECİ</span><h3>Henüz satış başvurusu toplamıyoruz</h3><p>Platform aktif geliştirme ve demo aşamasında. İşletme anlaşmaları başladığında doğrulanmış iletişim kanalları ve başvuru formu burada açılacak.</p><div><a class="marka-buton" href="${ROTALAR.musteriDemo}">Müşteri Demosunu Aç</a><a href="${ROTALAR.personelGiris}">Demo hesabın varsa giriş yap</a></div><small>Telefon, e-posta veya müşteri bilgisi uydurulmamıştır.</small></div>`;
+    return `<div class="demo-iletisim-durumu cam-panel"><span class="demo-rozet">ÜRÜNÜ KEŞFEDİN</span><h3>Restoran deneyimini doğrudan inceleyin</h3><p>QR menü, sipariş, sadakat ve operasyon akışlarının müşteri tarafında nasıl çalıştığını uygulama üzerinden görebilirsiniz.</p><div><a class="marka-buton" href="${ROTALAR.musteriDemo}">Müşteri Uygulamasını Aç</a><a href="${ROTALAR.personelGiris}">Personel Girişi</a></div><small>Tüm ürün ekranları aynı yönetim altyapısıyla birlikte çalışır.</small></div>`;
   }
 
   const A = TALEP_FORMU.alanlar;

@@ -432,15 +432,15 @@ function satisAsistani() {
 
   function demoYaniti(soru) {
     const metin = soru.toLocaleLowerCase("tr-TR");
-    if (/fiyat|ücret|paket|ödeme plan/.test(metin)) return "Paket kapsamları sayfada karşılaştırmalı olarak yer alıyor; ticari fiyatlar demo ve pilot süreç tamamlandıktan sonra kesinleşecek. Şu anda fiyat sözü veya satış başvurusu alınmıyor.";
-    if (/demo|dene|gör|incele/.test(metin)) return "Müşteri demosunda QR menü görünümünü, kategorileri, ürünleri, kampanyaları ve sadakat akışını inceleyebilirsiniz. Sayfadaki ‘Müşteri Demosunu Aç’ düğmesi sizi doğrudan çalışan uygulamaya götürür.";
+    if (/fiyat|ücret|paket|ödeme plan/.test(metin)) return "Paket kapsamları ve aylık fiyatlar sayfada karşılaştırmalı olarak yer alıyor. Çok şubeli işletmeler için ihtiyaçlara göre özel kapsam hazırlanır.";
+    if (/demo|dene|gör|incele|uygulama/.test(metin)) return "Müşteri uygulamasında QR menü görünümünü, kategorileri, ürünleri, kampanyaları ve sadakat akışını inceleyebilirsiniz. Sayfadaki ‘Müşteri Uygulamasını Aç’ düğmesi sizi doğrudan ürüne götürür.";
     if (/mutfak|salon|kroki|personel/.test(metin)) return "Mutfak paneli sipariş kuyruğunu ve hazırlık durumlarını; salon tarafı masa, rezervasyon ve oturma krokisini yönetir. Ürün turundaki ‘Mutfak ve salon’ sekmesinde akışın özetini görebilirsiniz.";
     if (/sadakat|puan|damga|cüzdan|kampanya/.test(metin)) return "Platformda puan, dijital damga kartı, kampanya ve kasadan bakiye yükleme araçları bulunur. Her işletme bu özellikleri kendi panelinden yapılandırabilir.";
     if (/online|iyzico|kartla|ödeme/.test(metin)) return "Online ödeme için teknik altyapı bulunuyor; canlı kullanım, ödeme kuruluşu sözleşmesi ve işletmeye özel sağlayıcı ayarları tamamlandıktan sonra etkinleştirilir.";
-    if (/kurulum|başla|qr kod/.test(metin)) return "İşletme, ürünler ve masa QR kodları yönetim panelinden hazırlanır. Platform demo aşamasında olduğu için yeni işletme kurulumu şu anda ekip içindeki super admin akışıyla yapılır.";
-    if (/iletişim|ulaş|satın|başvur|anlaş/.test(metin)) return "Platform henüz demo aşamasında olduğu için satış başvurusu toplamıyoruz. Doğrulanmış iletişim kanalları pilot işletme süreci başladığında landing page’de yayınlanacak.";
+    if (/kurulum|başla|qr kod/.test(metin)) return "İşletme profili, ürünler ve masa QR kodları yönetim panelinden hazırlanır. Yetkiler tanımlandıktan sonra personel, mutfak ve salon ekranları kullanıma açılır.";
+    if (/iletişim|ulaş|satın|başvur|anlaş/.test(metin)) return "Kurulum kapsamı işletmenin masa, şube ve operasyon ihtiyaçlarına göre belirlenir. Ürün ekranlarını hemen inceleyebilir, iletişim kanalından ekiple görüşebilirsiniz.";
     if (/özellik|neler|ne yap/.test(metin)) return "QR sipariş, ürün ve kampanya yönetimi, mutfak ve salon ekranları, rezervasyon, oturma krokisi, sadakat, cüzdan, stok ve raporlama aynı platformda birleşiyor.";
-    return "Bu demo rehberi yalnızca doğrulanmış ürün kapsamını anlatır. Demo, paketler, mutfak-salon akışı, sadakat veya ödeme altyapısı hakkında daha net bir soru sorabilirsiniz.";
+    return "Ürün rehberi; paketler, müşteri uygulaması, mutfak-salon akışı, sadakat ve ödeme altyapısı hakkında bilgi verir. Merak ettiğiniz başlığı daha ayrıntılı sorabilirsiniz.";
   }
 
   function paneliAyarla(acik) {
@@ -481,7 +481,7 @@ function satisAsistani() {
       mesajiEkle(demoYaniti(temiz), "asistan");
     } catch {
       bekleme.remove();
-      mesajiEkle("Demo kapsamını ürün turu ve özellikler bölümlerinden inceleyebilirsiniz.", "asistan");
+      mesajiEkle("Ürün kapsamını ürün turu ve özellikler bölümlerinden inceleyebilirsiniz.", "asistan");
     } finally {
       istekVar = false;
       girdi.disabled = false;
