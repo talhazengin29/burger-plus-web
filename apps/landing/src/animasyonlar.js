@@ -34,14 +34,6 @@ function baslat() {
   kartIsigiTakibi();
   miknatisliButonlar();
   ustBarKaydirmaDurumu();
-  // Tarayıcı sekmesi açılışta arka planda kalır veya animasyon yarıda kesilirse
-  // temel içerik hiçbir koşulda bulanık/gizli kalmasın.
-  window.setTimeout(() => {
-    document.querySelectorAll(".hero-baslik > *, .hero-rozet, .hero-aciklama, .hero-butonlar, .panel-maket").forEach((oge) => {
-      oge.style.opacity = "1";
-      oge.style.filter = "none";
-    });
-  }, 1600);
 }
 
 /* ------------------------------------------------------------------ Üst bar */
@@ -99,10 +91,11 @@ function heroGirisi() {
     // Bölünmüş metin ekran okuyucuya parça parça okunmasın.
     baslik.setAttribute("aria-label", tamMetin);
     kelimeler.forEach((kelime) => kelime.setAttribute("aria-hidden", "true"));
-    animate(kelimeler, masaustuMu()
-      ? { opacity: [0, 1], y: [28, 0], filter: ["blur(8px)", "blur(0px)"] }
-      : { opacity: [0, 1], y: [14, 0] },
-    { duration: masaustuMu() ? 0.6 : 0.38, delay: stagger(masaustuMu() ? 0.07 : 0.035, { startDelay: 0.06 }), ease: "easeOut" });
+    animate(
+      kelimeler,
+      { opacity: [0, 1], y: [28, 0], filter: ["blur(8px)", "blur(0px)"] },
+      { duration: 0.6, delay: stagger(0.07, { startDelay: 0.1 }), ease: "easeOut" },
+    );
   }
 
   const digerleri = [
@@ -117,7 +110,7 @@ function heroGirisi() {
   animate(
     digerleri,
     { opacity: [0, 1], y: [22, 0] },
-    { duration: masaustuMu() ? 0.6 : 0.4, delay: stagger(0.08, { startDelay: masaustuMu() ? 0.5 : 0.22 }), ease: YUMUSAK },
+    { duration: 0.6, delay: stagger(0.12, { startDelay: 0.5 }), ease: YUMUSAK },
   );
 }
 

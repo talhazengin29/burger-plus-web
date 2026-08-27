@@ -1,7 +1,7 @@
 <!-- ==========================================================================
      Hero — ana başlık ve birincil çağrı butonları.
      ========================================================================== -->
-<section class="hero-alani relative px-5 pb-12 pt-28 sm:px-6 md:pb-16 md:pt-40" id="ust">
+<section class="relative px-6 pb-16 pt-32 md:pt-40" id="ust">
   <div class="mx-auto max-w-4xl text-center">
     <p class="hero-rozet mb-6 inline-flex items-center gap-2.5 rounded-full border border-marka-cizgi bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-marka-gri-300 backdrop-blur-sm">
       <span class="nabiz-nokta" aria-hidden="true"></span>
@@ -17,18 +17,13 @@
       {{ heroAciklama }}
     </p>
 
-    <div class="hero-butonlar flex flex-col items-center justify-center gap-3 sm:flex-row">
-      <a class="marka-buton inline-block w-full rounded-full px-8 py-4 text-base font-medium sm:w-auto" href="{{ ROTALAR.musteriDemo }}">
+    <div class="hero-butonlar flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <a class="marka-buton inline-block rounded-full px-8 py-4 text-base font-medium" href="#fiyatlandirma">
         {{ heroBirincilButon }}
       </a>
-      <a class="inline-block w-full rounded-full border border-marka-cizgi px-8 py-4 text-base font-medium text-marka-metin transition-colors hover:border-marka-gri-400 hover:bg-white/5 sm:w-auto" href="#urun-turu">
+      <a class="inline-block rounded-full border border-marka-cizgi px-8 py-4 text-base font-medium text-marka-metin transition-colors hover:border-marka-gri-400 hover:bg-white/5" href="#ozellikler">
         {{ heroIkincilButon }}
       </a>
     </div>
-    <ul class="hero-guven mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-marka-gri-400" aria-label="Ürün bilgileri">
-      <li><span aria-hidden="true">✓</span> Tarayıcıdan anında deneyin</li>
-      <li><span aria-hidden="true">✓</span> Uygulama indirmek gerekmez</li>
-      <li><span aria-hidden="true">✓</span> Gerçek ürün akışlarını görün</li>
-    </ul>
   </div>
 </section>

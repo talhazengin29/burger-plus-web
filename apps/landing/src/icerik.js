@@ -17,14 +17,13 @@ export const ROTALAR = {
   musteriDemo: "/burger-plus", // apps/musteri → varsayılan işletme
 };
 
-const SITE_URL = String(process.env.VITE_SITE_URL || "").replace(/\/$/, "");
-
 // ============================================================================
 // ⚙️ KURULUM — YAYINA ÇIKMADAN ÖNCE DOLDURULACAK TEK YER
 //
 // Aşağıdaki İLETİŞİM ve YASAL blokları sayfanın "canlıya hazır" olup olmadığını
 // belirler. İkisi de boşken sayfa yine sorunsuz çalışır, ama:
-//   • İLETİŞİM boşsa  → form ve WhatsApp yerine şeffaf demo durumu gösterilir.
+//   • İLETİŞİM boşsa  → talep formu ve WhatsApp butonu HİÇ render edilmez,
+//                        dönüşüm butonları kapanış bölümüne kaydırır.
 //   • YASAL boşsa     → yasal sayfalar yayında [KÖŞELİ] yer tutucularla çıkar.
 // ============================================================================
 
@@ -97,7 +96,8 @@ export const YASAL_SAYFALAR = {
 // talep WhatsApp/e-posta ile ekibe düşer, kurulum sihirbazına elle işlenir.
 // Gerçek bir kayıt/deneme uçu eklendiğinde formun action'ı değiştirilmelidir.
 
-// İletişim kanalı tanımlıysa talep formuna, değilse demo kapanışına gider.
+// Dönüşüm butonlarının hedefi. İletişim kanalı tanımlıysa talep formuna,
+// değilse (form render edilmediği için) kapanış bölümüne gider.
 export function baslaBaglantisi() {
   return iletisimKanaliVarMi() ? "#iletisim" : "#basla";
 }
@@ -120,10 +120,10 @@ export const WHATSAPP = {
 // (bkz. burger-plus-backend/superAdminDb.js → abonelikOlustur).
 // Otomatik değil: talep geldikten sonra kurulum ekip tarafından yapılıyor.
 export const DENEME = {
-  gunSayisi: 0,
-  baslik: "Restoran deneyimini şimdi keşfedin",
-  aciklama: "Müşteri uygulamasından mutfak ve salon operasyonuna kadar tüm ürün akışını doğrudan inceleyebilirsiniz.",
-  buton: "Müşteri Uygulamasını Aç",
+  gunSayisi: 14,
+  baslik: "Tüm paketlerde 14 gün ücretsiz deneme",
+  aciklama: "Kurulumu ve menü aktarımını ekibimiz yapar. Deneme sonunda devam etmezseniz ücret alınmaz.",
+  buton: "14 Gün Ücretsiz Dene",
 };
 
 // --- Talep formu -------------------------------------------------------------
@@ -133,9 +133,10 @@ export const DENEME = {
 // bu sayfada saklanmaz veya üçüncü bir sunucuya iletilmez.
 export const TALEP_FORMU = {
   etiket: "İletişim",
-  baslik: "BİRLİKTE",
-  vurgu: "BÜYÜYELİM",
-  aciklama: "İşletmenizin ihtiyaçlarını paylaşın; size uygun kurulum ve ürün kapsamını birlikte planlayalım.",
+  baslik: "KURULUM İÇİN",
+  vurgu: "BİZE YAZIN",
+  aciklama:
+    "Menünüzü ve masa sayınızı iletin; kurulumu ekibimiz yapsın. Formu doldurduğunuzda bilgiler hazır bir mesaja dönüşür, gönderme kararı sizde kalır.",
   buton: "Talebi Gönder",
   butonEposta: "E-posta ile Gönder",
   gizlilikNotu: "Formu göndererek {kvkkBaglantisi} okuduğunuzu kabul edersiniz. Bilgileriniz yalnızca size dönüş yapmak için kullanılır.",
@@ -168,19 +169,20 @@ export const ICERIK = {
   // --- SEO / Open Graph ----------------------------------------------------
   sayfaBasligi: "orQRestro | QR Menü ve Restoran Yönetimi",
   sayfaAciklamasi:
-    "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoran yönetiminin tüm akışlarını tek platformda birleştirin.",
+    "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoranınızın siparişten ödemeye tüm akışını tek sistemde yönetin.",
   ogGorsel: "/gorseller/hero-telefon.jpg",
   ogGorselAlt: "orQRestro müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
-  heroRozet: "Yeni nesil restoran işletim sistemi",
+  heroRozet: "Sipariş, mutfak ve ödeme tek akışta",
   heroBaslikBir: "MASANIZ",
   heroVurguBir: "DİJİTAL",
   heroBaslikIki: "MUTFAĞINIZ",
   heroVurguIki: "CANLI",
-  heroAciklama: "Müşterinin QR menüsünden mutfak ekranına, salon krokisinden işletme raporlarına kadar bütün restoran akışını tek sistemde yönetin.",
-  heroBirincilButon: "Müşteri Uygulamasını Aç",
-  heroIkincilButon: "Ürün Turunu İncele",
+  heroAciklama:
+    "QR kodla masadan sipariş, mutfağa anlık düşen fişler ve güvenli online ödeme — hepsi tek sistemde.",
+  heroBirincilButon: "Paketleri İncele",
+  heroIkincilButon: "Özellikleri Gör",
 
   // --- Panel önizleme (hero altındaki yönetim maketi) ----------------------
   panelIsletmeAdi: "Lezzet Durağı",
@@ -199,31 +201,32 @@ export const ICERIK = {
   adimlarBaslik: "3 ADIMDA",
   adimlarVurgu: "BAŞLAYIN",
 
-  yorumlarEtiket: "Operasyon etkisi",
-  yorumlarBaslik: "PLATFORM NEYİ",
-  yorumlarVurgu: "İYİLEŞTİRİR?",
+  yorumlarEtiket: "Referans",
+  yorumlarBaslik: "İŞLETMELERDEN",
+  yorumlarVurgu: "GERİ BİLDİRİM",
 
   fiyatEtiket: "Fiyatlandırma",
-  fiyatBaslik: "İHTİYACA GÖRE",
-  fiyatVurgu: "PAKETLER",
-  fiyatAciklama: "İşletmenizin büyüklüğüne ve operasyon ihtiyacına göre şekillenen esnek paketlerden size uygun olanı seçin.",
+  fiyatBaslik: "NE GÖRÜRSEN",
+  fiyatVurgu: "ONU ÖDERSİN",
+  fiyatAciklama: "Ciro üzerinden komisyon yok. İşletmenizin boyutuna uygun, sabit aylık ücret.",
 
   sssEtiket: "SSS",
   sssBaslik: "SIK SORULAN",
   sssVurgu: "SORULAR",
 
-  ctaBaslik: "ÜRÜNÜ ANLATMAYALIM,",
-  ctaVurgu: "GÖSTERELİM",
-  ctaAciklama: "Müşteri uygulamasını tarayıcıda açın ve restoran deneyimini doğrudan inceleyin. Yetkili ekip üyeleri personel panelinden giriş yapabilir.",
-  ctaBirincilButon: "Personel Paneline Giriş",
-  ctaIkincilButon: "Müşteri Uygulaması",
+  ctaBaslik: "MASALARINIZI",
+  ctaVurgu: "DİJİTALLEŞTİRİN",
+  ctaAciklama:
+    "İşletme kurulumunu ekibimiz yapar; siz yalnızca menünüzü ve masa sayınızı iletin. Hesabı olan işletmeler doğrudan panele giriş yapabilir.",
+  ctaBirincilButon: "Panele Giriş Yap",
+  ctaIkincilButon: "Müşteri Uygulamasını Dene",
 };
 
 // --- Navigasyon --------------------------------------------------------------
 export const NAV_BAGLANTILARI = [
   { ad: "Ana Sayfa", hedef: "#ust" },
-  { ad: "Ürün Turu", hedef: "#urun-turu" },
   { ad: "Özellikler", hedef: "#ozellikler" },
+  { ad: "Nasıl Çalışır", hedef: "#nasil-calisir" },
   { ad: "Fiyatlandırma", hedef: "#fiyatlandirma" },
 ];
 
@@ -234,7 +237,7 @@ export const KONSEPTLER = [
   { ad: "Burger", ikon: "burger" },
   { ad: "Cafe", ikon: "kahve" },
   { ad: "Pizza", ikon: "pizza" },
-  { ad: "Online Ödeme Altyapısı", ikon: "kart" },
+  { ad: "iyzico ile Ödeme", ikon: "kart" },
 ];
 
 // --- Özellikler --------------------------------------------------------------
@@ -255,8 +258,8 @@ export const OZELLIKLER = [
     ikon: "yildiz",
   },
   {
-    baslik: "Ödemeye Hazır Altyapı",
-    metin: "Ödeme tutarı sunucuda doğrulanır. Canlı kartlı ödeme, sağlayıcı sözleşmesi ve işletme ayarları tamamlandıktan sonra etkinleştirilir.",
+    baslik: "Güvenli Ödeme",
+    metin: "iyzico altyapısıyla masada kredi kartı ile güvenli ödeme alma. Tutar doğrulaması sunucu tarafında yapılır.",
     ikon: "kart",
   },
   {
@@ -290,51 +293,75 @@ export const ADIMLAR = [
   },
 ];
 
-// Demo aşamasında doğrulanmamış müşteri yorumu yerine ürünün doğrudan
-// iyileştirdiği operasyon alanları anlatılır.
-export const SONUCLAR = [
-  { sira: "01", baslik: "Sipariş akışı sadeleşir", metin: "Müşteri, mutfak ve salon aynı sipariş durumunu görür; sözlü aktarım ve tekrar azalır.", detay: "Tek sipariş kaynağı", ikon: "qr" },
-  { sira: "02", baslik: "Yoğunluk görünür olur", metin: "Bekleyen masalar, hazırlık süreleri ve kritik stoklar yönetim ekranında birlikte izlenir.", detay: "Canlı operasyon", ikon: "grafik" },
-  { sira: "03", baslik: "Müşteri geri gelir", metin: "Puan, damga kartı, kampanya ve uygulama içi cüzdan aynı müşteri hesabında çalışır.", detay: "Sadakat araçları", ikon: "yildiz" },
-  { sira: "04", baslik: "Marka korunur", metin: "Logo, tema, içerik ve kampanyalar her işletmeye özel yönetilir; müşteri restoranın markasını görür.", detay: "White-label deneyim", ikon: "marka" },
+// --- Yorumlar ----------------------------------------------------------------
+// TODO(referanslar): Bunlar TEMSİLİ metinlerdir; gerçek müşteri referansı
+// alındığında bu dizi güncellenmelidir. Uydurma kişi/şirket adı kullanılmadı,
+// bu yüzden roller jenerik tutuldu ve görseller projedeki mevcut yerel
+// fotoğraflardan seçildi.
+export const YORUMLAR = [
+  {
+    metin: "Masadan sipariş açıldıktan sonra garson çağırma trafiği neredeyse bitti. Mutfak fişleri anında düşüyor, sıra karışmıyor.",
+    kisi: "Restoran işletmecisi",
+    rol: "Temsili değerlendirme",
+    gorsel: "/gorseller/kullanici-restoran.jpg",
+    gorselAlt: "Restoran işletmecisini temsil eden portre fotoğrafı",
+  },
+  {
+    metin: "Damga kartını dijitale taşımak en çok işimize yarayan kısım oldu. Puan ve hediye takibi tamamen sistemin üzerinde.",
+    kisi: "Kafe sahibi",
+    rol: "Temsili değerlendirme",
+    gorsel: "/gorseller/kullanici-kafe.jpg",
+    gorselAlt: "Kafe sahibini temsil eden portre fotoğrafı",
+  },
+  {
+    metin: "Mutfak ekranı sayesinde hangi masanın ne kadar beklediğini görüyoruz. Yoğun saatte en çok bu işe yarıyor.",
+    kisi: "Mutfak şefi",
+    rol: "Temsili değerlendirme",
+    gorsel: "/gorseller/kullanici-sef.jpg",
+    gorselAlt: "Mutfak şefini temsil eden portre fotoğrafı",
+  },
 ];
 
 // --- Paketler ----------------------------------------------------------------
+// Yıllık fiyat, aylık ücretin tek kaynağından (fiyatAylik) türetilir — bkz.
+// YILLIK_BEDAVA_AY ve paketKartlariHtml. Kurumsal'da fiyatAylik yok, o yüzden
+// aylık/yıllık anahtarından etkilenmeden hep "Özel Fiyat" gösterir.
+export const YILLIK_BEDAVA_AY = 2;
+
 export const PAKETLER = [
   {
     ad: "Başlangıç",
     hedefKitle: "Tek şubeli küçük işletmeler",
-    fiyat: "₺1.490",
-    periyot: "/ ay",
+    fiyatAylik: 499,
     ozellikler: [
       "Sınırsız QR menü görüntüleme",
       "Temel tema özelleştirme",
       "Ürün ve kategori yönetimi",
       "E-posta desteği",
     ],
-    buton: "Paketi İncele",
+    buton: "Paketi Seç",
     populer: false,
   },
   {
     ad: "Profesyonel",
     hedefKitle: "Masadan sipariş alan işletmeler",
-    fiyat: "₺2.990",
-    periyot: "/ ay",
+    fiyatAylik: 999,
     ozellikler: [
       "Başlangıç paketindeki her şey",
       "Masadan canlı sipariş alma",
       "Canlı mutfak ve salon paneli",
-      "Online ödeme entegrasyonuna hazır altyapı",
+      "iyzico ile online ödeme",
       "Sadakat programı ve raporlar",
     ],
-    buton: "Ürünü İncele",
+    buton: DENEME.buton,
+    deneme: true,
     populer: true,
     rozet: "EN ÇOK TERCİH EDİLEN",
   },
   {
     ad: "Kurumsal",
     hedefKitle: "Çok şubeli zincirler",
-    fiyat: "Özel Teklif",
+    fiyat: "Özel Fiyat",
     periyot: "",
     ozellikler: [
       "Profesyonel paketteki her şey",
@@ -343,7 +370,7 @@ export const PAKETLER = [
       "İki adımlı doğrulama zorunluluğu",
       "Öncelikli destek",
     ],
-    buton: "Kapsamı İncele",
+    buton: "Bize Ulaşın",
     populer: false,
   },
 ];
@@ -363,7 +390,7 @@ export const SORULAR = [
   {
     soru: "Ödeme nasıl alınıyor, güvenli mi?",
     cevap:
-      "Ödeme entegrasyonunda sipariş tutarı istemciden değil sunucuda hesaplanır ve sağlayıcı sonucu ayrıca doğrulanır. Kartlı ödeme, işletmeye özel sağlayıcı ayarları tamamlandıktan sonra güvenli biçimde etkinleştirilir.",
+      "Ödemeler iyzico Checkout üzerinden alınır. Sipariş tutarı istemciden değil sunucuda hesaplanır; ödeme sonucu iyzico'dan ayrıca sorgulanarak tutar, para birimi ve güvenlik durumu doğrulandıktan sonra sipariş mutfağa aktarılır.",
   },
   {
     soru: "Menümü ve tasarımı kendim yönetebilir miyim?",
@@ -436,22 +463,6 @@ function ikonCizimi(ad) {
   return IKONLAR[ad] || IKONLAR.qr;
 }
 
-export function seoMetaHtml() {
-  if (!SITE_URL) return "<!-- VITE_SITE_URL tanımlandığında canonical ve og:url otomatik eklenir. -->";
-  return `<link rel="canonical" href="${kacis(SITE_URL)}/"/><meta property="og:url" content="${kacis(SITE_URL)}/"/>`;
-}
-
-export function yapilandirilmisVeriHtml() {
-  const veri = {
-    "@context": "https://schema.org",
-    "@graph": [
-      { "@type": "SoftwareApplication", name: ICERIK.markaAdi, applicationCategory: "BusinessApplication", operatingSystem: "Web", description: ICERIK.sayfaAciklamasi, url: SITE_URL || undefined },
-      { "@type": "FAQPage", mainEntity: SORULAR.map((oge) => ({ "@type": "Question", name: oge.soru, acceptedAnswer: { "@type": "Answer", text: oge.cevap } })) },
-    ],
-  };
-  return `<script type="application/ld+json">${JSON.stringify(veri).replace(/</g, "\\u003c")}</script>`;
-}
-
 // WhatsApp sohbet adresi. Numara tanımlı değilse null döner.
 export function whatsappAdresi() {
   const rakamlar = String(WHATSAPP.numara || "").replace(/\D/g, "");
@@ -459,8 +470,8 @@ export function whatsappAdresi() {
   return `https://wa.me/${rakamlar}?text=${encodeURIComponent(WHATSAPP.hazirMesaj)}`;
 }
 
-// Form gönderimi için en az bir kanal tanımlı mı? İkisi de boşsa satış formu
-// yerine demo sürecini açıklayan bilgilendirme kartı gösterilir.
+// Form gönderimi için en az bir kanal tanımlı mı? İkisi de boşsa form hiç
+// basılmaz — çalışmayan bir form, hiç form olmamasından daha kötüdür.
 export function iletisimKanaliVarMi() {
   return Boolean(String(ILETISIM.whatsapp || "").replace(/\D/g, "") || String(ILETISIM.eposta || "").trim());
 }
@@ -492,7 +503,7 @@ export function denemeSeridiHtml() {
         <p class="font-baslik text-lg font-bold text-marka-metin">${kacis(DENEME.baslik)}</p>
         <p class="mt-1 text-sm leading-relaxed text-marka-gri-300">${kacis(DENEME.aciklama)}</p>
       </div>
-      <a class="marka-buton shrink-0 whitespace-nowrap rounded-full px-7 py-3 text-sm font-medium" href="${ROTALAR.musteriDemo}">${kacis(DENEME.buton)}</a>
+      <a class="marka-buton shrink-0 whitespace-nowrap rounded-full px-7 py-3 text-sm font-medium" href="${baslaBaglantisi()}" data-paket="Profesyonel">${kacis(DENEME.buton)}</a>
     </div>`;
 }
 
@@ -551,12 +562,60 @@ export function adimKartlariHtml() {
   ).join("");
 }
 
-export function sonucKartlariHtml() {
-  return SONUCLAR.map((sonuc) => `<article class="sonuc-karti isik-kart"><header><span>${sonuc.sira}</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(sonuc.ikon)}</svg></header><h3>${kacis(sonuc.baslik)}</h3><p>${kacis(sonuc.metin)}</p><small>${kacis(sonuc.detay)}</small></article>`).join("");
+// Şerit kesintisiz dönebilmek için kart listesi iki kez basılır. İkinci küme
+// yalnızca görseldir; ekran okuyucular metni iki kez okumasın diye
+// yorumKartlariKopyasiHtml() her kartı aria-hidden ile işaretler.
+export function yorumKartlariKopyasiHtml() {
+  return yorumKartlariHtml().replace(/<figure class="/g, '<figure aria-hidden="true" class="');
 }
 
+export function yorumKartlariHtml() {
+  return YORUMLAR.map(
+    (yorum) => `
+      <figure class="yorum-kart isik-kart rounded-2xl border border-marka-cizgi bg-marka-kart p-8">
+        <svg class="mb-6 h-8 w-8 text-marka-turuncu-500" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+        <blockquote class="mb-8 text-sm leading-relaxed text-marka-gri-300">${kacis(yorum.metin)}</blockquote>
+        <figcaption class="flex items-center gap-3">
+          <img class="h-10 w-10 rounded-full border border-marka-cizgi object-cover" src="${yorum.gorsel}" alt="${kacis(yorum.gorselAlt)}" width="40" height="40" loading="lazy" decoding="async"/>
+          <span class="block">
+            <span class="block text-sm font-semibold text-marka-metin">${kacis(yorum.kisi)}</span>
+            <span class="block text-xs text-marka-gri-400">${kacis(yorum.rol)}</span>
+          </span>
+        </figcaption>
+      </figure>`,
+  ).join("");
+}
+
+function paraFormatla(sayi) {
+  return `₺${Math.round(sayi).toLocaleString("tr-TR")}`;
+}
+
+// Aylık/yıllık anahtarına göre görünürlüğü arayuz.js değiştirir (bkz.
+// fiyatAnahtari()); JS çalışmazsa aylık blok zaten varsayılan görünür kalır.
 function fiyatBlokHtml(paket) {
-  return `<p class="mb-8"><span class="font-baslik text-2xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span>${paket.periyot ? ` <small class="text-xs text-marka-gri-400">${kacis(paket.periyot)}</small>` : ""}</p>`;
+  if (paket.fiyatAylik == null) {
+    return `
+        <p class="mb-8">
+          <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot || "")}</span>
+        </p>`;
+  }
+
+  const aylik = paket.fiyatAylik;
+  const yillikToplam = aylik * (12 - YILLIK_BEDAVA_AY);
+  const yillikAylikEsdeger = yillikToplam / 12;
+  const tasarruf = aylik * 12 - yillikToplam;
+
+  return `
+        <p class="mb-1">
+          <span class="fiyat-aylik-blok">
+            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(aylik)}</span><span class="text-marka-gri-400">/ay</span>
+          </span>
+          <span class="fiyat-yillik-blok hidden">
+            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(yillikAylikEsdeger)}</span><span class="text-marka-gri-400">/ay</span>
+          </span>
+        </p>
+        <p class="fiyat-aylik-blok mb-8 text-xs text-marka-gri-500">Yıllık ödemede ${YILLIK_BEDAVA_AY} ay hediye</p>
+        <p class="fiyat-yillik-blok hidden mb-8 text-xs font-semibold text-marka-turuncu-400">${paraFormatla(yillikToplam)}/yıl toplam · ${paraFormatla(tasarruf)} tasarruf</p>`;
 }
 
 export function paketKartlariHtml() {
@@ -571,7 +630,9 @@ export function paketKartlariHtml() {
       ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-marka-turuncu-500 px-3 py-1 text-[11px] font-bold tracking-wide text-white">${kacis(paket.rozet || "")}</span>`
       : "";
 
-    const hedef = ROTALAR.musteriDemo;
+    // Tüm paket butonları talep formuna gider. data-paket, forma tıklanan
+    // paketi önceden seçtirir (bkz. arayuz.js#talepFormu).
+    const hedef = baslaBaglantisi();
     const paketVerisi = ` data-paket="${kacis(paket.ad)}"`;
     const buton = paket.populer
       ? `<a class="marka-buton block w-full rounded-xl py-3 text-center text-sm font-medium" href="${hedef}"${paketVerisi}>${kacis(paket.buton)}</a>`
@@ -596,12 +657,20 @@ export function paketKartlariHtml() {
 
 export function paketKarsilastirmaHtml() {
   const satirlar = [
-    ["QR menü ve ürün yönetimi", true, true, true], ["Tema ve marka özelleştirme", true, true, true],
-    ["Masadan canlı sipariş", false, true, true], ["Mutfak ve salon paneli", false, true, true],
-    ["Sadakat, kampanya ve cüzdan", false, true, true], ["Raporlama ve değerlendirme", false, true, true],
-    ["Çoklu şube planı", false, false, true], ["Öncelikli destek planı", false, false, true],
+    ["QR menü ve ürün yönetimi", true, true, true],
+    ["Tema ve marka özelleştirme", true, true, true],
+    ["Masadan canlı sipariş", false, true, true],
+    ["Mutfak ve salon paneli", false, true, true],
+    ["Sadakat, kampanya ve cüzdan", false, true, true],
+    ["Raporlama ve değerlendirme", false, true, true],
+    ["Çoklu şube planı", false, false, true],
+    ["Öncelikli destek planı", false, false, true],
   ];
-  const isaret = (varMi) => varMi ? '<span class="karsilastirma-var" aria-label="Dahil">✓</span>' : '<span class="karsilastirma-yok" aria-label="Dahil değil">—</span>';
+
+  const isaret = (varMi) => varMi
+    ? '<span class="karsilastirma-var" aria-label="Dahil">✓</span>'
+    : '<span class="karsilastirma-yok" aria-label="Dahil değil">—</span>';
+
   return `<div class="paket-karsilastirma"><table><thead><tr><th>Kapsam</th><th>Başlangıç</th><th>Profesyonel</th><th>Kurumsal</th></tr></thead><tbody>${satirlar.map(([ad, ...degerler]) => `<tr><th>${kacis(ad)}</th>${degerler.map((deger) => `<td>${isaret(deger)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 
@@ -630,10 +699,13 @@ export function sorularHtml() {
   }).join("");
 }
 
-// --- Talep formu / demo durumu ----------------------------------------------
+// --- Talep formu -------------------------------------------------------------
+// Hiçbir iletişim kanalı tanımlı değilse form basılmaz: gönderilemeyen bir
+// form, ziyaretçiyi formu doldurttuktan sonra hüsrana uğratır.
 export function talepFormuHtml() {
   if (!iletisimKanaliVarMi()) {
-    return `<div class="demo-iletisim-durumu cam-panel"><span class="demo-rozet">ÜRÜNÜ KEŞFEDİN</span><h3>Restoran deneyimini doğrudan inceleyin</h3><p>QR menü, sipariş, sadakat ve operasyon akışlarının müşteri tarafında nasıl çalıştığını uygulama üzerinden görebilirsiniz.</p><div><a class="marka-buton" href="${ROTALAR.musteriDemo}">Müşteri Uygulamasını Aç</a><a href="${ROTALAR.personelGiris}">Personel Girişi</a></div><small>Tüm ürün ekranları aynı yönetim altyapısıyla birlikte çalışır.</small></div>`;
+    return `<!-- Talep formu: src/icerik.js icindeki ILETISIM.whatsapp ve ILETISIM.eposta
+     bos oldugu icin render edilmedi. Birini doldurunca form otomatik gorunur. -->`;
   }
 
   const A = TALEP_FORMU.alanlar;

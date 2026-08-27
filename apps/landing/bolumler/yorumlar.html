@@ -1,12 +1,24 @@
-<!-- Platformun operasyon üzerindeki sonuçları. -->
-<section class="sonuc-bolumu relative px-5 py-20 sm:px-6 md:py-24" id="sonuclar">
+<!-- ==========================================================================
+     Referanslar.
+     DİKKAT: Metinler temsilidir (bkz. src/icerik.js → YORUMLAR / TODO).
+     Gerçek müşteri referansı alındığında içerik dosyası güncellenmelidir.
+     ========================================================================== -->
+<section class="relative px-6 py-20 md:py-24" id="yorumlar">
   <div class="mx-auto max-w-6xl">
-    <div class="bolum-basligi mb-12 text-center">
+    <div class="bolum-basligi mb-14 text-center">
       <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-marka-gri-400">{{ yorumlarEtiket }}</p>
-      <h2 class="font-baslik text-3xl font-bold md:text-5xl"><span class="metin-akan">{{ yorumlarBaslik }}</span><br/><span class="metin-gradyan">{{ yorumlarVurgu }}</span></h2>
-      <p class="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-marka-gri-300 md:text-base">Siparişten müşteri sadakatine kadar bütün restoran akışını ölçülebilir ve yönetilebilir hale getirin.</p>
+      <h2 class="font-baslik text-3xl font-bold md:text-5xl">
+        <span class="metin-akan">{{ yorumlarBaslik }}</span><br/><span class="metin-gradyan">{{ yorumlarVurgu }}</span>
+      </h2>
     </div>
-    <div class="sonuc-kartlari">{{ sonucKartlariHtml }}</div>
-    <div class="demo-seffaflik"><span>TEK PLATFORM</span><p>Müşteri, salon, mutfak ve yönetim ekranları aynı veriyi kullanır; ekipler her aşamada güncel durumu görür.</p></div>
+
+    <!-- Kesintisiz kayan şerit. Üzerine gelince veya klavye odağı içine
+         girince durur; hareket azaltma tercihinde hiç akmaz. -->
+    <div class="yorum-serit">
+      <div class="yorum-akis">
+        {{ yorumKartlariHtml }}
+        {{ yorumKartlariKopyasiHtml }}
+      </div>
+    </div>
   </div>
 </section>

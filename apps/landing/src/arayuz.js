@@ -185,35 +185,6 @@ function fiyatAnahtari() {
   dugmeler.forEach((dugme) => dugme.addEventListener("click", () => uygula(dugme.dataset.periyot)));
 }
 
-/* ----------------------------------------------------------- Ürün turu sekmeleri */
-function urunTuruSekmeleri() {
-  const liste = document.querySelector(".urun-turu-sekmeler");
-  if (!liste) return;
-  const sekmeler = Array.from(liste.querySelectorAll('[role="tab"]'));
-  const paneller = Array.from(document.querySelectorAll("[data-tur-panel]"));
-  if (!sekmeler.length || !paneller.length) return;
-
-  function sec(sekme, odakla = false) {
-    sekmeler.forEach((aday) => {
-      const aktif = aday === sekme;
-      aday.setAttribute("aria-selected", String(aktif));
-      aday.tabIndex = aktif ? 0 : -1;
-    });
-    paneller.forEach((panel) => { panel.hidden = panel.dataset.turPanel !== sekme.dataset.tur; });
-    if (odakla) sekme.focus();
-  }
-
-  sekmeler.forEach((sekme, sira) => {
-    sekme.addEventListener("click", () => sec(sekme));
-    sekme.addEventListener("keydown", (olay) => {
-      const yon = olay.key === "ArrowRight" ? 1 : olay.key === "ArrowLeft" ? -1 : 0;
-      if (!yon) return;
-      olay.preventDefault();
-      sec(sekmeler[(sira + yon + sekmeler.length) % sekmeler.length], true);
-    });
-  });
-}
-
 /* --------------------------------------------- Menüde aktif bölümü işaretleme */
 function aktifBolumIsaretle() {
   const baglantilar = Array.from(document.querySelectorAll(".nav-baglanti"));
@@ -427,21 +398,9 @@ function satisAsistani() {
   const oneriler = document.getElementById("chatbot-oneriler");
   if (!kok || !acDugmesi || !kapatDugmesi || !panel || !form || !girdi || !mesajlar) return;
 
+  const backend = String(import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
   const gecmis = [];
   let istekVar = false;
-
-  function demoYaniti(soru) {
-    const metin = soru.toLocaleLowerCase("tr-TR");
-    if (/fiyat|ücret|paket|ödeme plan/.test(metin)) return "Paket kapsamları ve aylık fiyatlar sayfada karşılaştırmalı olarak yer alıyor. Çok şubeli işletmeler için ihtiyaçlara göre özel kapsam hazırlanır.";
-    if (/demo|dene|gör|incele|uygulama/.test(metin)) return "Müşteri uygulamasında QR menü görünümünü, kategorileri, ürünleri, kampanyaları ve sadakat akışını inceleyebilirsiniz. Sayfadaki ‘Müşteri Uygulamasını Aç’ düğmesi sizi doğrudan ürüne götürür.";
-    if (/mutfak|salon|kroki|personel/.test(metin)) return "Mutfak paneli sipariş kuyruğunu ve hazırlık durumlarını; salon tarafı masa, rezervasyon ve oturma krokisini yönetir. Ürün turundaki ‘Mutfak ve salon’ sekmesinde akışın özetini görebilirsiniz.";
-    if (/sadakat|puan|damga|cüzdan|kampanya/.test(metin)) return "Platformda puan, dijital damga kartı, kampanya ve kasadan bakiye yükleme araçları bulunur. Her işletme bu özellikleri kendi panelinden yapılandırabilir.";
-    if (/online|iyzico|kartla|ödeme/.test(metin)) return "Online ödeme için teknik altyapı bulunuyor; canlı kullanım, ödeme kuruluşu sözleşmesi ve işletmeye özel sağlayıcı ayarları tamamlandıktan sonra etkinleştirilir.";
-    if (/kurulum|başla|qr kod/.test(metin)) return "İşletme profili, ürünler ve masa QR kodları yönetim panelinden hazırlanır. Yetkiler tanımlandıktan sonra personel, mutfak ve salon ekranları kullanıma açılır.";
-    if (/iletişim|ulaş|satın|başvur|anlaş/.test(metin)) return "Kurulum kapsamı işletmenin masa, şube ve operasyon ihtiyaçlarına göre belirlenir. Ürün ekranlarını hemen inceleyebilir, iletişim kanalından ekiple görüşebilirsiniz.";
-    if (/özellik|neler|ne yap/.test(metin)) return "QR sipariş, ürün ve kampanya yönetimi, mutfak ve salon ekranları, rezervasyon, oturma krokisi, sadakat, cüzdan, stok ve raporlama aynı platformda birleşiyor.";
-    return "Ürün rehberi; paketler, müşteri uygulaması, mutfak-salon akışı, sadakat ve ödeme altyapısı hakkında bilgi verir. Merak ettiğiniz başlığı daha ayrıntılı sorabilirsiniz.";
-  }
 
   function paneliAyarla(acik) {
     panel.hidden = !acik;
@@ -467,6 +426,7 @@ function satisAsistani() {
   async function sor(metin) {
     const temiz = String(metin || "").trim().slice(0, 600);
     if (!temiz || istekVar) return;
+    const oncekiGecmis = gecmis.slice(-6);
     mesajiEkle(temiz, "kullanici");
     girdi.value = "";
     girdi.style.height = "auto";
@@ -475,14 +435,27 @@ function satisAsistani() {
     girdi.disabled = true;
     form.querySelector('button[type="submit"]')?.setAttribute("disabled", "");
     const bekleme = mesajiEkle("Yanıt hazırlanıyor…", "yukleniyor", false);
+    const denetleyici = new AbortController();
+    const zamanlayici = window.setTimeout(() => denetleyici.abort(), 20_000);
     try {
-      await new Promise((tamamla) => window.setTimeout(tamamla, 280));
+      const yanit = await fetch(`${backend}/api/landing/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: denetleyici.signal,
+        body: JSON.stringify({ mesaj: temiz, gecmis: oncekiGecmis }),
+      });
+      const veri = await yanit.json().catch(() => ({}));
+      if (!yanit.ok || !veri.cevap) throw new Error(veri.hata || "Yanıt alınamadı.");
       bekleme.remove();
-      mesajiEkle(demoYaniti(temiz), "asistan");
-    } catch {
+      mesajiEkle(veri.cevap, "asistan");
+    } catch (hata) {
       bekleme.remove();
-      mesajiEkle("Ürün kapsamını ürün turu ve özellikler bölümlerinden inceleyebilirsiniz.", "asistan");
+      const zamanAsimi = hata?.name === "AbortError";
+      mesajiEkle(zamanAsimi
+        ? "Yanıt biraz uzun sürdü. Lütfen tekrar deneyin veya iletişim bölümünden bize ulaşın."
+        : "Şu anda bağlantı kuramadım. Fiyat ve özellikleri sayfadan inceleyebilir, iletişim bölümünden bize ulaşabilirsiniz.", "asistan");
     } finally {
+      window.clearTimeout(zamanlayici);
       istekVar = false;
       girdi.disabled = false;
       form.querySelector('button[type="submit"]')?.removeAttribute("disabled");
@@ -520,7 +493,6 @@ mobilMenu();
 sssAkordiyonu();
 temaAnahtari();
 fiyatAnahtari();
-urunTuruSekmeleri();
 aktifBolumIsaretle();
 talepFormu();
 satisAsistani();
