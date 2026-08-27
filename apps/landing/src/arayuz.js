@@ -185,6 +185,35 @@ function fiyatAnahtari() {
   dugmeler.forEach((dugme) => dugme.addEventListener("click", () => uygula(dugme.dataset.periyot)));
 }
 
+/* ----------------------------------------------------------- Ürün turu sekmeleri */
+function urunTuruSekmeleri() {
+  const liste = document.querySelector(".urun-turu-sekmeler");
+  if (!liste) return;
+  const sekmeler = Array.from(liste.querySelectorAll('[role="tab"]'));
+  const paneller = Array.from(document.querySelectorAll("[data-tur-panel]"));
+  if (!sekmeler.length || !paneller.length) return;
+
+  function sec(sekme, odakla = false) {
+    sekmeler.forEach((aday) => {
+      const aktif = aday === sekme;
+      aday.setAttribute("aria-selected", String(aktif));
+      aday.tabIndex = aktif ? 0 : -1;
+    });
+    paneller.forEach((panel) => { panel.hidden = panel.dataset.turPanel !== sekme.dataset.tur; });
+    if (odakla) sekme.focus();
+  }
+
+  sekmeler.forEach((sekme, sira) => {
+    sekme.addEventListener("click", () => sec(sekme));
+    sekme.addEventListener("keydown", (olay) => {
+      const yon = olay.key === "ArrowRight" ? 1 : olay.key === "ArrowLeft" ? -1 : 0;
+      if (!yon) return;
+      olay.preventDefault();
+      sec(sekmeler[(sira + yon + sekmeler.length) % sekmeler.length], true);
+    });
+  });
+}
+
 /* --------------------------------------------- Menüde aktif bölümü işaretleme */
 function aktifBolumIsaretle() {
   const baglantilar = Array.from(document.querySelectorAll(".nav-baglanti"));
@@ -398,9 +427,21 @@ function satisAsistani() {
   const oneriler = document.getElementById("chatbot-oneriler");
   if (!kok || !acDugmesi || !kapatDugmesi || !panel || !form || !girdi || !mesajlar) return;
 
-  const backend = String(import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
   const gecmis = [];
   let istekVar = false;
+
+  function demoYaniti(soru) {
+    const metin = soru.toLocaleLowerCase("tr-TR");
+    if (/fiyat|ücret|paket|ödeme plan/.test(metin)) return "Paket kapsamları sayfada karşılaştırmalı olarak yer alıyor; ticari fiyatlar demo ve pilot süreç tamamlandıktan sonra kesinleşecek. Şu anda fiyat sözü veya satış başvurusu alınmıyor.";
+    if (/demo|dene|gör|incele/.test(metin)) return "Müşteri demosunda QR menü görünümünü, kategorileri, ürünleri, kampanyaları ve sadakat akışını inceleyebilirsiniz. Sayfadaki ‘Müşteri Demosunu Aç’ düğmesi sizi doğrudan çalışan uygulamaya götürür.";
+    if (/mutfak|salon|kroki|personel/.test(metin)) return "Mutfak paneli sipariş kuyruğunu ve hazırlık durumlarını; salon tarafı masa, rezervasyon ve oturma krokisini yönetir. Ürün turundaki ‘Mutfak ve salon’ sekmesinde akışın özetini görebilirsiniz.";
+    if (/sadakat|puan|damga|cüzdan|kampanya/.test(metin)) return "Platformda puan, dijital damga kartı, kampanya ve kasadan bakiye yükleme araçları bulunur. Her işletme bu özellikleri kendi panelinden yapılandırabilir.";
+    if (/online|iyzico|kartla|ödeme/.test(metin)) return "Online ödeme için teknik altyapı bulunuyor; canlı kullanım, ödeme kuruluşu sözleşmesi ve işletmeye özel sağlayıcı ayarları tamamlandıktan sonra etkinleştirilir.";
+    if (/kurulum|başla|qr kod/.test(metin)) return "İşletme, ürünler ve masa QR kodları yönetim panelinden hazırlanır. Platform demo aşamasında olduğu için yeni işletme kurulumu şu anda ekip içindeki super admin akışıyla yapılır.";
+    if (/iletişim|ulaş|satın|başvur|anlaş/.test(metin)) return "Platform henüz demo aşamasında olduğu için satış başvurusu toplamıyoruz. Doğrulanmış iletişim kanalları pilot işletme süreci başladığında landing page’de yayınlanacak.";
+    if (/özellik|neler|ne yap/.test(metin)) return "QR sipariş, ürün ve kampanya yönetimi, mutfak ve salon ekranları, rezervasyon, oturma krokisi, sadakat, cüzdan, stok ve raporlama aynı platformda birleşiyor.";
+    return "Bu demo rehberi yalnızca doğrulanmış ürün kapsamını anlatır. Demo, paketler, mutfak-salon akışı, sadakat veya ödeme altyapısı hakkında daha net bir soru sorabilirsiniz.";
+  }
 
   function paneliAyarla(acik) {
     panel.hidden = !acik;
@@ -426,7 +467,6 @@ function satisAsistani() {
   async function sor(metin) {
     const temiz = String(metin || "").trim().slice(0, 600);
     if (!temiz || istekVar) return;
-    const oncekiGecmis = gecmis.slice(-6);
     mesajiEkle(temiz, "kullanici");
     girdi.value = "";
     girdi.style.height = "auto";
@@ -435,27 +475,14 @@ function satisAsistani() {
     girdi.disabled = true;
     form.querySelector('button[type="submit"]')?.setAttribute("disabled", "");
     const bekleme = mesajiEkle("Yanıt hazırlanıyor…", "yukleniyor", false);
-    const denetleyici = new AbortController();
-    const zamanlayici = window.setTimeout(() => denetleyici.abort(), 20_000);
     try {
-      const yanit = await fetch(`${backend}/api/landing/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: denetleyici.signal,
-        body: JSON.stringify({ mesaj: temiz, gecmis: oncekiGecmis }),
-      });
-      const veri = await yanit.json().catch(() => ({}));
-      if (!yanit.ok || !veri.cevap) throw new Error(veri.hata || "Yanıt alınamadı.");
+      await new Promise((tamamla) => window.setTimeout(tamamla, 280));
       bekleme.remove();
-      mesajiEkle(veri.cevap, "asistan");
-    } catch (hata) {
+      mesajiEkle(demoYaniti(temiz), "asistan");
+    } catch {
       bekleme.remove();
-      const zamanAsimi = hata?.name === "AbortError";
-      mesajiEkle(zamanAsimi
-        ? "Yanıt biraz uzun sürdü. Lütfen tekrar deneyin veya iletişim bölümünden bize ulaşın."
-        : "Şu anda bağlantı kuramadım. Fiyat ve özellikleri sayfadan inceleyebilir, iletişim bölümünden bize ulaşabilirsiniz.", "asistan");
+      mesajiEkle("Demo kapsamını ürün turu ve özellikler bölümlerinden inceleyebilirsiniz.", "asistan");
     } finally {
-      window.clearTimeout(zamanlayici);
       istekVar = false;
       girdi.disabled = false;
       form.querySelector('button[type="submit"]')?.removeAttribute("disabled");
@@ -493,6 +520,7 @@ mobilMenu();
 sssAkordiyonu();
 temaAnahtari();
 fiyatAnahtari();
+urunTuruSekmeleri();
 aktifBolumIsaretle();
 talepFormu();
 satisAsistani();
