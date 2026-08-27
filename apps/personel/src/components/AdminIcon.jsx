@@ -25,6 +25,15 @@ const ikonlar = {
   alert: <><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5M12 17.5h.01"/></>,
   check: <path d="m5 12 4 4L19 6"/>,
   close: <><path d="m6 6 12 12M18 6 6 18"/></>,
+  target: <><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/></>,
+  clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+  graduation: <><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4c3 2 7 2 10 0v-4M21 9v6"/></>,
+  gift: <><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9H7.5a2.5 2.5 0 1 1 2.2-3.7L12 9Zm0 0h4.5a2.5 2.5 0 1 0-2.2-3.7L12 9Z"/></>,
+  flame: <path d="M12 22c4 0 7-2.8 7-7 0-3.2-1.7-6.1-5.1-8.8.1 2.1-.7 3.5-2 4.3.1-3.5-1.5-6.1-3.2-7.5.1 3.1-3.7 6.3-3.7 11.7C5 19 8 22 12 22Z"/>,
+  burger: <><path d="M4 10h16c0-3-3.6-5.5-8-5.5S4 7 4 10ZM3 14h18M5 18h14a2 2 0 0 0 2-2H3a2 2 0 0 0 2 2Z"/><path d="m6 12 2 2 2-2 2 2 2-2 2 2 2-2"/></>,
+  drink: <><path d="M7 7h10l-1 14H8L7 7ZM6 3h9M14 3l4 4"/><path d="M9 11h6"/></>,
+  card: <><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h3"/></>,
+  bolt: <path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/>,
 };
 
 export default function AdminIcon({ name, size = 20, className = "", ...props }) {

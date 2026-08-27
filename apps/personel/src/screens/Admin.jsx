@@ -30,9 +30,12 @@ const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
 const BOS_DAMGA_KARTI = { aktif: true, hedefAdet: 5, kategori: "Burgerler", odulUrunId: "", odulMetni: "1 Burger Hediye", kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun", aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.", damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★" };
 const BOS_CUZDAN_AYARI = { aktif: true, bonusAktif: true, bonusYuzde: 5, minYukleme: 100, maxYukleme: 10000, kampanyaBasligi: "Nakit yüklemene ekstra bakiye", kampanyaAciklamasi: "Kasadan nakit yükle, bonus bakiyeni anında kullan." };
 const KAMPANYA_IKONLARI = [
-  ["🎯", "Fırsat"], ["🕒", "Saat"], ["🎓", "Öğrenci"], ["🎁", "Hediye"],
-  ["🔥", "Popüler"], ["🍔", "Burger"], ["🥤", "İçecek"], ["👥", "Davet"],
-  ["💳", "Ödeme"], ["⭐", "Özel"], ["⚡", "Hızlı"], ["💸", "İndirim"],
+  { deger: "🎯", ad: "Fırsat", ikon: "target" }, { deger: "🕒", ad: "Saat", ikon: "clock" },
+  { deger: "🎓", ad: "Öğrenci", ikon: "graduation" }, { deger: "🎁", ad: "Hediye", ikon: "gift" },
+  { deger: "🔥", ad: "Popüler", ikon: "flame" }, { deger: "🍔", ad: "Burger", ikon: "burger" },
+  { deger: "🥤", ad: "İçecek", ikon: "drink" }, { deger: "👥", ad: "Davet", ikon: "users" },
+  { deger: "💳", ad: "Ödeme", ikon: "card" }, { deger: "⭐", ad: "Özel", ikon: "star" },
+  { deger: "⚡", ad: "Hızlı", ikon: "bolt" }, { deger: "💸", ad: "İndirim", ikon: "percent" },
 ];
 
 const BOLUMLER = [
@@ -76,6 +79,7 @@ const kategoriyeGoreUrunTipi = (kategori) => {
 };
 const tarihSaat = (d) => d ? new Date(d).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
 const kampanyaIkonu = (kampanya) => kampanya?.ikon || (String(kampanya?.etiket || "").includes(":") ? "🕒" : kampanya?.kod === "davet-et" || kampanya?.etiket === "Davet Et" ? "👥" : "🎓");
+const kampanyaOutlineIkonu = (kampanya) => KAMPANYA_IKONLARI.find(({ deger }) => deger === kampanyaIkonu(kampanya))?.ikon || "star";
 const SIKAYET_DURUMLARI = { yeni: "Yeni", inceleniyor: "İnceleniyor", cozuldu: "Çözüldü", reddedildi: "Reddedildi" };
 const SIKAYET_KATEGORILERI = { siparis: "Sipariş", urun: "Ürün / Lezzet", personel: "Personel", odeme: "Ödeme", uygulama: "Uygulama", diger: "Diğer" };
 
@@ -691,6 +695,12 @@ export default function Admin({ onCikis, temaKontrolu }) {
           </div>
         </header>
 
+        <div className="admin-mobil-durumlar" aria-label="Mobil işletme özeti">
+          <span className="admin-hizli-durum"><b>{dashboard?.bugunSiparis || 0}</b> sipariş</span>
+          <button type="button" className={`admin-hizli-durum ${kritikStok ? "uyari" : ""}`} onClick={() => git("/yonetim/stok-takibi")}><b>{kritikStok}</b> kritik stok</button>
+          <button type="button" className={`admin-hizli-durum ${acikSikayet ? "tehlike" : ""}`} onClick={() => git("/yonetim/sikayetler")}><b>{acikSikayet}</b> açık şikâyet</button>
+        </div>
+
         {bildirim && <div className="admin-toast">✓ {bildirim}</div>}
         {canliBildirim && <div className="admin-canli-toast"><i /> <div><b>Yeni satış alındı</b><span>{canliBildirim}</span></div></div>}
         {hata && <div className="admin-hata">{hata}</div>}
@@ -817,7 +827,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
                     <b>{kampanya.aktif ? "YAYINDA" : "PASİF"}</b>
                   </div>
                   <div className="yonetim-kart-icerik">
-                    <small><span className="kampanya-kart-ikonu">{kampanyaIkonu(kampanya)}</span>{kampanya.etiket}</small><h3>{kampanya.baslik}</h3><p>{kampanya.aciklama}</p>
+                    <small><span className="kampanya-kart-ikonu"><AdminIcon name={kampanyaOutlineIkonu(kampanya)} /></span>{kampanya.etiket}</small><h3>{kampanya.baslik}</h3><p>{kampanya.aciklama}</p>
                     <div className="yonetim-etiketler">
                       {Number(kampanya.indirimYuzde) > 0 && <span>%{kampanya.indirimYuzde} indirim</span>}
                       <span>{kampanya.kampanyaTipi === "saatli" ? `${String(kampanya.baslangicSaat).padStart(2, "0")}:00–${String(kampanya.bitisSaat).padStart(2, "0")}:00` : "Sürekli"}</span>
@@ -970,7 +980,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               </section>
               <KayitFiltreleri tur="mutfak" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
               <Panel baslik="Hazırlık geçmişi" alt={`${mutfakKayitlari.length} kayıt`}>
-                <div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu mutfak-zaman-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>İşlem zamanları</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td><b>{gelAlSiparisiMi(kayit.masa_no) ? "Gel Al" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td className="kayit-urun-metni">{kayit.urunler}</td><td>{kayit.personel_ad || "—"}</td><td><DurumRozeti durum={kayit.durum} /></td><td><MutfakSureAkisi kayit={kayit} /></td></tr>)}</tbody></table></div>
+                <div className="admin-tablo-sarici"><table className="admin-tablo admin-tablo--kart kayit-tablosu mutfak-zaman-tablosu"><thead><tr><th>Sipariş</th><th>Masa / kişi</th><th>Ürünler</th><th>Personel</th><th>Durum</th><th>İşlem zamanları</th></tr></thead><tbody>{mutfakKayitlari.map((kayit) => <tr key={kayit.siparis_no} className={Number(kayit.hazirlamaDakika) > 15 ? "kritik" : ""}><td data-label="Sipariş"><b>{kayit.siparis_no}</b><small>{tarihSaat(kayit.siparis_at)}</small></td><td data-label="Masa / kişi"><b>{gelAlSiparisiMi(kayit.masa_no) ? "Gel Al" : `Masa ${kayit.masa_no}`}</b><span>{kayit.kisi_adi || "Misafir"}</span></td><td data-label="Ürünler" className="kayit-urun-metni admin-kart-genis">{kayit.urunler}</td><td data-label="Personel">{kayit.personel_ad || "—"}</td><td data-label="Durum"><DurumRozeti durum={kayit.durum} /></td><td data-label="İşlem zamanları" className="admin-kart-genis"><MutfakSureAkisi kayit={kayit} /></td></tr>)}</tbody></table></div>
               </Panel>
             </>}
 
@@ -983,14 +993,14 @@ export default function Admin({ onCikis, temaKontrolu }) {
                 <Metrik ad="Toplam puan" deger={musteriler.reduce((t, m) => t + m.puan, 0).toLocaleString("tr-TR")} alt="Kullanılabilir puan" renk="mor" />
               </section>
               <KayitFiltreleri tur="musteri" filtre={kayitFiltre} setFiltre={setKayitFiltre} />
-              <Panel baslik="Müşteri listesi" alt={`${musteriler.length} hesap`}><div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Müşteri</th><th>İletişim</th><th>Kayıt tarihi</th><th>Sipariş</th><th>Toplam harcama</th><th>Puan</th><th>Son sipariş</th></tr></thead><tbody>{musteriler.map((musteri) => <tr key={musteri.id}><td><div className="tablo-kisi"><i>{musteri.ad?.[0]}{musteri.soyad?.[0]}</i><b>{musteri.ad} {musteri.soyad}</b></div></td><td><b>{musteri.email}</b><span>{musteri.telefon || "—"}</span></td><td>{tarihSaat(musteri.olusturma)}</td><td>{musteri.siparisSayisi}</td><td><strong>{para(musteri.toplamHarcama)}</strong></td><td>{musteri.puan.toLocaleString("tr-TR")}</td><td>{tarihSaat(musteri.son_siparis)}</td></tr>)}</tbody></table></div></Panel>
+              <Panel baslik="Müşteri listesi" alt={`${musteriler.length} hesap`}><div className="admin-tablo-sarici"><table className="admin-tablo admin-tablo--kart kayit-tablosu"><thead><tr><th>Müşteri</th><th>İletişim</th><th>Kayıt tarihi</th><th>Sipariş</th><th>Toplam harcama</th><th>Puan</th><th>Son sipariş</th></tr></thead><tbody>{musteriler.map((musteri) => <tr key={musteri.id}><td data-label="Müşteri" className="admin-kart-genis"><div className="tablo-kisi"><i>{musteri.ad?.[0]}{musteri.soyad?.[0]}</i><b>{musteri.ad} {musteri.soyad}</b></div></td><td data-label="İletişim" className="admin-kart-genis"><b>{musteri.email}</b><span>{musteri.telefon || "—"}</span></td><td data-label="Kayıt tarihi">{tarihSaat(musteri.olusturma)}</td><td data-label="Sipariş">{musteri.siparisSayisi}</td><td data-label="Toplam harcama"><strong>{para(musteri.toplamHarcama)}</strong></td><td data-label="Puan">{musteri.puan.toLocaleString("tr-TR")}</td><td data-label="Son sipariş" className="admin-kart-genis">{tarihSaat(musteri.son_siparis)}</td></tr>)}</tbody></table></div></Panel>
             </>}
 
             {bolum === "personel-kayitlari" && <>
               <BolumBaslik baslik="Personel performansı" aciklama="Vardiya sürelerini ve mutfakta tamamlanan sipariş performansını tarih aralığına göre karşılaştırın." />
               <KayitFiltreleri tur="personel" filtre={kayitFiltre} setFiltre={setKayitFiltre} personeller={personeller} />
               <div className="performans-grid">{personelKayitlari.performans.map((p) => <article key={p.id}><div className="personel-avatar">{p.ad?.[0]}{p.soyad?.[0]}</div><div><span>{p.rol}</span><h3>{p.ad} {p.soyad}</h3></div><strong>{p.hazirlananSiparis}</strong><small>hazırlanan sipariş</small><b>{p.ortalamaDakika == null ? "—" : `${p.ortalamaDakika} dk ort.`}</b></article>)}</div>
-              <Panel baslik="Vardiya hareketleri" alt={`${personelKayitlari.vardiyalar.length} kayıt`}><div className="admin-tablo-sarici"><table className="admin-tablo kayit-tablosu"><thead><tr><th>Personel</th><th>Rol</th><th>Giriş</th><th>Çıkış</th><th>Çalışma</th><th>Durum</th></tr></thead><tbody>{personelKayitlari.vardiyalar.map((v) => <tr key={v.id}><td><b>{v.ad} {v.soyad}</b></td><td>{v.rol}</td><td>{tarihSaat(v.giris)}</td><td>{v.cikis ? tarihSaat(v.cikis) : "—"}</td><td><strong>{v.calismaSaati.toFixed(2)} saat</strong></td><td><span className={`vardiya-rozet ${v.cikis ? "kapali" : "acik"}`}>{v.cikis ? "Tamamlandı" : "Vardiyada"}</span></td></tr>)}</tbody></table></div></Panel>
+              <Panel baslik="Vardiya hareketleri" alt={`${personelKayitlari.vardiyalar.length} kayıt`}><div className="admin-tablo-sarici"><table className="admin-tablo admin-tablo--kart kayit-tablosu"><thead><tr><th>Personel</th><th>Rol</th><th>Giriş</th><th>Çıkış</th><th>Çalışma</th><th>Durum</th></tr></thead><tbody>{personelKayitlari.vardiyalar.map((v) => <tr key={v.id}><td data-label="Personel" className="admin-kart-genis"><b>{v.ad} {v.soyad}</b></td><td data-label="Rol">{v.rol}</td><td data-label="Giriş">{tarihSaat(v.giris)}</td><td data-label="Çıkış">{v.cikis ? tarihSaat(v.cikis) : "—"}</td><td data-label="Çalışma"><strong>{v.calismaSaati.toFixed(2)} saat</strong></td><td data-label="Durum"><span className={`vardiya-rozet ${v.cikis ? "kapali" : "acik"}`}>{v.cikis ? "Tamamlandı" : "Vardiyada"}</span></td></tr>)}</tbody></table></div></Panel>
             </>}
 
             {bolum === "revizyonlar" && <>
@@ -1024,7 +1034,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
                 <Panel baslik="Kategori payları" alt="Ürün adedi"><KategoriDagilimi veriler={rapor.kategoriler || []} toplam={toplamUrun} detayli /></Panel>
                 <Panel baslik="Haftanın satış ritmi" alt="Ürün adedi"><MiniCizgiGrafigi veriler={haftayiDoldur(rapor.haftalik || [])} deger="adet" etiket={(g) => haftaAdi(g.gun)} renk="mor" /></Panel>
               </section>
-              <Panel baslik="Ürün performansı" alt={`${rapor.urunler.length} ürün`}><div className="admin-tablo-sarici"><table className="admin-tablo"><thead><tr><th>Ürün</th><th>Satılan</th><th>Ciro</th><th>Pay</th></tr></thead><tbody>{rapor.urunler.map((u) => <tr key={u.urun_ad}><td><b>{u.urun_ad}</b></td><td>{u.adet}</td><td><strong>{para(u.ciro)}</strong></td><td>%{toplamCiro ? ((u.ciro / toplamCiro) * 100).toFixed(1) : 0}</td></tr>)}</tbody></table></div></Panel>
+              <Panel baslik="Ürün performansı" alt={`${rapor.urunler.length} ürün`}><div className="admin-tablo-sarici"><table className="admin-tablo admin-tablo--kart"><thead><tr><th>Ürün</th><th>Satılan</th><th>Ciro</th><th>Pay</th></tr></thead><tbody>{rapor.urunler.map((u) => <tr key={u.urun_ad}><td data-label="Ürün" className="admin-kart-genis"><b>{u.urun_ad}</b></td><td data-label="Satılan">{u.adet}</td><td data-label="Ciro"><strong>{para(u.ciro)}</strong></td><td data-label="Pay">%{toplamCiro ? ((u.ciro / toplamCiro) * 100).toFixed(1) : 0}</td></tr>)}</tbody></table></div></Panel>
             </>}
           </div>
         )}
@@ -1040,7 +1050,10 @@ export default function Admin({ onCikis, temaKontrolu }) {
               <div><small>{urunForm.kategori || "KATEGORİ"}</small><h3>{urunForm.ad || "Yeni ürün"}</h3><p>{para(urunForm.fiyat)}{urunForm.gramajOpsiyonu?.goster ? ` · ${urunForm.temelMiktar || "—"} ${urunForm.gramajOpsiyonu?.birim || "gr"}` : ""}</p></div>
               <i>{urunForm.id ? "DÜZENLENİYOR" : "YENİ KAYIT"}</i>
             </div>
-            <FormBolumu ikon="products" baslik="Temel bilgiler" aciklama="Ürünün adı, kategorisi, fiyatı ve menüdeki sırası." />
+            <nav className="urun-form-gezinme" aria-label="Ürün düzenleme bölümleri">
+              {[['urun-temel', 'Temel'], ['urun-satis', 'Satış'], ['urun-secenek', 'Seçenekler'], ['urun-fiyat', 'Fiyat'], ['urun-icerik', 'İçerik']].map(([hedef, ad]) => <button type="button" key={hedef} onClick={() => document.getElementById(hedef)?.scrollIntoView({ behavior: "smooth", block: "start" })}>{ad}</button>)}
+            </nav>
+            <FormBolumu id="urun-temel" ikon="products" baslik="Temel bilgiler" aciklama="Ürünün adı, kategorisi, fiyatı ve menüdeki sırası." />
             <Ikili>
               <Alan etiket="Ürün adı"><input required maxLength="120" value={urunForm.ad} onChange={(e) => setUrunForm({ ...urunForm, ad: e.target.value })} /></Alan>
               <Alan etiket="Kategori"><select value={urunForm.kategori} onChange={(e) => urunKategorisiDegistir(e.target.value)}>{kategoriler.map((kategori) => <option key={kategori.id} value={kategori.ad}>{kategori.ad}</option>)}</select></Alan>
@@ -1050,7 +1063,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               <Alan etiket="Gösterim sırası"><input required type="number" min="0" max="9999" step="1" value={urunForm.sira} onChange={(e) => setUrunForm({ ...urunForm, sira: e.target.value })} /><small>Küçük sayı önce görünür. Örn. 10, 20, 30.</small></Alan>
             </Ikili>
 
-            <FormBolumu ikon="stock" baslik="Satış ve görünürlük" aciklama="Vitrin görünürlüğünü ve paketli ürün stok takibini yönetin." />
+            <FormBolumu id="urun-satis" ikon="stock" baslik="Satış ve görünürlük" aciklama="Vitrin görünürlüğünü ve paketli ürün stok takibini yönetin." />
             <section className={`urun-vitrin-kart ${urunForm.populer ? "aktif" : ""}`}>
               <header>
                 <div><b>Popüler ürün vitrini</b><small>Açıksa müşteri ana sayfasında bu kategorinin popüler ürünleri arasında gösterilir.</small></div>
@@ -1066,7 +1079,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               {urunForm.stokTakibi && <Alan etiket="Mevcut stok (adet)"><input required type="number" min="0" max="1000000" step="1" value={urunForm.stokAdedi} onChange={(e) => setUrunForm({ ...urunForm, stokAdedi: e.target.value })} /></Alan>}
             </section>
 
-            <FormBolumu ikon="products" baslik="Ürün seçenekleri" aciklama="Müşterinin seçebileceği ekstra malzemeleri ve ürün önerilerini belirleyin." />
+            <FormBolumu id="urun-secenek" ikon="products" baslik="Ürün seçenekleri" aciklama="Müşterinin seçebileceği ekstra malzemeleri ve ürün önerilerini belirleyin." />
             <section className={`ekstra-malzeme-editoru ${urunForm.ekstraMalzemeAyari?.aktif ? "aktif" : ""}`}>
               <header>
                 <div><b>Ekstra malzeme seçenekleri</b><small>Bu ürün için müşterinin ücretli veya ücretsiz ek malzeme seçmesini açıp kapat.</small></div>
@@ -1108,7 +1121,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               {!onerilebilecekUrunler.length && <p>Öneri eklemek için önce başka bir aktif ürün oluşturmalısın.</p>}
             </section>
 
-            <FormBolumu ikon="percent" baslik="Porsiyon ve fiyatlandırma" aciklama="Gramaj, boyut veya menü içeriğine göre fiyat davranışını ayarlayın." />
+            <FormBolumu id="urun-fiyat" ikon="percent" baslik="Porsiyon ve fiyatlandırma" aciklama="Gramaj, boyut veya menü içeriğine göre fiyat davranışını ayarlayın." />
             {urunForm.urunTipi === "burger" && <section className={`gramaj-kural-kart ${urunForm.gramajOpsiyonu?.goster ? "aktif" : ""}`}>
               <header>
                 <div><b>Miktar / gramaj bilgisini göster</b><small>Kapalıysa müşteri ürünün gramajını veya miktarını hiçbir yerde görmez.</small></div>
@@ -1172,7 +1185,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               </section>
             )}
 
-            <FormBolumu ikon="palette" baslik="Müşteriye görünen içerik" aciklama="Ürün görselini, açıklamasını, içeriğini ve alerjen bilgisini tamamlayın." />
+            <FormBolumu id="urun-icerik" ikon="palette" baslik="Müşteriye görünen içerik" aciklama="Ürün görselini, açıklamasını, içeriğini ve alerjen bilgisini tamamlayın." />
             <Alan etiket="Ürün görseli (en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/*" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : urunForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
             <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
             {urunForm.urunTipi !== "menu" ? <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
@@ -1199,8 +1212,8 @@ export default function Admin({ onCikis, temaKontrolu }) {
         <Modal baslik={kampanyaForm.id ? "Kampanyayı düzenle" : "Yeni kampanya"} aciklama="Kaydettiğiniz değişiklikler müşteri uygulamasına anında yansır." sinif="admin-modal--yonetim" kapat={() => setKampanyaForm(null)}>
           <form className="admin-form" onSubmit={kampanyaKaydet}>
             <section className="kampanya-ikon-editoru">
-              <header><div><span>{kampanyaIkonu(kampanyaForm)}</span><div><b>Kampanya ikonu</b><small>Müşteri uygulamasındaki kampanya etiketinin yanında görünür.</small></div></div><input aria-label="Özel kampanya emojisi" maxLength="16" value={kampanyaForm.ikon || ""} onChange={(e) => setKampanyaForm({ ...kampanyaForm, ikon: e.target.value })} placeholder="Emoji" /></header>
-              <div>{KAMPANYA_IKONLARI.map(([ikon, ad]) => <button type="button" key={ikon} className={kampanyaForm.ikon === ikon ? "secili" : ""} title={ad} aria-label={`${ad} ikonunu seç`} onClick={() => setKampanyaForm({ ...kampanyaForm, ikon })}><span>{ikon}</span><small>{ad}</small></button>)}</div>
+              <header><div><span><AdminIcon name={kampanyaOutlineIkonu(kampanyaForm)} /></span><div><b>Kampanya ikonu</b><small>Müşteri uygulamasındaki kampanya etiketini temsil eder.</small></div></div></header>
+              <div>{KAMPANYA_IKONLARI.map((secenek) => <button type="button" key={secenek.deger} className={kampanyaForm.ikon === secenek.deger ? "secili" : ""} title={secenek.ad} aria-label={`${secenek.ad} ikonunu seç`} onClick={() => setKampanyaForm({ ...kampanyaForm, ikon: secenek.deger })}><span><AdminIcon name={secenek.ikon} /></span><small>{secenek.ad}</small></button>)}</div>
             </section>
             <Ikili><Alan etiket="Kısa etiket"><input required maxLength="80" value={kampanyaForm.etiket} onChange={(e) => setKampanyaForm({ ...kampanyaForm, etiket: e.target.value })} placeholder="Örn. HAFTA SONU" /></Alan><Alan etiket="Kampanya başlığı"><input required maxLength="120" value={kampanyaForm.baslik} onChange={(e) => setKampanyaForm({ ...kampanyaForm, baslik: e.target.value })} /></Alan></Ikili>
             <Alan etiket="Açıklama"><textarea required maxLength="600" value={kampanyaForm.aciklama} onChange={(e) => setKampanyaForm({ ...kampanyaForm, aciklama: e.target.value })} /></Alan>
@@ -1498,4 +1511,4 @@ function IslemKatmani({ metin }) { return <div className="admin-islem-perde" rol
 function Alan({ etiket, children }) { return <label className="admin-alan"><span>{etiket}</span>{children}</label>; }
 function Ikili({ children }) { return <div className="admin-ikili">{children}</div>; }
 function FormAlt({ kapat }) { return <div className="form-alt"><button type="button" onClick={kapat}>Vazgeç</button><button className="primary" type="submit">Kaydet</button></div>; }
-function FormBolumu({ ikon, baslik, aciklama }) { return <div className="urun-form-bolum-baslik"><i><AdminIcon name={ikon} /></i><div><b>{baslik}</b><small>{aciklama}</small></div></div>; }
+function FormBolumu({ id, ikon, baslik, aciklama }) { return <div id={id} className="urun-form-bolum-baslik"><i><AdminIcon name={ikon} /></i><div><b>{baslik}</b><small>{aciklama}</small></div></div>; }
