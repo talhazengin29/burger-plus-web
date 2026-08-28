@@ -253,6 +253,13 @@ export async function gorselYukle(dosya) {
   return adminIstek("/gorseller", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
 }
 
+const DESTEKLENEN_GIDER_BELGELERI = new Set(["image/png", "image/jpeg", "image/webp"]);
+export async function giderBelgesiYukle(dosya) {
+  if (!dosya || !DESTEKLENEN_GIDER_BELGELERI.has(dosya.type)) throw new Error("Fiş veya fatura PNG, JPG/JPEG ya da WebP formatında olmalıdır.");
+  if (dosya.size > 5 * 1024 * 1024) throw new Error("Gider belgesi en fazla 5 MB olabilir.");
+  return adminIstek("/gider-belgesi", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
+}
+
 export function temaKaydet(tema) {
   return adminIstek("/tema", jsonGonder("PUT", tema));
 }

@@ -10,6 +10,7 @@ import AdminIcon from "../components/AdminIcon";
 import TemaYonetimi from "./admin/TemaYonetimi";
 import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import DegerlendirmeRaporu from "./admin/DegerlendirmeRaporu";
+import FinansYonetimi from "./admin/FinansYonetimi";
 import "./Admin.css";
 import "./AdminPolish.css";
 
@@ -46,6 +47,7 @@ const BOLUMLER = [
   ["kampanyalar", "Kampanyalar", "percent", "kampanyalar"],
   ["oduller", "Puan Marketi", "star", "puan-marketi"],
   ["cuzdan", "Uygulama Cüzdanı", "wallet", "cuzdan"],
+  ["finans", "Finans ve Giderler", "receipt", "finans"],
   ["duyurular", "Duyurular", "megaphone", "duyurular"],
   ["sikayetler", "Şikayetler", "message", "sikayetler"],
   ["salon-krokisi", "Salon Krokisi", "floor", "salon-krokisi"],
@@ -61,6 +63,7 @@ const BOLUMLER = [
 ];
 
 const MENU_GRUPLARI = [
+  { id: "finans", ad: "Finans", ikon: "receipt", aciklama: "Gider, kasa ve tedarikçi", bolumler: ["finans"] },
   { id: "uygulama", ad: "Uygulama", ikon: "products", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
   { id: "operasyon", ad: "Operasyon", ikon: "activity", aciklama: "Anlık işletme yönetimi", bolumler: ["salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "receipt", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
@@ -710,6 +713,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
             {bolum === "tema" && <TemaYonetimi onKayitDurumu={setIslemDurumu} />}
             {bolum === "salon-krokisi" && <SalonKrokisiYonetimi onKayitDurumu={setIslemDurumu} />}
             {bolum === "degerlendirmeler" && <DegerlendirmeRaporu />}
+            {bolum === "finans" && <FinansYonetimi />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
