@@ -166,7 +166,7 @@ export default function ReceteStokYonetimi({ onUrunlerYenile }) {
     {hareketForm && <Modal baslik={`${hareketForm.hammadde.ad} · stok işlemi`} aciklama={`Kullanılabilir stok: ${miktar(hareketForm.hammadde.stokMiktari)} ${hareketForm.hammadde.birim}`} onKapat={() => setHareketForm(null)}>
       <form className="recete-form" onSubmit={hareketKaydet}>
         <label className="genis">İşlem<select value={hareketForm.tur} onChange={(e) => setHareketForm({ ...hareketForm, tur: e.target.value })}><option value="giris">Mal alımı / stok girişi</option><option value="fire">Fire / zayi çıkışı</option><option value="sayim">Sayım sonucu kesin stok</option></select></label>
-        <label>{hareketForm.tur === "sayim" ? "Yeni kesin stok" : "Miktar"}<input required type="number" min={hareketForm.tur === "sayim" ? "0" : "0.0001"} step="0.001" value={hareketForm.miktar} onChange={(e) => setHareketForm({ ...hareketForm, miktar: e.target.value })} /><small>{hareketForm.hammadde.birim}</small></label>
+        <label>{hareketForm.tur === "sayim" ? "Yeni kesin stok" : "Miktar"}<input required type="number" min={hareketForm.tur === "sayim" ? "0" : "0.0001"} step="0.0001" value={hareketForm.miktar} onChange={(e) => setHareketForm({ ...hareketForm, miktar: e.target.value })} /><small>{hareketForm.hammadde.birim}</small></label>
         {hareketForm.tur === "giris" && <label>Toplam alış tutarı<input required type="number" min="0" step="0.01" value={hareketForm.toplamMaliyet} onChange={(e) => setHareketForm({ ...hareketForm, toplamMaliyet: e.target.value })} /><small>Ağırlıklı birim maliyet otomatik hesaplanır.</small></label>}
         <label className="genis">Açıklama<input maxLength="500" value={hareketForm.aciklama} onChange={(e) => setHareketForm({ ...hareketForm, aciklama: e.target.value })} placeholder="Fatura, tedarikçi veya sayım notu" /></label>
         <footer><button type="button" onClick={() => setHareketForm(null)}>Vazgeç</button><button className="primary" disabled={kaydediliyor}>Stoğu güncelle</button></footer>
@@ -180,7 +180,7 @@ export default function ReceteStokYonetimi({ onUrunlerYenile }) {
         <div className="recete-satir-baslik"><span>Hammadde</span><span>Net miktar</span><span>Fire %</span><i /></div>
         {receteForm.satirlar.map((s, index) => <div className="recete-satir" key={index}>
           <select required value={s.hammaddeId} onChange={(e) => receteSatiriGuncelle(index, "hammaddeId", e.target.value)}><option value="">Hammadde seç</option>{veri.hammaddeler.filter((h) => h.aktif).map((h) => <option key={h.id} value={h.id}>{h.ad} ({h.birim})</option>)}</select>
-          <input required type="number" min="0.0001" step="0.001" value={s.miktar} onChange={(e) => receteSatiriGuncelle(index, "miktar", e.target.value)} />
+          <input required type="number" min="0.0001" step="0.0001" value={s.miktar} onChange={(e) => receteSatiriGuncelle(index, "miktar", e.target.value)} />
           <input required type="number" min="0" max="100" step="0.1" value={s.fireOrani} onChange={(e) => receteSatiriGuncelle(index, "fireOrani", e.target.value)} />
           <button type="button" onClick={() => receteSatiriSil(index)} aria-label="Satırı sil">×</button>
         </div>)}
