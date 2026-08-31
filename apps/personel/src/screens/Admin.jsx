@@ -11,6 +11,7 @@ import TemaYonetimi from "./admin/TemaYonetimi";
 import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import DegerlendirmeRaporu from "./admin/DegerlendirmeRaporu";
 import FinansYonetimi from "./admin/FinansYonetimi";
+import ReceteStokYonetimi from "./admin/ReceteStokYonetimi";
 import "./Admin.css";
 import "./AdminPolish.css";
 
@@ -744,7 +745,9 @@ export default function Admin({ onCikis, temaKontrolu }) {
             </>}
 
             {bolum === "stok" && <>
-              <BolumBaslik baslik="Paketli ürün stok takibi" aciklama="Adetle sayılan hazır ürünleri tek ekrandan izleyin ve güncelleyin." />
+              <BolumBaslik baslik="Stok ve reçete yönetimi" aciklama="Hammaddeleri, ürün reçetelerini, gerçek maliyeti ve paketli ürün stoklarını birlikte yönetin." />
+              <ReceteStokYonetimi />
+              <div className="paketli-stok-ayirici"><span>PAKETLİ ÜRÜNLER</span><p>Kutu içecek gibi doğrudan adetle satılan hazır ürünler</p></div>
               <section className="stok-ozet-grid">
                 <article><span>Takip edilen</span><strong>{urunler.filter((urun) => urun.stokTakibi).length}</strong><small>paketli ürün</small></article>
                 <article className="uyari"><span>Kritik stok</span><strong>{urunler.filter((urun) => urun.stokTakibi && urun.stokAdedi > 0 && urun.stokAdedi <= 5).length}</strong><small>5 adet veya altı</small></article>
