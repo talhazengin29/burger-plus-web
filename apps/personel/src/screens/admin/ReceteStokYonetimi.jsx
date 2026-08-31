@@ -125,7 +125,7 @@ export default function ReceteStokYonetimi({ onUrunlerYenile }) {
         <div className="hammadde-listesi">
           {veri.hammaddeler.map((h) => <article key={h.id} className={`${h.kritik ? "kritik" : ""} ${!h.aktif ? "pasif" : ""}`}>
             <div><b>{h.ad}</b><small>{para(h.birimMaliyet)} / {h.birim} · min. {miktar(h.minimumStok)} {h.birim}</small><small className={`hammadde-gorunurluk ${h.musteriyeGoster ? "gorunur" : "gizli"}`}>{h.musteriyeGoster ? `Müşteride: ${h.musteriAdi || h.ad}` : "Müşteriye gizli"}</small></div>
-            <span><strong>{miktar(h.stokMiktari)}</strong><small>{h.birim} kullanılabilir{h.rezerveMiktar > 0 ? ` · ${miktar(h.rezerveMiktar)} rezerve` : ""}</small></span>
+            <span><strong>{miktar(h.fizikselStok)}</strong><small>{h.birim} fiziksel · {miktar(h.stokMiktari)} kullanılabilir{h.rezerveMiktar > 0 ? ` · ${miktar(h.rezerveMiktar)} rezerve` : ""}</small></span>
             <em>{para(h.stokDegeri)}</em>
             <div className="hammadde-islemler"><button type="button" onClick={() => setHareketForm({ hammadde: h, tur: "giris", miktar: "", toplamMaliyet: "", aciklama: "" })}>Stok işlemi</button><button type="button" onClick={() => setHammaddeForm({ ...h })}>Düzenle</button></div>
           </article>)}
@@ -163,7 +163,7 @@ export default function ReceteStokYonetimi({ onUrunlerYenile }) {
       </form>
     </Modal>}
 
-    {hareketForm && <Modal baslik={`${hareketForm.hammadde.ad} · stok işlemi`} aciklama={`Kullanılabilir stok: ${miktar(hareketForm.hammadde.stokMiktari)} ${hareketForm.hammadde.birim}`} onKapat={() => setHareketForm(null)}>
+    {hareketForm && <Modal baslik={`${hareketForm.hammadde.ad} · stok işlemi`} aciklama={`Fiziksel: ${miktar(hareketForm.hammadde.fizikselStok)} ${hareketForm.hammadde.birim} · Kullanılabilir: ${miktar(hareketForm.hammadde.stokMiktari)} · Rezerve: ${miktar(hareketForm.hammadde.rezerveMiktar)}`} onKapat={() => setHareketForm(null)}>
       <form className="recete-form" onSubmit={hareketKaydet}>
         <label className="genis">İşlem<select value={hareketForm.tur} onChange={(e) => setHareketForm({ ...hareketForm, tur: e.target.value })}><option value="giris">Mal alımı / stok girişi</option><option value="fire">Fire / zayi çıkışı</option><option value="sayim">Sayım sonucu kesin stok</option></select></label>
         <label>{hareketForm.tur === "sayim" ? "Yeni kesin stok" : "Miktar"}<input required type="number" min={hareketForm.tur === "sayim" ? "0" : "0.0001"} step="0.0001" value={hareketForm.miktar} onChange={(e) => setHareketForm({ ...hareketForm, miktar: e.target.value })} /><small>{hareketForm.hammadde.birim}</small></label>
