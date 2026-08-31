@@ -5,7 +5,7 @@ import "./ReceteStokYonetimi.css";
 
 const para = (deger) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(Number(deger || 0));
 const miktar = (deger) => new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 3 }).format(Number(deger || 0));
-const BOS_HAMMADDE = { ad: "", birim: "gr", minimumStok: 0, aktif: true };
+const BOS_HAMMADDE = { ad: "", birim: "gr", minimumStok: 0, musteriyeGoster: false, musteriAdi: "", aktif: true };
 
 function Modal({ baslik, aciklama, onKapat, children }) {
   return <div className="recete-modal-perde" onMouseDown={(e) => e.target === e.currentTarget && onKapat()}>
@@ -16,7 +16,7 @@ function Modal({ baslik, aciklama, onKapat, children }) {
   </div>;
 }
 
-export default function ReceteStokYonetimi() {
+export default function ReceteStokYonetimi({ onUrunlerYenile }) {
   const [veri, setVeri] = useState({ hammaddeler: [], receteler: [], hareketler: [] });
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
@@ -56,7 +56,13 @@ export default function ReceteStokYonetimi() {
 
   const islem = async (fonksiyon, mesaj, kapat) => {
     setKaydediliyor(true); setHata(""); setBildirim("");
-    try { await fonksiyon(); kapat?.(); await yenile({ sessiz: true }); setBildirim(mesaj); }
+    try {
+      await fonksiyon();
+      kapat?.();
+      await yenile({ sessiz: true });
+      await onUrunlerYenile?.();
+      setBildirim(mesaj);
+    }
     catch (e) { setHata(e.message); }
     finally { setKaydediliyor(false); }
   };
@@ -77,6 +83,7 @@ export default function ReceteStokYonetimi() {
   const receteAc = (recete) => setReceteForm({
     urunId: recete.urunId,
     urunAdi: recete.urunAdi,
+    malzemeleriOtomatikGuncelle: recete.malzemeleriOtomatikGuncelle !== false,
     satirlar: recete.satirlar.map((s) => ({ hammaddeId: String(s.hammaddeId), miktar: s.miktar, fireOrani: s.fireOrani })),
   });
   const receteSatiriEkle = () => setReceteForm((f) => ({ ...f, satirlar: [...f.satirlar, { hammaddeId: "", miktar: "", fireOrani: 0 }] }));
@@ -85,7 +92,10 @@ export default function ReceteStokYonetimi() {
   const receteKaydet = (e) => {
     e.preventDefault();
     const satirlar = receteForm.satirlar.map((s) => ({ hammaddeId: Number(s.hammaddeId), miktar: Number(s.miktar), fireOrani: Number(s.fireOrani || 0) }));
-    islem(() => adminIstek(`/urunler/${receteForm.urunId}/recete`, jsonGonder("PUT", { satirlar })), "Ürün reçetesi ve maliyeti güncellendi.", () => setReceteForm(null));
+    islem(() => adminIstek(`/urunler/${receteForm.urunId}/recete`, jsonGonder("PUT", {
+      satirlar,
+      malzemeleriOtomatikGuncelle: receteForm.malzemeleriOtomatikGuncelle,
+    })), "Ürün reçetesi, maliyeti ve müşteri içeriği güncellendi.", () => setReceteForm(null));
   };
 
   const formMaliyeti = useMemo(() => (receteForm?.satirlar || []).reduce((toplam, s) => {
@@ -114,7 +124,7 @@ export default function ReceteStokYonetimi() {
         <header><div><span>DEPO</span><h3>Hammaddeler</h3></div><small>Stok / maliyet / alarm</small></header>
         <div className="hammadde-listesi">
           {veri.hammaddeler.map((h) => <article key={h.id} className={`${h.kritik ? "kritik" : ""} ${!h.aktif ? "pasif" : ""}`}>
-            <div><b>{h.ad}</b><small>{para(h.birimMaliyet)} / {h.birim} · min. {miktar(h.minimumStok)} {h.birim}</small></div>
+            <div><b>{h.ad}</b><small>{para(h.birimMaliyet)} / {h.birim} · min. {miktar(h.minimumStok)} {h.birim}</small><small className={`hammadde-gorunurluk ${h.musteriyeGoster ? "gorunur" : "gizli"}`}>{h.musteriyeGoster ? `Müşteride: ${h.musteriAdi || h.ad}` : "Müşteriye gizli"}</small></div>
             <span><strong>{miktar(h.stokMiktari)}</strong><small>{h.birim} kullanılabilir{h.rezerveMiktar > 0 ? ` · ${miktar(h.rezerveMiktar)} rezerve` : ""}</small></span>
             <em>{para(h.stokDegeri)}</em>
             <div className="hammadde-islemler"><button type="button" onClick={() => setHareketForm({ hammadde: h, tur: "giris", miktar: "", toplamMaliyet: "", aciklama: "" })}>Stok işlemi</button><button type="button" onClick={() => setHammaddeForm({ ...h })}>Düzenle</button></div>
@@ -146,6 +156,8 @@ export default function ReceteStokYonetimi() {
         <label className="genis">Hammadde adı<input required minLength="2" maxLength="120" value={hammaddeForm.ad} onChange={(e) => setHammaddeForm({ ...hammaddeForm, ad: e.target.value })} placeholder="Örn. Kaşar peyniri" /></label>
         <label>Temel birim<select disabled={Boolean(hammaddeForm.id)} value={hammaddeForm.birim} onChange={(e) => setHammaddeForm({ ...hammaddeForm, birim: e.target.value })}><option value="gr">Gram (gr)</option><option value="ml">Mililitre (ml)</option><option value="adet">Adet</option></select>{hammaddeForm.id && <small>Reçete miktarlarını bozmamak için kayıt sonrasında değiştirilemez.</small>}</label>
         <label>Kritik stok eşiği<input required type="number" min="0" step="0.001" value={hammaddeForm.minimumStok} onChange={(e) => setHammaddeForm({ ...hammaddeForm, minimumStok: e.target.value })} /></label>
+        <label className="recete-onay genis"><input type="checkbox" checked={hammaddeForm.musteriyeGoster === true} onChange={(e) => setHammaddeForm({ ...hammaddeForm, musteriyeGoster: e.target.checked, musteriAdi: e.target.checked ? (hammaddeForm.musteriAdi || hammaddeForm.ad) : hammaddeForm.musteriAdi })} /><span><b>Müşteriye ürün içeriğinde göster</b><small>Kapalıysa yağ, ambalaj ve fire gibi iç maliyet kalemleri uygulamada görünmez.</small></span></label>
+        {hammaddeForm.musteriyeGoster === true && <label className="genis">Müşteriye görünen ad<input required minLength="2" maxLength="120" value={hammaddeForm.musteriAdi || ""} onChange={(e) => setHammaddeForm({ ...hammaddeForm, musteriAdi: e.target.value })} placeholder={hammaddeForm.ad || "Örn. Kaşar peyniri"} /><small>Stok birimi ve reçete miktarı müşteriye gösterilmez; yalnızca bu ad kullanılır.</small></label>}
         {hammaddeForm.id && <label className="recete-onay genis"><input type="checkbox" checked={hammaddeForm.aktif} onChange={(e) => setHammaddeForm({ ...hammaddeForm, aktif: e.target.checked })} /> Aktif olarak kullan</label>}
         <footer><button type="button" onClick={() => setHammaddeForm(null)}>Vazgeç</button><button className="primary" disabled={kaydediliyor}>Kaydet</button></footer>
       </form>
@@ -164,6 +176,7 @@ export default function ReceteStokYonetimi() {
     {receteForm && <Modal baslik={`${receteForm.urunAdi} reçetesi`} aciklama="Bir adet ürün satıldığında tüketilecek net miktarı ve fire payını yazın." onKapat={() => setReceteForm(null)}>
       <form className="recete-form recete-editor" onSubmit={receteKaydet}>
         <div className="recete-editor-ozet"><span>Güncel reçete maliyeti</span><strong>{para(formMaliyeti)}</strong><small>Alış fiyatları değiştiğinde otomatik güncellenir.</small></div>
+        <label className="recete-onay recete-musteri-senkron genis"><input type="checkbox" checked={receteForm.malzemeleriOtomatikGuncelle === true} onChange={(e) => setReceteForm({ ...receteForm, malzemeleriOtomatikGuncelle: e.target.checked })} /><span><b>Müşteri malzeme listesini reçeteden otomatik oluştur</b><small>Yalnızca “müşteriye göster” olarak işaretlenen hammaddeler ürün detayına aktarılır.</small></span></label>
         <div className="recete-satir-baslik"><span>Hammadde</span><span>Net miktar</span><span>Fire %</span><i /></div>
         {receteForm.satirlar.map((s, index) => <div className="recete-satir" key={index}>
           <select required value={s.hammaddeId} onChange={(e) => receteSatiriGuncelle(index, "hammaddeId", e.target.value)}><option value="">Hammadde seç</option>{veri.hammaddeler.filter((h) => h.aktif).map((h) => <option key={h.id} value={h.id}>{h.ad} ({h.birim})</option>)}</select>

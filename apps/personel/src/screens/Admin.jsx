@@ -23,7 +23,7 @@ const BOS_BOYUTLAR = (birim = "gr") => [
 ];
 const BOS_MENU = { burgerUrunId: "", yanLezzetUrunId: "", icecekUrunId: "", varsayilanYanBoyut: "", varsayilanIcecekBoyut: "" };
 const BOS_EKSTRA = { aktif: false, baslik: "Ekstra malzeme seç", minSecim: 0, maxSecim: 1, secenekler: [] };
-const BOS_URUN = { ad: "", fiyat: "", sira: 100, kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], ekstraMalzemeAyari: BOS_EKSTRA, menuYapisi: BOS_MENU };
+const BOS_URUN = { ad: "", fiyat: "", sira: 100, kategori: "Burgerler", urunTipi: "burger", temelMiktar: "", gorsel: "", aciklama: "", malzemeler: "", malzemelerReceteden: false, alerjenler: "", aktif: true, populer: false, stokTakibi: false, stokAdedi: 0, onerilenUrunler: [], gramajOpsiyonu: BOS_GRAMAJ, boyutSecenekleri: [], ekstraMalzemeAyari: BOS_EKSTRA, menuYapisi: BOS_MENU };
 const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
@@ -126,6 +126,7 @@ const urunuFormaCevir = (urun) => ({
   ...urun,
   populer: urun.populer === true,
   stokTakibi: urun.stokTakibi === true,
+  malzemelerReceteden: urun.malzemelerReceteden === true,
   stokAdedi: Number(urun.stokAdedi || 0),
   sira: Number(urun.sira ?? 100),
   onerilenUrunler: (urun.onerilenUrunler || []).map(Number).filter(Number.isInteger),
@@ -382,6 +383,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
       stokTakibi: urunForm.stokTakibi === true,
       stokAdedi: urunForm.stokTakibi ? Number(urunForm.stokAdedi) : 0,
       onerilenUrunler: [...new Set((urunForm.onerilenUrunler || []).map(Number).filter(Number.isInteger))].slice(0, 5),
+      malzemelerReceteden: urunForm.malzemelerReceteden === true,
       malzemeler: urunForm.malzemeler.split(",").map((x) => x.trim()).filter(Boolean),
       alerjenler: urunForm.alerjenler.split(",").map((x) => x.trim()).filter(Boolean),
     };
@@ -746,7 +748,10 @@ export default function Admin({ onCikis, temaKontrolu }) {
 
             {bolum === "stok" && <>
               <BolumBaslik baslik="Stok ve reçete yönetimi" aciklama="Hammaddeleri, ürün reçetelerini, gerçek maliyeti ve paketli ürün stoklarını birlikte yönetin." />
-              <ReceteStokYonetimi />
+              <ReceteStokYonetimi onUrunlerYenile={async () => {
+                const sonuc = await adminIstek("/urunler");
+                setUrunler(sonuc.urunler || []);
+              }} />
               <div className="paketli-stok-ayirici"><span>PAKETLİ ÜRÜNLER</span><p>Kutu içecek gibi doğrudan adetle satılan hazır ürünler</p></div>
               <section className="stok-ozet-grid">
                 <article><span>Takip edilen</span><strong>{urunler.filter((urun) => urun.stokTakibi).length}</strong><small>paketli ürün</small></article>
@@ -1195,7 +1200,10 @@ export default function Admin({ onCikis, temaKontrolu }) {
             <FormBolumu id="urun-icerik" ikon="palette" baslik="Müşteriye görünen içerik" aciklama="Ürün görselini, açıklamasını, içeriğini ve alerjen bilgisini tamamlayın." />
             <Alan etiket="Ürün görseli (en fazla 5 MB)"><label className={`gorsel-yukleme ${gorselYukleniyor ? "yukleniyor" : ""}`}><input required={!urunForm.gorsel} type="file" accept="image/*" onChange={(e) => urunGorseliSec(e.target.files?.[0])} /><span>{gorselYukleniyor ? "Görsel yükleniyor…" : urunForm.gorsel ? "Görseli değiştir" : "Bilgisayardan görsel seç"}</span><small>{urunForm.gorsel ? "Görsel güvenli depolamaya yüklendi." : "PNG, JPG, WebP, GIF, AVIF ve BMP desteklenir."}</small></label></Alan>
             <Alan etiket="Açıklama"><textarea value={urunForm.aciklama || ""} onChange={(e) => setUrunForm({ ...urunForm, aciklama: e.target.value })} /></Alan>
-            {urunForm.urunTipi !== "menu" ? <Alan etiket="Malzemeler (virgülle)"><input value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} /></Alan> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
+            {urunForm.urunTipi !== "menu" ? <>
+              <label className="urun-recete-senkronu"><input type="checkbox" checked={urunForm.malzemelerReceteden === true} onChange={(e) => setUrunForm({ ...urunForm, malzemelerReceteden: e.target.checked })} /><span><b>Malzemeleri reçeteden otomatik oluştur</b><small>Stok ve reçete ekranında müşteriye açık hammaddeler değiştikçe bu liste kendiliğinden güncellenir.</small></span></label>
+              <Alan etiket={urunForm.malzemelerReceteden ? "Malzemeler (reçeteden otomatik)" : "Malzemeler (virgülle)"}><input disabled={urunForm.malzemelerReceteden === true} value={urunForm.malzemeler || ""} onChange={(e) => setUrunForm({ ...urunForm, malzemeler: e.target.value })} placeholder={urunForm.malzemelerReceteden ? "Reçete kaydedilince otomatik oluşur" : "Örn. Kaşar peyniri, domates"} /></Alan>
+            </> : <p className="menu-malzeme-notu">Menü malzemeleri seçilen burgerden otomatik alınır.</p>}
             <Alan etiket="Alerjenler (virgülle)"><input value={urunForm.alerjenler || ""} onChange={(e) => setUrunForm({ ...urunForm, alerjenler: e.target.value })} /></Alan>
             <FormAlt kapat={() => setUrunForm(null)} />
           </form>
