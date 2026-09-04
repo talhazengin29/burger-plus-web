@@ -182,7 +182,7 @@ function ilerlemeCubugu() {
   const cubuk = document.createElement("div");
   cubuk.setAttribute("aria-hidden", "true");
   cubuk.style.cssText =
-    "position:fixed;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#0b91d3,#08b85f,#ff6b00);transform-origin:left;transform:scaleX(0);z-index:70;pointer-events:none;will-change:transform;";
+    "position:fixed;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#0b91d3,#08b85f);transform-origin:left;transform:scaleX(0);z-index:70;pointer-events:none;will-change:transform;";
   document.body.prepend(cubuk);
   scroll((ilerleme) => {
     cubuk.style.transform = `scaleX(${ilerleme})`;

@@ -22,11 +22,6 @@ export default {
           lacivert: "var(--marka-lacivert)",
           mavi: "var(--marka-mavi)",
           yesil: "var(--marka-yesil)",
-          turuncu: {
-            400: "var(--marka-turuncu-400)",
-            500: "var(--marka-turuncu-500)",
-            600: "var(--marka-turuncu-600)",
-          },
           gri: {
             300: "var(--marka-gri-300)",
             400: "var(--marka-gri-400)",

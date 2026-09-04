@@ -162,7 +162,7 @@ const YIL = new Date().getFullYear();
 export const ICERIK = {
   // --- Marka ---------------------------------------------------------------
   markaAdi: "Menüle",
-  markaAdiHtml: 'Menü<span class="marka-le-vurgu">l</span>e',
+  markaAdiHtml: 'Menü<span class="marka-catal" aria-hidden="true"><svg viewBox="0 0 12 30" fill="none"><path d="M1 1v8a5 5 0 0 0 10 0V1M6 1v28"/></svg></span><span class="sr-only">l</span>e',
   markaAciklamasi: "Menüden siparişe, stoktan sadakate restoranınızın işletim sistemi.",
   telifSatiri: `© ${YIL} Menüle. Tüm hakları saklıdır.`,
 
@@ -175,10 +175,10 @@ export const ICERIK = {
 
   // --- Hero ----------------------------------------------------------------
   heroRozet: "Restoranınızın tüm akışı tek platformda",
-  heroBaslikBir: "RESTORANINIZI",
-  heroVurguBir: "MENÜLE",
-  heroBaslikIki: "OPERASYONU",
-  heroVurguIki: "KOLAYLAŞTIRIN",
+  heroBaslikBir: "MASANIZ",
+  heroVurguBir: "DİJİTAL",
+  heroBaslikIki: "MUTFAĞINIZ",
+  heroVurguIki: "CANLI",
   heroAciklama:
     "QR menüden canlı siparişe, reçete maliyetinden sadakat programına kadar işletmenizin tamamını tek merkezden yönetin.",
   heroBirincilButon: "Paketleri İncele",
@@ -596,7 +596,7 @@ function fiyatBlokHtml(paket) {
   if (paket.fiyatAylik == null) {
     return `
         <p class="mb-8">
-          <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot || "")}</span>
+          <span class="font-baslik text-3xl font-bold text-marka-mavi">${kacis(paket.fiyat)}</span><span class="text-marka-gri-400">${kacis(paket.periyot || "")}</span>
         </p>`;
   }
 
@@ -608,14 +608,14 @@ function fiyatBlokHtml(paket) {
   return `
         <p class="mb-1">
           <span class="fiyat-aylik-blok">
-            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(aylik)}</span><span class="text-marka-gri-400">/ay</span>
+            <span class="font-baslik text-3xl font-bold text-marka-mavi">${paraFormatla(aylik)}</span><span class="text-marka-gri-400">/ay</span>
           </span>
           <span class="fiyat-yillik-blok hidden">
-            <span class="font-baslik text-3xl font-bold text-marka-turuncu-500">${paraFormatla(yillikAylikEsdeger)}</span><span class="text-marka-gri-400">/ay</span>
+            <span class="font-baslik text-3xl font-bold text-marka-mavi">${paraFormatla(yillikAylikEsdeger)}</span><span class="text-marka-gri-400">/ay</span>
           </span>
         </p>
         <p class="fiyat-aylik-blok mb-8 text-xs text-marka-gri-500">Yıllık ödemede ${YILLIK_BEDAVA_AY} ay hediye</p>
-        <p class="fiyat-yillik-blok hidden mb-8 text-xs font-semibold text-marka-turuncu-400">${paraFormatla(yillikToplam)}/yıl toplam · ${paraFormatla(tasarruf)} tasarruf</p>`;
+        <p class="fiyat-yillik-blok hidden mb-8 text-xs font-semibold text-marka-yesil">${paraFormatla(yillikToplam)}/yıl toplam · ${paraFormatla(tasarruf)} tasarruf</p>`;
 }
 
 export function paketKartlariHtml() {
@@ -627,7 +627,7 @@ export function paketKartlariHtml() {
         </li>`;
 
     const rozet = paket.populer
-      ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-marka-turuncu-500 px-3 py-1 text-[11px] font-bold tracking-wide text-white">${kacis(paket.rozet || "")}</span>`
+      ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-marka-yesil px-3 py-1 text-[11px] font-bold tracking-wide text-white">${kacis(paket.rozet || "")}</span>`
       : "";
 
     // Tüm paket butonları talep formuna gider. data-paket, forma tıklanan
@@ -641,7 +641,7 @@ export function paketKartlariHtml() {
     return `
       <article class="paket-kart isik-kart relative flex flex-col rounded-2xl p-8 ${
         paket.populer
-          ? "nefes-hale border border-marka-turuncu-500/50 bg-marka-zemin"
+          ? "nefes-hale border border-marka-yesil/50 bg-marka-zemin"
           : "border border-marka-cizgi bg-marka-kart"
       }">
         ${rozet}
@@ -684,7 +684,7 @@ export function sorularHtml() {
     return `
       <div class="border-b border-marka-cizgi">
         <h3>
-          <button class="sss-dugme flex w-full items-center justify-between gap-4 py-5 text-left font-baslik text-base font-medium text-marka-metin transition-colors hover:text-marka-turuncu-500 md:text-lg"
+          <button class="sss-dugme flex w-full items-center justify-between gap-4 py-5 text-left font-baslik text-base font-medium text-marka-metin transition-colors hover:text-marka-mavi md:text-lg"
                   id="${dugmeId}" type="button" aria-expanded="true" aria-controls="${panelId}">
             <span>${kacis(oge.soru)}</span>
             <svg class="sss-ikon h-5 w-5 shrink-0 text-marka-gri-400 transition-transform duration-300" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -709,7 +709,7 @@ export function talepFormuHtml() {
   }
 
   const A = TALEP_FORMU.alanlar;
-  const zorunluIsareti = '<span class="text-marka-turuncu-500" aria-hidden="true">*</span>';
+  const zorunluIsareti = '<span class="text-marka-mavi" aria-hidden="true">*</span>';
 
   const alan = (ad, tanim, tur = "text", ekAttr = "") => `
         <div class="talep-alan">

@@ -19,9 +19,6 @@
     --marka-lacivert: #082f55;
     --marka-mavi: #0b91d3;
     --marka-yesil: #08b85f;
-    --marka-turuncu-400: #ff8a3d;
-    --marka-turuncu-500: #ff6b00;
-    --marka-turuncu-600: #e95f00;
     --marka-gri-300: #425b6b;
     --marka-gri-400: #6e8492;
     --marka-metin: #082f55;
@@ -33,7 +30,7 @@
     --cam-kenar: rgba(8, 47, 85, 0.1);
     --izgara-cizgi: rgba(11, 145, 211, 0.055);
     --izgara-adim: 40px;
-    --turuncu-parilti: 0 14px 34px -16px rgba(255, 107, 0, 0.72);
+    --marka-parilti: 0 14px 34px -16px rgba(11, 145, 211, 0.58);
     --ust-bar-yuksekligi: 4.5rem;
     --hale-opaklik: 0.28;
   }
@@ -47,9 +44,6 @@
     --marka-lacivert: #8dd9f5;
     --marka-mavi: #25aee8;
     --marka-yesil: #16cf72;
-    --marka-turuncu-400: #ff8a3d;
-    --marka-turuncu-500: #ff6b00;
-    --marka-turuncu-600: #e65c00;
     --marka-gri-300: #b7cad5;
     --marka-gri-400: #7e9aaa;
     --marka-metin: #f4fbff;
@@ -63,6 +57,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--ust-bar-yuksekligi) + 2rem);
     /* Kök elemana overflow-x kuralı bilinçli olarak konulmadı: yatay taşmaya
        karşı koruma zaten iki katmanda var — body'deki overflow-x-hidden ve
        dekoratif ışıkları saran overflow-hidden'lı sabit katman
@@ -76,21 +71,45 @@
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 
-  .marka-le-vurgu,
-  .chatbot-marka > span {
-    color: var(--marka-yesil);
+  .chatbot-marka {
+    color: var(--marka-metin);
   }
 
   .menule-wordmark {
     color: var(--marka-metin);
   }
 
-  .menule-logo-isaret,
   .menule-logo img {
-    border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.94);
-    padding: 0.2rem;
-    box-shadow: 0 8px 24px -14px rgba(11, 145, 211, 0.72);
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+    filter: drop-shadow(0 6px 12px rgba(11, 145, 211, 0.12));
+  }
+
+  .dark .menule-logo img {
+    content: url("/gorseller/menule-mark-dark.svg");
+  }
+
+  .marka-catal {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.84em;
+    margin-inline: 0.025em 0.01em;
+    vertical-align: -0.08em;
+  }
+
+  .marka-catal svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .marka-catal path {
+    stroke: var(--marka-yesil);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   h1,
@@ -194,7 +213,7 @@
     left: 30%;
     width: 40vw;
     height: 40vw;
-    background: radial-gradient(circle, rgba(255, 107, 0, 0.09) 0%, rgba(255, 107, 0, 0) 70%);
+    background: radial-gradient(circle, rgba(8, 184, 95, 0.1) 0%, rgba(8, 184, 95, 0) 70%);
   }
   .hale--alt {
     bottom: -10%;
@@ -231,15 +250,15 @@
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(90deg, var(--marka-mavi), var(--marka-yesil), var(--marka-turuncu-500));
+    background-image: linear-gradient(90deg, var(--marka-mavi), var(--marka-yesil), var(--marka-mavi));
     background-size: 200% auto;
     animation: marka-akis 4s linear infinite;
   }
 
-  /* Turuncu gradyanlı birincil buton. */
+  /* Menüle mavi-yeşil gradyanlı birincil buton. */
   .marka-buton {
-    background-image: linear-gradient(110deg, var(--marka-turuncu-500), var(--marka-turuncu-400));
-    box-shadow: var(--turuncu-parilti);
+    background-image: linear-gradient(110deg, var(--marka-mavi), var(--marka-yesil));
+    box-shadow: var(--marka-parilti);
     color: #ffffff;
     transition:
       background-image 0.3s ease,
@@ -248,12 +267,7 @@
       box-shadow 0.3s ease;
   }
   .marka-buton:hover {
-    background-image: linear-gradient(to right, var(--marka-turuncu-500), var(--marka-turuncu-600));
-  }
-
-  /* Sadece parıltı gerektiğinde. */
-  .parlak-turuncu {
-    box-shadow: var(--turuncu-parilti);
+    background-image: linear-gradient(to right, color-mix(in srgb, var(--marka-mavi) 86%, #001d35), color-mix(in srgb, var(--marka-yesil) 86%, #003722));
   }
 
   /* --- Fiyatlandırma: aylık/yıllık anahtarı. ------------------------------ */
@@ -272,7 +286,7 @@
   .fiyat-anahtar-dugme--aktif {
     background-image: linear-gradient(to right, var(--marka-mavi), var(--marka-yesil));
     color: #ffffff;
-    box-shadow: var(--turuncu-parilti);
+    box-shadow: var(--marka-parilti);
   }
   .fiyat-anahtar-rozet {
     margin-left: 0.45rem;
@@ -284,8 +298,8 @@
     color: inherit;
   }
   .fiyat-anahtar-dugme:not(.fiyat-anahtar-dugme--aktif) .fiyat-anahtar-rozet {
-    background: rgba(255, 107, 0, 0.15);
-    color: var(--marka-turuncu-400);
+    background: color-mix(in srgb, var(--marka-yesil) 15%, transparent);
+    color: var(--marka-yesil);
   }
 }
 
@@ -630,8 +644,8 @@
 
   .talep-girdi:focus {
     outline: none;
-    border-color: var(--marka-turuncu-500);
-    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.18);
+    border-color: var(--marka-mavi);
+    box-shadow: 0 0 0 3px rgba(11, 145, 211, 0.16);
   }
 
   .talep-girdi--metin {
@@ -671,18 +685,18 @@
     height: 1rem;
     border-radius: 0.25rem;
     border: 1px solid var(--marka-cizgi);
-    accent-color: var(--marka-turuncu-500);
+    accent-color: var(--marka-mavi);
     cursor: pointer;
   }
 
   .talep-yasal-baglanti {
-    color: var(--marka-turuncu-500);
+    color: var(--marka-mavi);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
   .talep-yasal-baglanti:hover {
-    color: var(--marka-turuncu-400);
+    color: var(--marka-yesil);
   }
 
   .talep-gonder {
@@ -707,7 +721,7 @@
   }
 
   .talep-yedek-baglanti {
-    color: var(--marka-turuncu-500);
+    color: var(--marka-mavi);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -760,7 +774,7 @@
   }
 
   .yasal-govde a {
-    color: var(--marka-turuncu-500);
+    color: var(--marka-mavi);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -805,16 +819,16 @@
   /* Doldurulmamış künye alanları: [KÖŞELİ] yer tutucular göze çarpsın ki
      yayına eksik bilgiyle çıkılmasın. */
   .yasal-yer-tutucu {
-    background: rgba(255, 107, 0, 0.14);
-    color: var(--marka-turuncu-500);
+    background: rgba(11, 145, 211, 0.14);
+    color: var(--marka-mavi);
     border-radius: 0.25rem;
     padding: 0.05em 0.35em;
     font-weight: 600;
   }
 
   .yasal-uyari {
-    border: 1px solid var(--marka-turuncu-500);
-    background: rgba(255, 107, 0, 0.08);
+    border: 1px solid var(--marka-mavi);
+    background: rgba(11, 145, 211, 0.08);
     border-radius: 0.75rem;
     padding: 1rem 1.15rem;
     margin-bottom: 2rem;
@@ -899,10 +913,10 @@
 @keyframes marka-nefes {
   0%,
   100% {
-    box-shadow: 0 0 24px -6px rgba(255, 107, 0, 0.28);
+    box-shadow: 0 0 24px -6px rgba(11, 145, 211, 0.24);
   }
   50% {
-    box-shadow: 0 0 46px -4px rgba(255, 107, 0, 0.5);
+    box-shadow: 0 0 46px -4px rgba(8, 184, 95, 0.34);
   }
 }
 
