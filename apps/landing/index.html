@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta name="theme-color" content="#0f1015"/>
+<meta name="theme-color" content="#041521"/>
+<link rel="icon" type="image/svg+xml" href="/gorseller/menule-mark.svg"/>
 
 <!-- Tema tercihini CSS/boya işleminden ÖNCE uygula — aksi halde bir anlık
      yanlış tema (FOUC) görülür. Varsayılan koyu (mevcut davranış). -->
 <script>
   (function () {
     try {
-      var kayitli = localStorage.getItem("bp-landing-tema");
+      var kayitli = localStorage.getItem("menule-landing-tema");
       var koyu = kayitli ? kayitli === "dark" : true;
       document.documentElement.classList.toggle("dark", koyu);
     } catch (e) {

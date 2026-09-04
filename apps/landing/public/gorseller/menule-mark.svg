@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Menüle</title>
+  <desc id="desc">Menü, QR ve servis akışını birleştiren Menüle marka işareti</desc>
+  <defs>
+    <linearGradient id="page" x1="8" y1="8" x2="50" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#082F55"/>
+      <stop offset="1" stop-color="#075C8D"/>
+    </linearGradient>
+    <linearGradient id="service" x1="42" y1="18" x2="52" y2="57" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08C46B"/>
+      <stop offset="1" stop-color="#00A851"/>
+    </linearGradient>
+  </defs>
+  <path d="M13 7.5h28l9 9v31A9.5 9.5 0 0 1 40.5 57h-27A9.5 9.5 0 0 1 4 47.5V17A9.5 9.5 0 0 1 13.5 7.5Z" fill="none" stroke="url(#page)" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M41 7.5v9h9" fill="#0B91D3" stroke="#0B91D3" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M15 20h17M15 27h17" stroke="#082F55" stroke-width="4" stroke-linecap="round"/>
+  <path d="M15 36h8v8h-8zM29 36h7v7h-7zM15 49h7v6M29 49h7v6h-7" fill="none" stroke="#0B91D3" stroke-width="3"/>
+  <path d="M46 24v9M51 24v9M56 24v9M46 33c0 5 2.2 7.5 5 7.5s5-2.5 5-7.5M51 40.5V57" fill="none" stroke="url(#service)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="24.5" cy="51.5" r="1.8" fill="#FF6B00"/>
+</svg>

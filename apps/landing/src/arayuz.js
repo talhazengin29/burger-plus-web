@@ -131,7 +131,7 @@ function sssAkordiyonu() {
 }
 
 /* --------------------------------------------------------- Tema anahtarı (koyu/aydınlık) */
-const TEMA_ANAHTARI = "bp-landing-tema";
+const TEMA_ANAHTARI = "menule-landing-tema";
 
 function temaAnahtari() {
   const dugme = document.getElementById("tema-anahtari-dugmesi");
@@ -146,7 +146,7 @@ function temaAnahtari() {
     ayIkon?.classList.toggle("hidden", !koyu);
     gunesIkon?.classList.toggle("hidden", koyu);
     dugme.setAttribute("aria-label", koyu ? "Aydınlık temaya geç" : "Koyu temaya geç");
-    if (metaRenk) metaRenk.setAttribute("content", koyu ? "#0f1015" : "#f7f7f8");
+    if (metaRenk) metaRenk.setAttribute("content", koyu ? "#041521" : "#f4f8fb");
   }
 
   // Sayfa index.html'deki başlangıç scriptiyle zaten doğru class'ta açılıyor;
@@ -326,7 +326,7 @@ function talepFormu() {
   function mesajiKur() {
     const oku = (ad) => String(form.elements[ad]?.value || "").trim();
     const satirlar = [
-      "Merhaba, orQRestro için kurulum talebim var.",
+      "Merhaba, Menüle için kurulum talebim var.",
       "",
       `Ad Soyad: ${oku("ad")}`,
       `İşletme: ${oku("isletme")}`,
@@ -354,7 +354,7 @@ function talepFormu() {
     const adres =
       kanal === "whatsapp"
         ? `https://wa.me/${hedef}?text=${encodeURIComponent(mesaj)}`
-        : `mailto:${hedef}?subject=${encodeURIComponent("orQRestro — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
+        : `mailto:${hedef}?subject=${encodeURIComponent("Menüle — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
 
     if (durum) {
       durum.textContent =

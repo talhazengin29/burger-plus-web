@@ -111,7 +111,7 @@ export const WHATSAPP = {
     return ILETISIM.whatsapp;
   },
   // Sohbet açıldığında mesaj kutusuna hazır gelen metin.
-  hazirMesaj: "Merhaba, orQRestro hakkında bilgi almak istiyorum.",
+  hazirMesaj: "Merhaba, Menüle hakkında bilgi almak istiyorum.",
   etiket: "WhatsApp'tan yazın",
 };
 
@@ -161,26 +161,26 @@ const YIL = new Date().getFullYear();
 
 export const ICERIK = {
   // --- Marka ---------------------------------------------------------------
-  markaAdi: "orQRestro",
-  markaAdiHtml: 'or<span class="marka-qr-vurgu">QR</span>estro',
-  markaAciklamasi: "Yeni nesil dijital restoran yönetim sistemi.",
-  telifSatiri: `© ${YIL} orQRestro. Tüm hakları saklıdır.`,
+  markaAdi: "Menüle",
+  markaAdiHtml: 'Menü<span class="marka-le-vurgu">l</span>e',
+  markaAciklamasi: "Menüden siparişe, stoktan sadakate restoranınızın işletim sistemi.",
+  telifSatiri: `© ${YIL} Menüle. Tüm hakları saklıdır.`,
 
   // --- SEO / Open Graph ----------------------------------------------------
-  sayfaBasligi: "orQRestro | QR Menü ve Restoran Yönetimi",
+  sayfaBasligi: "Menüle | Restoran Yönetim ve Sipariş Platformu",
   sayfaAciklamasi:
     "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoranınızın siparişten ödemeye tüm akışını tek sistemde yönetin.",
   ogGorsel: "/gorseller/hero-telefon.jpg",
-  ogGorselAlt: "orQRestro müşteri uygulamasının telefon ekranındaki görünümü",
+  ogGorselAlt: "Menüle müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
-  heroRozet: "Sipariş, mutfak ve ödeme tek akışta",
-  heroBaslikBir: "MASANIZ",
-  heroVurguBir: "DİJİTAL",
-  heroBaslikIki: "MUTFAĞINIZ",
-  heroVurguIki: "CANLI",
+  heroRozet: "Restoranınızın tüm akışı tek platformda",
+  heroBaslikBir: "RESTORANINIZI",
+  heroVurguBir: "MENÜLE",
+  heroBaslikIki: "OPERASYONU",
+  heroVurguIki: "KOLAYLAŞTIRIN",
   heroAciklama:
-    "QR kodla masadan sipariş, mutfağa anlık düşen fişler ve güvenli online ödeme — hepsi tek sistemde.",
+    "QR menüden canlı siparişe, reçete maliyetinden sadakat programına kadar işletmenizin tamamını tek merkezden yönetin.",
   heroBirincilButon: "Paketleri İncele",
   heroIkincilButon: "Özellikleri Gör",
 
@@ -498,7 +498,7 @@ export function whatsappButonuHtml() {
 
 export function denemeSeridiHtml() {
   return `
-    <div class="deneme-serit isik-kart mb-12 flex flex-col items-center gap-4 rounded-2xl border border-marka-turuncu-500/40 bg-marka-turuncu-500/[0.06] px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+    <div class="deneme-serit isik-kart mb-12 flex flex-col items-center gap-4 rounded-2xl border border-marka-yesil/40 bg-marka-yesil/[0.06] px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
       <div>
         <p class="font-baslik text-lg font-bold text-marka-metin">${kacis(DENEME.baslik)}</p>
         <p class="mt-1 text-sm leading-relaxed text-marka-gri-300">${kacis(DENEME.aciklama)}</p>
@@ -541,8 +541,8 @@ export function konseptSeridiHtml() {
 export function ozellikKartlariHtml() {
   return OZELLIKLER.map(
     (ozellik) => `
-      <article class="ozellik-kart isik-kart cam-panel group rounded-2xl p-6 transition-colors duration-300 hover:border-marka-turuncu-500/50">
-        <div class="ozellik-ikon mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-white/5 text-marka-gri-300 transition-colors group-hover:bg-marka-turuncu-500/15 group-hover:text-marka-turuncu-500">
+      <article class="ozellik-kart isik-kart cam-panel group rounded-2xl p-6 transition-colors duration-300 hover:border-marka-mavi/50">
+        <div class="ozellik-ikon mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-marka-mavi/[0.08] text-marka-mavi transition-colors group-hover:bg-marka-yesil/15 group-hover:text-marka-yesil">
           <svg class="h-7 w-7" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(ozellik.ikon)}</svg>
         </div>
         <h3 class="metin-akan metin-akan--yumusak mb-2 font-baslik text-lg font-semibold">${kacis(ozellik.baslik)}</h3>
@@ -555,7 +555,7 @@ export function adimKartlariHtml() {
   return ADIMLAR.map(
     (adim) => `
       <li class="adim-kart cam-panel relative rounded-2xl p-6">
-        <span class="font-baslik text-4xl font-extrabold text-marka-turuncu-500/30" aria-hidden="true">${kacis(adim.sira)}</span>
+        <span class="font-baslik text-4xl font-extrabold text-marka-mavi/35" aria-hidden="true">${kacis(adim.sira)}</span>
         <h3 class="metin-akan metin-akan--yumusak mb-2 mt-3 font-baslik text-lg font-semibold">${kacis(adim.baslik)}</h3>
         <p class="text-sm leading-relaxed text-marka-gri-300">${kacis(adim.metin)}</p>
       </li>`,
@@ -573,7 +573,7 @@ export function yorumKartlariHtml() {
   return YORUMLAR.map(
     (yorum) => `
       <figure class="yorum-kart isik-kart rounded-2xl border border-marka-cizgi bg-marka-kart p-8">
-        <svg class="mb-6 h-8 w-8 text-marka-turuncu-500" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+        <svg class="mb-6 h-8 w-8 text-marka-yesil" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
         <blockquote class="mb-8 text-sm leading-relaxed text-marka-gri-300">${kacis(yorum.metin)}</blockquote>
         <figcaption class="flex items-center gap-3">
           <img class="h-10 w-10 rounded-full border border-marka-cizgi object-cover" src="${yorum.gorsel}" alt="${kacis(yorum.gorselAlt)}" width="40" height="40" loading="lazy" decoding="async"/>
@@ -622,7 +622,7 @@ export function paketKartlariHtml() {
   return PAKETLER.map((paket) => {
     const madde = (metin) => `
         <li class="flex items-start gap-3">
-          <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-marka-turuncu-500" aria-hidden="true"></span>
+          <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-marka-yesil" aria-hidden="true"></span>
           <span>${kacis(metin)}</span>
         </li>`;
 
