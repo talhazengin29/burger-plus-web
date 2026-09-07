@@ -162,7 +162,7 @@ const YIL = new Date().getFullYear();
 export const ICERIK = {
   // --- Marka ---------------------------------------------------------------
   markaAdi: "Menüle",
-  markaAdiHtml: 'Menü<span class="marka-catal" aria-hidden="true"><svg viewBox="0 0 12 30" fill="none"><path d="M1 1v8a5 5 0 0 0 10 0V1M6 1v28"/></svg></span><span class="sr-only">l</span>e',
+  markaAdiHtml: "Menüle",
   markaAciklamasi: "Menüden siparişe, stoktan sadakate restoranınızın işletim sistemi.",
   telifSatiri: `© ${YIL} Menüle. Tüm hakları saklıdır.`,
 

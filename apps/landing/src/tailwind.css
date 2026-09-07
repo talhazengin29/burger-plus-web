@@ -75,41 +75,15 @@
     color: var(--marka-metin);
   }
 
-  .menule-wordmark {
-    color: var(--marka-metin);
-  }
-
-  .menule-logo img {
-    border-radius: 0;
-    background: transparent;
-    padding: 0;
-    filter: drop-shadow(0 6px 12px rgba(11, 145, 211, 0.12));
-  }
-
-  .dark .menule-logo img {
-    content: url("/gorseller/menule-mark-dark.svg");
-  }
-
-  .marka-catal {
-    display: inline-block;
-    width: 0.42em;
-    height: 0.84em;
-    margin-inline: 0.025em 0.01em;
-    vertical-align: -0.08em;
-  }
-
-  .marka-catal svg {
+  .menule-logo-gorseli {
     display: block;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
+    width: auto;
+    height: 2.75rem;
+    object-fit: contain;
   }
 
-  .marka-catal path {
-    stroke: var(--marka-yesil);
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .menule-logo-gorseli--altbilgi {
+    height: 2.5rem;
   }
 
   h1,
