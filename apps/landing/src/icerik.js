@@ -174,7 +174,6 @@ export const ICERIK = {
   ogGorselAlt: "Menüle müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
-  heroRozet: "Restoranınızın tüm akışı tek platformda",
   heroBaslikBir: "MASANIZ",
   heroVurguBir: "DİJİTAL",
   heroBaslikIki: "MUTFAĞINIZ",

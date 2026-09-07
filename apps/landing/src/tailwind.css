@@ -402,21 +402,76 @@
   }
 
   /* --- Hero rozetindeki "canlı" nabzı. ----------------------------------- */
-  .nabiz-nokta {
-    position: relative;
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 9999px;
-    background: var(--marka-yesil);
+  .hero-akis-kapsayici {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .55rem;
+    margin-bottom: 1.65rem;
   }
-  .nabiz-nokta::after {
+  .hero-akis {
+    display: flex;
+    align-items: center;
+  }
+  .hero-akis-adim {
+    display: inline-flex;
+    min-width: 3.7rem;
+    flex-direction: column;
+    align-items: center;
+    gap: .38rem;
+    color: var(--marka-gri-300);
+    font-size: .67rem;
+    font-weight: 650;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .hero-akis-ikon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--marka-mavi) 38%, var(--marka-cizgi));
+    border-radius: .72rem;
+    background: color-mix(in srgb, var(--marka-mavi) 6%, transparent);
+    color: var(--marka-mavi);
+  }
+  .hero-akis-adim:last-child .hero-akis-ikon {
+    border-color: color-mix(in srgb, var(--marka-yesil) 45%, var(--marka-cizgi));
+    background: color-mix(in srgb, var(--marka-yesil) 7%, transparent);
+    color: var(--marka-yesil);
+  }
+  .hero-akis-ikon svg {
+    width: 1.18rem;
+    height: 1.18rem;
+  }
+  .hero-akis-baglanti {
+    position: relative;
+    width: clamp(.7rem, 2.7vw, 2.1rem);
+    height: 1px;
+    margin: 0 .12rem 1rem;
+    overflow: hidden;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--marka-mavi) 18%, transparent), color-mix(in srgb, var(--marka-mavi) 65%, transparent));
+  }
+  .hero-akis-baglanti::after {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: inherit;
-    animation: marka-nabiz 2.6s ease-out infinite;
+    top: -1px;
+    left: -20%;
+    width: 20%;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--marka-mavi);
+    animation: hero-akis-ilerle 4.8s ease-in-out infinite;
+  }
+  .hero-akis-baglanti:nth-child(4)::after { animation-delay: .5s; }
+  .hero-akis-baglanti:nth-child(6)::after { animation-delay: 1s; }
+  .hero-akis-kapsayici > p {
+    margin: 0;
+    color: var(--marka-gri-400);
+    font-size: .66rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
   }
 
   /* --- Öne çıkan paketin yavaş nefes alan halesi. ------------------------- */
@@ -845,19 +900,10 @@
   }
 }
 
-@keyframes marka-nabiz {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  70% {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(2.6);
-    opacity: 0;
-  }
+@keyframes hero-akis-ilerle {
+  0% { opacity: 0; transform: translateX(0); }
+  18%, 72% { opacity: .9; }
+  100% { opacity: 0; transform: translateX(600%); }
 }
 
 @keyframes yorum-kay {
@@ -963,21 +1009,38 @@
 body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(safe-area-inset-bottom))); }
 
 .chatbot-ac {
-  display: inline-flex;
-  min-height: 3.5rem;
-  align-items: center;
-  gap: 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--marka-mavi), var(--marka-yesil));
-  padding: 0.75rem 1.1rem;
-  color: #fff;
-  box-shadow: 0 12px 34px rgba(11, 145, 211, 0.28);
-  font-size: 0.875rem;
-  font-weight: 700;
+  position: relative;
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--marka-mavi) 42%, var(--marka-cizgi));
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--marka-kart) 92%, transparent);
+  color: var(--marka-mavi);
+  box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), inset 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  transition: transform .2s ease, border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
 }
-.chatbot-ac svg { width: 1.55rem; height: 1.55rem; transform: translate(1px, -1px); }
-.chatbot-ac span { display: block; line-height: 1; }
+.chatbot-ac:hover {
+  border-color: var(--marka-mavi);
+  background: color-mix(in srgb, var(--marka-mavi) 10%, var(--marka-kart));
+  box-shadow: 0 16px 38px rgba(11, 145, 211, 0.24);
+  transform: translateY(-2px);
+}
+.chatbot-ac:active { transform: translateY(0) scale(.97); }
+.chatbot-ac svg { width: 1.65rem; height: 1.65rem; }
+.chatbot-durum {
+  position: absolute;
+  top: .48rem;
+  right: .48rem;
+  width: .48rem;
+  height: .48rem;
+  border: 2px solid var(--marka-kart);
+  border-radius: 50%;
+  background: var(--marka-yesil);
+  box-sizing: content-box;
+}
 .chatbot-kok--acik .chatbot-ac { display: none; }
 
 .chatbot-panel {

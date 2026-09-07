@@ -99,7 +99,7 @@ function heroGirisi() {
   }
 
   const digerleri = [
-    document.querySelector(".hero-rozet"),
+    document.querySelector(".hero-akis-kapsayici"),
     document.querySelector(".hero-aciklama"),
     document.querySelector(".hero-butonlar"),
   ].filter(Boolean);
