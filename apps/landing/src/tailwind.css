@@ -687,39 +687,217 @@
     box-shadow: 0 0 0 3px rgba(11, 145, 211, 0.16);
   }
 
-  .talep-select-kapsayici {
+  .talep-ozel-select {
     position: relative;
   }
 
-  .talep-select-kapsayici::after {
-    content: "";
+  .talep-ozel-select--acik {
+    z-index: 30;
+  }
+
+  .talep-select-native {
     position: absolute;
-    top: 50%;
-    right: 1rem;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .talep-select-tetikleyici {
+    width: 100%;
+    min-height: 4rem;
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) 1.25rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--marka-cizgi);
+    border-radius: 0.85rem;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--marka-turkuaz) 8%, transparent), transparent 48%),
+      var(--marka-zemin);
+    color: var(--marka-metin);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .talep-select-tetikleyici:hover {
+    border-color: color-mix(in srgb, var(--marka-turkuaz) 65%, var(--marka-cizgi));
+  }
+
+  .talep-select-tetikleyici:focus-visible,
+  .talep-ozel-select--acik .talep-select-tetikleyici {
+    outline: none;
+    border-color: var(--marka-mavi);
+    box-shadow: 0 0 0 3px rgba(11, 145, 211, 0.16);
+  }
+
+  .talep-select-on-ikon {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--marka-turkuaz) 32%, transparent);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, var(--marka-turkuaz) 11%, transparent);
+    color: var(--marka-turkuaz);
+  }
+
+  .talep-select-on-ikon svg,
+  .talep-select-ok,
+  .talep-select-secenek > svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .talep-select-on-ikon svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .talep-select-secilen {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+  }
+
+  .talep-select-secilen small {
+    color: var(--marka-gri-400);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .talep-select-secilen strong {
+    overflow: hidden;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .talep-select-ok {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--marka-gri-400);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .talep-ozel-select--acik .talep-select-ok {
+    color: var(--marka-turkuaz);
+    transform: rotate(180deg);
+  }
+
+  .talep-select-menu {
+    position: absolute;
+    top: calc(100% + 0.55rem);
+    right: 0;
+    left: 0;
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--marka-turkuaz) 28%, var(--marka-cizgi));
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--marka-kart) 96%, transparent);
+    box-shadow: 0 1.25rem 3rem rgba(0, 20, 35, 0.28);
+    backdrop-filter: blur(18px);
+    animation: talep-select-acilis 0.18s ease-out;
+  }
+
+  .talep-select-menu[hidden] {
+    display: none;
+  }
+
+  .talep-select-secenek {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 0.65rem minmax(0, 1fr) 1.1rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 0.72rem;
+    background: transparent;
+    color: var(--marka-metin);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background-color 0.16s ease;
+  }
+
+  .talep-select-secenek:hover,
+  .talep-select-secenek:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--marka-turkuaz) 25%, transparent);
+    background: color-mix(in srgb, var(--marka-turkuaz) 8%, transparent);
+  }
+
+  .talep-select-secenek[aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--marka-yesil) 38%, transparent);
+    background: color-mix(in srgb, var(--marka-yesil) 11%, transparent);
+  }
+
+  .talep-select-secenek-isaret {
     width: 0.55rem;
     height: 0.55rem;
-    border-right: 2px solid var(--marka-turkuaz);
-    border-bottom: 2px solid var(--marka-turkuaz);
-    transform: translateY(-68%) rotate(45deg);
-    pointer-events: none;
-    transition: transform 0.2s ease;
+    border: 2px solid var(--marka-gri-400);
+    border-radius: 999px;
   }
 
-  .talep-select-kapsayici:focus-within::after {
-    transform: translateY(-30%) rotate(225deg);
+  .talep-select-secenek[aria-selected="true"] .talep-select-secenek-isaret {
+    border-color: var(--marka-yesil);
+    background: var(--marka-yesil);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--marka-yesil) 13%, transparent);
   }
 
-  .talep-girdi--select {
-    min-height: 3rem;
-    padding-right: 3rem;
-    appearance: none;
-    cursor: pointer;
-    background-image: none;
+  .talep-select-secenek-metin {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
   }
 
-  .talep-girdi--select option {
-    background: var(--marka-zemin);
-    color: var(--marka-metin);
+  .talep-select-secenek-metin strong {
+    font-size: 0.875rem;
+    line-height: 1.25;
+  }
+
+  .talep-select-secenek-metin small {
+    overflow: hidden;
+    color: var(--marka-gri-400);
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .talep-select-secenek > svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    color: transparent;
+  }
+
+  .talep-select-secenek[aria-selected="true"] > svg {
+    color: var(--marka-yesil);
+  }
+
+  @keyframes talep-select-acilis {
+    from { opacity: 0; transform: translateY(-0.4rem) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   .talep-sayi-kontrol {

@@ -775,6 +775,21 @@ export function talepFormuHtml() {
   const paketSecenekleri = PAKETLER.map(
     (paket) => `<option value="${kacis(paket.ad)}">${kacis(paket.ad)}</option>`,
   ).join("");
+  const paketAciklamalari = {
+    "Başlangıç": "QR menü ve temel yönetim",
+    "Profesyonel": "Sipariş, mutfak ve sadakat",
+    "Kurumsal": "Çok şubeli işletmeler",
+  };
+  const paketListeSecenekleri = [
+    ...PAKETLER.map((paket) => ({ ad: paket.ad, aciklama: paketAciklamalari[paket.ad] || "İşletmenize uygun çözüm" })),
+    { ad: "Kararsızım", aciklama: "Paketi birlikte belirleyelim" },
+  ].map((paket, sira) => `
+    <button class="talep-select-secenek" type="button" role="option" data-paket-degeri="${kacis(paket.ad)}"
+            aria-selected="${sira === 0 ? "true" : "false"}">
+      <span class="talep-select-secenek-isaret" aria-hidden="true"></span>
+      <span class="talep-select-secenek-metin"><strong>${kacis(paket.ad)}</strong><small>${kacis(paket.aciklama)}</small></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+    </button>`).join("");
 
   const gizlilikNotu = TALEP_FORMU.gizlilikNotu.replace(
     "{kvkkBaglantisi}",
@@ -827,12 +842,23 @@ export function talepFormuHtml() {
             <p class="talep-hata" id="talep-masaSayisi-hata" role="alert" hidden></p>
           </div>
           <div class="talep-alan">
-            <label class="talep-etiket" for="talep-paket">${kacis(TALEP_FORMU.paketEtiketi)}</label>
-            <div class="talep-select-kapsayici">
-              <select class="talep-girdi talep-girdi--select" id="talep-paket" name="paket">
+            <label class="talep-etiket" id="talep-paket-etiket" for="talep-paket">${kacis(TALEP_FORMU.paketEtiketi)}</label>
+            <div class="talep-ozel-select" data-talep-select>
+              <select class="talep-select-native" id="talep-paket" name="paket" tabindex="-1" aria-hidden="true">
                 ${paketSecenekleri}
                 <option value="Kararsızım">Kararsızım</option>
               </select>
+              <button class="talep-select-tetikleyici" type="button" role="combobox" aria-haspopup="listbox" aria-labelledby="talep-paket-etiket"
+                      aria-expanded="false" aria-controls="talep-paket-listesi">
+                <span class="talep-select-on-ikon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M20 13 13 20a2 2 0 0 1-2.8 0L4 13.8V4h9.8L20 10.2a2 2 0 0 1 0 2.8Z"/><circle cx="9" cy="9" r="1.25"/></svg>
+                </span>
+                <span class="talep-select-secilen"><small>Seçili paket</small><strong data-paket-secilen>Başlangıç</strong></span>
+                <svg class="talep-select-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg>
+              </button>
+              <div class="talep-select-menu" id="talep-paket-listesi" role="listbox" tabindex="-1" hidden>
+                ${paketListeSecenekleri}
+              </div>
             </div>
           </div>
         </div>

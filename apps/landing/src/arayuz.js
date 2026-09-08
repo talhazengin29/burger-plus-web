@@ -284,6 +284,80 @@ function talepFormu() {
   });
   masaDugmeleriniGuncelle();
 
+  const paketSelectKapsayici = form.querySelector("[data-talep-select]");
+  const paketSelect = form.elements.paket;
+  const paketTetikleyici = paketSelectKapsayici?.querySelector(".talep-select-tetikleyici");
+  const paketMenu = paketSelectKapsayici?.querySelector(".talep-select-menu");
+  const paketSecilenMetin = paketSelectKapsayici?.querySelector("[data-paket-secilen]");
+  const paketSecenekleri = [...(paketSelectKapsayici?.querySelectorAll("[data-paket-degeri]") || [])];
+
+  function paketMenusunuKapat(odagiGeriVer = false) {
+    if (!paketMenu || !paketTetikleyici) return;
+    paketMenu.hidden = true;
+    paketTetikleyici.setAttribute("aria-expanded", "false");
+    paketSelectKapsayici.classList.remove("talep-ozel-select--acik");
+    if (odagiGeriVer) paketTetikleyici.focus();
+  }
+
+  function paketMenusunuAc() {
+    if (!paketMenu || !paketTetikleyici) return;
+    paketMenu.hidden = false;
+    paketTetikleyici.setAttribute("aria-expanded", "true");
+    paketSelectKapsayici.classList.add("talep-ozel-select--acik");
+    const secili = paketSecenekleri.find((secenek) => secenek.getAttribute("aria-selected") === "true");
+    requestAnimationFrame(() => (secili || paketSecenekleri[0])?.focus());
+  }
+
+  function paketiSec(deger, odagiGeriVer = true) {
+    if (!paketSelect || !paketSecilenMetin) return;
+    paketSelect.value = deger;
+    paketSecilenMetin.textContent = deger;
+    paketSecenekleri.forEach((secenek) => {
+      secenek.setAttribute("aria-selected", String(secenek.dataset.paketDegeri === deger));
+    });
+    paketSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    paketMenusunuKapat(odagiGeriVer);
+  }
+
+  paketTetikleyici?.addEventListener("click", () => {
+    if (paketMenu.hidden) paketMenusunuAc();
+    else paketMenusunuKapat();
+  });
+
+  paketTetikleyici?.addEventListener("keydown", (olay) => {
+    if (["ArrowDown", "ArrowUp", "Enter", " "].includes(olay.key)) {
+      olay.preventDefault();
+      paketMenusunuAc();
+    }
+  });
+
+  paketSecenekleri.forEach((secenek, sira) => {
+    secenek.addEventListener("click", () => paketiSec(secenek.dataset.paketDegeri));
+    secenek.addEventListener("keydown", (olay) => {
+      if (olay.key === "Escape" || olay.key === "Tab") {
+        paketMenusunuKapat(olay.key === "Escape");
+        return;
+      }
+      const hedefSira = olay.key === "ArrowDown" ? Math.min(paketSecenekleri.length - 1, sira + 1)
+        : olay.key === "ArrowUp" ? Math.max(0, sira - 1)
+          : olay.key === "Home" ? 0
+            : olay.key === "End" ? paketSecenekleri.length - 1 : null;
+      if (hedefSira != null) {
+        olay.preventDefault();
+        paketSecenekleri[hedefSira]?.focus();
+      }
+    });
+  });
+
+  document.addEventListener("pointerdown", (olay) => {
+    if (!paketSelectKapsayici?.contains(olay.target)) paketMenusunuKapat();
+  });
+
+  form.addEventListener("reset", () => requestAnimationFrame(() => {
+    masaDugmeleriniGuncelle();
+    paketiSec(paketSelect?.value || "Başlangıç", false);
+  }));
+
   const hataKutusu = (ad) => document.getElementById(`talep-${ad}-hata`);
 
   function hataGoster(ad, mesaj) {
