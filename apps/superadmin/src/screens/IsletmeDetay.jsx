@@ -3,24 +3,6 @@ import { abonelikGuncelle, abonelikOlustur, erisimTokeniOlustur, isletmeAdminiGu
 import { qrPdfIndir } from "../lib/qrPdf";
 import { Basari, DurumRozeti, Hata, Metrik, para, sayi, Yukleme } from "../components/Ui";
 
-function kopyala(metin) {
-  return navigator.clipboard.writeText(String(metin || ""));
-}
-
-// İşletme sahibi kendi şifresini belirleyene kadar (sifreDegistirmeli),
-// admin oluşturma/sıfırlama ekranında tek seferlik gösterilen şifreyi
-// kaçırmışsak burada tekrar görüp kopyalayabiliriz.
-function GeciciSifre({ deger }) {
-  const [kopyalandi, setKopyalandi] = useState(false);
-  return (
-    <span className="gecici-sifre">
-      <small>GEÇİCİ ŞİFRE</small>
-      <code>{deger}</code>
-      <button type="button" onClick={() => kopyala(deger).then(() => { setKopyalandi(true); setTimeout(() => setKopyalandi(false), 1500); })}>{kopyalandi ? "Kopyalandı" : "Kopyala"}</button>
-    </span>
-  );
-}
-
 export default function IsletmeDetay({ id, kapat, degisti }) {
   const [veri, setVeri] = useState(null);
   const [form, setForm] = useState(null);
@@ -136,7 +118,7 @@ export default function IsletmeDetay({ id, kapat, degisti }) {
       <h3>İşletme yöneticisi</h3>
       <p className="bolum-ipucu">Yöneticileri buradan oluşturabilir, düzenleyebilir veya erişimlerini kaldırabilirsiniz. Yeni hesaplarda şifre zorunludur; düzenlemede boş bırakırsanız mevcut şifre korunur.</p>
       {adminler.length
-        ? <ul className="admin-listesi">{adminler.map((admin) => <li key={admin.id} className={duzenlenenAdminId === admin.id ? "secili" : ""}><span><b>{admin.ad} {admin.soyad}</b><small>{admin.email}</small></span>{admin.sifreDegistirmeli && admin.sifreGeciciMetin && <GeciciSifre deger={admin.sifreGeciciMetin} />}<em>{admin.ikiFaktorAktif ? "2FA açık" : "2FA kapalı"}</em><span className="admin-islemleri"><button type="button" disabled={islemde} onClick={() => adminDuzenle(admin)}>Düzenle</button><button type="button" className="sil" disabled={islemde} onClick={() => adminSil(admin)}>Sil</button></span></li>)}</ul>
+        ? <ul className="admin-listesi">{adminler.map((admin) => <li key={admin.id} className={duzenlenenAdminId === admin.id ? "secili" : ""}><span><b>{admin.ad} {admin.soyad}</b><small>{admin.email}</small></span><em>{admin.ikiFaktorAktif ? "2FA açık" : "2FA kapalı"}</em><span className="admin-islemleri"><button type="button" disabled={islemde} onClick={() => adminDuzenle(admin)}>Düzenle</button><button type="button" className="sil" disabled={islemde} onClick={() => adminSil(admin)}>Sil</button></span></li>)}</ul>
         : <p className="bolum-ipucu uyari">Bu işletmenin tanımlı bir yöneticisi yok; sahibi panele giriş yapamaz.</p>}
       {duzenlenenAdminId && <div className="duzenleme-bildirimi"><span>Seçili yöneticiyi düzenliyorsunuz</span><button type="button" onClick={adminDuzenlemeyiIptalEt}>İptal</button></div>}
       <div className="form-grid">

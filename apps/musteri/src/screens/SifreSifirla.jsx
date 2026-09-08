@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion } from "framer-motion";
 import { sifreSifirla, tokenDogrula as tokenSunucudaDogrula } from "../lib/authApi";
@@ -18,8 +17,11 @@ function sifreGucu(sifre, t) {
 export default function SifreSifirla() {
   const git = useIsletmeNavigate();
   const { t } = useDil();
-  const [parametreler] = useSearchParams();
-  const token = parametreler.get("token") || "";
+  const [token] = useState(() => {
+    const hashParametreleri = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const sorguParametreleri = new URLSearchParams(window.location.search);
+    return hashParametreleri.get("token") || sorguParametreleri.get("token") || "";
+  });
 
   const [durum, setDurum] = useState("kontrol"); // kontrol | gecerli | gecersiz | basarili
   const [sifre, setSifre] = useState("");
@@ -30,6 +32,9 @@ export default function SifreSifirla() {
 
   useEffect(() => {
     if (!token) { setDurum("gecersiz"); return; }
+    // Token okunduktan sonra adres çubuğu, tarayıcı geçmişi ve ekran
+    // görüntülerinde kalmaması için URL hemen temizlenir.
+    window.history.replaceState(null, "", window.location.pathname);
     tokenSunucudaDogrula(token).then((sonuc) => {
       setDurum(sonuc?.gecerli ? "gecerli" : "gecersiz");
     });

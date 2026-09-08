@@ -20,7 +20,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
   const [sifreGorunur, setSifreGorunur] = useState(false);
-  const [beniHatirla, setBeniHatirla] = useState(true);
   const [hata, setHata] = useState("");
   const [alanHatalari, setAlanHatalari] = useState({});
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -35,7 +34,7 @@ export default function Login() {
 
   const basariliGirisiTamamla = (sonuc) => {
     girisGecisiRef.current = true;
-    tokeniKaydet(sonuc.token, beniHatirla);
+    tokeniKaydet(sonuc.token);
     perdeIleGit(() => git("/anasayfa", { replace: true }), "normal");
     girisiTamamla(sonuc.kullanici);
   };
@@ -175,15 +174,6 @@ export default function Login() {
           {t("login.forgotPassword")}
         </button>
 
-        {/* Beni hatırla */}
-        <label className="beni-hatirla">
-          <input
-            type="checkbox"
-            checked={beniHatirla}
-            onChange={(e) => setBeniHatirla(e.target.checked)}
-          />
-          <span>{t("login.rememberMe")}</span>
-        </label>
           </>
         )}
 

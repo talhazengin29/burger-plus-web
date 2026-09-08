@@ -44,12 +44,16 @@ function TemaButonu({ tema, onDegistir, className = "" }) {
 // çünkü bu platformda artık birden fazla işletme var.
 function KokEkrani() {
   const [arama] = useSearchParams();
-  const token = arama.get("erisim") || "";
+  const parca = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  // Eski query bağlantıları bir sürüm boyunca kabul edilir; token okunduğu
+  // anda adres çubuğundan temizlenir.
+  const token = parca.get("erisim") || arama.get("erisim") || "";
   const [hedef, setHedef] = useState(null);
   const [kontrolEdildi, setKontrolEdildi] = useState(!token);
 
   useEffect(() => {
     if (!token) { setKontrolEdildi(true); return; }
+    window.history.replaceState(null, "", `${window.location.pathname}`);
     const erisim = erisimTokeniniCoz(token);
     if (erisim) {
       const slug = String(erisim.isletmeSlug).trim().toLowerCase();

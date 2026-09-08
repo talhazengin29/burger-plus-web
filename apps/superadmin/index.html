@@ -18,17 +18,7 @@
 
     <!-- Tema tercihini CSS/boya işleminden ÖNCE uygula — aksi halde bir anlık
          yanlış tema (FOUC) görülür. Varsayılan koyu (mevcut davranış). -->
-    <script>
-      (function () {
-        try {
-          var kayitli = localStorage.getItem("bp-superadmin-tema");
-          var koyu = kayitli ? kayitli === "dark" : true;
-          document.documentElement.classList.toggle("dark", koyu);
-        } catch (e) {
-          document.documentElement.classList.add("dark");
-        }
-      })();
-    </script>
+    <script src="./tema-baslat.js"></script>
   </head>
   <body>
     <div id="root"></div>

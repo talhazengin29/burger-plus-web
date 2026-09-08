@@ -19,17 +19,7 @@
 <link rel="manifest" href="/manifest.webmanifest"/>
 
 <!-- Tema tercihini boyamadan ÖNCE uygula (ana sayfayla aynı anahtar). -->
-<script>
-  (function () {
-    try {
-      var kayitli = localStorage.getItem("menule-landing-tema");
-      var koyu = kayitli ? kayitli === "dark" : true;
-      document.documentElement.classList.toggle("dark", koyu);
-    } catch (e) {
-      document.documentElement.classList.add("dark");
-    }
-  })();
-</script>
+<script src="/tema-baslat.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>

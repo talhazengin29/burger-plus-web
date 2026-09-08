@@ -15,20 +15,18 @@ function tokenAnahtari() {
   return tenantDepoAnahtari("bp_token");
 }
 
-export function tokeniKaydet(token, hatirla = true) {
+export function tokeniKaydet(token) {
   const anahtar = tokenAnahtari();
-  if (hatirla) {
-    localStorage.setItem(anahtar, token);
-    sessionStorage.removeItem(anahtar);
-  } else {
-    sessionStorage.setItem(anahtar, token);
-    localStorage.removeItem(anahtar);
-  }
+  sessionStorage.setItem(anahtar, token);
+  // Eski sürümlerin kalıcı depoya yazdığı bearer tokenları temizle.
+  localStorage.removeItem(anahtar);
 }
 
 export function tokeniAl() {
   const anahtar = tokenAnahtari();
-  return localStorage.getItem(anahtar) || sessionStorage.getItem(anahtar);
+  const token = sessionStorage.getItem(anahtar);
+  localStorage.removeItem(anahtar);
+  return token;
 }
 
 export function tokeniSil() {
@@ -145,7 +143,9 @@ export async function sifirlamaTalep(email) {
 
 export async function tokenDogrula(token) {
   try {
-    return await jsonIstegi(`/api/sifre-sifirla/dogrula?token=${encodeURIComponent(token)}`, {}, "Bağlantı doğrulanamadı.");
+    return await jsonIstegi("/api/sifre-sifirla/dogrula", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }),
+    }, "Bağlantı doğrulanamadı.");
   } catch {
     return { gecerli: false };
   }

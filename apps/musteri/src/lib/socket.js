@@ -6,7 +6,8 @@ export const socket = io(BACKEND_URL, { autoConnect: false });
 
 function tenantTokeni(slug) {
   const anahtar = `bp_token_${slug}`;
-  return localStorage.getItem(anahtar) || sessionStorage.getItem(anahtar) || "";
+  localStorage.removeItem(anahtar);
+  return sessionStorage.getItem(anahtar) || "";
 }
 
 export function socketIsletmesiniAyarla(slug) {

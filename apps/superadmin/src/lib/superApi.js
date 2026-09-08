@@ -91,5 +91,7 @@ export const kayitlariGetir = (filtre = {}) => {
 
 export function personelPanelineGit(token) {
   const temel = String(import.meta.env.VITE_PERSONEL_URL || `${window.location.origin}/personel`).replace(/\/$/, "");
-  window.location.assign(`${temel}?erisim=${encodeURIComponent(token)}`);
+  // Yetki tokenı query string'e yazılmaz: fragment sunucu, erişim logu ve
+  // Referrer başlığına gönderilmez.
+  window.location.assign(`${temel}#erisim=${encodeURIComponent(token)}`);
 }
