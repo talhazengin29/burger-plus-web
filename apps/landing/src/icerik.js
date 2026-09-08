@@ -50,7 +50,7 @@ export const canonicalUrl = `${SITE_URL}/`;
 // telefon  → altbilgide görünen, insanın okuyacağı biçim. Örnek: "0532 111 22 33"
 export const ILETISIM = {
   whatsapp: "905522855561",
-  eposta: "menule@info.com",
+  eposta: "info@menule.com",
   telefon: "+90 552 285 55 61",
 };
 

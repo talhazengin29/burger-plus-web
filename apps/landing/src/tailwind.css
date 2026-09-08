@@ -862,6 +862,18 @@
     padding-block: 0.25rem;
   }
 
+  .menule-logo-gorseli--koyu {
+    display: none;
+  }
+
+  .dark .menule-logo-gorseli--acik {
+    display: none;
+  }
+
+  .dark .menule-logo-gorseli--koyu {
+    display: block;
+  }
+
   .talep-tuzak {
     position: absolute !important;
     left: -10000px !important;
