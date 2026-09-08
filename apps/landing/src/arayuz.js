@@ -241,6 +241,48 @@ function talepFormu() {
   let formBaslangici = Date.now();
   let istekAnahtari = uuidUret();
   let gonderiliyor = false;
+  const masaSayisiGirdisi = form.elements.masaSayisi;
+  const MASA_ALT_SINIR = 1;
+  const MASA_UST_SINIR = 500;
+
+  function masaSayisiniSinirla(deger) {
+    const sayi = Number(deger);
+    if (!Number.isFinite(sayi)) return MASA_ALT_SINIR;
+    return Math.min(MASA_UST_SINIR, Math.max(MASA_ALT_SINIR, Math.round(sayi)));
+  }
+
+  const masaAdimDugmeleri = [...form.querySelectorAll("[data-masa-adim]")];
+  function masaDugmeleriniGuncelle() {
+    const bos = masaSayisiGirdisi?.value === "";
+    const deger = Number(masaSayisiGirdisi?.value);
+    masaAdimDugmeleri.forEach((dugme) => {
+      const adim = Number(dugme.dataset.masaAdim);
+      dugme.disabled = !bos && ((adim < 0 && deger <= MASA_ALT_SINIR) || (adim > 0 && deger >= MASA_UST_SINIR));
+    });
+  }
+
+  masaAdimDugmeleri.forEach((dugme) => {
+    dugme.addEventListener("click", () => {
+      const adim = Number(dugme.dataset.masaAdim) || 0;
+      const mevcut = masaSayisiGirdisi.value === "" ? (adim > 0 ? 0 : 2) : Number(masaSayisiGirdisi.value);
+      masaSayisiGirdisi.value = String(masaSayisiniSinirla(mevcut + adim));
+      masaSayisiGirdisi.dispatchEvent(new Event("input", { bubbles: true }));
+      masaSayisiGirdisi.focus();
+    });
+  });
+
+  masaSayisiGirdisi?.addEventListener("input", () => {
+    masaDugmeleriniGuncelle();
+    hatayiTemizle("masaSayisi");
+  });
+
+  masaSayisiGirdisi?.addEventListener("blur", () => {
+    if (masaSayisiGirdisi.value !== "") {
+      masaSayisiGirdisi.value = String(masaSayisiniSinirla(masaSayisiGirdisi.value));
+      masaDugmeleriniGuncelle();
+    }
+  });
+  masaDugmeleriniGuncelle();
 
   const hataKutusu = (ad) => document.getElementById(`talep-${ad}-hata`);
 
@@ -304,6 +346,15 @@ function talepFormu() {
       hatalar.push("eposta");
     } else if (eposta) {
       hatayiTemizle("eposta");
+    }
+
+    const masaHam = String(form.elements.masaSayisi?.value || "").trim();
+    const masaSayisi = Number(masaHam);
+    if (masaHam && (!Number.isSafeInteger(masaSayisi) || masaSayisi < MASA_ALT_SINIR || masaSayisi > MASA_UST_SINIR)) {
+      hataGoster("masaSayisi", "Masa sayısı 1 ile 500 arasında tam sayı olmalıdır.");
+      hatalar.push("masaSayisi");
+    } else {
+      hatayiTemizle("masaSayisi");
     }
 
     const kvkk = form.elements.kvkk;

@@ -647,6 +647,20 @@
     color: var(--marka-metin);
   }
 
+  .talep-etiket-satiri {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .talep-alan-siniri {
+    color: var(--marka-gri-400);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
   /* @tailwindcss/forms eklentisi girdileri sıfırlıyor; görsel dili buradan
      kuruyoruz ki koyu/aydınlık temanın ikisinde de tutarlı olsun. */
   .talep-girdi {
@@ -671,6 +685,130 @@
     outline: none;
     border-color: var(--marka-mavi);
     box-shadow: 0 0 0 3px rgba(11, 145, 211, 0.16);
+  }
+
+  .talep-select-kapsayici {
+    position: relative;
+  }
+
+  .talep-select-kapsayici::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-right: 2px solid var(--marka-turkuaz);
+    border-bottom: 2px solid var(--marka-turkuaz);
+    transform: translateY(-68%) rotate(45deg);
+    pointer-events: none;
+    transition: transform 0.2s ease;
+  }
+
+  .talep-select-kapsayici:focus-within::after {
+    transform: translateY(-30%) rotate(225deg);
+  }
+
+  .talep-girdi--select {
+    min-height: 3rem;
+    padding-right: 3rem;
+    appearance: none;
+    cursor: pointer;
+    background-image: none;
+  }
+
+  .talep-girdi--select option {
+    background: var(--marka-zemin);
+    color: var(--marka-metin);
+  }
+
+  .talep-sayi-kontrol {
+    display: grid;
+    grid-template-columns: 2.875rem minmax(0, 1fr) 2.875rem;
+    min-height: 3rem;
+    overflow: hidden;
+    border: 1px solid var(--marka-cizgi);
+    border-radius: 0.75rem;
+    background: var(--marka-zemin);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .talep-sayi-kontrol:focus-within {
+    border-color: var(--marka-mavi);
+    box-shadow: 0 0 0 3px rgba(11, 145, 211, 0.16);
+  }
+
+  .talep-girdi--sayi {
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding-inline: 0.75rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+    appearance: textfield;
+  }
+
+  .talep-girdi--sayi:focus {
+    box-shadow: none;
+  }
+
+  .talep-girdi--sayi::-webkit-inner-spin-button,
+  .talep-girdi--sayi::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+
+  .talep-sayi-dugmesi {
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: color-mix(in srgb, var(--marka-turkuaz) 8%, transparent);
+    color: var(--marka-turkuaz);
+    cursor: pointer;
+    transition:
+      color 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .talep-sayi-dugmesi:first-child {
+    border-right: 1px solid var(--marka-cizgi);
+  }
+
+  .talep-sayi-dugmesi:last-child {
+    border-left: 1px solid var(--marka-cizgi);
+  }
+
+  .talep-sayi-dugmesi:hover {
+    background: color-mix(in srgb, var(--marka-turkuaz) 18%, transparent);
+    color: var(--marka-yesil);
+  }
+
+  .talep-sayi-dugmesi:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: transparent;
+  }
+
+  .talep-sayi-dugmesi:focus-visible {
+    outline: 2px solid var(--marka-mavi);
+    outline-offset: -3px;
+  }
+
+  .talep-sayi-dugmesi svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .talep-sayi-kontrol:has(.talep-girdi--hatali) {
+    border-color: #ef4444;
   }
 
   .talep-girdi--metin {

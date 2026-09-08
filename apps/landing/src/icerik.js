@@ -808,13 +808,32 @@ export function talepFormuHtml() {
           ${alan("isletme", A.isletme, "text", ' autocomplete="organization"')}
           ${alan("telefon", A.telefon, "tel", ' autocomplete="tel" inputmode="tel"')}
           ${alan("eposta", A.eposta, "email", ' autocomplete="email"')}
-          ${alan("masaSayisi", A.masaSayisi, "number", ' min="1" max="999" inputmode="numeric"')}
+          <div class="talep-alan">
+            <div class="talep-etiket-satiri">
+              <label class="talep-etiket" for="talep-masaSayisi">${kacis(A.masaSayisi.etiket)}</label>
+              <span class="talep-alan-siniri">1–500 masa</span>
+            </div>
+            <div class="talep-sayi-kontrol">
+              <button type="button" class="talep-sayi-dugmesi" data-masa-adim="-1" aria-label="Masa sayısını azalt">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+              </button>
+              <input class="talep-girdi talep-girdi--sayi" id="talep-masaSayisi" name="masaSayisi" type="number"
+                     placeholder="${kacis(A.masaSayisi.tutucu)}" min="1" max="500" step="1" inputmode="numeric"
+                     aria-describedby="talep-masaSayisi-hata"/>
+              <button type="button" class="talep-sayi-dugmesi" data-masa-adim="1" aria-label="Masa sayısını artır">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+            <p class="talep-hata" id="talep-masaSayisi-hata" role="alert" hidden></p>
+          </div>
           <div class="talep-alan">
             <label class="talep-etiket" for="talep-paket">${kacis(TALEP_FORMU.paketEtiketi)}</label>
-            <select class="talep-girdi" id="talep-paket" name="paket">
-              ${paketSecenekleri}
-              <option value="Kararsızım">Kararsızım</option>
-            </select>
+            <div class="talep-select-kapsayici">
+              <select class="talep-girdi talep-girdi--select" id="talep-paket" name="paket">
+                ${paketSecenekleri}
+                <option value="Kararsızım">Kararsızım</option>
+              </select>
+            </div>
           </div>
         </div>
 
