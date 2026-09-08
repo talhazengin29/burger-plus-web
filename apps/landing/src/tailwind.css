@@ -480,81 +480,77 @@
   }
 
   /* --- Sabit WhatsApp iletişim butonu. -----------------------------------
-     Sağ altta durur; üzerine gelince (veya klavyeyle odaklanınca) yanından
-     etiketi açılır. Marka turuncusu yerine WhatsApp yeşili kullanıldı:
-     buton ancak tanınabilir olduğunda işini yapar. */
+     Canlı destek tetikleyicisiyle aynı ölçü, köşe ve ikon dilini kullanır.
+     Etiket yalnızca hover/klavye odağında tooltip olarak görünür; butonun
+     ölçüsünü ve sağ kenar hizasını değiştirmez. */
   .whatsapp-buton {
     position: fixed;
-    right: 1.25rem;
-    bottom: 1.25rem;
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
     z-index: 60;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.625rem;
+    display: grid;
+    width: 3.5rem;
     height: 3.5rem;
-    padding: 0 1.1rem;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, #25d366, #128c7e);
-    color: #ffffff;
-    box-shadow:
-      0 10px 30px -8px rgba(18, 140, 126, 0.75),
-      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--marka-yesil) 52%, var(--marka-cizgi));
+    border-radius: 1.1rem;
+    background: color-mix(in srgb, var(--marka-kart) 92%, transparent);
+    color: var(--marka-yesil);
+    box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), inset 0 1px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
     transition:
-      transform 0.28s ease,
-      box-shadow 0.28s ease;
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
   .whatsapp-buton:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 16px 38px -8px rgba(18, 140, 126, 0.9),
-      0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+    border-color: var(--marka-yesil);
+    background: color-mix(in srgb, var(--marka-yesil) 10%, var(--marka-kart));
+    box-shadow: 0 16px 38px rgba(18, 140, 126, 0.2);
+    transform: translateY(-2px);
   }
+  .whatsapp-buton:active { transform: translateY(0) scale(0.97); }
   .whatsapp-ikon {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.65rem;
+    height: 1.65rem;
     flex-shrink: 0;
   }
 
-  /* Etiket varsayılan olarak kapalı; hover/odakta açılır. */
+  /* Etiket butonun dışında açılan erişilebilir bir tooltip'tir. */
   .whatsapp-etiket {
-    max-width: 0;
-    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 0.75rem);
+    width: max-content;
+    max-width: min(13rem, calc(100vw - 6rem));
+    padding: 0.48rem 0.7rem;
+    border: 1px solid var(--marka-cizgi);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, var(--marka-kart) 96%, transparent);
+    color: var(--marka-metin);
+    box-shadow: 0 10px 28px rgba(3, 25, 39, 0.2);
     white-space: nowrap;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 650;
     opacity: 0;
-    transition:
-      max-width 0.35s ease,
-      opacity 0.25s ease;
+    pointer-events: none;
+    transform: translate(0.35rem, -50%);
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
   .whatsapp-buton:hover .whatsapp-etiket,
   .whatsapp-buton:focus-visible .whatsapp-etiket {
-    max-width: 12rem;
     opacity: 1;
+    transform: translate(0, -50%);
   }
 
-  /* Dikkat çeken yavaş nabız halkası. */
-  .whatsapp-halka {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    border: 2px solid rgba(37, 211, 102, 0.55);
-    animation: whatsapp-nabiz 3.2s ease-out infinite;
-    pointer-events: none;
-  }
-
-  /* Dar ekranda yalnızca ikon; etiket yer kaplamasın. */
+  /* Mobilde iki aksiyon da aynı sağ kenar ekseninde kalır. */
   @media (max-width: 480px) {
     .whatsapp-buton {
-      right: 1rem;
-      bottom: 1rem;
-      height: 3.25rem;
-      padding: 0 0.9rem;
+      right: max(1rem, env(safe-area-inset-right));
+      bottom: max(1rem, env(safe-area-inset-bottom));
     }
-    .whatsapp-buton:hover .whatsapp-etiket {
-      max-width: 0;
-      opacity: 0;
-    }
+    .whatsapp-etiket { display: none; }
   }
 
   /* --- Kayan referans şeridi. --------------------------------------------
@@ -945,18 +941,6 @@
   50% { translate: 0 -7px; }
 }
 
-@keyframes whatsapp-nabiz {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  70%,
-  100% {
-    transform: scale(1.35);
-    opacity: 0;
-  }
-}
-
 @keyframes marka-nefes {
   0%,
   100% {
@@ -1023,7 +1007,7 @@
    ========================================================================== */
 .chatbot-kok {
   position: fixed;
-  right: max(1rem, env(safe-area-inset-right));
+  right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 70;
   display: flex;
@@ -1127,7 +1111,7 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
 @keyframes chatbot-bekle { 50% { opacity: .4; } }
 
 @media (max-width: 480px) {
-  .chatbot-kok { right: .65rem; bottom: max(.65rem, env(safe-area-inset-bottom)); }
+  .chatbot-kok { right: max(1rem, env(safe-area-inset-right)); bottom: max(.65rem, env(safe-area-inset-bottom)); }
   body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.25rem, calc(.65rem + env(safe-area-inset-bottom))); }
   .chatbot-panel { width: calc(100vw - 1.3rem); height: min(38rem, calc(100dvh - 1.3rem)); border-radius: 1.2rem; }
 }
