@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /personel
+Disallow: /super-admin
+Disallow: /uygulama
+Disallow: /burger-plus
+
+Sitemap: https://orqrestro.vercel.app/sitemap.xml

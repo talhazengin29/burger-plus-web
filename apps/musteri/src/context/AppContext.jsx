@@ -266,9 +266,17 @@ export function AppProvider({ children }) {
   // Misafir oturumu: QR'dan "Misafir olarak devam et" ile gelince true olur.
   // sessionStorage'a yazılır → sayfa yenilenince korunur.
   // ÖNEMLİ: Giriş yapmış kullanıcı ASLA misafir değildir (kullanici doluysa misafir=false).
-  const [misafirState, setMisafirState] = useState(
-    () => temaOnizlemeModu || sessionStorage.getItem(tenantDepoAnahtari("bp_misafir", isletmeSlug)) === "1"
-  );
+  const [misafirState, setMisafirState] = useState(() => {
+    const landingOnizlemesi = new URLSearchParams(window.location.search).get("misafir") === "1";
+    return temaOnizlemeModu
+      || landingOnizlemesi
+      || sessionStorage.getItem(tenantDepoAnahtari("bp_misafir", isletmeSlug)) === "1";
+  });
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("misafir") === "1") {
+      sessionStorage.setItem(depoAnahtari("bp_misafir"), "1");
+    }
+  }, [depoAnahtari]);
   const misafir = kullanici ? false : misafirState;
   const setMisafir = (deger) => {
     const anahtar = depoAnahtari("bp_misafir");

@@ -5,6 +5,9 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta name="theme-color" content="#041521"/>
 <link rel="icon" type="image/png" href="/gorseller/menule-symbol-original.png"/>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="apple-touch-icon" href="/icons/menule-180.png"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
 
 <!-- Tema tercihini CSS/boya işleminden ÖNCE uygula — aksi halde bir anlık
      yanlış tema (FOUC) görülür. Varsayılan koyu (mevcut davranış). -->
@@ -24,11 +27,11 @@
 <title>{{ sayfaBasligi }}</title>
 <meta name="description" content="{{ sayfaAciklamasi }}"/>
 <meta name="robots" content="index, follow"/>
+<link rel="canonical" href="{{ canonicalUrl }}"/>
 
-<!-- Open Graph / Twitter
-     TODO(mutlak-og-url): og:image ideal olarak mutlak adres olmalı. Yayın
-     alan adı kesinleştiğinde buraya tam URL yazılmalı. -->
+<!-- Open Graph / Twitter -->
 <meta property="og:type" content="website"/>
+<meta property="og:url" content="{{ canonicalUrl }}"/>
 <meta property="og:site_name" content="{{ markaAdi }}"/>
 <meta property="og:title" content="{{ sayfaBasligi }}"/>
 <meta property="og:description" content="{{ sayfaAciklamasi }}"/>
@@ -39,6 +42,7 @@
 <meta name="twitter:title" content="{{ sayfaBasligi }}"/>
 <meta name="twitter:description" content="{{ sayfaAciklamasi }}"/>
 <meta name="twitter:image" content="{{ ogGorsel }}"/>
+{{ jsonLdHtml }}
 
 <!-- Tipografi: Inter (gövde) + Outfit (başlık).
      Vanilla Vite kurulumunda next/font yok; en performanslı yol preconnect +
@@ -79,8 +83,6 @@
   <!-- parca: ozellikler -->
   <hr class="ayirac mx-auto max-w-6xl"/>
   <!-- parca: nasil-calisir -->
-  <!-- parca: yorumlar -->
-  <hr class="ayirac mx-auto max-w-6xl"/>
   <!-- parca: fiyatlandirma -->
   <hr class="ayirac mx-auto max-w-3xl"/>
   <!-- parca: sss -->

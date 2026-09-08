@@ -7,6 +7,7 @@ import Isletmeler from "./screens/Isletmeler";
 import Raporlar from "./screens/Raporlar";
 import Abonelikler from "./screens/Abonelikler";
 import Kayitlar from "./screens/Kayitlar";
+import Basvurular from "./screens/Basvurular";
 import { Yukleme } from "./components/Ui";
 import PlatformAmblemi from "./components/PlatformAmblemi";
 
@@ -39,6 +40,7 @@ const NAV = [
   { yol: "/isletmeler", ad: "İşletmeler", ikon: "isletme" },
   { yol: "/raporlar", ad: "Raporlar", ikon: "rapor" },
   { yol: "/abonelikler", ad: "Abonelikler", ikon: "abonelik" },
+  { yol: "/basvurular", ad: "Başvurular", ikon: "basvuru" },
   { yol: "/kayitlar", ad: "Denetim İzi", ikon: "kayit" },
 ];
 const TEMEL = String(import.meta.env.BASE_URL || "/super-admin/").replace(/\/$/, "");
@@ -49,6 +51,7 @@ function PlatformIkonu({ tur }) {
     isletme: <><path d="M4 21V6l8-3 8 3v15" /><path d="M9 21v-5h6v5M8 8h.01M12 8h.01M16 8h.01M8 12h.01M12 12h.01M16 12h.01" /></>,
     rapor: <><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" /></>,
     abonelik: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M3 10h18M7 15h4" /></>,
+    basvuru: <><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /><path d="M17 11h4M19 9v4" /></>,
     kayit: <><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></>,
     cikis: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M13 3h5a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-5" /></>,
   };
@@ -67,6 +70,7 @@ function Panel({ superAdmin, cikis, yol, git, koyu, temaDegistir }) {
     "/isletmeler": <Isletmeler />,
     "/raporlar": <Raporlar />,
     "/abonelikler": <Abonelikler />,
+    "/basvurular": <Basvurular />,
     "/kayitlar": <Kayitlar />,
   };
   const aktifSayfa = NAV.find((oge) => oge.yol === yol) || NAV[0];

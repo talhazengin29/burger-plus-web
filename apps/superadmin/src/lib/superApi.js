@@ -77,6 +77,12 @@ export const abonelikleriGetir = () => superIstek("/abonelikler");
 export const abonelikOlustur = (veri) => superIstek("/abonelikler", json("POST", veri));
 export const abonelikGuncelle = (id, veri) => superIstek(`/abonelikler/${id}`, json("PUT", veri));
 export const gelirRaporu = (ay = 12) => superIstek(`/gelir?ay=${encodeURIComponent(ay)}`);
+export const basvurulariGetir = (filtre = {}) => {
+  const sorgu = new URLSearchParams();
+  Object.entries(filtre).forEach(([anahtar, deger]) => deger != null && deger !== "" && sorgu.set(anahtar, deger));
+  return superIstek(`/basvurular?${sorgu}`);
+};
+export const basvuruGuncelle = (id, veri) => superIstek(`/basvurular/${encodeURIComponent(id)}`, json("PATCH", veri));
 export const kayitlariGetir = (filtre = {}) => {
   const sorgu = new URLSearchParams();
   Object.entries(filtre).forEach(([anahtar, deger]) => deger != null && deger !== "" && sorgu.set(anahtar, deger));

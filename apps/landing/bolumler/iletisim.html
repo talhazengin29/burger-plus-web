@@ -2,12 +2,11 @@
      Talep formu — sayfanın dönüşüm noktası.
 
      Platformda self-servis kayıt yok (bkz. src/icerik.js → TODO(kayit-akisi));
-     bu form, ziyaretçinin bilgilerini hazır bir mesaja çevirip WhatsApp'a
-     (yoksa e-postaya) aktarır. Gönderim tamamen istemci tarafındadır: hiçbir
-     veri bu sayfada saklanmaz, üçüncü bir sunucuya iletilmez.
+     bu form ziyaretçinin bilgilerini güvenli API üzerinden platformun ayrı
+     başvuru tablosuna kaydeder. Kayıtları yalnızca Super Admin görebilir.
 
-     ILETISIM.whatsapp ve ILETISIM.eposta boşsa talepFormuHtml() bu bölümün
-     içini boş bırakır — çalışmayan bir form yayına çıkmasın diye.
+     ILETISIM.whatsapp ve ILETISIM.eposta boşsa talepFormuHtml() açık bir
+     hazırlık durumu gösterir; çalışmayan bir form yayına çıkmaz.
      ========================================================================== -->
 <section class="relative px-6 py-20 md:py-24" id="iletisim">
   <div class="mx-auto max-w-3xl">
@@ -17,7 +16,7 @@
         <span class="metin-akan">{{ TALEP_FORMU.baslik }}</span> <span class="metin-gradyan">{{ TALEP_FORMU.vurgu }}</span>
       </h2>
       <p class="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-marka-gri-300 md:text-base">
-        {{ TALEP_FORMU.aciklama }}
+        {{ talepAciklamasi }}
       </p>
     </div>
 

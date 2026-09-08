@@ -223,17 +223,24 @@ function aktifBolumIsaretle() {
 }
 
 /* ------------------------------------------------------------- Talep formu */
-// Form gönderimi tamamen istemci tarafındadır: alanlar doğrulanır, tek bir
-// mesaja çevrilir ve WhatsApp'a (yoksa e-postaya) aktarılır. Hiçbir veri
-// saklanmaz veya üçüncü bir sunucuya iletilmez — bu yüzden formun backend'e
-// ihtiyacı yoktur.
+// Başvuru güvenli API üzerinden platform tablosuna kaydedilir ve Super Admin
+// ekranında takip edilir. İstemci doğrulaması kullanıcı deneyimi içindir;
+// aynı kontroller backend'de yeniden uygulanır.
 function talepFormu() {
   const form = document.getElementById("talep-formu");
   if (!form) return; // İletişim kanalı tanımlı değilse form basılmamıştır.
 
   const durum = document.getElementById("talep-durum");
-  const kanal = form.dataset.kanal || "whatsapp";
-  const hedef = form.dataset.hedef || "";
+  const backend = String(import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+  const gonderDugmesi = form.querySelector('button[type="submit"]');
+  const uuidUret = () => globalThis.crypto?.randomUUID?.()
+    || "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (karakter) => {
+      const rastgele = Math.floor(Math.random() * 16);
+      return (karakter === "x" ? rastgele : (rastgele & 0x3) | 0x8).toString(16);
+    });
+  let formBaslangici = Date.now();
+  let istekAnahtari = uuidUret();
+  let gonderiliyor = false;
 
   const hataKutusu = (ad) => document.getElementById(`talep-${ad}-hata`);
 
@@ -299,12 +306,6 @@ function talepFormu() {
       hatayiTemizle("eposta");
     }
 
-    // E-posta kanalında dönüş adresi olmadan talep işe yaramaz.
-    if (kanal === "eposta" && !eposta) {
-      hataGoster("eposta", "E-posta ile gönderimde bu alan zorunludur.");
-      hatalar.push("eposta");
-    }
-
     const kvkk = form.elements.kvkk;
     const kvkkHatasi = document.getElementById("talep-kvkk-hata");
     if (kvkk && !kvkk.checked) {
@@ -323,24 +324,31 @@ function talepFormu() {
     return hatalar;
   }
 
-  function mesajiKur() {
+  function basvuruVerisiniKur() {
     const oku = (ad) => String(form.elements[ad]?.value || "").trim();
-    const satirlar = [
-      "Merhaba, Menüle için kurulum talebim var.",
-      "",
-      `Ad Soyad: ${oku("ad")}`,
-      `İşletme: ${oku("isletme")}`,
-      `Telefon: ${oku("telefon")}`,
-    ];
-    if (oku("eposta")) satirlar.push(`E-posta: ${oku("eposta")}`);
-    if (oku("masaSayisi")) satirlar.push(`Masa sayısı: ${oku("masaSayisi")}`);
-    if (oku("paket")) satirlar.push(`İlgilenilen paket: ${oku("paket")}`);
-    if (oku("mesaj")) satirlar.push("", `Not: ${oku("mesaj")}`);
-    return satirlar.join("\n");
+    const sorgu = new URLSearchParams(window.location.search);
+    return {
+      adSoyad: oku("ad"),
+      isletmeAdi: oku("isletme"),
+      telefon: oku("telefon"),
+      email: oku("eposta"),
+      masaSayisi: oku("masaSayisi"),
+      paket: oku("paket"),
+      mesaj: oku("mesaj"),
+      kvkkOnay: form.elements.kvkk?.checked === true,
+      website: oku("website"),
+      istekAnahtari,
+      formSuresiMs: Date.now() - formBaslangici,
+      utmSource: sorgu.get("utm_source") || "",
+      utmMedium: sorgu.get("utm_medium") || "",
+      utmCampaign: sorgu.get("utm_campaign") || "",
+      referrer: document.referrer || "",
+    };
   }
 
-  form.addEventListener("submit", (olay) => {
+  form.addEventListener("submit", async (olay) => {
     olay.preventDefault();
+    if (gonderiliyor) return;
     const hatalar = dogrula();
 
     if (hatalar.length) {
@@ -350,23 +358,27 @@ function talepFormu() {
       return;
     }
 
-    const mesaj = mesajiKur();
-    const adres =
-      kanal === "whatsapp"
-        ? `https://wa.me/${hedef}?text=${encodeURIComponent(mesaj)}`
-        : `mailto:${hedef}?subject=${encodeURIComponent("Menüle — Kurulum talebi")}&body=${encodeURIComponent(mesaj)}`;
-
-    if (durum) {
-      durum.textContent =
-        kanal === "whatsapp"
-          ? "WhatsApp açılıyor — mesajı göndermeyi unutmayın."
-          : "E-posta uygulamanız açılıyor — mesajı göndermeyi unutmayın.";
+    gonderiliyor = true;
+    gonderDugmesi?.setAttribute("disabled", "");
+    if (durum) durum.textContent = "Başvurunuz güvenli şekilde gönderiliyor…";
+    try {
+      const yanit = await fetch(`${backend}/api/landing/basvurular`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(basvuruVerisiniKur()),
+      });
+      const veri = await yanit.json().catch(() => ({}));
+      if (!yanit.ok) throw new Error(veri.hata || "Başvuru gönderilemedi.");
+      form.reset();
+      formBaslangici = Date.now();
+      istekAnahtari = uuidUret();
+      if (durum) durum.textContent = "Başvurunuz alındı. Ekibimiz en kısa sürede sizinle iletişime geçecek.";
+    } catch (hata) {
+      if (durum) durum.textContent = hata.message || "Başvuru gönderilemedi. Lütfen WhatsApp veya e-posta kanalımızı kullanın.";
+    } finally {
+      gonderiliyor = false;
+      gonderDugmesi?.removeAttribute("disabled");
     }
-
-    // WhatsApp yeni sekmede, mailto aynı sekmede açılır (mailto yeni sekmede
-    // boş bir pencere bırakır).
-    if (kanal === "whatsapp") window.open(adres, "_blank", "noopener,noreferrer");
-    else window.location.href = adres;
   });
 
   // Kullanıcı düzeltmeye başlayınca hata mesajı kaybolsun.

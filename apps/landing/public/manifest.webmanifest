@@ -1,0 +1,14 @@
+{
+  "name": "Menüle",
+  "short_name": "Menüle",
+  "description": "Restoran yönetim ve sipariş platformu",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#041521",
+  "theme_color": "#041521",
+  "icons": [
+    { "src": "/icons/menule-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/menule-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -14,8 +14,18 @@
 // Bunlar Vercel dağıtımındaki (bkz. vercel.json) canlı adreslerdir.
 export const ROTALAR = {
   personelGiris: "/personel", // apps/personel → GenelGiris ekranı
-  musteriDemo: "/burger-plus", // apps/musteri → varsayılan işletme
+  musteriDemo: "/burger-plus/anasayfa?misafir=1", // giriş duvarı olmadan gerçek misafir görünümü
 };
+
+// VITE_SITE_URL, özel alan adı bağlandığında Vercel ortam değişkeninden
+// değiştirilir. Sondaki eğik çizgi temizlenir ki canonical adresler tek olsun.
+const ORTAM_SITE_URL = typeof process !== "undefined"
+  ? process.env.VITE_SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "")
+  : "";
+export const SITE_URL = String(ORTAM_SITE_URL || "https://orqrestro.vercel.app").replace(/\/$/, "");
+export const canonicalUrl = `${SITE_URL}/`;
 
 // ============================================================================
 // ⚙️ KURULUM — YAYINA ÇIKMADAN ÖNCE DOLDURULACAK TEK YER
@@ -39,9 +49,9 @@ export const ROTALAR = {
 //            görünen başvuru adresi. Örnek: "iletisim@ornek.com"
 // telefon  → altbilgide görünen, insanın okuyacağı biçim. Örnek: "0532 111 22 33"
 export const ILETISIM = {
-  whatsapp: "",
-  eposta: "",
-  telefon: "",
+  whatsapp: "905522855561",
+  eposta: "menule@info.com",
+  telefon: "+90 552 285 55 61",
 };
 
 // --- Yasal / künye bilgileri -------------------------------------------------
@@ -58,7 +68,12 @@ export const YASAL = {
   kepAdresi: "",          // varsa
   veriSorumlusu: "",      // genelde şirket ünvanının aynısı
   sonGuncelleme: "",      // "4 Ağustos 2026"
+  yayinaHazir: false,      // hukuk kontrolü ve tüm yer tutucular tamamlanınca true
 };
+
+export const yasalRobots = () => YASAL.yayinaHazir
+  ? "index, follow"
+  : "noindex, nofollow, noarchive";
 
 // Dolu alan olduğu gibi basılır; boş alan gözle görülür bir yer tutucuya
 // dönüşür (bkz. .yasal-yer-tutucu) — eksik künye yayında fark edilsin diye.
@@ -127,16 +142,14 @@ export const DENEME = {
 };
 
 // --- Talep formu -------------------------------------------------------------
-// Self-servis kayıt olmadığı için dönüşüm bu formdan geçer: ziyaretçi
-// bilgilerini bırakır, form içeriği tek mesaja dönüşüp WhatsApp'a (yoksa
-// e-postaya) aktarılır. Gönderim tamamen istemci tarafındadır; hiçbir veri
-// bu sayfada saklanmaz veya üçüncü bir sunucuya iletilmez.
+// Self-servis kayıt olmadığı için dönüşüm bu formdan geçer. Başvurular ayrı
+// platform tablosuna kaydedilir ve yalnızca Super Admin'de görüntülenir.
 export const TALEP_FORMU = {
   etiket: "İletişim",
   baslik: "KURULUM İÇİN",
   vurgu: "BİZE YAZIN",
   aciklama:
-    "Menünüzü ve masa sayınızı iletin; kurulumu ekibimiz yapsın. Formu doldurduğunuzda bilgiler hazır bir mesaja dönüşür, gönderme kararı sizde kalır.",
+    "Menünüzü ve masa sayınızı iletin; başvurunuz ekibimize ulaşsın, kurulumu birlikte planlayalım.",
   buton: "Talebi Gönder",
   butonEposta: "E-posta ile Gönder",
   gizlilikNotu: "Formu göndererek {kvkkBaglantisi} okuduğunuzu kabul edersiniz. Bilgileriniz yalnızca size dönüş yapmak için kullanılır.",
@@ -157,6 +170,12 @@ export const TALEP_FORMU = {
   },
 };
 
+export function talepAciklamasi() {
+  return iletisimKanaliVarMi()
+    ? TALEP_FORMU.aciklama
+    : "Kurulum talebi kanalları yayına hazırlanmaktadır. İletişim bilgileri tanımlandığında bu bölümden doğrudan başvuru alınacaktır.";
+}
+
 const YIL = new Date().getFullYear();
 
 export const ICERIK = {
@@ -170,7 +189,7 @@ export const ICERIK = {
   sayfaBasligi: "Menüle | Restoran Yönetim ve Sipariş Platformu",
   sayfaAciklamasi:
     "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoranınızın siparişten ödemeye tüm akışını tek sistemde yönetin.",
-  ogGorsel: "/gorseller/hero-telefon.jpg",
+  ogGorsel: `${SITE_URL}/gorseller/hero-telefon.jpg`,
   ogGorselAlt: "Menüle müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
@@ -205,8 +224,8 @@ export const ICERIK = {
   yorumlarVurgu: "GERİ BİLDİRİM",
 
   fiyatEtiket: "Fiyatlandırma",
-  fiyatBaslik: "NE GÖRÜRSEN",
-  fiyatVurgu: "ONU ÖDERSİN",
+  fiyatBaslik: "İHTİYACINIZA UYGUN",
+  fiyatVurgu: "PAKETİ SEÇİN",
   fiyatAciklama: "Ciro üzerinden komisyon yok. İşletmenizin boyutuna uygun, sabit aylık ücret.",
 
   sssEtiket: "SSS",
@@ -402,6 +421,36 @@ export const SORULAR = [
       "Tüm veriler PostgreSQL veritabanında kalıcı olarak saklanır. Her işletmenin verisi ayrı tutulur; şifreler bcrypt ile saklanır ve yönetici hesaplarında iki adımlı doğrulama açılabilir.",
   },
 ];
+
+// Arama motorları için görünen içerikle aynı kaynaktan üretilen yapılandırılmış
+// veri. Fiyat ve SSS değişince şema da otomatik güncel kalır.
+export function jsonLdHtml() {
+  const uygulama = {
+    "@type": "SoftwareApplication",
+    name: ICERIK.markaAdi,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: canonicalUrl,
+    description: ICERIK.sayfaAciklamasi,
+    offers: PAKETLER.filter((paket) => paket.fiyatAylik != null).map((paket) => ({
+      "@type": "Offer",
+      name: paket.ad,
+      price: String(paket.fiyatAylik),
+      priceCurrency: "TRY",
+      url: `${SITE_URL}/#fiyatlandirma`,
+    })),
+  };
+  const sss = {
+    "@type": "FAQPage",
+    mainEntity: SORULAR.map((oge) => ({
+      "@type": "Question",
+      name: oge.soru,
+      acceptedAnswer: { "@type": "Answer", text: oge.cevap },
+    })),
+  };
+  const veri = { "@context": "https://schema.org", "@graph": [uygulama, sss] };
+  return `<script type="application/ld+json">${JSON.stringify(veri).replace(/</g, "\\u003c")}</script>`;
+}
 
 // --- Alt bilgi ---------------------------------------------------------------
 export const ALTBILGI_KOLONLARI = [
@@ -658,6 +707,7 @@ export function paketKarsilastirmaHtml() {
   const satirlar = [
     ["QR menü ve ürün yönetimi", true, true, true],
     ["Tema ve marka özelleştirme", true, true, true],
+    ["Kurulum ve menü aktarımı", true, true, true],
     ["Masadan canlı sipariş", false, true, true],
     ["Mutfak ve salon paneli", false, true, true],
     ["Sadakat, kampanya ve cüzdan", false, true, true],
@@ -699,12 +749,14 @@ export function sorularHtml() {
 }
 
 // --- Talep formu -------------------------------------------------------------
-// Hiçbir iletişim kanalı tanımlı değilse form basılmaz: gönderilemeyen bir
-// form, ziyaretçiyi formu doldurttuktan sonra hüsrana uğratır.
+// Hiçbir iletişim kanalı tanımlı değilse form yerine açık bir hazırlık durumu
+// basılır: gönderilemeyen bir form ziyaretçiye sunulmaz.
 export function talepFormuHtml() {
   if (!iletisimKanaliVarMi()) {
-    return `<!-- Talep formu: src/icerik.js icindeki ILETISIM.whatsapp ve ILETISIM.eposta
-     bos oldugu icin render edilmedi. Birini doldurunca form otomatik gorunur. -->`;
+    return `<div class="cam-panel rounded-2xl border border-marka-cizgi px-6 py-8 text-center" role="status">
+      <p class="font-baslik text-lg font-semibold text-marka-metin">Başvuru kanalı hazırlanıyor</p>
+      <p class="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-marka-gri-300">Yanlış bir iletişim adresi yayınlamamak için form henüz etkin değil. E-posta veya WhatsApp kanalı tanımlandığında otomatik olarak açılacak.</p>
+    </div>`;
   }
 
   const A = TALEP_FORMU.alanlar;
@@ -748,6 +800,10 @@ export function talepFormuHtml() {
   return `
       <form class="talep-form isik-kart" id="talep-formu" novalidate
             data-kanal="${kanal}" data-hedef="${kacis(kanalHedefi)}">
+        <div class="talep-tuzak" aria-hidden="true">
+          <label for="talep-website">Website</label>
+          <input id="talep-website" name="website" type="text" tabindex="-1" autocomplete="off"/>
+        </div>
         <div class="talep-izgara">
           ${alan("ad", A.ad, "text", ' autocomplete="name"')}
           ${alan("isletme", A.isletme, "text", ' autocomplete="organization"')}
@@ -790,10 +846,10 @@ export function altbilgiIletisimHtml() {
   const satirlar = [];
   const eposta = String(ILETISIM.eposta || "").trim();
   const telefon = String(ILETISIM.telefon || "").trim();
-  if (eposta) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="mailto:${kacis(eposta)}">${kacis(eposta)}</a></li>`);
-  if (telefon) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="tel:${telefon.replace(/[^\d+]/g, "")}">${kacis(telefon)}</a></li>`);
+  if (eposta) satirlar.push(`<li><a class="altbilgi-link transition-colors hover:text-marka-metin" href="mailto:${kacis(eposta)}">${kacis(eposta)}</a></li>`);
+  if (telefon) satirlar.push(`<li><a class="altbilgi-link transition-colors hover:text-marka-metin" href="tel:${telefon.replace(/[^\d+]/g, "")}">${kacis(telefon)}</a></li>`);
   const wa = whatsappAdresi();
-  if (wa) satirlar.push(`<li><a class="transition-colors hover:text-marka-metin" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>`);
+  if (wa) satirlar.push(`<li><a class="altbilgi-link transition-colors hover:text-marka-metin" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>`);
   if (!satirlar.length) return "<!-- Altbilgi iletisim: ILETISIM alanlari bos. -->";
 
   return `
@@ -812,7 +868,7 @@ export function altbilgiKolonlariHtml() {
         <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${kolon.baglantilar
           .map(
             (baglanti) => `
-          <li><a class="transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a></li>`,
+          <li><a class="altbilgi-link transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a></li>`,
           )
           .join("")}
         </ul>

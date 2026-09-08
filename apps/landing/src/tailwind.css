@@ -855,6 +855,21 @@
     font-weight: 600;
   }
 
+  .altbilgi-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-block: 0.25rem;
+  }
+
+  .talep-tuzak {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+  }
+
   .yasal-uyari {
     border: 1px solid var(--marka-mavi);
     background: rgba(11, 145, 211, 0.08);
