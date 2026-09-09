@@ -66,6 +66,7 @@
 .mz-chipler { display: flex; flex-wrap: wrap; gap: 8px; }
 .mz-chip { min-height: 38px; padding: 0 13px; color: var(--muted); border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--text) 3%, transparent); font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; }
 .mz-chip--aktif { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.mz-alerjen-bos { margin: 0; padding: 11px 12px; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; font-size: 9px; line-height: 1.45; }
 .mz-grup legend { margin-bottom: 9px; }
 .mz-grup legend b { float: right; color: var(--accent); }
 .mz-range { width: 100%; accent-color: var(--accent); }

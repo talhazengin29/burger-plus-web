@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconArrowRight, IconCheck, IconClock, IconMinus, IconPlus, IconUsers, IconWarning } from "./Icons";
 import {
@@ -8,8 +8,13 @@ import {
 import { socket } from "../lib/socket";
 import "./MasaZekasi.css";
 
-const ALERJENLER = ["Gluten", "Süt", "Yumurta", "Yer fıstığı", "Soya"];
 const PARA = new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" });
+
+function alerjenEtiketiniTemizle(deger) {
+  return [...String(deger || "")]
+    .filter((karakter) => karakter.charCodeAt(0) >= 32 && karakter !== "<" && karakter !== ">")
+    .join("").trim().slice(0, 60);
+}
 
 function Secenek({ aktif, onClick, children }) {
   return <button type="button" className={`mz-chip${aktif ? " mz-chip--aktif" : ""}`} aria-pressed={aktif} onClick={onClick}>{children}</button>;
@@ -50,6 +55,26 @@ export default function MasaZekasi({ acik, masaNo, masaTokeni, kullanici, urunle
   const panelRef = useRef(null);
   const ortakMod = Boolean(masaNo && masaTokeni);
   const gorunenKisiSayisi = ortakMod ? Math.max(1, ortakOturum?.katilimcilar?.length || 1) : tercih.kisiSayisi;
+  const alerjenSecenekleri = useMemo(() => {
+    const benzersiz = new Map();
+    (urunler || []).forEach((urun) => {
+      (Array.isArray(urun?.alerjenler) ? urun.alerjenler : []).forEach((deger) => {
+        const etiket = alerjenEtiketiniTemizle(deger);
+        if (!etiket) return;
+        const anahtar = etiket.toLocaleLowerCase("tr-TR");
+        if (!benzersiz.has(anahtar)) benzersiz.set(anahtar, etiket);
+      });
+    });
+    return [...benzersiz.values()].sort((a, b) => a.localeCompare(b, "tr-TR"));
+  }, [urunler]);
+
+  useEffect(() => {
+    const gecerli = new Set(alerjenSecenekleri.map((a) => a.toLocaleLowerCase("tr-TR")));
+    setTercih((onceki) => {
+      const alerjenler = onceki.alerjenler.filter((a) => gecerli.has(String(a).toLocaleLowerCase("tr-TR")));
+      return alerjenler.length === onceki.alerjenler.length ? onceki : { ...onceki, alerjenler };
+    });
+  }, [alerjenSecenekleri]);
 
   useEffect(() => {
     if (!acik) return undefined;
@@ -152,7 +177,7 @@ export default function MasaZekasi({ acik, masaNo, masaTokeni, kullanici, urunle
             <fieldset className="mz-grup"><legend>Açlık seviyesi</legend><div className="mz-chipler"><Secenek aktif={tercih.aclik === "hafif"} onClick={() => degistir("aclik", "hafif")}>Hafif</Secenek><Secenek aktif={tercih.aclik === "normal"} onClick={() => degistir("aclik", "normal")}>Normal</Secenek><Secenek aktif={tercih.aclik === "cok"} onClick={() => degistir("aclik", "cok")}>Çok açız</Secenek></div></fieldset>
             <fieldset className="mz-grup"><legend>Beslenme tercihi</legend><div className="mz-chipler"><Secenek aktif={tercih.beslenme === "farketmez"} onClick={() => degistir("beslenme", "farketmez")}>Fark etmez</Secenek><Secenek aktif={tercih.beslenme === "vejetaryen"} onClick={() => degistir("beslenme", "vejetaryen")}>Vejetaryen</Secenek><Secenek aktif={tercih.beslenme === "vegan"} onClick={() => degistir("beslenme", "vegan")}>Vegan</Secenek></div></fieldset>
             <fieldset className="mz-grup"><legend>Acı tercihi <b>{tercih.aci}/5</b></legend><input className="mz-range" type="range" min="0" max="5" value={tercih.aci} onChange={(e) => degistir("aci", Number(e.target.value))} /></fieldset>
-            <fieldset className="mz-grup"><legend>Alerjenler</legend><div className="mz-chipler">{ALERJENLER.map((a) => <Secenek key={a} aktif={tercih.alerjenler.includes(a)} onClick={() => alerjenDegistir(a)}>{a}</Secenek>)}</div></fieldset>
+            <fieldset className="mz-grup"><legend>Alerjenler</legend>{alerjenSecenekleri.length > 0 ? <div className="mz-chipler">{alerjenSecenekleri.map((a) => <Secenek key={a.toLocaleLowerCase("tr-TR")} aktif={tercih.alerjenler.includes(a)} onClick={() => alerjenDegistir(a)}>{a}</Secenek>)}</div> : <p className="mz-alerjen-bos">Bu işletmenin ürün kayıtlarında henüz alerjen bilgisi tanımlanmamış.</p>}</fieldset>
             <label className="mz-alan"><span>Sevmediğiniz malzemeler</span><input className="mz-metin-input" maxLength="240" value={tercih.sevilmeyenler} onChange={(e) => degistir("sevilmeyenler", e.target.value)} placeholder="Örn. turşu, soğan, mantar" /><small>Birden fazlaysa virgülle ayırın.</small></label>
             {hata && <p className="mz-hata" role="alert">{hata}</p>}
             <footer className="mz-footer mz-footer--iki"><button type="button" className="mz-geri" onClick={() => setAdim(1)}>Geri</button><button type="button" className="mz-ana-btn" disabled={yukleniyor || ortakYukleniyor} onClick={planOlustur}>{yukleniyor ? "Kaydediliyor…" : ortakMod ? "Tercihimi masaya gönder" : "Planları oluştur"}<IconArrowRight /></button></footer>
