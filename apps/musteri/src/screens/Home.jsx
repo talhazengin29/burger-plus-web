@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,6 +6,7 @@ import { useApp } from "../context/AppContext";
 import { useSuruklenebilir } from "../hooks/useSuruklenebilir";
 import { IconPlus, IconSearch, IconFilter } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
+import MasaZekasi, { MasaZekasiKart } from "../components/MasaZekasi";
 import { siraliKonteyner, siraliOge, asagiAcilma } from "../lib/animasyonlar";
 import { guvenliMetin } from "../lib/dogrulama";
 import { useTema } from "../context/TemaContext";
@@ -36,9 +37,11 @@ export default function Home() {
   const [arama, setArama] = useState("");
   const [siralama, setSiralama] = useState("onerilen");
   const [filtreAcik, setFiltreAcik] = useState(false);
-  const { sepeteEkle, burgerDamga, burgerDamgaHedef, damgaKarti, misafir, indirimliFiyat, urunler, kategoriler } = useApp();
+  const [masaZekasiAcik, setMasaZekasiAcik] = useState(false);
+  const { sepeteEkle, burgerDamga, burgerDamgaHedef, damgaKarti, misafir, kullanici, indirimliFiyat, urunler, kategoriler, ozetMasaNo, ozetMasaTokeni } = useApp();
   const git = useIsletmeNavigate();
   const chipRef = useSuruklenebilir();
+  const masaZekasiniKapat = useCallback(() => setMasaZekasiAcik(false), []);
 
   useEffect(() => {
     if (kategoriler.some((kategori) => kategori.ad === aktifKategori)) return;
@@ -127,6 +130,8 @@ export default function Home() {
         </motion.section>}
 
         {/* Kategoriler — yuvarlak görseller, yatay kaydırma */}
+        <MasaZekasiKart masaNo={ozetMasaNo} onAc={() => setMasaZekasiAcik(true)} />
+
         <div className="kategori-satir" ref={chipRef}>
           {kategoriler.map((kategori) => {
             const k = kategori.ad;
@@ -250,6 +255,15 @@ export default function Home() {
           <p className="bos-sonuc">{arama ? t("home.noResult", { query: arama }) : t("home.waitingProducts")}</p>
         )}
       </div>
+      <MasaZekasi
+        acik={masaZekasiAcik}
+        masaNo={ozetMasaNo}
+        masaTokeni={ozetMasaTokeni}
+        kullanici={kullanici}
+        urunler={urunler}
+        sepeteEkle={sepeteEkle}
+        onKapat={masaZekasiniKapat}
+      />
     </div>
   );
 }

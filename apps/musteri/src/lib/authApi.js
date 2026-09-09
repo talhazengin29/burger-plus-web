@@ -210,6 +210,34 @@ export async function duyurulariGetir() {
   catch { return []; }
 }
 
+export async function masaZekasiOnerisiGetir(tercihler) {
+  return jsonIstegi("/api/masa-zekasi/oner", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(tercihler || {}),
+  }, "Masa için sipariş önerisi oluşturulamadı.");
+}
+
+function masaZekasiMasaIstegi(masaNo, masaTokeni, yol, method, body, hata) {
+  return jsonIstegi(`/api/masa/${encodeURIComponent(masaNo)}/zeka-oturumu${yol}`, {
+    method,
+    headers: { "Content-Type": "application/json", "X-Masa-Token": masaTokeni },
+    body: JSON.stringify(body || {}),
+  }, hata);
+}
+
+export function masaZekasiOturumunaKatil(masaNo, masaTokeni, cihazAnahtari, ad) {
+  return masaZekasiMasaIstegi(masaNo, masaTokeni, "/katil", "POST", { cihazAnahtari, ad }, "Ortak masa oturumuna katılınamadı.");
+}
+
+export function masaZekasiTercihiniKaydet(masaNo, masaTokeni, cihazAnahtari, tercihler) {
+  return masaZekasiMasaIstegi(masaNo, masaTokeni, "/tercihim", "PUT", { cihazAnahtari, tercihler }, "Tercihler kaydedilemedi.");
+}
+
+export function masaZekasiOrtakOnerisiGetir(masaNo, masaTokeni, cihazAnahtari) {
+  return masaZekasiMasaIstegi(masaNo, masaTokeni, "/oner", "POST", { cihazAnahtari }, "Ortak sipariş planı oluşturulamadı.");
+}
+
 export async function siparisGecmisiniGetir() {
   if (!tokeniAl()) return [];
   return (await jsonIstegi("/api/siparislerim", {}, "Sipariş geçmişi alınamadı.")).siparisler || [];
