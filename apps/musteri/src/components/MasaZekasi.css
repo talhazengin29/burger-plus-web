@@ -21,11 +21,12 @@
 .masa-zekasi-kart__ok svg { width: 17px; height: 17px; }
 
 .mz-perde { position: fixed; z-index: 1200; inset: 0; display: flex; justify-content: center; align-items: flex-end; padding: 16px; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); }
-.mz-panel { width: min(100%, 520px); max-height: min(88dvh, 820px); overflow: hidden; color: var(--text); border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border)); border-radius: 28px; background: var(--surface); box-shadow: 0 26px 80px rgba(0,0,0,.45); outline: none; }
+.mz-panel { width: min(100%, 520px); height: min(88dvh, 820px); max-height: min(88dvh, 820px); display: flex; flex-direction: column; overflow: hidden; color: var(--text); border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border)); border-radius: 28px; background: var(--surface); box-shadow: 0 26px 80px rgba(0,0,0,.45); outline: none; }
 .mz-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 21px 21px 14px; }
 .mz-header small { color: var(--accent); font-size: 9px; font-weight: 900; letter-spacing: .12em; }
 .mz-header h2 { margin: 5px 0 0; font-size: 22px; line-height: 1.15; }
 .mz-kapat { flex: 0 0 36px; width: 36px; height: 36px; color: var(--muted); border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--text) 5%, transparent); font-size: 25px; line-height: 1; cursor: pointer; }
+.mz-header, .mz-ilerleme, .mz-ortak { flex: 0 0 auto; }
 .mz-ilerleme { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 0 21px 16px; }
 .mz-ilerleme span { height: 3px; border-radius: 9px; background: color-mix(in srgb, var(--text) 12%, transparent); }
 .mz-ilerleme span.aktif { background: var(--accent); }
@@ -38,7 +39,7 @@
 .mz-katilimcilar > span.hazir { color: var(--text); border-color: color-mix(in srgb, #31d98b 30%, var(--border)); }
 .mz-katilimcilar > span.hazir > i { background: #31d98b; }
 .mz-katilimcilar > small { color: var(--muted); font-size: 8px; }
-.mz-icerik { max-height: calc(88dvh - 100px); overflow-y: auto; overscroll-behavior: contain; padding: 3px 21px 22px; scrollbar-width: thin; }
+.mz-icerik { flex: 1 1 auto; min-height: 0; max-height: none; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 3px 21px 22px; scrollbar-width: thin; }
 .mz-adim-baslik { display: flex; align-items: flex-start; gap: 12px; margin: 4px 0 22px; }
 .mz-adim-baslik > span { flex: 0 0 auto; padding: 6px 8px; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 9px; font-size: 9px; font-weight: 900; }
 .mz-adim-baslik h3 { margin: 0; font-size: 18px; }
@@ -70,7 +71,7 @@
 .mz-range { width: 100%; accent-color: var(--accent); }
 .mz-metin-input { min-height: 50px; padding: 0 14px; color: var(--text); border: 1px solid var(--border); border-radius: 14px; outline: 0; background: color-mix(in srgb, var(--text) 4%, transparent); font: inherit; font-size: 12px; }
 .mz-metin-input:focus, .mz-para:focus-within { border-color: var(--accent); }
-.mz-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+.mz-footer { position: sticky; z-index: 5; bottom: -22px; display: flex; justify-content: flex-end; gap: 9px; margin: 22px -21px -22px; padding: 16px 21px max(18px, env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent, var(--surface) 13px); }
 .mz-footer--iki { justify-content: space-between; }
 .mz-ana-btn, .mz-geri { min-height: 48px; padding: 0 17px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; font: inherit; font-size: 11px; font-weight: 850; cursor: pointer; }
 .mz-ana-btn { color: var(--accent-contrast, #fff); border: 0; background: var(--accent); }
@@ -119,6 +120,9 @@
 
 @media (max-width: 559px) {
   .mz-perde { padding: 0; }
-  .mz-panel { max-height: 92dvh; border-radius: 26px 26px 0 0; border-bottom: 0; }
-  .mz-icerik { max-height: calc(92dvh - 100px); }
+  .mz-panel { width: 100%; height: 92dvh; max-height: 92dvh; border-radius: 26px 26px 0 0; border-bottom: 0; }
+  .mz-header { padding-top: 17px; padding-bottom: 11px; }
+  .mz-ilerleme { padding-bottom: 11px; }
+  .mz-ortak { margin-bottom: 11px; }
+  .mz-ana-btn, .mz-geri { min-height: 52px; }
 }
