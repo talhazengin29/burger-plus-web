@@ -1,17 +1,7 @@
-/* ==========================================================================
-   Uygulama geneli paylaşılan state: puan, tema ve sepet + ödeme.
-   Ödeme yapıldığında puan burada artar. Puan oranı mockData'da (PUAN_ORANI_TL).
-   ========================================================================== */
+/* Uygulama geneli paylaşılan state: katalog, puan, sepet ve ödeme. */
 
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
-import {
-  kampanyalar as varsayilanKampanyalar,
-  kampanyaAktifMi,
-  kategoriler as varsayilanKategoriAdlari,
-  kategoriGorseller,
-  urunler as varsayilanUrunler,
-  urunKurallariniUygula,
-} from "../data/mockData";
+import { kampanyaAktifMi, urunKurallariniUygula } from "../lib/katalogKurallari";
 import { socket, socketIsletmesiniAyarla } from "../lib/socket";
 import { sepetAnahtariOlustur } from "../lib/urunSecimleri";
 import { useIsletme } from "./IsletmeContext";
@@ -25,45 +15,36 @@ import {
 
 const AppContext = createContext(null);
 const VARSAYILAN_DAMGA_KARTI = {
-  aktif: true, hedefAdet: 5, kategori: "Burgerler", odulMetni: "1 Burger Hediye",
+  aktif: false, hedefAdet: 5, kategori: "", odulMetni: "Hediye",
   kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun",
   aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.",
   damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★",
 };
 
-function kataloguBirlestir(uzakUrunler, isletmeSlug) {
+function kataloguBirlestir(uzakUrunler) {
   return uzakUrunler.map((uzak) => {
-    const yerel = isletmeSlug === "burger-plus"
-      ? varsayilanUrunler.find((u) => String(u.id) === String(uzak.id)) || {}
-      : {};
     const doluUzakAlanlar = Object.fromEntries(
       Object.entries(uzak).filter(([, deger]) => deger !== null && deger !== undefined)
     );
-    return urunKurallariniUygula({ ...yerel, ...doluUzakAlanlar });
+    return urunKurallariniUygula(doluUzakAlanlar);
   });
 }
 
-const varsayilanKategoriler = varsayilanKategoriAdlari.map((ad, sira) => ({
-  id: ad === "Tümü" ? "tumu" : `varsayilan-${sira}`,
-  ad,
-  gorsel: kategoriGorseller[ad] || null,
-  sira,
-}));
+const TUMU_KATEGORISI = { id: "tumu", ad: "Tümü", gorsel: null, sira: 0 };
 
-function kategorileriBirlestir(uzakKategoriler, isletmeSlug) {
-  const tumu = varsayilanKategoriler[0];
+function kategorileriBirlestir(uzakKategoriler) {
   const liste = uzakKategoriler
     .filter((kategori) => kategori && String(kategori.ad || "").trim() && kategori.aktif !== false)
     .map((kategori, sira) => ({
       id: kategori.id ?? `uzak-${sira}`,
       ad: String(kategori.ad).trim(),
-      gorsel: kategori.gorsel || (isletmeSlug === "burger-plus" ? kategoriGorseller[kategori.ad] : null) || null,
+      gorsel: kategori.gorsel || null,
       sira: Number.isFinite(Number(kategori.sira)) ? Number(kategori.sira) : sira + 1,
       ceviriler: kategori.ceviriler || {},
       ceviriDurumu: kategori.ceviriDurumu || "bekliyor",
     }));
   const benzersiz = Array.from(new Map(liste.map((kategori) => [kategori.ad, kategori])).values());
-  return [tumu, ...benzersiz.sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, "tr"))];
+  return [TUMU_KATEGORISI, ...benzersiz.sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, "tr"))];
 }
 
 function kategorileriUrunlerdenTamamla(mevcut, urunler) {
@@ -86,17 +67,20 @@ export function AppProvider({ children }) {
   const [puan, setPuan] = useState(0);
   const [sadakat, setSadakat] = useState({ burgerDamga: 0, burgerDamgaHedef: 5, damgaKarti: VARSAYILAN_DAMGA_KARTI, oduller: [], puanGecmisi: [], hediyeler: [] });
   const [damgaKarti, setDamgaKarti] = useState(VARSAYILAN_DAMGA_KARTI);
-  const [urunler, setUrunler] = useState(() => isletmeSlug === "burger-plus" ? varsayilanUrunler : []);
-  const [menuKategorileri, setMenuKategorileri] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKategoriler : [varsayilanKategoriler[0]]);
-  const [kampanyalar, setKampanyalar] = useState(() => isletmeSlug === "burger-plus" ? varsayilanKampanyalar : []);
+  const [urunler, setUrunler] = useState([]);
+  const [menuKategorileri, setMenuKategorileri] = useState([TUMU_KATEGORISI]);
+  const [kampanyalar, setKampanyalar] = useState([]);
 
-  // Backend kataloğu varsa onu kullan; sunucu kapalıyken mevcut menü çalışmaya devam eder.
+  // Katalog işletmeye özeldir ve yalnızca backend kayıtlarından yüklenir.
   useEffect(() => {
+    setUrunler([]);
+    setMenuKategorileri([TUMU_KATEGORISI]);
+    setKampanyalar([]);
     istekAt("/api/urunler")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ urunler: uzakUrunler }) => {
         if (!Array.isArray(uzakUrunler)) return;
-        const katalog = kataloguBirlestir(uzakUrunler, isletmeSlug);
+        const katalog = kataloguBirlestir(uzakUrunler);
         setUrunler(katalog);
         setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
       })
@@ -105,7 +89,7 @@ export function AppProvider({ children }) {
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then(({ kategoriler: uzakKategoriler }) => {
         if (Array.isArray(uzakKategoriler) && uzakKategoriler.length) {
-          setMenuKategorileri(kategorileriBirlestir(uzakKategoriler, isletmeSlug));
+          setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
         }
       })
       .catch(() => {});
@@ -136,12 +120,12 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const katalogGuncelle = (uzakUrunler) => {
       if (!Array.isArray(uzakUrunler)) return;
-      const katalog = kataloguBirlestir(uzakUrunler, isletmeSlug);
+      const katalog = kataloguBirlestir(uzakUrunler);
       setUrunler(katalog);
       setMenuKategorileri((mevcut) => kategorileriUrunlerdenTamamla(mevcut, katalog));
     };
     const kategorilerGuncelle = (uzakKategoriler) => {
-      if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler, isletmeSlug));
+      if (Array.isArray(uzakKategoriler)) setMenuKategorileri(kategorileriBirlestir(uzakKategoriler));
     };
     const kampanyalarGuncelle = (uzakKampanyalar) => {
       if (Array.isArray(uzakKampanyalar)) setKampanyalar(uzakKampanyalar);

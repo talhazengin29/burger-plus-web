@@ -270,7 +270,7 @@ Masa numarası tek başına yetmez; geçerli `masaToken` da gönderilmelidir.
 
 1. `AppContext` `/api/urunler`, `/api/kategoriler` ve `/api/kampanyalar` isteklerini yapar.
 2. Backend verileri kullanılabilir durumdaysa ekranlar bunlarla beslenir.
-3. Burger Plus işletmesinde eksik alanlar `data/mockData.js` içindeki varsayılanlarla tamamlanabilir.
+3. Ürün ve kategori ekranları yalnızca işletmenin backend üzerinden gelen kayıtlarıyla beslenir.
 4. Ürün detayında gramaj, hariç malzeme, ekstra malzeme ve menü seçimleri hazırlanır.
 5. `lib/urunSecimleri.js` seçilmiş varyasyonlardan benzersiz bir `sepetAnahtari` üretir.
 6. Aynı ürün ve aynı seçimler sepette adet olarak birleşir; farklı seçimler ayrı satır olur.
@@ -282,7 +282,7 @@ Masa numarası tek başına yetmez; geçerli `masaToken` da gönderilmelidir.
 - Ürün yapılandırma: `screens/UrunDetay.jsx`
 - Sepet: `screens/Cart.jsx`
 - Seçim anahtarı ve yardımcılar: `lib/urunSecimleri.js`
-- Varsayılan ürün kuralları: `data/mockData.js`
+- Ürün kuralları: `lib/katalogKurallari.js`
 
 ## 10. Sipariş ve ödeme akışı
 
@@ -488,7 +488,7 @@ Bu kural olmazsa kullanıcı `/tost-point/anasayfa` gibi bir route'u doğrudan a
 ## 19. Dikkat edilmesi gereken teknik noktalar
 
 - `AppContext.jsx` çok fazla sorumluluk taşıyor. Büyük yeni modüllerde cüzdan, katalog, masa ve sadakat state'lerini ayrı provider/hook'lara bölmek ileride bakımı kolaylaştırır.
-- `data/mockData.js` tamamen kullanılmayan bir demo dosyası değildir; Burger Plus için fallback ve ürün kuralları hâlâ buradan gelebilir.
+- Katalogda yerel ürün veya kampanya fallback'i yoktur; işletme verileri backend'den gelir.
 - Eski `apps/musteri/README.md` içindeki ödeme ve veri kaynağı açıklamalarının bir kısmı güncel koddan geride kalmıştır. Güncel davranış için kaynak kod ve bu rehber esas alınmalıdır.
 - Misafir sipariş geçmişi backend hesabına değil, kullanılan tarayıcıya bağlıdır.
 - Masa erişiminde numaranın yanında token da zorunlu tutulmalıdır; yalnızca masa numarasıyla veri okunmamalıdır.

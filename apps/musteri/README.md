@@ -28,7 +28,7 @@ Ana sayfada ürüne + bas → üstteki sepet ikonundan Sepet → Ödemeye Geç �
 
 Her ödemede, **gerçekten ödenen tutar** üzerinden puan kazanılır.
 Oran: her 10 TL = 1 puan (200 TL → 20 puan).
-Oranı değiştirmek için tek yer: `src/data/mockData.js` içindeki `PUAN_ORANI_TL`.
+Ödeme ekranındaki tahmini puan hesabı `src/lib/puan.js` içindedir. Kesin puanı backend hesaplar.
 
 ## Gerçek ödeme (POS) entegrasyonu
 
@@ -47,7 +47,7 @@ src/
     PaymentSuccess.jsx Ödeme başarılı + puan
   components/   Ortak parçalar (alt menü, ikonlar)
   context/      Sepet + puan + ödeme state'i (odemeyiTamamla puanı burada artırır)
-  data/         Sahte veriler + puan oranı
+  lib/          API, katalog ve hesaplama yardımcıları
   theme.css     Renkler, fontlar, açık/karanlık tema
 ```
 

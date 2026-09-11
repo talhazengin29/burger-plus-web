@@ -1,8 +1,8 @@
 <!-- ==========================================================================
-     Panel önizleme — yönetim panelinin temsili görünümü.
-     Tamamen dekoratif bir makettir: içinde gerçek form öğesi yoktur, bu yüzden
+     Panel önizleme — yönetim paneli özelliklerini anlatan dekoratif görünüm.
+     İçinde gerçek form öğesi yoktur, bu yüzden
      kapsayıcı role="img" ile tek bir görsel gibi duyurulur ve klavye odağı
-     sahte butonlara takılmaz.
+     etkileşimsiz kontrollere takılmaz.
      ========================================================================== -->
 <section class="relative px-4 pb-20 sm:px-6" aria-labelledby="panel-onizleme-basligi">
   <h2 class="sr-only" id="panel-onizleme-basligi">Yönetim panelinden bir görünüm</h2>
@@ -10,7 +10,7 @@
   <figure
     class="panel-maket relative z-10 mx-auto max-w-5xl overflow-hidden rounded-2xl border border-marka-cizgi bg-marka-kart p-4 shadow-2xl sm:p-6"
     role="img"
-    aria-label="Yönetim panelinin temsili görünümü: sol tarafta canlı masalar ve mutfak menüsü, ortada masa kartları, altta masaya katılan kişiler ve ürün görseli yükleme alanı."
+    aria-label="Yönetim paneli özelliklerinin görünümü: sol tarafta canlı masalar ve mutfak menüsü, ortada masa durumları, altta masaya katılan kişiler ve ürün görseli yükleme alanı."
   >
     <!-- Menüle mavisiyle iç ortam ışığı -->
     <div class="pointer-events-none absolute left-1/4 top-0 h-1/2 w-1/2 rounded-full bg-marka-mavi/10 blur-[100px]"></div>
@@ -20,7 +20,9 @@
       <div class="flex w-full shrink-0 flex-col gap-6 border-b border-marka-cizgi pb-6 md:w-60 md:border-b-0 md:border-r md:pb-0 md:pr-6">
         <div class="flex items-center justify-between rounded-lg p-2">
           <div class="flex items-center gap-3">
-            <img class="h-10 w-10 rounded-full border border-marka-cizgi object-cover" src="/gorseller/kullanici-restoran.webp" alt="" width="40" height="40" loading="lazy" decoding="async"/>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full border border-marka-cizgi bg-marka-zemin" aria-hidden="true">
+              <svg class="h-5 w-5 text-marka-gri-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </span>
             <span class="text-sm font-medium">{{ panelIsletmeAdi }}</span>
           </div>
           <svg class="h-4 w-4 text-marka-gri-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
@@ -42,7 +44,7 @@
             </div>
             <span class="absolute -bottom-4 -right-4 z-20 flex flex-col items-center">
               <svg class="h-4 w-4 -rotate-45 text-purple-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0l16 11.2-5.4.9L19.2 24l-3.2 2.4-4.8-12-3.2 4z"/></svg>
-              <span class="mt-1 rounded bg-purple-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Ayşe</span>
+              <span class="mt-1 rounded bg-purple-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Yönetici</span>
             </span>
           </div>
         </div>
@@ -84,8 +86,8 @@
               <svg class="relative z-10 h-14 w-14 translate-y-1 text-marka-mavi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 8 0 0 1 16 0z"/><path d="M3 14h18M5 18h14"/></svg>
             </div>
             <div class="text-center">
-              <p class="mb-1 text-sm font-medium">Masa 3</p>
-              <p class="text-xs text-marka-gri-400">4 ürün · ₺310</p>
+              <p class="mb-1 text-sm font-medium">Masa</p>
+              <p class="text-xs text-marka-gri-400">Sipariş açık</p>
             </div>
           </div>
 
@@ -95,12 +97,12 @@
               <svg class="relative z-10 h-14 w-14 translate-y-1 text-marka-yesil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 8 0 0 1 16 0z"/><path d="M3 14h18M5 18h14"/></svg>
             </div>
             <div class="text-center">
-              <p class="mb-1 text-sm font-medium">Masa 7</p>
-              <p class="text-xs text-marka-gri-400">6 ürün · ₺685</p>
+              <p class="mb-1 text-sm font-medium">Masa</p>
+              <p class="text-xs text-marka-gri-400">Hazırlanıyor</p>
             </div>
             <span class="absolute -left-2 top-1/2 z-20 flex flex-col items-center">
               <svg class="h-4 w-4 -rotate-45 text-green-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0l16 11.2-5.4.9L19.2 24l-3.2 2.4-4.8-12-3.2 4z"/></svg>
-              <span class="mt-1 rounded bg-green-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Mehmet</span>
+              <span class="mt-1 rounded bg-green-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Salon</span>
             </span>
           </div>
 
@@ -111,7 +113,7 @@
             </div>
             <div class="text-center">
               <p class="mb-1 text-sm font-medium">Gel Al</p>
-              <p class="text-xs text-marka-gri-400">2 ürün · ₺145</p>
+              <p class="text-xs text-marka-gri-400">Yeni sipariş</p>
             </div>
           </div>
         </div>
@@ -120,7 +122,7 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <!-- Masaya katılanlar -->
           <div class="flex flex-col rounded-xl border border-marka-cizgi bg-marka-zemin p-5">
-            <p class="mb-4 text-sm font-semibold">Masa 7'ye katılanlar</p>
+            <p class="mb-4 text-sm font-semibold">Masaya katılanlar</p>
             <div class="relative mb-6">
               <div class="w-full truncate rounded-lg border border-marka-cizgi bg-marka-kart py-2.5 pl-3 pr-20 text-sm text-marka-gri-400">
                 Ad veya e-posta ile davet et
@@ -130,9 +132,11 @@
             <div class="flex flex-1 flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <img class="h-8 w-8 rounded-full border border-marka-cizgi object-cover" src="/gorseller/kullanici-kafe.webp" alt="" width="32" height="32" loading="lazy" decoding="async"/>
+                  <span class="flex h-8 w-8 items-center justify-center rounded-full border border-marka-cizgi bg-marka-kart" aria-hidden="true">
+                    <svg class="h-4 w-4 text-marka-gri-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                  </span>
                   <div>
-                    <p class="text-sm font-medium leading-none">Elif</p>
+                    <p class="text-sm font-medium leading-none">Katılımcı</p>
                     <p class="mt-1 text-xs text-marka-gri-400">Siparişe ekleyebilir</p>
                   </div>
                 </div>
@@ -140,9 +144,11 @@
               </div>
               <div class="flex items-center justify-between opacity-50">
                 <div class="flex items-center gap-3">
-                  <img class="h-8 w-8 rounded-full border border-marka-cizgi object-cover" src="/gorseller/kullanici-sef.webp" alt="" width="32" height="32" loading="lazy" decoding="async"/>
+                  <span class="flex h-8 w-8 items-center justify-center rounded-full border border-marka-cizgi bg-marka-kart" aria-hidden="true">
+                    <svg class="h-4 w-4 text-marka-gri-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                  </span>
                   <div>
-                    <p class="text-sm font-medium leading-none">Burak</p>
+                    <p class="text-sm font-medium leading-none">Masa sahibi</p>
                     <p class="mt-1 text-xs text-marka-gri-400">Masayı açan</p>
                   </div>
                 </div>
@@ -155,10 +161,12 @@
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between rounded-xl border border-marka-cizgi bg-marka-zemin p-3">
               <div class="flex items-center gap-3">
-                <span class="flex h-8 w-8 items-center justify-center rounded bg-marka-mavi/15 text-xs font-bold text-marka-mavi">#42</span>
+                <span class="flex h-8 w-8 items-center justify-center rounded bg-marka-mavi/15 text-marka-mavi" aria-hidden="true">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/></svg>
+                </span>
                 <div>
-                  <p class="text-sm font-medium leading-none">Sipariş #1042</p>
-                  <p class="mt-1 text-xs text-marka-gri-400">₺420 · ödeme onaylandı</p>
+                  <p class="text-sm font-medium leading-none">Aktif sipariş</p>
+                  <p class="mt-1 text-xs text-marka-gri-400">Ödeme onaylandı</p>
                 </div>
               </div>
               <span class="flex h-5 w-5 items-center justify-center rounded-full border border-green-500">
@@ -177,7 +185,7 @@
               <p class="mt-1 text-xs text-marka-gri-400">{{ panelYuklemeAciklama }}</p>
               <span class="absolute right-1/4 top-1/4 z-20 flex flex-col items-center">
                 <svg class="h-4 w-4 -rotate-45 text-blue-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0l16 11.2-5.4.9L19.2 24l-3.2 2.4-4.8-12-3.2 4z"/></svg>
-                <span class="mt-1 rounded bg-blue-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Zeynep</span>
+                <span class="mt-1 rounded bg-blue-500 px-1.5 py-0.5 text-[10px] text-white shadow-sm">Mutfak</span>
               </span>
             </div>
           </div>

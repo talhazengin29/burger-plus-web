@@ -29,7 +29,7 @@ const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "",
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", ikon: "🎯", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
 const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
-const BOS_DAMGA_KARTI = { aktif: true, hedefAdet: 5, kategori: "Burgerler", odulUrunId: "", odulMetni: "1 Burger Hediye", kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun", aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.", damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★" };
+const BOS_DAMGA_KARTI = { aktif: false, hedefAdet: 5, kategori: "", odulUrunId: "", odulMetni: "Hediye", kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun", aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.", damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★" };
 const BOS_CUZDAN_AYARI = { aktif: true, bonusAktif: true, bonusYuzde: 5, minYukleme: 100, maxYukleme: 10000, kampanyaBasligi: "Nakit yüklemene ekstra bakiye", kampanyaAciklamasi: "Kasadan nakit yükle, bonus bakiyeni anında kullan." };
 const KAMPANYA_IKONLARI = [
   { deger: "🎯", ad: "Fırsat", ikon: "target" }, { deger: "🕒", ad: "Saat", ikon: "clock" },

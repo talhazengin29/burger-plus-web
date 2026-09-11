@@ -156,7 +156,7 @@ export const TALEP_FORMU = {
   kvkkBaglantiMetni: "KVKK Aydınlatma Metni'ni",
   alanlar: {
     ad: { etiket: "Ad Soyad", tutucu: "Adınız ve soyadınız", zorunlu: true },
-    isletme: { etiket: "İşletme Adı", tutucu: "Örn. Lezzet Durağı", zorunlu: true },
+    isletme: { etiket: "İşletme Adı", tutucu: "İşletmenizin adı", zorunlu: true },
     telefon: { etiket: "Telefon", tutucu: "05XX XXX XX XX", zorunlu: true },
     eposta: { etiket: "E-posta", tutucu: "ornek@isletmeniz.com", zorunlu: false },
     masaSayisi: { etiket: "Masa Sayısı", tutucu: "Örn. 12", zorunlu: false },
@@ -203,7 +203,7 @@ export const ICERIK = {
   heroIkincilButon: "Özellikleri Gör",
 
   // --- Panel önizleme (hero altındaki yönetim maketi) ----------------------
-  panelIsletmeAdi: "Lezzet Durağı",
+  panelIsletmeAdi: "İşletmeniz",
   panelYuklemeBaslik: "Ürün görseli yükle",
   panelYuklemeAciklama: "PNG, JPG, WebP veya GIF (en fazla 5 MB)",
 
@@ -218,10 +218,6 @@ export const ICERIK = {
   adimlarEtiket: "Nasıl çalışır",
   adimlarBaslik: "3 ADIMDA",
   adimlarVurgu: "BAŞLAYIN",
-
-  yorumlarEtiket: "Referans",
-  yorumlarBaslik: "İŞLETMELERDEN",
-  yorumlarVurgu: "GERİ BİLDİRİM",
 
   fiyatEtiket: "Fiyatlandırma",
   fiyatBaslik: "İHTİYACINIZA UYGUN",
@@ -308,35 +304,6 @@ export const ADIMLAR = [
     sira: "03",
     baslik: "Sipariş Almaya Başlayın",
     metin: "Müşterileriniz masadan sipariş versin, mutfak ekranı siparişi anında görsün.",
-  },
-];
-
-// --- Yorumlar ----------------------------------------------------------------
-// TODO(referanslar): Bunlar TEMSİLİ metinlerdir; gerçek müşteri referansı
-// alındığında bu dizi güncellenmelidir. Uydurma kişi/şirket adı kullanılmadı,
-// bu yüzden roller jenerik tutuldu ve görseller projedeki mevcut yerel
-// fotoğraflardan seçildi.
-export const YORUMLAR = [
-  {
-    metin: "Masadan sipariş açıldıktan sonra garson çağırma trafiği neredeyse bitti. Mutfak fişleri anında düşüyor, sıra karışmıyor.",
-    kisi: "Restoran işletmecisi",
-    rol: "Temsili değerlendirme",
-    gorsel: "/gorseller/kullanici-restoran.jpg",
-    gorselAlt: "Restoran işletmecisini temsil eden portre fotoğrafı",
-  },
-  {
-    metin: "Damga kartını dijitale taşımak en çok işimize yarayan kısım oldu. Puan ve hediye takibi tamamen sistemin üzerinde.",
-    kisi: "Kafe sahibi",
-    rol: "Temsili değerlendirme",
-    gorsel: "/gorseller/kullanici-kafe.jpg",
-    gorselAlt: "Kafe sahibini temsil eden portre fotoğrafı",
-  },
-  {
-    metin: "Mutfak ekranı sayesinde hangi masanın ne kadar beklediğini görüyoruz. Yoğun saatte en çok bu işe yarıyor.",
-    kisi: "Mutfak şefi",
-    rol: "Temsili değerlendirme",
-    gorsel: "/gorseller/kullanici-sef.jpg",
-    gorselAlt: "Mutfak şefini temsil eden portre fotoğrafı",
   },
 ];
 
@@ -606,30 +573,6 @@ export function adimKartlariHtml() {
         <h3 class="metin-akan metin-akan--yumusak mb-2 mt-3 font-baslik text-lg font-semibold">${kacis(adim.baslik)}</h3>
         <p class="text-sm leading-relaxed text-marka-gri-300">${kacis(adim.metin)}</p>
       </li>`,
-  ).join("");
-}
-
-// Şerit kesintisiz dönebilmek için kart listesi iki kez basılır. İkinci küme
-// yalnızca görseldir; ekran okuyucular metni iki kez okumasın diye
-// yorumKartlariKopyasiHtml() her kartı aria-hidden ile işaretler.
-export function yorumKartlariKopyasiHtml() {
-  return yorumKartlariHtml().replace(/<figure class="/g, '<figure aria-hidden="true" class="');
-}
-
-export function yorumKartlariHtml() {
-  return YORUMLAR.map(
-    (yorum) => `
-      <figure class="yorum-kart isik-kart rounded-2xl border border-marka-cizgi bg-marka-kart p-8">
-        <svg class="mb-6 h-8 w-8 text-marka-yesil" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-        <blockquote class="mb-8 text-sm leading-relaxed text-marka-gri-300">${kacis(yorum.metin)}</blockquote>
-        <figcaption class="flex items-center gap-3">
-          <img class="h-10 w-10 rounded-full border border-marka-cizgi object-cover" src="${yorum.gorsel}" alt="${kacis(yorum.gorselAlt)}" width="40" height="40" loading="lazy" decoding="async"/>
-          <span class="block">
-            <span class="block text-sm font-semibold text-marka-metin">${kacis(yorum.kisi)}</span>
-            <span class="block text-xs text-marka-gri-400">${kacis(yorum.rol)}</span>
-          </span>
-        </figcaption>
-      </figure>`,
   ).join("");
 }
 

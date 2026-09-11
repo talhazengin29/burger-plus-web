@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
-import { kampanyaDurumu } from "../data/mockData";
+import { kampanyaDurumu } from "../lib/katalogKurallari";
 import { useApp } from "../context/AppContext";
 import { IconClock, IconInvite } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
@@ -97,7 +97,9 @@ export default function Campaigns() {
               return (
                 <motion.article key={k.id} className="camp-kart" variants={siraliOge}>
                   <div className="camp-gorsel-wrap">
-                    <img className="camp-gorsel" src={k.gorsel || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=500&fit=crop"} alt={yerelAlan(k, "baslik", k.baslik)} />
+                    {k.gorsel
+                      ? <img className="camp-gorsel" src={k.gorsel} alt={yerelAlan(k, "baslik", k.baslik)} />
+                      : <div className="camp-gorsel camp-gorsel--bos" aria-hidden="true" />}
                     <span className="camp-rozet">
                       <EtiketIkon ikon={k.ikon} etiket={k.etiket} />
                       {yerelAlan(k, "etiket", k.etiket)}

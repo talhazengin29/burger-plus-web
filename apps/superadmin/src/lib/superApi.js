@@ -47,7 +47,6 @@ export const isletmeleriGetir = () => superIstek("/isletmeler");
 export const isletmeGetir = (id) => superIstek(`/isletmeler/${id}`);
 export const isletmeOlustur = (veri) => superIstek("/isletmeler", json("POST", veri));
 export const kurulumTamamla = (veri) => superIstek("/isletmeler/kurulum", json("POST", veri));
-export const sablonGetir = (konsept) => superIstek(`/sablonlar/${encodeURIComponent(konsept)}`);
 export const slugKontrol = (slug) => superIstek(`/slug-kontrol?slug=${encodeURIComponent(slug)}`);
 export const isletmeGuncelle = (id, veri) => superIstek(`/isletmeler/${id}`, json("PUT", veri));
 export const isletmeDurumuDegistir = (id, aktif) => superIstek(`/isletmeler/${id}/durum`, json("PATCH", { aktif }));

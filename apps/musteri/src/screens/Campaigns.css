@@ -53,6 +53,7 @@
 }
 .camp-gorsel-wrap { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
 .camp-gorsel { width: 100%; height: 100%; object-fit: cover; }
+.camp-gorsel--bos { background: linear-gradient(135deg, var(--surface), color-mix(in srgb, var(--accent) 18%, var(--surface))); }
 .camp-rozet {
   position: absolute;
   top: 11px; left: 11px;

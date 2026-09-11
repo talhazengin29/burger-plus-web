@@ -10,7 +10,7 @@ import "./TableWelcome.css";
   Masa karşılama ekranı. Masadaki QR okutulunca /masa?no=3#token=... açılır.
   Masa numarasını context'e yazar (aktifMasa). Kullanıcıya iki seçenek sunar:
    - Misafir olarak devam et: tek oturumluk, puan yok, doğrudan menüye.
-   - Giriş yap: daimi müşteri, puan kazanır. (Giriş şimdilik sahte.)
+   - Giriş yap: daimi müşteri, puan kazanır.
   Her iki durumda da masa QR'dan biliniyor; ödeme öncesi tekrar QR sorulmaz.
 */
 export default function TableWelcome() {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
-import { puanHesapla } from "../data/mockData";
+import { puanHesapla } from "../lib/puan";
 import { IconBack, IconCard, IconWallet, IconUsers, IconBag, IconMinus, IconPlus, IconCheck, IconTableService } from "../components/Icons";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
 import { cuzdanlaOdemeyiOnayla, cuzdanOzetiniGetir, iyzicoOdemesiniBaslat, nakitMasaDurumunuGetir, nakitSiparisGonder, odemeTaslagiOlustur } from "../lib/authApi";
