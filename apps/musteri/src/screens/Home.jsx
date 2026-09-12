@@ -75,12 +75,14 @@ export default function Home() {
   const populerUrunler = gosterilen.filter((urun) => urun.populer === true).slice(0, 4);
   const digerUrunler = gosterilen.filter((urun) => urun.populer !== true);
   const aktifKategoriVerisi = kategoriler.find((kategori) => kategori.ad === aktifKategori);
+  const ambiyansGorseli = aktifKategoriVerisi?.gorsel || gosterilen.find((urun) => urun.gorsel)?.gorsel || urunler.find((urun) => urun.gorsel)?.gorsel;
   const kategoriBasligi = aktifKategori === "Tümü" ? t("home.products") : yerelAlan(aktifKategoriVerisi, "ad", aktifKategori);
   const sloganVurguIndex = metinler.slogan.lastIndexOf(metinler.sloganVurgu);
   const sloganBaslangici = sloganVurguIndex >= 0 ? metinler.slogan.slice(0, sloganVurguIndex).trim() : metinler.slogan;
 
   return (
     <div className="ekran home">
+      <div className="ekran-ambiyans" style={ambiyansGorseli ? { backgroundImage: `url(${JSON.stringify(ambiyansGorseli)})` } : undefined} aria-hidden="true" />
       <OrtakHeader selamlama />
 
       <div className="home-govde">

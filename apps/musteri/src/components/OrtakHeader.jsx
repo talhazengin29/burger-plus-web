@@ -106,19 +106,20 @@ export default function OrtakHeader({ selamlama = false }) {
   };
 
   return (
-    <header className="home-header">
-      {selamlama ? (
+    <header className={`home-header${selamlama ? " home-header--selamli" : ""}`}>
+      <div className="header-kimlik">
+        <div className="brand">
+          <MarkaLogosu className="brand-logo" alt={isletme.ad} />
+        </div>
+        {selamlama && (
         <div className="selam">
           <span className="selam-ust">{t("header.hello")}</span>
           <span className="selam-ad">
             {ad} <span aria-hidden="true">👋</span>
           </span>
         </div>
-      ) : (
-        <div className="brand">
-          <MarkaLogosu className="brand-logo" alt={isletme.ad} />
-        </div>
-      )}
+        )}
+      </div>
       <div className="home-header-sag">
         {ozetMasaNo && (
           <motion.button
