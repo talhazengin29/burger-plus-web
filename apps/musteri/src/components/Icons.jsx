@@ -152,14 +152,6 @@ export const IconBack = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M15 18l-6-6 6-6" /></svg>
 );
 
-export const IconHeart = (p) => (
-  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6a5.5 5.5 0 0 0 1-8.8z" /></svg>
-);
-
-export const IconLock = (p) => (
-  <svg viewBox="0 0 24 24" {...s} {...p}><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
-);
-
 export const IconUsers = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><path d="M16 5.5a3 3 0 0 1 0 5.8M18 20c0-2.2-.8-3.8-2-5" /></svg>
 );

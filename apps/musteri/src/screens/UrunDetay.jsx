@@ -4,7 +4,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import { useIsletme } from "../context/IsletmeContext";
-import { IconBack, IconHeart, IconMinus, IconPlus, IconWarning } from "../components/Icons";
+import { IconBack, IconMinus, IconPlus, IconWarning } from "../components/Icons";
 import { siraliKonteyner, siraliOge } from "../lib/animasyonlar";
 import { varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
 import { useDil } from "../dil/DilContext";
@@ -18,21 +18,11 @@ const besinEtiketleri = [
   { anahtar: "yag", ceviri: "product.fat" },
 ];
 
-function favorileriOku(anahtar) {
-  try {
-    const kayit = JSON.parse(localStorage.getItem(anahtar) || "[]");
-    return Array.isArray(kayit) ? kayit.map(String) : [];
-  } catch {
-    return [];
-  }
-}
-
 export default function UrunDetay() {
   const { t, yerelAlan } = useDil();
   const { id } = useParams();
   const git = useIsletmeNavigate();
   const { isletmeSlug } = useIsletme();
-  const favoriAnahtari = `menule_favoriler_${isletmeSlug}`;
   const { sepeteEkle, indirimliFiyat, urunler } = useApp();
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
@@ -42,19 +32,9 @@ export default function UrunDetay() {
   const [icecekBoyutKodu, setIcecekBoyutKodu] = useState("");
   const [ekstraMalzemeIdleri, setEkstraMalzemeIdleri] = useState([]);
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
-  const [favoriler, setFavoriler] = useState(() => favorileriOku(favoriAnahtari));
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
-  const favori = favoriler.includes(String(urun.id));
-  const favoriDegistir = () => {
-    setFavoriler((onceki) => {
-      const urunId = String(urun.id);
-      const sonraki = onceki.includes(urunId) ? onceki.filter((kayit) => kayit !== urunId) : [...onceki, urunId];
-      try { localStorage.setItem(favoriAnahtari, JSON.stringify(sonraki)); } catch { /* Depolama kapalıysa mevcut oturumda çalışır. */ }
-      return sonraki;
-    });
-  };
   const stoktaYok = urun.stokta === false;
   const urunAdi = yerelAlan(urun, "ad", urun.ad);
   const urunAciklamasi = yerelAlan(urun, "aciklama", urun.aciklama);
@@ -167,7 +147,6 @@ export default function UrunDetay() {
 
   return (
     <div className="ekran urun-detay">
-      <div className="ekran-ambiyans" style={urun.gorsel ? { backgroundImage: `url(${JSON.stringify(urun.gorsel)})` } : undefined} aria-hidden="true" />
       <div className="urun-detay-govde">
         {/* Üst görsel — yukarıdan fade ile gelir */}
         <motion.div
@@ -179,9 +158,6 @@ export default function UrunDetay() {
           <img className="urun-detay-gorsel" src={urun.gorsel} alt={urunAdi} />
           <button className="urun-detay-geri" onClick={() => git(-1)} aria-label={t("common.back")}>
             <IconBack />
-          </button>
-          <button className={`urun-detay-favori${favori ? " urun-detay-favori--aktif" : ""}`} type="button" onClick={favoriDegistir} aria-label={t(favori ? "product.favoriteRemove" : "product.favoriteAdd")} aria-pressed={favori}>
-            <IconHeart />
           </button>
         </motion.div>
 

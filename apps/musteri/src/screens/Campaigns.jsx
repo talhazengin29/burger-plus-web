@@ -3,7 +3,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { kampanyaDurumu } from "../lib/katalogKurallari";
 import { useApp } from "../context/AppContext";
-import { IconClock, IconInvite, IconLock, IconTag } from "../components/Icons";
+import { IconClock, IconInvite } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { siraliKonteyner, siraliOge, fadeIn, asagiAcilma } from "../lib/animasyonlar";
@@ -16,7 +16,7 @@ function EtiketIkon({ ikon, etiket }) {
   if (ikon) return <span className="rozet-emoji" aria-hidden="true">{ikon}</span>;
   if (etiket.includes(":")) return <IconClock className="rozet-ikon" />;
   if (etiket === "Davet Et") return <IconInvite className="rozet-ikon" />;
-  return <IconTag className="rozet-ikon" />;
+  return <span className="rozet-emoji">🎓</span>;
 }
 
 // Canlı durum rozeti: AKTİF (yeşil) / BAŞLAMADI / SONA ERDİ (gri)
@@ -80,63 +80,8 @@ export default function Campaigns() {
     }
   };
 
-  const kampanyaKarti = (k, ana = false) => {
-    const durum = kampanyaDurumu(k, simdi);
-    const davetKampanyasi = k.kod === "davet-et" || k.etiket === "Davet Et";
-    const siparisVerilebilir = !davetKampanyasi;
-    const pasif = siparisVerilebilir && durum !== "aktif";
-    return (
-      <motion.article key={k.id} className={`camp-kart${ana ? " camp-kart--ana" : " camp-kart--ikincil"}`} variants={siraliOge}>
-        <div className="camp-gorsel-wrap">
-          {k.gorsel
-            ? <img className="camp-gorsel" src={k.gorsel} alt={yerelAlan(k, "baslik", k.baslik)} />
-            : <div className="camp-gorsel camp-gorsel--bos" aria-hidden="true" />}
-          <span className="camp-rozet">
-            <EtiketIkon ikon={k.ikon} etiket={k.etiket} />
-            {yerelAlan(k, "etiket", k.etiket)}
-          </span>
-          {durum !== "pasif" && (
-            <span className={"camp-durum-rozet camp-durum-rozet--" + durum}>
-              {t(durumAnahtari[durum])}
-            </span>
-          )}
-        </div>
-        <div className="camp-icerik">
-          <div className="camp-baslik-satir">
-            <h3 className="camp-kart-baslik">{yerelAlan(k, "baslik", k.baslik)}</h3>
-            {k.indirimYuzde > 0 && <span className="camp-fiyat">%{k.indirimYuzde}</span>}
-          </div>
-          <p className="camp-aciklama">{yerelAlan(k, "aciklama", k.aciklama)}</p>
-          {siparisVerilebilir && misafir && <span className="camp-uye-rozet"><IconLock />{t("campaigns.membersOnly")}</span>}
-          {davetKampanyasi && davetAcik ? (
-            <div className="davet-kodu-kutu">
-              <span>{t("campaigns.inviteCode")}</span>
-              <strong>{davetOzeti?.davetKodu || kullanici?.davetKodu || t("campaigns.loading")}</strong>
-              <button type="button" onClick={koduKopyala} disabled={!davetOzeti?.davetKodu && !kullanici?.davetKodu}>{kopyalandi ? t("campaigns.copied") : t("campaigns.copy")}</button>
-              {davetHatasi && <small className="davet-hata">{davetHatasi}</small>}
-              <div className="davet-istatistikler">
-                <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b> {t("campaigns.invites")}</span>
-                <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b> {t("campaigns.pointsEarned")}</span>
-              </div>
-            </div>
-          ) : (
-            <motion.button
-              className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
-              whileTap={{ scale: 0.95 }}
-              disabled={pasif}
-              onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKodunuGoster : undefined}
-            >
-              {yerelAlan(k, "buton", k.buton)}
-            </motion.button>
-          )}
-        </div>
-      </motion.article>
-    );
-  };
-
   return (
     <div className="ekran campaigns">
-      <div className="ekran-ambiyans" style={kampanyalar[0]?.gorsel ? { backgroundImage: `url(${JSON.stringify(kampanyalar[0].gorsel)})` } : undefined} aria-hidden="true" />
       <OrtakHeader />
       <SayfaSarici>
         <div className="camp-govde">
@@ -144,13 +89,61 @@ export default function Campaigns() {
           <p className="camp-alt">{t("campaigns.intro")}</p>
 
           <motion.div className="camp-liste" {...siraliKonteyner} initial="initial" animate="animate">
-            {kampanyalar[0] && kampanyaKarti(kampanyalar[0], true)}
-            {kampanyalar.length > 1 && (
-              <section className="camp-diger-bolum">
-                <div className="camp-diger-baslik"><h2>{t("campaigns.other")}</h2><span>{t("campaigns.viewAll")}</span></div>
-                <div className="camp-diger-grid">{kampanyalar.slice(1).map((kampanya) => kampanyaKarti(kampanya))}</div>
-              </section>
-            )}
+            {kampanyalar.map((k) => {
+              const durum = kampanyaDurumu(k, simdi);
+              const davetKampanyasi = k.kod === "davet-et" || k.etiket === "Davet Et";
+              const siparisVerilebilir = !davetKampanyasi;
+              const pasif = siparisVerilebilir && durum !== "aktif";
+              return (
+                <motion.article key={k.id} className="camp-kart" variants={siraliOge}>
+                  <div className="camp-gorsel-wrap">
+                    {k.gorsel
+                      ? <img className="camp-gorsel" src={k.gorsel} alt={yerelAlan(k, "baslik", k.baslik)} />
+                      : <div className="camp-gorsel camp-gorsel--bos" aria-hidden="true" />}
+                    <span className="camp-rozet">
+                      <EtiketIkon ikon={k.ikon} etiket={k.etiket} />
+                      {yerelAlan(k, "etiket", k.etiket)}
+                    </span>
+                    {durum !== "pasif" && (
+                      <span className={"camp-durum-rozet camp-durum-rozet--" + durum}>
+                        {t(durumAnahtari[durum])}
+                      </span>
+                    )}
+                  </div>
+                  <div className="camp-icerik">
+                    <div className="camp-baslik-satir">
+                      <h3 className="camp-kart-baslik">{yerelAlan(k, "baslik", k.baslik)}</h3>
+                      {k.indirimYuzde > 0 && <span className="camp-fiyat">%{k.indirimYuzde}</span>}
+                    </div>
+                    <p className="camp-aciklama">{yerelAlan(k, "aciklama", k.aciklama)}</p>
+                    {siparisVerilebilir && misafir && (
+                      <span className="camp-uye-rozet">{t("campaigns.membersOnly")}</span>
+                    )}
+                    {davetKampanyasi && davetAcik ? (
+                      <div className="davet-kodu-kutu">
+                        <span>{t("campaigns.inviteCode")}</span>
+                        <strong>{davetOzeti?.davetKodu || kullanici?.davetKodu || t("campaigns.loading")}</strong>
+                        <button type="button" onClick={koduKopyala} disabled={!davetOzeti?.davetKodu && !kullanici?.davetKodu}>{kopyalandi ? t("campaigns.copied") : t("campaigns.copy")}</button>
+                        {davetHatasi && <small className="davet-hata">{davetHatasi}</small>}
+                        <div className="davet-istatistikler">
+                          <span><b>{davetOzeti?.davetEdilenSayisi ?? 0}</b> {t("campaigns.invites")}</span>
+                          <span><b>{davetOzeti?.kazanilanPuan ?? 0}</b> {t("campaigns.pointsEarned")}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <motion.button
+                        className={"camp-btn " + (k.butonTipi === "primary" ? "camp-btn--primary" : "camp-btn--charcoal")}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={pasif}
+                        onClick={siparisVerilebilir ? () => siparisVerTiklandi(k) : davetKampanyasi ? davetKodunuGoster : undefined}
+                      >
+                        {yerelAlan(k, "buton", k.buton)}
+                      </motion.button>
+                    )}
+                  </div>
+                </motion.article>
+              );
+            })}
           </motion.div>
         </div>
       </SayfaSarici>
