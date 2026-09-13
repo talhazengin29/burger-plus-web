@@ -15,9 +15,9 @@
   --bg-primary: #0d0d0d;
   /* Derinlik efekti kartlarda değil, sayfa zemininde üretilir. Böylece
      kartların dikdörtgen sınırları/parçalı blur alanları görünmez. */
-  --bg-card: rgba(255, 255, 255, 0.06);
-  --bg-card-hover: rgba(255, 255, 255, 0.09);
-  --bg-input: rgba(255, 255, 255, 0.05);
+  --bg-card: rgba(30, 25, 21, 0.28);
+  --bg-card-hover: rgba(255, 255, 255, 0.17);
+  --bg-input: rgba(255, 255, 255, 0.11);
   --accent: #ff6b00;
   --accent-glow: rgba(255, 107, 0, 0.4);
   --font-baslik: "Montserrat", sans-serif;
@@ -25,7 +25,7 @@
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
-  --border-glass: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.28);
   /* Zeminin arkasındaki sıcak turuncu parlama (dekoratif bloblar) */
   --warm-glow: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 50%);
 
@@ -36,19 +36,19 @@
 
   /* --- Cam (glassmorphism) yüzey tokenları --- */
   --glass-bg: var(--bg-card);                    /* standart kart */
-  --glass-bg-soft: transparent;                    /* input, iç kutu */
+  --glass-bg-soft: rgba(255, 255, 255, 0.075);      /* input, iç kutu */
   --glass-bg-strong: var(--bg-card-hover);       /* vurgulu kart / hover */
-  --glass-bg-solid: rgba(255, 255, 255, 0.1);     /* rozet, ikon dairesi */
+  --glass-bg-solid: rgba(24, 20, 17, 0.5);        /* rozet, ikon dairesi */
   --glass-border: var(--border-glass);
-  --glass-border-soft: rgba(255, 255, 255, 0.03);
-  --glass-border-strong: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(32px);
-  --glass-blur-sm: blur(12px);
-  --glass-blur-lg: blur(40px);
+  --glass-border-soft: rgba(255, 255, 255, 0.16);
+  --glass-border-strong: rgba(255, 255, 255, 0.42);
+  --glass-blur: saturate(135%) blur(22px);
+  --glass-blur-sm: saturate(125%) blur(12px);
+  --glass-blur-lg: saturate(145%) blur(30px);
   /* Cam kartın imzası: dış gölge + üstte ince ışık çizgisi (inset) */
-  --glass-inset: none;
-  --glass-shadow: none;
-  --glass-shadow-sm: none;
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), var(--glass-inset);
+  --glass-shadow-sm: 0 8px 22px rgba(0, 0, 0, 0.16), var(--glass-inset);
 
   /* --- Eski yüzey adları → cam karşılıkları --- */
   --surface-container-lowest: var(--glass-bg);
@@ -115,26 +115,26 @@
    değişmez; yalnızca nötr zemin, cam, metin, kenarlık ve gölgeler dönüşür. */
 :root[data-gorunum="acik"] {
   --bg-primary: #f5f4f1;
-  --bg-card: rgba(255, 255, 255, 0.72);
-  --bg-card-hover: rgba(255, 255, 255, 0.9);
-  --bg-input: rgba(255, 255, 255, 0.78);
+  --bg-card: rgba(255, 255, 255, 0.38);
+  --bg-card-hover: rgba(255, 255, 255, 0.56);
+  --bg-input: rgba(255, 255, 255, 0.3);
   --text-primary: #171717;
   --text-secondary: rgba(23, 23, 23, 0.68);
   --text-muted: rgba(23, 23, 23, 0.46);
-  --border-glass: rgba(23, 23, 23, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.68);
   --bg-page: var(--bg-primary);
   --bg-deep: #e6e3de;
   --surface: var(--bg-page);
   --glass-bg: var(--bg-card);
-  --glass-bg-soft: rgba(255, 255, 255, 0.5);
+  --glass-bg-soft: rgba(255, 255, 255, 0.25);
   --glass-bg-strong: var(--bg-card-hover);
-  --glass-bg-solid: rgba(255, 255, 255, 0.96);
+  --glass-bg-solid: rgba(255, 255, 255, 0.58);
   --glass-border: var(--border-glass);
-  --glass-border-soft: rgba(23, 23, 23, 0.06);
-  --glass-border-strong: rgba(23, 23, 23, 0.14);
+  --glass-border-soft: rgba(255, 255, 255, 0.4);
+  --glass-border-strong: rgba(255, 255, 255, 0.82);
   --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.86);
-  --glass-shadow: 0 12px 34px rgba(42, 35, 28, 0.1), var(--glass-inset);
-  --glass-shadow-sm: 0 6px 18px rgba(42, 35, 28, 0.08), var(--glass-inset);
+  --glass-shadow: 0 16px 36px rgba(42, 35, 28, 0.14), var(--glass-inset);
+  --glass-shadow-sm: 0 8px 22px rgba(42, 35, 28, 0.1), var(--glass-inset);
   --surface-container-lowest: rgba(255, 255, 255, 0.96);
   --surface-container-low: rgba(255, 255, 255, 0.66);
   --surface-container: rgba(255, 255, 255, 0.74);
@@ -158,7 +158,7 @@
 :root[data-gorunum="acik"] select { color-scheme: light; }
 
 :root[data-gorunum="acik"] .bottom-nav {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.42);
   border-color: var(--glass-border-strong);
   box-shadow: 0 12px 34px rgba(42, 35, 28, 0.14), var(--glass-inset);
 }
@@ -252,18 +252,6 @@
 /* Backdrop blur her kart için ayrı bir dikdörtgen katman oluşturur ve
    arka plandaki efektin kart sınırlarında kesilmiş görünmesine yol açar.
    Ambiyans .telefon-ekran zemininde kaldığı için burada kapatılır. */
-.telefon-ekran .ekran,
-.telefon-ekran .ekran * {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-/* Sadakat kartı genel mobil performans kuralının bilinçli tek istisnasıdır. */
-.telefon-ekran .ekran .damga-kart {
-  -webkit-backdrop-filter: saturate(135%) blur(22px) !important;
-  backdrop-filter: saturate(135%) blur(22px) !important;
-}
-
 /* Durum/hover geçişlerini yumuşat */
 body, .telefon-ekran, .ekran, .urun-kart, .odul-kart, .camp-kart,
 .puan-kart, .profil-menu, .gecmis-liste, .damga-kart, .profil-puan-kart,

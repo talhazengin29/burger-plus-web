@@ -224,3 +224,74 @@
 .davet-istatistikler span { grid-column:auto;text-align:center;color:var(--on-surface-variant);font-size:10px;font-weight:600 }
 .davet-istatistikler b { display:block;color:var(--on-surface);font-family: var(--font-baslik);font-size:15px }
 .davet-hata { grid-column:1 / -1;color:var(--error);font-size:11px }
+
+/* İlk kampanyayı vitrine çıkaran, arkadaki görseli görünür bırakan cam düzen. */
+.campaigns .home-header {
+  background: rgba(24, 20, 17, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.camp-govde { padding-top: 26px; }
+
+.camp-baslik,
+.camp-alt {
+  text-align: left;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.42);
+}
+
+.camp-baslik {
+  max-width: 330px;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.camp-liste {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.camp-kart {
+  min-width: 0;
+  background: rgba(30, 25, 21, 0.3);
+  border-color: rgba(255, 255, 255, 0.34);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+}
+
+.camp-kart:first-child { grid-column: 1 / -1; }
+.camp-kart:first-child .camp-gorsel-wrap { aspect-ratio: 1.72 / 1; }
+.camp-kart:not(:first-child) .camp-gorsel-wrap { aspect-ratio: 1.22 / 1; }
+.camp-kart:not(:first-child) .camp-icerik { padding: 11px; }
+.camp-kart:not(:first-child) .camp-baslik-satir { align-items: flex-start; gap: 5px; }
+.camp-kart:not(:first-child) .camp-kart-baslik { font-size: 14px; line-height: 1.25; }
+.camp-kart:not(:first-child) .camp-fiyat { font-size: 14px; }
+.camp-kart:not(:first-child) .camp-aciklama {
+  display: -webkit-box;
+  min-height: 34px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 11px;
+}
+.camp-kart:not(:first-child) .camp-btn { padding: 10px 7px; font-size: 11px; }
+
+.camp-rozet,
+.camp-durum-rozet--baslamadi,
+.camp-durum-rozet--sonaerdi {
+  background: rgba(24, 20, 17, 0.36);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.camp-icerik { background: rgba(255, 255, 255, 0.035); }
+
+:root[data-gorunum="acik"] .campaigns .home-header,
+:root[data-gorunum="acik"] .camp-kart {
+  background: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.82);
+}
+
+:root[data-gorunum="acik"] .camp-baslik,
+:root[data-gorunum="acik"] .camp-alt { text-shadow: 0 2px 18px rgba(255, 255, 255, 0.6); }

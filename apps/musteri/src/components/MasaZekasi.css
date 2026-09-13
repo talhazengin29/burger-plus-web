@@ -11,6 +11,19 @@
   border-radius: 21px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--surface)), var(--surface));
   cursor: pointer; box-shadow: none;
 }
+
+.masa-zekasi-kart {
+  background: rgba(30, 25, 21, 0.25);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-sm);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+}
+
+:root[data-gorunum="acik"] .masa-zekasi-kart {
+  background: rgba(255, 255, 255, 0.34);
+  border-color: rgba(255, 255, 255, 0.78);
+}
 .masa-zekasi-kart__ikon { width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
 .masa-zekasi-kart__ikon svg { width: 24px; height: 24px; }
 .masa-zekasi-kart__metin { min-width: 0; display: grid; gap: 3px; }
