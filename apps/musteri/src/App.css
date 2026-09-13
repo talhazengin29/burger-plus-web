@@ -17,61 +17,19 @@
   width: 390px;
   height: 844px;
   max-height: calc(100vh - 48px);
-  /* Sayfalar kayarken sabit kalan görsel ambiyans aşağıdaki ayrı katmandadır. */
-  background: var(--bg-page);
+  /* Dekoratif turuncu-amber bloblar — sabit pozisyonlu, içerik kaydıkça
+     yerinde kalır (kaydırma .ekran içinde olur). Cam kartların
+     backdrop-filter'ı bu blobları bulanıklaştırıp derinlik verir. */
+  background:
+    radial-gradient(42% 26% at 8% 4%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 72%),
+    radial-gradient(48% 30% at 96% 26%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 72%),
+    radial-gradient(55% 32% at 46% 102%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 72%),
+    var(--warm-glow),
+    var(--bg-page);
   border-radius: 40px;
   overflow: hidden;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75);
   border: 10px solid #000;
-}
-
-.telefon-ambiyans {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--accent) 48%, transparent), transparent 42%),
-    radial-gradient(circle at 82% 76%, rgba(255, 205, 132, 0.2), transparent 45%),
-    #15110e;
-}
-
-.telefon-ambiyans img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.08);
-  filter: blur(11px) saturate(1.22) brightness(0.7);
-}
-
-.telefon-ambiyans::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(12, 10, 9, 0.08), rgba(12, 10, 9, 0.3) 54%, rgba(12, 10, 9, 0.56)),
-    radial-gradient(circle at 72% 14%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 38%);
-}
-
-.telefon-ekran > .ekran {
-  position: relative;
-  z-index: 1;
-  background: transparent;
-}
-
-.telefon-ekran > .bottom-nav { z-index: 10; }
-
-:root[data-gorunum="acik"] .telefon-ambiyans { background: #d8d0c5; }
-
-:root[data-gorunum="acik"] .telefon-ambiyans img {
-  filter: blur(10px) saturate(1.12) brightness(1.04);
-}
-
-:root[data-gorunum="acik"] .telefon-ambiyans::after {
-  background:
-    linear-gradient(180deg, rgba(255, 250, 242, 0.08), rgba(235, 225, 211, 0.28) 55%, rgba(229, 218, 202, 0.52)),
-    radial-gradient(circle at 72% 14%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 38%);
 }
 
 /* Dar ekranlarda çerçeveyi kaldır, tam ekran yap */

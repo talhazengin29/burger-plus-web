@@ -42,24 +42,11 @@ function AdminKorumali({ children }) {
 
 function TelefonYerlesimi() {
   const konum = useLocation();
-  const { urunler = [], kategoriler = [], kampanyalar = [] } = useApp();
   const tenantSonrasiYol = `/${konum.pathname.split("/").filter(Boolean).slice(1).join("/")}`;
   const altMenuGoster = altMenuluYollar.includes(tenantSonrasiYol);
-  const urunId = tenantSonrasiYol.startsWith("/urun/") ? tenantSonrasiYol.split("/")[2] : null;
-  const seciliUrun = urunId ? urunler.find((urun) => String(urun.id) === urunId) : null;
-  const varsayilanUrunGorseli = kategoriler.find((kategori) => kategori.gorsel)?.gorsel
-    || urunler.find((urun) => urun.gorsel)?.gorsel;
-  const kampanyaGorseli = kampanyalar.find((kampanya) => kampanya.gorsel)?.gorsel;
-  const ambiyansGorseli = seciliUrun?.gorsel
-    || (tenantSonrasiYol === "/kampanyalar" ? kampanyaGorseli : varsayilanUrunGorseli)
-    || kampanyaGorseli;
-
   return (
     <div className="telefon">
       <div className="telefon-ekran">
-        <div className="telefon-ambiyans" aria-hidden="true">
-          {ambiyansGorseli && <img src={ambiyansGorseli} alt="" />}
-        </div>
         <Outlet />
         {altMenuGoster && <BottomNav />}
       </div>
