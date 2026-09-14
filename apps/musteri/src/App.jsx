@@ -48,8 +48,10 @@ function TelefonYerlesimi() {
   const altMenuGoster = altMenuluYollar.includes(tenantSonrasiYol);
   const urunId = tenantSonrasiYol.startsWith("/urun/") ? tenantSonrasiYol.split("/")[2] : null;
   const seciliUrun = urunId ? urunler.find((urun) => String(urun.id) === urunId) : null;
-  const varsayilanUrunGorseli = kategoriler.find((kategori) => kategori.gorsel)?.gorsel
-    || urunler.find((urun) => urun.gorsel)?.gorsel;
+  // Arka plan ambiyansi icin urun fotografi tercih edilir. Kategori ikonlari
+  // genellikle kucuk/kirpilmistir ve tam ekran blur katmaninda kalite kaybeder.
+  const varsayilanUrunGorseli = urunler.find((urun) => urun.gorsel)?.gorsel
+    || kategoriler.find((kategori) => kategori.gorsel)?.gorsel;
   const kampanyaGorseli = kampanyalar.find((kampanya) => kampanya.gorsel)?.gorsel;
   const ambiyansGorseli = seciliUrun?.gorsel
     || (tenantSonrasiYol === "/kampanyalar" ? kampanyaGorseli : varsayilanUrunGorseli)

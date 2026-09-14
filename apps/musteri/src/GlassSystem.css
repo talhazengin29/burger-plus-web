@@ -14,9 +14,9 @@
   --bg-page: #07111a;
   --bg-deep: #03070c;
   --surface: #07111a;
-  --bg-card: rgba(17, 27, 37, 0.62);
-  --bg-card-hover: rgba(27, 39, 50, 0.76);
-  --bg-input: rgba(16, 25, 34, 0.7);
+  --bg-card: rgba(112, 122, 128, 0.24);
+  --bg-card-hover: rgba(142, 151, 156, 0.32);
+  --bg-input: rgba(113, 123, 129, 0.24);
   --text-primary: #f8fafc;
   --text-secondary: rgba(235, 242, 248, 0.76);
   --text-muted: rgba(220, 230, 238, 0.5);
@@ -24,20 +24,20 @@
   --on-surface-variant: var(--text-secondary);
   --outline: var(--text-muted);
   --placeholder: rgba(225, 234, 241, 0.46);
-  --glass-bg: linear-gradient(145deg, rgba(31, 43, 54, 0.68), rgba(12, 20, 29, 0.56));
-  --glass-bg-soft: rgba(255, 255, 255, 0.07);
-  --glass-bg-strong: rgba(39, 52, 64, 0.78);
-  --glass-bg-solid: rgba(12, 21, 30, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-border-soft: rgba(255, 255, 255, 0.12);
-  --glass-border-strong: rgba(255, 255, 255, 0.28);
+  --glass-bg: linear-gradient(145deg, rgba(207, 214, 216, 0.25), rgba(88, 99, 107, 0.18));
+  --glass-bg-soft: rgba(228, 233, 234, 0.13);
+  --glass-bg-strong: rgba(212, 219, 221, 0.29);
+  --glass-bg-solid: rgba(25, 34, 41, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.34);
+  --glass-border-soft: rgba(255, 255, 255, 0.22);
+  --glass-border-strong: rgba(255, 255, 255, 0.52);
   --border-glass: var(--glass-border);
-  --glass-blur: saturate(125%) blur(20px);
-  --glass-blur-sm: saturate(120%) blur(12px);
-  --glass-blur-lg: saturate(130%) blur(26px);
-  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.035);
-  --glass-shadow: 0 18px 42px rgba(0, 0, 0, 0.28), var(--glass-inset);
-  --glass-shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.22), var(--glass-inset);
+  --glass-blur: saturate(140%) blur(20px);
+  --glass-blur-sm: saturate(135%) blur(12px);
+  --glass-blur-lg: saturate(145%) blur(24px);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -1px 0 rgba(255, 255, 255, 0.09);
+  --glass-shadow: 0 18px 42px rgba(0, 0, 0, 0.25), var(--glass-inset);
+  --glass-shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.19), var(--glass-inset);
   --surface-container-lowest: rgba(9, 16, 24, 0.84);
   --surface-container-low: rgba(14, 23, 32, 0.72);
   --surface-container: rgba(20, 30, 40, 0.72);
@@ -87,21 +87,21 @@ body { background: var(--bg-deep); }
 
 .telefon-ambiyans {
   background:
-    radial-gradient(circle at 83% 13%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 26%),
-    radial-gradient(circle at 12% 58%, rgba(31, 90, 126, 0.18), transparent 42%),
+    radial-gradient(circle at 83% 13%, color-mix(in srgb, var(--accent) 25%, transparent), transparent 30%),
+    radial-gradient(circle at 12% 58%, rgba(91, 129, 150, 0.25), transparent 42%),
     #07111a;
 }
 
 .telefon-ambiyans img {
-  transform: scale(1.18);
-  filter: blur(18px) saturate(0.82) brightness(0.42);
-  opacity: 0.72;
+  transform: scale(1.2);
+  filter: blur(18px) saturate(0.96) brightness(0.7);
+  opacity: 0.92;
 }
 
 .telefon-ambiyans::after {
   background:
-    linear-gradient(180deg, rgba(3, 10, 17, 0.36), rgba(4, 12, 20, 0.58) 48%, rgba(3, 9, 15, 0.78)),
-    radial-gradient(circle at 80% 16%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 32%);
+    linear-gradient(180deg, rgba(4, 12, 20, 0.24), rgba(5, 14, 23, 0.36) 48%, rgba(4, 11, 18, 0.53)),
+    radial-gradient(circle at 80% 16%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 34%);
 }
 
 .ekran { overscroll-behavior: contain; }
@@ -130,16 +130,16 @@ body { background: var(--bg-deep); }
 .campaigns .home-header,
 :root[data-gorunum="acik"] .campaigns .home-header {
   margin: 0;
-  min-height: 88px;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 13px;
-  background: linear-gradient(180deg, rgba(17, 29, 40, 0.94), rgba(10, 19, 28, 0.88));
+  min-height: 78px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px 9px;
+  background: linear-gradient(180deg, rgba(175, 184, 186, 0.2), rgba(77, 88, 95, 0.17));
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.36);
   border-radius: 0;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
-.brand-logo { width: 104px; height: 48px; }
+.brand-logo { width: 124px; height: 52px; }
 .selam-ust { color: rgba(241, 246, 250, 0.72); font-size: 12px; }
 .selam-ad { color: #fff; font-size: 18px; }
 .home-header-sag { gap: 3px; }
@@ -150,11 +150,11 @@ body { background: var(--bg-deep); }
 .sepet-badge { color: var(--on-accent); }
 
 /* Ana ekran */
-.home-govde { padding: 20px 16px 0; }
+.home-govde { padding: 15px 16px 0; }
 .home-hero {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: #fff;
-  font-size: 28px;
+  font-size: 27px;
   line-height: 1.12;
   letter-spacing: -0.035em;
   text-shadow: 0 5px 22px rgba(0, 0, 0, 0.46);
@@ -163,12 +163,12 @@ body { background: var(--bg-deep); }
 
 .damga-kart,
 :root[data-gorunum="acik"] .damga-kart {
-  margin-bottom: 14px;
-  padding: 17px;
+  margin-bottom: 10px;
+  padding: 15px;
   background:
-    radial-gradient(circle at 94% -8%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 38%),
-    linear-gradient(145deg, rgba(37, 49, 60, 0.68), rgba(12, 21, 30, 0.58));
-  border: 1px solid rgba(255, 255, 255, 0.23);
+    radial-gradient(circle at 94% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 38%),
+    linear-gradient(145deg, rgba(211, 216, 216, 0.24), rgba(84, 94, 101, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 24px;
   box-shadow: var(--glass-shadow);
 }
@@ -184,8 +184,8 @@ body { background: var(--bg-deep); }
 .damga-sayac,
 .damga-noktalar > span,
 .damga-misafir-not {
-  background: rgba(255, 255, 255, 0.065);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(224, 229, 230, 0.12);
+  border-color: rgba(255, 255, 255, 0.34);
 }
 .damga-noktalar > span.dolu {
   background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 88%, white), var(--accent));
@@ -196,21 +196,21 @@ body { background: var(--bg-deep); }
 .damga-alt > p { color: var(--on-accent); }
 
 .masa-zekasi-kart {
-  margin-bottom: 14px;
-  background: linear-gradient(145deg, rgba(35, 47, 58, 0.7), rgba(13, 22, 31, 0.62));
-  border: 1px solid rgba(255, 255, 255, 0.21);
+  margin-bottom: 9px;
+  background: linear-gradient(145deg, rgba(211, 216, 216, 0.23), rgba(76, 87, 94, 0.17));
+  border: 1px solid rgba(255, 255, 255, 0.44);
   border-radius: 22px;
   box-shadow: var(--glass-shadow-sm);
 }
 
-.kategori-satir { z-index: 1; gap: 14px; margin: 3px 0 18px; }
+.kategori-satir { z-index: 1; gap: 11px; margin: 0 0 9px; padding-block: 7px; }
 .kategori { min-width: 68px; }
 .kategori-daire {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   padding: 3px;
-  background: rgba(12, 21, 29, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(206, 213, 214, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.44);
   box-shadow: 0 9px 20px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.16);
 }
 .kategori--aktif .kategori-daire {
@@ -220,13 +220,13 @@ body { background: var(--bg-deep); }
 .kategori-ad { color: rgba(241, 245, 249, 0.78); font-size: 11px; }
 .kategori--aktif .kategori-ad { color: var(--primary); }
 
-.arama-sarici { margin-bottom: 20px; }
+.arama-sarici { margin-bottom: 15px; }
 .arama-kutu,
 :root[data-gorunum="acik"] .arama-kutu {
-  min-height: 54px;
+  min-height: 50px;
   padding-left: 16px;
-  background: linear-gradient(145deg, rgba(34, 46, 57, 0.74), rgba(12, 21, 29, 0.67));
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(145deg, rgba(210, 216, 217, 0.22), rgba(77, 88, 95, 0.19));
+  border: 1px solid rgba(255, 255, 255, 0.43);
   box-shadow: var(--glass-shadow-sm);
 }
 .arama-input { color: #fff; }
@@ -240,8 +240,8 @@ body { background: var(--bg-deep); }
 :root[data-gorunum="acik"] .urun-kart {
   min-width: 0;
   overflow: hidden;
-  background: linear-gradient(150deg, rgba(32, 43, 53, 0.7), rgba(10, 18, 27, 0.65));
-  border: 1px solid rgba(255, 255, 255, 0.19);
+  background: linear-gradient(150deg, rgba(72, 83, 91, 0.55), rgba(9, 17, 25, 0.58));
+  border: 1px solid rgba(255, 255, 255, 0.36);
   border-radius: 21px;
   box-shadow: var(--glass-shadow-sm);
 }
@@ -269,8 +269,8 @@ body { background: var(--bg-deep); }
 .camp-kart,
 :root[data-gorunum="acik"] .camp-kart {
   display: block;
-  background: linear-gradient(150deg, rgba(31, 42, 53, 0.72), rgba(10, 18, 27, 0.66));
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(150deg, rgba(109, 119, 126, 0.46), rgba(10, 18, 27, 0.56));
+  border: 1px solid rgba(255, 255, 255, 0.43);
   border-radius: 23px;
   box-shadow: var(--glass-shadow);
 }
@@ -320,8 +320,8 @@ body { background: var(--bg-deep); }
 .urun-detay-kart,
 :root[data-gorunum="acik"] .urun-detay-kart {
   padding: 16px 17px;
-  background: linear-gradient(145deg, rgba(34, 46, 57, 0.72), rgba(11, 19, 28, 0.68));
-  border: 1px solid rgba(255, 255, 255, 0.21);
+  background: linear-gradient(145deg, rgba(126, 136, 142, 0.43), rgba(17, 26, 34, 0.52));
+  border: 1px solid rgba(255, 255, 255, 0.43);
   border-radius: 22px;
   box-shadow: var(--glass-shadow-sm);
 }
@@ -343,8 +343,8 @@ body { background: var(--bg-deep); }
   right: 8px;
   z-index: 12;
   padding: 9px;
-  background: linear-gradient(145deg, rgba(32, 44, 55, 0.84), rgba(9, 17, 25, 0.82));
-  border: 1px solid rgba(255, 255, 255, 0.23);
+  background: linear-gradient(145deg, rgba(147, 156, 160, 0.48), rgba(15, 24, 32, 0.64));
+  border: 1px solid rgba(255, 255, 255, 0.46);
   border-radius: 22px;
   box-shadow: 0 15px 38px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.19);
 }
@@ -365,8 +365,8 @@ body { background: var(--bg-deep); }
   right: 8px;
   min-height: 68px;
   padding: 7px 4px;
-  background: linear-gradient(145deg, rgba(30, 42, 53, 0.84), rgba(8, 16, 24, 0.82));
-  border: 1px solid rgba(255, 255, 255, 0.23);
+  background: linear-gradient(145deg, rgba(149, 158, 162, 0.43), rgba(13, 22, 30, 0.62));
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 23px;
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.2);
 }
@@ -406,7 +406,23 @@ body { background: var(--bg-deep); }
 @media (max-width: 480px) {
   .telefon { background: #07111a; padding: 0; }
   .telefon-ekran { width: 100vw; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
-  .home-header { min-height: 84px; }
+  .home-header { min-height: 76px; }
+}
+
+/* Kisa ekranlarda ilk akisin kategori ve aramaya kadar gorunur kalmasi. */
+@media (max-height: 760px) and (max-width: 480px) {
+  .home-govde { padding-top: 11px; }
+  .home-hero { margin-bottom: 9px; font-size: 24px; }
+  .damga-kart { padding: 12px 13px; margin-bottom: 8px; }
+  .damga-ust { margin-bottom: 9px; }
+  .damga-baslik { margin-top: 6px; font-size: 16px; }
+  .damga-aciklama { font-size: 10px; }
+  .damga-noktalar { gap: 6px; margin-bottom: 9px; }
+  .damga-noktalar > span { height: 39px; min-height: 39px; border-radius: 12px; }
+  .damga-misafir-not { padding: 8px 10px; }
+  .masa-zekasi-kart { min-height: 78px; }
+  .kategori-daire { width: 54px; height: 54px; }
+  .kategori-satir { padding-block: 4px; }
 }
 
 @media (max-width: 360px) {
