@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useIsletme } from "../../context/IsletmeContext";
-import { logoYukle, temaKaydet } from "../../lib/adminApi";
+import { logoYukle, temaArkaPlaniSil, temaArkaPlaniYukle, temaKaydet } from "../../lib/adminApi";
 import { hexRgba, KONSEPTLER, METIN_ALANLARI } from "../../data/konseptler";
 import "./TemaYonetimi.css";
 
@@ -17,6 +17,7 @@ function baslangicFormu(isletme, tema) {
     logoOlcegi: Math.min(180, Math.max(60, Number(tema?.logoOlcegi) || 100)),
     logoKonumX: Math.min(80, Math.max(-80, Number(tema?.logoKonumX) || 0)),
     logoKonumY: Math.min(30, Math.max(-30, Number(tema?.logoKonumY) || 0)),
+    arkaPlanGorseli: tema?.arkaPlanGorseli || "",
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [
       alan,
       tema?.metinler?.[alan] && tema.metinler[alan] !== varsayilan.metinler[alan] ? tema.metinler[alan] : "",
@@ -30,9 +31,11 @@ export default function TemaYonetimi({ onKayitDurumu }) {
   const [logoOnizleme, setLogoOnizleme] = useState(isletme.logoUrl || tema?.logoUrl || "");
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [logoYukleniyor, setLogoYukleniyor] = useState(false);
+  const [arkaPlanYukleniyor, setArkaPlanYukleniyor] = useState(false);
   const [bildirim, setBildirim] = useState("");
   const [hata, setHata] = useState("");
   const dosyaRef = useRef(null);
+  const arkaPlanDosyaRef = useRef(null);
   const canliOnizlemeRef = useRef(null);
   const nesneUrlRef = useRef("");
 
@@ -65,6 +68,7 @@ export default function TemaYonetimi({ onKayitDurumu }) {
     logoOlcegi: form.logoOlcegi,
     logoKonumX: form.logoKonumX,
     logoKonumY: form.logoKonumY,
+    arkaPlanGorseli: form.arkaPlanGorseli || null,
   }), [form, isletme.logoUrl, logoOnizleme, onizleme, tema, varsayilan.font]);
 
   const onizlemeMesajiniGonder = useCallback(() => canliOnizlemeRef.current?.contentWindow?.postMessage({
@@ -91,6 +95,7 @@ export default function TemaYonetimi({ onKayitDurumu }) {
     logoOlcegi: form.logoOlcegi,
     logoKonumX: form.logoKonumX,
     logoKonumY: form.logoKonumY,
+    arkaPlanGorseli: form.arkaPlanGorseli || null,
     metinler: Object.fromEntries(METIN_ALANLARI.map(([alan]) => [alan, ""])),
   });
 
@@ -113,6 +118,7 @@ export default function TemaYonetimi({ onKayitDurumu }) {
         logoOlcegi: form.logoOlcegi,
         logoKonumX: form.logoKonumX,
         logoKonumY: form.logoKonumY,
+        arkaPlanGorseli: form.arkaPlanGorseli || null,
         metinler: form.metinler,
       });
       isletmeyiGuncelle(yanit.isletme, yanit.tema);
@@ -147,6 +153,42 @@ export default function TemaYonetimi({ onKayitDurumu }) {
       setLogoYukleniyor(false);
       if (nesneUrlRef.current) URL.revokeObjectURL(nesneUrlRef.current);
       nesneUrlRef.current = "";
+    }
+  };
+
+  const arkaPlanSecildi = async (e) => {
+    const dosya = e.target.files?.[0];
+    e.target.value = "";
+    if (!dosya) return;
+    setArkaPlanYukleniyor(true);
+    setHata("");
+    setBildirim("");
+    try {
+      const yanit = await temaArkaPlaniYukle(dosya);
+      isletmeyiGuncelle(yanit.isletme, yanit.tema);
+      setForm((onceki) => ({ ...onceki, arkaPlanGorseli: yanit.tema?.arkaPlanGorseli || "" }));
+      setBildirim("Arka plan yüklendi ve cam yüzeylerin arkasına uygulandı.");
+    } catch (istekHatasi) {
+      setHata(istekHatasi.message);
+    } finally {
+      setArkaPlanYukleniyor(false);
+    }
+  };
+
+  const arkaPlaniKaldir = async () => {
+    if (!form.arkaPlanGorseli || !window.confirm("Özel arka plan kaldırılsın mı? Ürün fotoğrafından üretilen otomatik arka plana dönülecek.")) return;
+    setArkaPlanYukleniyor(true);
+    setHata("");
+    setBildirim("");
+    try {
+      const yanit = await temaArkaPlaniSil();
+      isletmeyiGuncelle(yanit.isletme, yanit.tema);
+      setForm((onceki) => ({ ...onceki, arkaPlanGorseli: "" }));
+      setBildirim("Özel arka plan kaldırıldı; otomatik ürün ambiyansına dönüldü.");
+    } catch (istekHatasi) {
+      setHata(istekHatasi.message);
+    } finally {
+      setArkaPlanYukleniyor(false);
     }
   };
 
@@ -185,6 +227,27 @@ export default function TemaYonetimi({ onKayitDurumu }) {
           <label className="logo-olcek"><span>Boyut</span><input type="range" min="60" max="180" step="5" value={form.logoOlcegi} onChange={(e) => setForm({ ...form, logoOlcegi: Number(e.target.value) })} /><output>{form.logoOlcegi}%</output></label>
           <label className="logo-olcek"><span>Sağ / sol</span><input type="range" min="-80" max="80" step="2" value={form.logoKonumX} onChange={(e) => setForm({ ...form, logoKonumX: Number(e.target.value) })} /><output>{form.logoKonumX}px</output></label>
           <label className="logo-olcek"><span>Yukarı / aşağı</span><input type="range" min="-30" max="30" step="1" value={form.logoKonumY} onChange={(e) => setForm({ ...form, logoKonumY: Number(e.target.value) })} /><output>{form.logoKonumY}px</output></label>
+        </fieldset>
+
+        <fieldset className="tema-kutu arka-plan-kutusu">
+          <legend>Cam arka planı</legend>
+          <p>Bu görsel tüm müşteri ekranlarında buzlu cam yüzeylerin arkasında kullanılır. Yüklemezsen sistem restoranın ürün fotoğraflarından otomatik ambiyans oluşturur.</p>
+          <div className="arka-plan-satiri">
+            <span className="arka-plan-onizleme">
+              {form.arkaPlanGorseli
+                ? <img src={form.arkaPlanGorseli} alt="Seçili uygulama arka planı" />
+                : <i>Otomatik ürün ambiyansı</i>}
+              <b aria-hidden="true" />
+            </span>
+            <div>
+              <button type="button" disabled={arkaPlanYukleniyor} onClick={() => arkaPlanDosyaRef.current?.click()}>
+                {arkaPlanYukleniyor ? "Yükleniyor..." : form.arkaPlanGorseli ? "Arka planı değiştir" : "Arka plan yükle"}
+              </button>
+              {form.arkaPlanGorseli && <button type="button" className="arka-plan-kaldir" disabled={arkaPlanYukleniyor} onClick={arkaPlaniKaldir}>Özel arka planı kaldır</button>}
+            </div>
+            <input ref={arkaPlanDosyaRef} type="file" hidden accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" onChange={arkaPlanSecildi} />
+          </div>
+          <small className="arka-plan-yardim">PNG, JPG, WebP, GIF, AVIF veya BMP · en fazla 5 MB · yatay ve yüksek çözünürlüklü görsel önerilir.</small>
         </fieldset>
 
         <fieldset className="tema-kutu">

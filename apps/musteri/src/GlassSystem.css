@@ -24,20 +24,21 @@
   --on-surface-variant: var(--text-secondary);
   --outline: var(--text-muted);
   --placeholder: rgba(225, 234, 241, 0.46);
-  --glass-bg: linear-gradient(145deg, rgba(207, 214, 216, 0.25), rgba(88, 99, 107, 0.18));
-  --glass-bg-soft: rgba(228, 233, 234, 0.13);
-  --glass-bg-strong: rgba(212, 219, 221, 0.29);
-  --glass-bg-solid: rgba(25, 34, 41, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.34);
-  --glass-border-soft: rgba(255, 255, 255, 0.22);
-  --glass-border-strong: rgba(255, 255, 255, 0.52);
+  --glass-bg: linear-gradient(145deg, rgba(225, 231, 232, 0.34), rgba(91, 103, 111, 0.23));
+  --glass-bg-soft: rgba(234, 239, 240, 0.2);
+  --glass-bg-strong: rgba(225, 231, 232, 0.38);
+  --glass-bg-solid: rgba(25, 34, 41, 0.82);
+  --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.055) 34%, transparent 62%);
+  --glass-border: rgba(255, 255, 255, 0.44);
+  --glass-border-soft: rgba(255, 255, 255, 0.29);
+  --glass-border-strong: rgba(255, 255, 255, 0.62);
   --border-glass: var(--glass-border);
-  --glass-blur: saturate(140%) blur(20px);
-  --glass-blur-sm: saturate(135%) blur(12px);
-  --glass-blur-lg: saturate(145%) blur(24px);
-  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -1px 0 rgba(255, 255, 255, 0.09);
-  --glass-shadow: 0 18px 42px rgba(0, 0, 0, 0.25), var(--glass-inset);
-  --glass-shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.19), var(--glass-inset);
+  --glass-blur: saturate(132%) blur(26px);
+  --glass-blur-sm: saturate(128%) blur(16px);
+  --glass-blur-lg: saturate(136%) blur(32px);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.58), inset 1px 0 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 20px 46px rgba(0, 0, 0, 0.28), 0 1px 1px rgba(255, 255, 255, 0.08), var(--glass-inset);
+  --glass-shadow-sm: 0 11px 28px rgba(0, 0, 0, 0.22), 0 1px 1px rgba(255, 255, 255, 0.06), var(--glass-inset);
   --surface-container-lowest: rgba(9, 16, 24, 0.84);
   --surface-container-low: rgba(14, 23, 32, 0.72);
   --surface-container: rgba(20, 30, 40, 0.72);
@@ -94,13 +95,13 @@ body { background: var(--bg-deep); }
 
 .telefon-ambiyans img {
   transform: scale(1.2);
-  filter: blur(18px) saturate(0.96) brightness(0.7);
-  opacity: 0.92;
+  filter: blur(11px) saturate(0.98) brightness(0.69);
+  opacity: 0.94;
 }
 
 .telefon-ambiyans::after {
   background:
-    linear-gradient(180deg, rgba(4, 12, 20, 0.24), rgba(5, 14, 23, 0.36) 48%, rgba(4, 11, 18, 0.53)),
+    linear-gradient(180deg, rgba(4, 12, 20, 0.18), rgba(5, 14, 23, 0.29) 48%, rgba(4, 11, 18, 0.47)),
     radial-gradient(circle at 80% 16%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 34%);
 }
 
@@ -117,6 +118,7 @@ body { background: var(--bg-deep); }
 .urun-detay-kart,
 .urun-detay-alt-bar,
 .bottom-nav,
+.login-form,
 .bildirim-panel,
 .personel-cagri-panel,
 .uye-modal {
@@ -132,11 +134,13 @@ body { background: var(--bg-deep); }
   margin: 0;
   min-height: 78px;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 20px 9px;
-  background: linear-gradient(180deg, rgba(175, 184, 186, 0.2), rgba(77, 88, 95, 0.17));
+  background:
+    var(--glass-sheen),
+    linear-gradient(180deg, rgba(214, 221, 222, 0.29), rgba(87, 99, 107, 0.22));
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.36);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.17), inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 
 .brand-logo { width: 124px; height: 52px; }
@@ -148,6 +152,34 @@ body { background: var(--bg-deep); }
 .ikon-btn svg { width: 24px; height: 24px; }
 .bildirim-badge,
 .sepet-badge { color: var(--on-accent); }
+
+/* Giris, kayit ve sifre ekranlari da ayni buzlu cam malzemeyi kullanir. */
+.login {
+  background: transparent;
+}
+.login-ust { padding-top: 42px; padding-bottom: 27px; }
+.login-form,
+:root[data-gorunum="acik"] .login-form {
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(213, 220, 221, 0.34), rgba(31, 42, 50, 0.38));
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.32), var(--glass-inset);
+}
+.login-input,
+:root[data-gorunum="acik"] .login-input {
+  background: linear-gradient(145deg, rgba(229, 234, 235, 0.14), rgba(12, 20, 27, 0.3));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+}
+.login-input:focus,
+:root[data-gorunum="acik"] .login-input:focus {
+  background: rgba(16, 25, 32, 0.42);
+  border-color: var(--primary);
+}
+.login-giris-btn { color: var(--on-accent); background: var(--accent); }
 
 /* Ana ekran */
 .home-govde { padding: 15px 16px 0; }
@@ -167,8 +199,9 @@ body { background: var(--bg-deep); }
   padding: 15px;
   background:
     radial-gradient(circle at 94% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 38%),
-    linear-gradient(145deg, rgba(211, 216, 216, 0.24), rgba(84, 94, 101, 0.18));
-  border: 1px solid rgba(255, 255, 255, 0.48);
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(224, 230, 231, 0.33), rgba(89, 101, 108, 0.23));
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 24px;
   box-shadow: var(--glass-shadow);
 }
@@ -197,8 +230,10 @@ body { background: var(--bg-deep); }
 
 .masa-zekasi-kart {
   margin-bottom: 9px;
-  background: linear-gradient(145deg, rgba(211, 216, 216, 0.23), rgba(76, 87, 94, 0.17));
-  border: 1px solid rgba(255, 255, 255, 0.44);
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(221, 227, 228, 0.31), rgba(81, 93, 101, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 22px;
   box-shadow: var(--glass-shadow-sm);
 }
@@ -209,8 +244,8 @@ body { background: var(--bg-deep); }
   width: 60px;
   height: 60px;
   padding: 3px;
-  background: rgba(206, 213, 214, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.44);
+  background: linear-gradient(145deg, rgba(233, 238, 239, 0.26), rgba(83, 95, 103, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.54);
   box-shadow: 0 9px 20px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.16);
 }
 .kategori--aktif .kategori-daire {
@@ -225,13 +260,19 @@ body { background: var(--bg-deep); }
 :root[data-gorunum="acik"] .arama-kutu {
   min-height: 50px;
   padding-left: 16px;
-  background: linear-gradient(145deg, rgba(210, 216, 217, 0.22), rgba(77, 88, 95, 0.19));
-  border: 1px solid rgba(255, 255, 255, 0.43);
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(225, 231, 232, 0.3), rgba(82, 94, 102, 0.23));
+  border: 1px solid rgba(255, 255, 255, 0.56);
   box-shadow: var(--glass-shadow-sm);
 }
 .arama-input { color: #fff; }
-.filtre-btn { background: rgba(255, 255, 255, 0.09); }
-.filtre-menu { background: rgba(10, 18, 27, 0.94); border-color: var(--glass-border-strong); }
+.filtre-btn { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.17); }
+.filtre-menu {
+  background: linear-gradient(145deg, rgba(104, 116, 124, 0.62), rgba(9, 17, 25, 0.78));
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+}
 
 .bolum-baslik { color: #fff; font-size: 22px; text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4); }
 .diger-urunler-baslik small { color: var(--text-secondary); }
@@ -240,8 +281,10 @@ body { background: var(--bg-deep); }
 :root[data-gorunum="acik"] .urun-kart {
   min-width: 0;
   overflow: hidden;
-  background: linear-gradient(150deg, rgba(72, 83, 91, 0.55), rgba(9, 17, 25, 0.58));
-  border: 1px solid rgba(255, 255, 255, 0.36);
+  background:
+    var(--glass-sheen),
+    linear-gradient(150deg, rgba(125, 136, 142, 0.5), rgba(9, 17, 25, 0.59));
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 21px;
   box-shadow: var(--glass-shadow-sm);
 }
@@ -269,8 +312,10 @@ body { background: var(--bg-deep); }
 .camp-kart,
 :root[data-gorunum="acik"] .camp-kart {
   display: block;
-  background: linear-gradient(150deg, rgba(109, 119, 126, 0.46), rgba(10, 18, 27, 0.56));
-  border: 1px solid rgba(255, 255, 255, 0.43);
+  background:
+    var(--glass-sheen),
+    linear-gradient(150deg, rgba(151, 161, 166, 0.48), rgba(10, 18, 27, 0.57));
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 23px;
   box-shadow: var(--glass-shadow);
 }
@@ -320,8 +365,10 @@ body { background: var(--bg-deep); }
 .urun-detay-kart,
 :root[data-gorunum="acik"] .urun-detay-kart {
   padding: 16px 17px;
-  background: linear-gradient(145deg, rgba(126, 136, 142, 0.43), rgba(17, 26, 34, 0.52));
-  border: 1px solid rgba(255, 255, 255, 0.43);
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(162, 172, 176, 0.46), rgba(17, 26, 34, 0.53));
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 22px;
   box-shadow: var(--glass-shadow-sm);
 }
@@ -343,8 +390,10 @@ body { background: var(--bg-deep); }
   right: 8px;
   z-index: 12;
   padding: 9px;
-  background: linear-gradient(145deg, rgba(147, 156, 160, 0.48), rgba(15, 24, 32, 0.64));
-  border: 1px solid rgba(255, 255, 255, 0.46);
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(169, 178, 181, 0.5), rgba(15, 24, 32, 0.62));
+  border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: 22px;
   box-shadow: 0 15px 38px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.19);
 }
@@ -365,8 +414,10 @@ body { background: var(--bg-deep); }
   right: 8px;
   min-height: 68px;
   padding: 7px 4px;
-  background: linear-gradient(145deg, rgba(149, 158, 162, 0.43), rgba(13, 22, 30, 0.62));
-  border: 1px solid rgba(255, 255, 255, 0.48);
+  background:
+    var(--glass-sheen),
+    linear-gradient(145deg, rgba(168, 178, 181, 0.47), rgba(13, 22, 30, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 23px;
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.2);
 }

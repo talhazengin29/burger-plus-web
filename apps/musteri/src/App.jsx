@@ -24,6 +24,7 @@ import Korumali from "./components/Korumali";
 import { useApp } from "./context/AppContext";
 import { IsletmeSarici } from "./context/IsletmeContext";
 import { useIsletme } from "./context/IsletmeContext";
+import { useTema } from "./context/TemaContext";
 import "./App.css";
 import "./tablet.css";
 import "./GlassSystem.css";
@@ -43,6 +44,7 @@ function AdminKorumali({ children }) {
 
 function TelefonYerlesimi() {
   const konum = useLocation();
+  const { arkaPlanGorseli } = useTema();
   const { urunler = [], kategoriler = [], kampanyalar = [] } = useApp();
   const tenantSonrasiYol = `/${konum.pathname.split("/").filter(Boolean).slice(1).join("/")}`;
   const altMenuGoster = altMenuluYollar.includes(tenantSonrasiYol);
@@ -53,7 +55,8 @@ function TelefonYerlesimi() {
   const varsayilanUrunGorseli = urunler.find((urun) => urun.gorsel)?.gorsel
     || kategoriler.find((kategori) => kategori.gorsel)?.gorsel;
   const kampanyaGorseli = kampanyalar.find((kampanya) => kampanya.gorsel)?.gorsel;
-  const ambiyansGorseli = seciliUrun?.gorsel
+  const ambiyansGorseli = arkaPlanGorseli
+    || seciliUrun?.gorsel
     || (tenantSonrasiYol === "/kampanyalar" ? kampanyaGorseli : varsayilanUrunGorseli)
     || kampanyaGorseli;
 

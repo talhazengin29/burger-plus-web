@@ -273,3 +273,19 @@ export async function logoYukle(dosya) {
   if (!r.ok) throw new Error(veri.hata || `Logo yüklenemedi (HTTP ${r.status}).`);
   return veri;
 }
+
+export async function temaArkaPlaniYukle(dosya) {
+  if (!dosya || !DESTEKLENEN_GORSELLER.has(dosya.type)) throw new Error("PNG, JPG/JPEG, WebP, GIF, AVIF veya BMP formatinda bir arka plan secmelisin.");
+  if (dosya.size > 5 * 1024 * 1024) throw new Error("Arka plan gorseli en fazla 5 MB olabilir.");
+  const r = await istekAt("/api/admin/tema-arka-plani", { method: "POST", headers: { "Content-Type": dosya.type }, body: dosya });
+  const veri = await jsonOku(r).catch(() => ({}));
+  if (!r.ok) throw new Error(veri.hata || `Arka plan yuklenemedi (HTTP ${r.status}).`);
+  return veri;
+}
+
+export async function temaArkaPlaniSil() {
+  const r = await istekAt("/api/admin/tema-arka-plani", { method: "DELETE" });
+  const veri = await jsonOku(r).catch(() => ({}));
+  if (!r.ok) throw new Error(veri.hata || `Arka plan kaldirilamadi (HTTP ${r.status}).`);
+  return veri;
+}
