@@ -283,14 +283,23 @@ body { background: var(--bg-deep); }
   overflow: hidden;
   background:
     var(--glass-sheen),
-    linear-gradient(150deg, rgba(125, 136, 142, 0.5), rgba(9, 17, 25, 0.59));
-  border: 1px solid rgba(255, 255, 255, 0.48);
+    linear-gradient(150deg, rgba(187, 196, 199, 0.38), rgba(62, 75, 84, 0.34));
+  border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: 21px;
   box-shadow: var(--glass-shadow-sm);
 }
 .urun-gorsel-wrap { aspect-ratio: 1.34 / 1; }
 .urun-gorsel { width: 100%; height: 100%; object-fit: cover; }
-.urun-alt { padding: 10px 11px 11px; background: rgba(5, 12, 18, 0.24); }
+.urun-alt {
+  padding: 10px 11px 11px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 52%),
+    linear-gradient(145deg, rgba(224, 231, 233, 0.22), rgba(91, 104, 112, 0.2));
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
 .urun-ad { min-height: 0; margin-bottom: 7px; color: #fff; font-size: 13px; }
 .urun-standart-miktar { color: var(--text-muted); }
 .urun-fiyat { color: var(--primary); font-size: 15px; }
