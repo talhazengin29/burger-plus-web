@@ -109,12 +109,16 @@
     }
   }
 
-  .dark .marka-logo {
-    background: transparent;
+  .marka-logo-gorseli--koyu {
+    display: none;
   }
 
-  .dark .marka-logo-gorseli {
-    filter: brightness(0) invert(1);
+  .dark .marka-logo-gorseli--acik {
+    display: none;
+  }
+
+  .dark .marka-logo-gorseli--koyu {
+    display: block;
   }
 
   h1,
