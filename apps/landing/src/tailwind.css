@@ -524,14 +524,14 @@
     bottom: max(1.25rem, env(safe-area-inset-bottom));
     z-index: 60;
     display: grid;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3.75rem;
+    height: 3.75rem;
     place-items: center;
-    border: 1px solid color-mix(in srgb, var(--marka-yesil) 52%, var(--marka-cizgi));
+    border: 1px solid color-mix(in srgb, var(--marka-yesil) 48%, var(--marka-cizgi));
     border-radius: 1.1rem;
-    background: color-mix(in srgb, var(--marka-kart) 92%, transparent);
+    background: rgba(255, 255, 255, 0.95);
     color: var(--marka-yesil);
-    box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), inset 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), 0 0 0 4px color-mix(in srgb, var(--marka-yesil) 9%, transparent), inset 0 1px rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(16px);
     transition:
       transform 0.2s ease,
@@ -541,8 +541,8 @@
   }
   .whatsapp-buton:hover {
     border-color: var(--marka-yesil);
-    background: color-mix(in srgb, var(--marka-yesil) 10%, var(--marka-kart));
-    box-shadow: 0 16px 38px rgba(18, 140, 126, 0.2);
+    background: #ffffff;
+    box-shadow: 0 16px 38px rgba(0, 185, 140, 0.24), 0 0 0 5px color-mix(in srgb, var(--marka-yesil) 12%, transparent);
     transform: translateY(-2px);
   }
   .whatsapp-buton:active { transform: translateY(0) scale(0.97); }
