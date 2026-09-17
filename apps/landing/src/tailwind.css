@@ -16,12 +16,12 @@
     --marka-zemin: #f4f8fb;
     --marka-kart: #ffffff;
     --marka-cizgi: #d8e5ee;
-    --marka-lacivert: #082f55;
-    --marka-mavi: #0b91d3;
-    --marka-yesil: #08b85f;
+    --marka-lacivert: #07366d;
+    --marka-mavi: #0b6eac;
+    --marka-yesil: #00b98c;
     --marka-gri-300: #425b6b;
     --marka-gri-400: #6e8492;
-    --marka-metin: #082f55;
+    --marka-metin: #07345f;
     --marka-kenar-hafif: rgba(8, 47, 85, 0.09);
 
     /* Efektler */
@@ -30,7 +30,7 @@
     --cam-kenar: rgba(8, 47, 85, 0.1);
     --izgara-cizgi: rgba(11, 145, 211, 0.055);
     --izgara-adim: 40px;
-    --marka-parilti: 0 14px 34px -16px rgba(11, 145, 211, 0.58);
+    --marka-parilti: 0 14px 34px -16px rgba(0, 185, 140, 0.52);
     --ust-bar-yuksekligi: 4.5rem;
     --hale-opaklik: 0.28;
   }
@@ -42,8 +42,8 @@
     --marka-kart: #082436;
     --marka-cizgi: #19435b;
     --marka-lacivert: #8dd9f5;
-    --marka-mavi: #25aee8;
-    --marka-yesil: #16cf72;
+    --marka-mavi: #4db9ed;
+    --marka-yesil: #20d4a6;
     --marka-gri-300: #b7cad5;
     --marka-gri-400: #7e9aaa;
     --marka-metin: #f4fbff;
@@ -72,18 +72,51 @@
   }
 
   .chatbot-marka {
-    color: var(--marka-metin);
+    background: linear-gradient(100deg, #07366d 0%, #07366d 58%, #00b98c 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
 
-  .menule-logo-gorseli {
+  .dark .chatbot-marka {
+    background-image: linear-gradient(100deg, #8dd9f5 0%, #4db9ed 52%, #20d4a6 100%);
+  }
+
+  .marka-logo {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 0.8rem;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .marka-logo-gorseli {
     display: block;
     width: auto;
-    height: 2.75rem;
+    height: 1.75rem;
     object-fit: contain;
   }
 
-  .menule-logo-gorseli--altbilgi {
-    height: 2.5rem;
+  .marka-logo-gorseli--altbilgi {
+    height: 2.15rem;
+  }
+
+  @media (min-width: 640px) {
+    .marka-logo-gorseli {
+      height: 2.25rem;
+    }
+
+    .marka-logo-gorseli--altbilgi {
+      height: 2.15rem;
+    }
+  }
+
+  .dark .marka-logo {
+    padding: 0.38rem 0.55rem;
+    border-color: rgba(255, 255, 255, 0.58);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   h1,
@@ -160,7 +193,7 @@
       linear-gradient(to bottom, var(--izgara-cizgi) 1px, transparent 1px);
   }
 
-  /* Menüle paletinden dengeli ortam ışıkları. */
+  /* MasanPOS paletinden dengeli ortam ışıkları. */
   .hale {
     position: absolute;
     border-radius: 9999px;
@@ -218,7 +251,7 @@
     animation-duration: 7s;
   }
 
-  /* Başlıklardaki Menüle mavi-yeşil-turuncu gradyanı. */
+  /* Başlıklardaki MasanPOS mavi-yeşil gradyanı. */
   .metin-gradyan {
     background-clip: text;
     -webkit-background-clip: text;
@@ -229,7 +262,7 @@
     animation: marka-akis 4s linear infinite;
   }
 
-  /* Menüle mavi-yeşil gradyanlı birincil buton. */
+  /* MasanPOS mavi-yeşil gradyanlı birincil buton. */
   .marka-buton {
     background-image: linear-gradient(110deg, var(--marka-mavi), var(--marka-yesil));
     box-shadow: var(--marka-parilti);
@@ -1174,18 +1207,6 @@
     padding-block: 0.25rem;
   }
 
-  .menule-logo-gorseli--koyu {
-    display: none;
-  }
-
-  .dark .menule-logo-gorseli--acik {
-    display: none;
-  }
-
-  .dark .menule-logo-gorseli--koyu {
-    display: block;
-  }
-
   .talep-tuzak {
     position: absolute !important;
     left: -10000px !important;
@@ -1338,25 +1359,25 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
 .chatbot-ac {
   position: relative;
   display: grid;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3.75rem;
+  height: 3.75rem;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--marka-mavi) 42%, var(--marka-cizgi));
+  border: 1px solid color-mix(in srgb, var(--marka-yesil) 48%, var(--marka-cizgi));
   border-radius: 1.1rem;
-  background: color-mix(in srgb, var(--marka-kart) 92%, transparent);
-  color: var(--marka-mavi);
-  box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), inset 0 1px rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  color: #07366d;
+  box-shadow: 0 14px 36px rgba(3, 25, 39, 0.24), 0 0 0 4px color-mix(in srgb, var(--marka-yesil) 9%, transparent), inset 0 1px rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   transition: transform .2s ease, border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
 }
 .chatbot-ac:hover {
-  border-color: var(--marka-mavi);
-  background: color-mix(in srgb, var(--marka-mavi) 10%, var(--marka-kart));
-  box-shadow: 0 16px 38px rgba(11, 145, 211, 0.24);
+  border-color: var(--marka-yesil);
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(0, 185, 140, 0.24), 0 0 0 5px color-mix(in srgb, var(--marka-yesil) 12%, transparent);
   transform: translateY(-2px);
 }
 .chatbot-ac:active { transform: translateY(0) scale(.97); }
-.chatbot-ac svg { width: 1.65rem; height: 1.65rem; }
+.chatbot-ac-gorseli { width: 2.85rem; height: 2.85rem; object-fit: contain; }
 .chatbot-durum {
   position: absolute;
   top: .48rem;
@@ -1391,8 +1412,8 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
   border-bottom: 1px solid var(--marka-cizgi);
   background: color-mix(in srgb, var(--marka-mavi) 8%, transparent);
 }
-.chatbot-avatar { display: grid; width: 2.65rem; height: 2.65rem; flex: none; place-items: center; border-radius: 0.85rem; background: var(--marka-mavi); color: #fff; box-shadow: 0 6px 18px rgba(11,145,211,.25); }
-.chatbot-avatar svg { width: 1.6rem; height: 1.6rem; }
+.chatbot-avatar { display: grid; width: 2.8rem; height: 2.8rem; flex: none; place-items: center; overflow: hidden; border: 1px solid color-mix(in srgb, var(--marka-yesil) 38%, var(--marka-cizgi)); border-radius: 0.85rem; background: rgba(255,255,255,.94); box-shadow: 0 6px 18px rgba(0,185,140,.18); }
+.chatbot-avatar-gorseli { width: 2.3rem; height: 2.3rem; object-fit: contain; }
 .chatbot-baslik-satiri > div { min-width: 0; flex: 1; }
 .chatbot-baslik-satiri h2 { margin: 0; font-size: 1rem; font-weight: 700; }
 .chatbot-baslik-satiri p { display: flex; align-items: center; gap: .35rem; margin: .15rem 0 0; color: var(--marka-gri-400); font-size: .72rem; }
@@ -1404,7 +1425,7 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
 .chatbot-mesajlar { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 1rem; scrollbar-width: thin; }
 .chatbot-mesaj { width: fit-content; max-width: 88%; margin-bottom: .7rem; padding: .72rem .85rem; border-radius: 1rem; font-size: .82rem; line-height: 1.5; overflow-wrap: anywhere; }
 .chatbot-mesaj--asistan, .chatbot-mesaj--yukleniyor { border: 1px solid var(--marka-cizgi); border-bottom-left-radius: .3rem; background: color-mix(in srgb, var(--marka-metin) 5%, transparent); color: var(--marka-gri-300); }
-.chatbot-mesaj--kullanici { margin-left: auto; border-bottom-right-radius: .3rem; background: var(--marka-mavi); color: #fff; }
+.chatbot-mesaj--kullanici { margin-left: auto; border-bottom-right-radius: .3rem; background: linear-gradient(110deg, #07539b, #00a980); color: #fff; }
 .chatbot-mesaj--yukleniyor { opacity: .7; animation: chatbot-bekle 1.2s ease-in-out infinite; }
 
 .chatbot-oneriler { display: flex; gap: .45rem; overflow-x: auto; padding: 0 1rem .75rem; scrollbar-width: none; }
@@ -1419,7 +1440,7 @@ body:has(.whatsapp-buton) .chatbot-kok { bottom: max(5.75rem, calc(1rem + env(sa
 .chatbot-form textarea:focus,
 .chatbot-form textarea:focus-visible { border-color: transparent; outline: none; box-shadow: none; --tw-ring-shadow: 0 0 #0000; }
 .chatbot-form textarea::placeholder { color: var(--marka-gri-400); }
-.chatbot-form button { display: grid; width: 2.55rem; height: 2.55rem; flex: none; place-items: center; border-radius: .78rem; background: var(--marka-yesil); color: #fff; }
+.chatbot-form button { display: grid; width: 2.55rem; height: 2.55rem; flex: none; place-items: center; border-radius: .78rem; background: linear-gradient(135deg, #0b67ae, #00b98c); color: #fff; box-shadow: 0 7px 18px rgba(0,185,140,.2); }
 .chatbot-form button:disabled { opacity: .45; cursor: wait; }
 .chatbot-form button svg { width: 1.25rem; height: 1.25rem; }
 .chatbot-not { margin: .55rem .9rem .75rem; color: var(--marka-gri-400); font-size: .62rem; text-align: center; }

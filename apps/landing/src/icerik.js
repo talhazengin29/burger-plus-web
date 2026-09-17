@@ -126,7 +126,7 @@ export const WHATSAPP = {
     return ILETISIM.whatsapp;
   },
   // Sohbet açıldığında mesaj kutusuna hazır gelen metin.
-  hazirMesaj: "Merhaba, Menüle hakkında bilgi almak istiyorum.",
+  hazirMesaj: "Merhaba, MasanPOS hakkında bilgi almak istiyorum.",
   etiket: "WhatsApp'tan yazın",
 };
 
@@ -180,17 +180,17 @@ const YIL = new Date().getFullYear();
 
 export const ICERIK = {
   // --- Marka ---------------------------------------------------------------
-  markaAdi: "Menüle",
-  markaAdiHtml: "Menüle",
+  markaAdi: "MasanPOS",
+  markaAdiHtml: "Masan<span>POS</span>",
   markaAciklamasi: "Menüden siparişe, stoktan sadakate restoranınızın işletim sistemi.",
-  telifSatiri: `© ${YIL} Menüle. Tüm hakları saklıdır.`,
+  telifSatiri: `© ${YIL} MasanPOS. Tüm hakları saklıdır.`,
 
   // --- SEO / Open Graph ----------------------------------------------------
-  sayfaBasligi: "Menüle | Restoran Yönetim ve Sipariş Platformu",
+  sayfaBasligi: "MasanPOS | Restoran Yönetim ve Sipariş Platformu",
   sayfaAciklamasi:
     "QR kodla masadan sipariş, canlı mutfak paneli, sadakat programı ve detaylı raporlar. Restoranınızın siparişten ödemeye tüm akışını tek sistemde yönetin.",
   ogGorsel: `${SITE_URL}/gorseller/hero-telefon.jpg`,
-  ogGorselAlt: "Menüle müşteri uygulamasının telefon ekranındaki görünümü",
+  ogGorselAlt: "MasanPOS müşteri uygulamasının telefon ekranındaki görünümü",
 
   // --- Hero ----------------------------------------------------------------
   heroBaslikBir: "MASANIZ",

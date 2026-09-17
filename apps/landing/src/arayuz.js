@@ -131,7 +131,7 @@ function sssAkordiyonu() {
 }
 
 /* --------------------------------------------------------- Tema anahtarı (koyu/aydınlık) */
-const TEMA_ANAHTARI = "menule-landing-tema";
+const TEMA_ANAHTARI = "masanpos-landing-tema";
 
 function temaAnahtari() {
   const dugme = document.getElementById("tema-anahtari-dugmesi");
