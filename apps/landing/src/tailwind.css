@@ -1821,57 +1821,8 @@
 .altbilgi-akis-haritasi {
   position: absolute;
   z-index: 2;
-  top: 28%;
-  right: 2.5%;
-  bottom: 5%;
-  left: 2.5%;
-  pointer-events: none;
-}
-
-.altbilgi-akis-haritasi > svg {
-  position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.altbilgi-akis-golge,
-.altbilgi-akis-cizgi {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.altbilgi-akis-golge {
-  stroke: rgba(0, 79, 101, 0.28);
-  stroke-width: 7;
-  filter: blur(4px);
-}
-
-.altbilgi-akis-cizgi {
-  stroke: #00bcae;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 7;
-  opacity: 0.88;
-}
-
-.dark .altbilgi-akis-cizgi {
-  stroke: #39d8cb;
-}
-
-.altbilgi-akis-haritasi circle {
-  fill: #f4fdff;
-  stroke: #00bcae;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 4px rgba(0, 188, 174, 0.72));
-}
-
-.dark .altbilgi-akis-haritasi circle {
-  fill: #052635;
-  stroke: #39d8cb;
+  pointer-events: none;
 }
 
 .altbilgi-akis-adimlari {
@@ -1900,7 +1851,7 @@
   text-align: center;
   white-space: nowrap;
   backdrop-filter: blur(9px);
-  transform: translate(-50%, -155%);
+  transform: translate(-50%, -145%);
 }
 
 .dark .altbilgi-akis-adimlari li {
@@ -1949,12 +1900,6 @@
 
   .altbilgi-sahne-gorseli {
     object-position: 50% bottom;
-  }
-
-  .altbilgi-akis-haritasi {
-    top: 31%;
-    right: 1.5%;
-    left: 1.5%;
   }
 
   .altbilgi-akis-adimlari li {
