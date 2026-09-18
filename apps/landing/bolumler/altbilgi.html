@@ -1,43 +1,32 @@
 <!-- ==========================================================================
-     MasanPOS Gece Servisi — operasyon akışını anlatan özgün alt bilgi.
+     MasanPOS kompakt alt bilgi.
+     Restoran operasyonu görseli ayrı bir vitrin olmak yerine yüzeyin içinde,
+     düşük yoğunluklu bir marka dokusu olarak kullanılır.
      ========================================================================== -->
 <footer class="masanpos-altbilgi" id="altbilgi">
-  <section class="altbilgi-akis" aria-label="MasanPOS restoran operasyon akışı">
-    <div class="altbilgi-akis-pencere">
-      <div class="altbilgi-akis-iz">
-        <ul class="altbilgi-akis-grubu">
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--mavi"></span><strong>Masa 12</strong><span>Sipariş alındı</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--turuncu"></span><strong>Mutfak</strong><span>3 ürün hazırlanıyor</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--yesil"></span><strong>Gel Al #184</strong><span>Teslime hazır</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--yesil"></span><strong>Kasa</strong><span>Ödeme tamamlandı</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--mavi"></span><strong>Stok</strong><span>Tüm ürünler yeterli</span></li>
-        </ul>
-        <ul class="altbilgi-akis-grubu" aria-hidden="true">
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--mavi"></span><strong>Masa 12</strong><span>Sipariş alındı</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--turuncu"></span><strong>Mutfak</strong><span>3 ürün hazırlanıyor</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--yesil"></span><strong>Gel Al #184</strong><span>Teslime hazır</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--yesil"></span><strong>Kasa</strong><span>Ödeme tamamlandı</span></li>
-          <li><span class="altbilgi-akis-nokta altbilgi-akis-nokta--mavi"></span><strong>Stok</strong><span>Tüm ürünler yeterli</span></li>
-        </ul>
-      </div>
-    </div>
-  </section>
+  <img
+    class="altbilgi-ambiyans"
+    src="/gorseller/masanpos-gece-servisi.webp"
+    alt=""
+    width="1920"
+    height="739"
+    loading="lazy"
+    decoding="async"
+    aria-hidden="true"
+  />
 
   <div class="altbilgi-icerik">
-    <div class="altbilgi-ust">
+    <div class="altbilgi-ana">
       <section class="altbilgi-marka" aria-labelledby="altbilgi-marka-baslik">
         <a class="altbilgi-logo" href="#ust" aria-label="MasanPOS — sayfa başına dön">
           <img class="altbilgi-logo-gorseli" src="/gorseller/masanpos-logo-dark.webp" alt="MasanPOS" width="900" height="141" loading="lazy" decoding="async"/>
         </a>
         <h2 class="sr-only" id="altbilgi-marka-baslik">MasanPOS</h2>
         <p>{{ markaAciklamasi }}</p>
-        <div class="altbilgi-marka-aksiyonlar">
-          <a class="altbilgi-ana-aksiyon" href="#iletisim">
-            Kurulum görüşmesi
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-          <a class="altbilgi-ikincil-aksiyon" href="{{ ROTALAR.musteriDemo }}">Müşteri görünümünü aç</a>
-        </div>
+        <a class="altbilgi-ana-aksiyon" href="#iletisim">
+          Kurulum görüşmesi
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
       </section>
 
       <nav class="altbilgi-menusu" aria-label="Alt bilgi menüsü">
@@ -46,24 +35,15 @@
       </nav>
     </div>
 
-    <section class="altbilgi-sahne" aria-labelledby="altbilgi-sahne-baslik">
-      <img src="/gorseller/masanpos-gece-servisi.webp" alt="Masalardan mutfağa, kasaya ve gel-al noktasına uzanan dijital restoran operasyonu" width="1920" height="739" loading="lazy" decoding="async"/>
-      <div class="altbilgi-sahne-perde" aria-hidden="true"></div>
-      <div class="altbilgi-sahne-baslik">
-        <p>MASADAN MUTFAĞA TEK AKIŞ</p>
-        <h2 id="altbilgi-sahne-baslik">Servisin arkasındaki bütün hareket tek yerde.</h2>
-      </div>
-      <ol class="altbilgi-sahne-adimlari" aria-label="Siparişin MasanPOS içindeki ilerleyişi">
-        <li><span>01</span><strong>Masa</strong><small>Sipariş alındı</small></li>
-        <li><span>02</span><strong>Mutfak</strong><small>Hazırlanıyor</small></li>
-        <li><span>03</span><strong>Servis</strong><small>Teslime hazır</small></li>
-        <li><span>04</span><strong>Kasa</strong><small>Ödeme tamamlandı</small></li>
-      </ol>
-    </section>
-
     <div class="altbilgi-alt">
       <p>{{ telifSatiri }}</p>
-      <p class="altbilgi-sistem-durumu"><span aria-hidden="true"></span>Siparişten ödemeye tek merkez</p>
+      <ol class="altbilgi-operasyon" aria-label="MasanPOS sipariş akışı">
+        <li><span aria-hidden="true"></span>Masa</li>
+        <li><span aria-hidden="true"></span>Mutfak</li>
+        <li><span aria-hidden="true"></span>Servis</li>
+        <li><span aria-hidden="true"></span>Kasa</li>
+      </ol>
+      <p class="altbilgi-sistem-durumu"><span aria-hidden="true"></span>Tüm sistemler çalışıyor</p>
     </div>
   </div>
 </footer>
