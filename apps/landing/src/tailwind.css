@@ -622,7 +622,7 @@
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-rows: 13.5rem 19rem 15.5rem;
-    gap: 1rem;
+    gap: 1.25rem;
     padding-block: 0.75rem 1.5rem;
     font-family: theme("fontFamily.govde");
   }
@@ -687,7 +687,6 @@
     --ozellik-vurgu: #8b7cf6;
     grid-column: 5 / 9;
     grid-row: 2;
-    margin-top: 1rem;
     border-radius: 2.6rem 0.9rem 0.9rem 1.6rem;
   }
   .ozellik-kart--yildiz::before { top: -5rem; right: -3rem; }
@@ -696,7 +695,6 @@
     --ozellik-vurgu: var(--marka-yesil);
     grid-column: 9 / 13;
     grid-row: 2;
-    margin-bottom: 1rem;
     border-radius: 0.9rem 2.7rem 1.7rem 0.9rem;
   }
   .ozellik-kart--kart::before { bottom: -5rem; left: -3rem; }
@@ -704,7 +702,6 @@
   .ozellik-kart--grafik {
     grid-column: 1 / 8;
     grid-row: 3;
-    margin-top: 1.5rem;
     border-radius: 0.9rem 2.8rem 1rem 2.3rem;
   }
   .ozellik-kart--grafik::before { top: -4.5rem; right: 12%; }
@@ -713,7 +710,6 @@
     --ozellik-vurgu: var(--marka-yesil);
     grid-column: 8 / 13;
     grid-row: 3;
-    margin-top: 3.5rem;
     border-radius: 2.4rem 0.9rem 2.8rem 0.9rem;
   }
   .ozellik-kart--marka::before { right: -4.5rem; bottom: -4.5rem; }
@@ -1822,6 +1818,98 @@
     linear-gradient(90deg, rgba(3, 19, 30, 0.2), transparent 30%, transparent 70%, rgba(3, 19, 30, 0.18));
 }
 
+.altbilgi-akis-haritasi {
+  position: absolute;
+  z-index: 2;
+  top: 28%;
+  right: 2.5%;
+  bottom: 5%;
+  left: 2.5%;
+  pointer-events: none;
+}
+
+.altbilgi-akis-haritasi > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.altbilgi-akis-golge,
+.altbilgi-akis-cizgi {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.altbilgi-akis-golge {
+  stroke: rgba(0, 79, 101, 0.28);
+  stroke-width: 7;
+  filter: blur(4px);
+}
+
+.altbilgi-akis-cizgi {
+  stroke: #00bcae;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 7;
+  opacity: 0.88;
+}
+
+.dark .altbilgi-akis-cizgi {
+  stroke: #39d8cb;
+}
+
+.altbilgi-akis-haritasi circle {
+  fill: #f4fdff;
+  stroke: #00bcae;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 4px rgba(0, 188, 174, 0.72));
+}
+
+.dark .altbilgi-akis-haritasi circle {
+  fill: #052635;
+  stroke: #39d8cb;
+}
+
+.altbilgi-akis-adimlari {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.altbilgi-akis-adimlari li {
+  position: absolute;
+  top: var(--akis-y);
+  left: var(--akis-x);
+  max-width: 7.5rem;
+  border: 1px solid rgba(8, 47, 85, 0.13);
+  border-radius: 999px;
+  padding: 0.3rem 0.52rem;
+  background: rgba(247, 252, 253, 0.76);
+  color: #0a4762;
+  box-shadow: 0 8px 22px -14px rgba(3, 39, 57, 0.48), inset 0 1px rgba(255, 255, 255, 0.66);
+  font-family: theme("fontFamily.govde");
+  font-size: clamp(0.5rem, 0.65vw, 0.62rem);
+  font-weight: 750;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  backdrop-filter: blur(9px);
+  transform: translate(-50%, -155%);
+}
+
+.dark .altbilgi-akis-adimlari li {
+  border-color: rgba(57, 216, 203, 0.2);
+  background: rgba(3, 27, 39, 0.72);
+  color: #d8fffa;
+  box-shadow: 0 9px 24px -14px rgba(0, 0, 0, 0.7), inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
 @media (max-width: 1023px) {
   .altbilgi-ana {
     grid-template-columns: 1fr;
@@ -1861,6 +1949,22 @@
 
   .altbilgi-sahne-gorseli {
     object-position: 50% bottom;
+  }
+
+  .altbilgi-akis-haritasi {
+    top: 31%;
+    right: 1.5%;
+    left: 1.5%;
+  }
+
+  .altbilgi-akis-adimlari li {
+    max-width: 4rem;
+    border-radius: 0.55rem;
+    padding: 0.22rem 0.26rem;
+    font-size: 0.46rem;
+    line-height: 1.15;
+    white-space: normal;
+    transform: translate(-50%, -145%);
   }
 }
 
