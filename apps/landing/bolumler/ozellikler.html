@@ -13,7 +13,22 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="ozellik-operasyon-haritasi">
+      <svg class="ozellik-rota" viewBox="0 0 1200 760" fill="none" aria-hidden="true" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="ozellik-rota-renk" x1="40" y1="80" x2="1160" y2="700" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4DB9ED"/>
+            <stop offset="0.52" stop-color="#20D4A6"/>
+            <stop offset="1" stop-color="#4DB9ED"/>
+          </linearGradient>
+        </defs>
+        <path d="M54 322H465C492 322 505 309 505 282V113C505 88 518 75 544 75H1146" stroke="url(#ozellik-rota-renk)" stroke-width="1.5" stroke-dasharray="4 10"/>
+        <path d="M590 263V408C590 433 603 446 628 446H1145" stroke="url(#ozellik-rota-renk)" stroke-width="1.5" stroke-dasharray="4 10"/>
+        <path d="M213 565H706C733 565 746 578 746 605V700H1146" stroke="url(#ozellik-rota-renk)" stroke-width="1.5" stroke-dasharray="4 10"/>
+        <circle cx="54" cy="322" r="5" fill="#4DB9ED"/><circle cx="505" cy="113" r="5" fill="#20D4A6"/>
+        <circle cx="590" cy="263" r="5" fill="#20D4A6"/><circle cx="1145" cy="446" r="5" fill="#4DB9ED"/>
+        <circle cx="213" cy="565" r="5" fill="#4DB9ED"/><circle cx="1146" cy="700" r="5" fill="#20D4A6"/>
+      </svg>
       {{ ozellikKartlariHtml }}
     </div>
   </div>

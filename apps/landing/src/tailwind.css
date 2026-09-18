@@ -613,15 +613,362 @@
     animation-play-state: paused;
   }
 
-  /* --- Özellik kartlarında hafif süzülme. --------------------------------
-     Bilerek `translate` özelliği kullanılıyor: kartın hover animasyonu
-     motion üzerinden `transform`u sürüyor, ikisi aynı özelliği paylaşsaydı
-     birbirini ezerdi. */
-  .ozellik-kart {
-    animation: kart-suzul 7s ease-in-out infinite;
+  /* --- Özellik operasyon haritası. ---------------------------------------
+     Klasik eş kutulu bento yerine restoran akışını izleyen, kasıtlı olarak
+     asimetrik istasyonlar kullanılır. Arka plandaki rota yalnızca geniş
+     ekranda görünür; içerik sırası DOM'da her zaman mantıksal kalır. */
+  .ozellik-operasyon-haritasi {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: 13.5rem 19rem 15.5rem;
+    gap: 1rem;
+    padding-block: 0.75rem 1.5rem;
   }
-  .ozellik-kart:nth-child(3n + 2) { animation-delay: -2.4s; }
-  .ozellik-kart:nth-child(3n) { animation-delay: -4.8s; }
+
+  .ozellik-rota {
+    position: absolute;
+    z-index: 0;
+    inset: -0.5rem -1.75rem -1rem;
+    width: calc(100% + 3.5rem);
+    height: calc(100% + 1.5rem);
+    opacity: 0.42;
+    pointer-events: none;
+  }
+
+  .ozellik-kart {
+    --ozellik-vurgu: var(--marka-mavi);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ozellik-vurgu) 22%, var(--marka-cizgi));
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--marka-kart) 94%, transparent), color-mix(in srgb, var(--marka-zemin) 88%, transparent)),
+      var(--marka-kart);
+    box-shadow: 0 20px 52px -38px color-mix(in srgb, var(--ozellik-vurgu) 46%, transparent), inset 0 1px rgba(255, 255, 255, 0.06);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ozellik-kart:hover {
+    border-color: color-mix(in srgb, var(--ozellik-vurgu) 48%, var(--marka-cizgi));
+    box-shadow: 0 28px 64px -38px color-mix(in srgb, var(--ozellik-vurgu) 64%, transparent), inset 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  .ozellik-kart::before {
+    position: absolute;
+    width: 8rem;
+    height: 8rem;
+    border: 1px solid color-mix(in srgb, var(--ozellik-vurgu) 16%, transparent);
+    border-radius: 50%;
+    content: "";
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  .ozellik-kart--qr {
+    grid-column: 1 / 5;
+    grid-row: 1 / 3;
+    border-radius: 2.8rem 0.9rem 2.1rem 0.9rem;
+  }
+  .ozellik-kart--qr::before { right: -4.5rem; bottom: -4.5rem; }
+
+  .ozellik-kart--mutfak {
+    --ozellik-vurgu: #f59e0b;
+    grid-column: 5 / 13;
+    grid-row: 1;
+    border-radius: 0.9rem 3rem 0.9rem 2rem;
+  }
+  .ozellik-kart--mutfak::before { top: -5.5rem; left: 34%; }
+
+  .ozellik-kart--yildiz {
+    --ozellik-vurgu: #8b7cf6;
+    grid-column: 5 / 9;
+    grid-row: 2;
+    margin-top: 1rem;
+    border-radius: 2.6rem 0.9rem 0.9rem 1.6rem;
+  }
+  .ozellik-kart--yildiz::before { top: -5rem; right: -3rem; }
+
+  .ozellik-kart--kart {
+    --ozellik-vurgu: var(--marka-yesil);
+    grid-column: 9 / 13;
+    grid-row: 2;
+    margin-bottom: 1rem;
+    border-radius: 0.9rem 2.7rem 1.7rem 0.9rem;
+  }
+  .ozellik-kart--kart::before { bottom: -5rem; left: -3rem; }
+
+  .ozellik-kart--grafik {
+    grid-column: 1 / 8;
+    grid-row: 3;
+    margin-top: 1.5rem;
+    border-radius: 0.9rem 2.8rem 1rem 2.3rem;
+  }
+  .ozellik-kart--grafik::before { top: -4.5rem; right: 12%; }
+
+  .ozellik-kart--marka {
+    --ozellik-vurgu: var(--marka-yesil);
+    grid-column: 8 / 13;
+    grid-row: 3;
+    margin-top: 3.5rem;
+    border-radius: 2.4rem 0.9rem 2.8rem 0.9rem;
+  }
+  .ozellik-kart--marka::before { right: -4.5rem; bottom: -4.5rem; }
+
+  .ozellik-kart-ust {
+    position: absolute;
+    z-index: 2;
+    top: 0.85rem;
+    right: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .ozellik-istasyon {
+    color: color-mix(in srgb, var(--ozellik-vurgu) 76%, var(--marka-metin));
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.6rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+  }
+
+  .ozellik-durum {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    color: var(--marka-gri-400);
+    font-size: 0.58rem;
+    font-weight: 650;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+  }
+
+  .ozellik-durum i {
+    width: 0.36rem;
+    height: 0.36rem;
+    border-radius: 50%;
+    background: var(--ozellik-vurgu);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ozellik-vurgu) 10%, transparent);
+  }
+
+  .ozellik-kart-govde {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    align-items: end;
+    gap: 1rem;
+    padding: 3rem 1.25rem 1.2rem;
+  }
+
+  .ozellik-kopya {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .ozellik-ikon {
+    display: grid;
+    width: 2.3rem;
+    height: 2.3rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--ozellik-vurgu) 22%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--ozellik-vurgu) 9%, transparent);
+    color: var(--ozellik-vurgu);
+  }
+
+  .ozellik-ikon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .ozellik-kopya h3 {
+    margin-top: 0.75rem;
+    color: var(--marka-metin);
+    font-family: theme("fontFamily.baslik");
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .ozellik-kopya p {
+    max-width: 34rem;
+    margin-top: 0.38rem;
+    color: var(--marka-gri-300);
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .ozellik-vinyet {
+    position: relative;
+    min-width: 0;
+    border: 1px solid color-mix(in srgb, var(--ozellik-vurgu) 18%, var(--marka-cizgi));
+    background: color-mix(in srgb, var(--marka-zemin) 72%, transparent);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .ozellik-kart--qr .ozellik-kart-govde {
+    grid-template-rows: 1fr auto;
+    align-items: start;
+  }
+
+  .ozellik-vinyet--qr {
+    display: grid;
+    grid-template-columns: 5.4rem 1fr;
+    gap: 0.9rem;
+    align-items: center;
+    border-radius: 1.25rem 0.55rem 1.25rem 0.55rem;
+    padding: 0.9rem;
+  }
+
+  .ozellik-qr-kod {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.22rem;
+    aspect-ratio: 1;
+    border-radius: 0.7rem;
+    padding: 0.55rem;
+    background: color-mix(in srgb, var(--marka-kart) 94%, transparent);
+  }
+
+  .ozellik-qr-kod i {
+    border-radius: 0.15rem;
+    background: color-mix(in srgb, var(--ozellik-vurgu) 74%, var(--marka-metin));
+  }
+  .ozellik-qr-kod i:nth-child(5),
+  .ozellik-qr-kod i:nth-child(7) { opacity: 0.18; }
+  .ozellik-qr-kod i:nth-child(6),
+  .ozellik-qr-kod i:nth-child(8) { border-radius: 50%; }
+
+  .ozellik-qr-akis {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+  .ozellik-qr-akis small { color: var(--ozellik-vurgu); font-size: 0.52rem; font-weight: 800; letter-spacing: 0.09em; }
+  .ozellik-qr-akis strong { margin-top: 0.24rem; color: var(--marka-metin); font-size: 0.76rem; }
+  .ozellik-qr-akis span { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.55rem; color: var(--marka-gri-400); font-size: 0.59rem; }
+  .ozellik-qr-akis span i { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--marka-yesil); box-shadow: 0 0 0 3px color-mix(in srgb, var(--marka-yesil) 10%, transparent); }
+
+  .ozellik-kart--mutfak .ozellik-kart-govde,
+  .ozellik-kart--grafik .ozellik-kart-govde,
+  .ozellik-kart--marka .ozellik-kart-govde {
+    grid-template-columns: minmax(12rem, 0.9fr) minmax(15rem, 1.2fr);
+    align-items: end;
+  }
+
+  .ozellik-vinyet--mutfak {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.45rem;
+    align-items: end;
+    min-height: 7.2rem;
+    border-width: 0 0 0 1px;
+    border-radius: 0;
+    padding-left: 1rem;
+    background: transparent;
+  }
+
+  .ozellik-fis {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.35rem;
+    border: 1px solid var(--marka-cizgi);
+    border-radius: 0.65rem 0.65rem 0.25rem 0.25rem;
+    padding: 0.6rem;
+    background: color-mix(in srgb, var(--marka-kart) 88%, transparent);
+  }
+  .ozellik-fis small { overflow: hidden; color: var(--marka-gri-400); font-size: 0.46rem; font-weight: 800; letter-spacing: 0.06em; text-overflow: ellipsis; }
+  .ozellik-fis span { height: 0.24rem; border-radius: 999px; background: var(--marka-cizgi); }
+  .ozellik-fis span:nth-of-type(2) { width: 68%; }
+  .ozellik-fis b { width: 0.48rem; height: 0.48rem; margin-top: 0.15rem; border-radius: 50%; background: var(--marka-mavi); }
+  .ozellik-fis--hazirlik { translate: 0 -0.65rem; }
+  .ozellik-fis--hazirlik b { background: #f59e0b; }
+  .ozellik-fis--hazir b { background: var(--marka-yesil); }
+
+  .ozellik-vinyet--sadakat {
+    border-radius: 1.1rem 0.45rem 1.1rem 0.45rem;
+    padding: 0.8rem;
+  }
+  .ozellik-damga-satiri { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem; }
+  .ozellik-damga-satiri i { aspect-ratio: 1; border: 1px dashed color-mix(in srgb, var(--ozellik-vurgu) 35%, var(--marka-cizgi)); border-radius: 50%; }
+  .ozellik-damga-satiri i:nth-child(-n + 3) { border-style: solid; background: color-mix(in srgb, var(--ozellik-vurgu) 22%, transparent); box-shadow: inset 0 0 0 0.3rem color-mix(in srgb, var(--marka-kart) 55%, transparent); }
+  .ozellik-odul-cizgisi { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.7rem; color: var(--marka-gri-400); font-size: 0.55rem; }
+  .ozellik-odul-cizgisi b { width: 2rem; height: 0.28rem; border-radius: 999px; background: var(--ozellik-vurgu); }
+
+  .ozellik-vinyet--odeme {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.65rem;
+    align-items: center;
+    border-radius: 0.55rem 1.25rem 0.55rem 1.25rem;
+    padding: 0.75rem;
+  }
+  .ozellik-kart-cipi { width: 1.8rem; height: 1.35rem; border: 1px solid color-mix(in srgb, var(--ozellik-vurgu) 42%, transparent); border-radius: 0.35rem; background: linear-gradient(135deg, color-mix(in srgb, var(--ozellik-vurgu) 24%, transparent), transparent); }
+  .ozellik-vinyet--odeme div { display: flex; min-width: 0; flex-direction: column; }
+  .ozellik-vinyet--odeme small { color: var(--marka-gri-400); font-size: 0.47rem; letter-spacing: 0.07em; }
+  .ozellik-vinyet--odeme strong { color: var(--marka-metin); font-size: 0.7rem; }
+  .ozellik-vinyet--odeme svg { width: 1.6rem; height: 1.6rem; border-radius: 50%; padding: 0.3rem; background: color-mix(in srgb, var(--ozellik-vurgu) 14%, transparent); stroke: var(--ozellik-vurgu); stroke-width: 2; fill: none; }
+
+  .ozellik-vinyet--rapor {
+    overflow: hidden;
+    border-radius: 1.3rem 0.55rem 1.3rem 0.55rem;
+    padding: 0.75rem 0.75rem 0;
+  }
+  .ozellik-rapor-etiketleri { display: flex; gap: 0.35rem; }
+  .ozellik-rapor-etiketleri span { border: 1px solid var(--marka-cizgi); border-radius: 999px; padding: 0.2rem 0.45rem; color: var(--marka-gri-400); font-size: 0.48rem; }
+  .ozellik-vinyet--rapor svg { display: block; width: 100%; height: 5.2rem; margin-top: 0.3rem; overflow: visible; }
+  .ozellik-grafik-alan { fill: color-mix(in srgb, var(--ozellik-vurgu) 10%, transparent); }
+  .ozellik-grafik-cizgi { fill: none; stroke: var(--ozellik-vurgu); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .ozellik-vinyet--rapor circle { fill: var(--marka-kart); stroke: var(--ozellik-vurgu); stroke-width: 2; vector-effect: non-scaling-stroke; }
+
+  .ozellik-vinyet--marka {
+    border-radius: 0.55rem 1.3rem 0.55rem 1.3rem;
+    padding: 0.85rem;
+  }
+  .ozellik-marka-baslik { display: flex; align-items: center; gap: 0.5rem; }
+  .ozellik-marka-baslik span { width: 1.7rem; height: 1.7rem; border-radius: 0.55rem 0.25rem 0.55rem 0.25rem; background: linear-gradient(135deg, var(--marka-mavi), var(--marka-yesil)); }
+  .ozellik-marka-baslik b { color: var(--marka-metin); font-size: 0.58rem; letter-spacing: 0.1em; }
+  .ozellik-renkler { display: flex; gap: 0.35rem; margin-top: 0.8rem; }
+  .ozellik-renkler i { width: 1.4rem; height: 0.35rem; border-radius: 999px; background: var(--marka-mavi); }
+  .ozellik-renkler i:nth-child(2) { background: var(--marka-yesil); }
+  .ozellik-renkler i:nth-child(3) { background: var(--marka-metin); opacity: 0.42; }
+  .ozellik-marka-satir { display: grid; grid-template-columns: 1fr 0.55fr; gap: 0.45rem; margin-top: 0.8rem; }
+  .ozellik-marka-satir span { height: 0.35rem; border-radius: 999px; background: var(--marka-cizgi); }
+
+  @media (max-width: 1023px) {
+    .ozellik-operasyon-haritasi {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: none;
+    }
+    .ozellik-rota { display: none; }
+    .ozellik-kart { grid-column: auto; grid-row: auto; min-height: 20rem; margin: 0; border-radius: 1.5rem 0.7rem 1.5rem 0.7rem; }
+    .ozellik-kart--qr,
+    .ozellik-kart--mutfak,
+    .ozellik-kart--grafik { grid-column: 1 / -1; }
+    .ozellik-kart--qr .ozellik-kart-govde,
+    .ozellik-kart--mutfak .ozellik-kart-govde,
+    .ozellik-kart--grafik .ozellik-kart-govde,
+    .ozellik-kart--marka .ozellik-kart-govde { grid-template-columns: minmax(12rem, 0.9fr) minmax(15rem, 1.2fr); grid-template-rows: none; align-items: end; }
+  }
+
+  @media (max-width: 639px) {
+    .ozellik-operasyon-haritasi { display: flex; flex-direction: column; gap: 0.85rem; padding-bottom: 0; }
+    .ozellik-kart { min-height: 0; }
+    .ozellik-kart-govde,
+    .ozellik-kart--qr .ozellik-kart-govde,
+    .ozellik-kart--mutfak .ozellik-kart-govde,
+    .ozellik-kart--grafik .ozellik-kart-govde,
+    .ozellik-kart--marka .ozellik-kart-govde { grid-template-columns: 1fr; grid-template-rows: none; align-items: stretch; }
+    .ozellik-vinyet--mutfak { min-height: 6.5rem; border-width: 1px; border-radius: 1rem 0.45rem 1rem 0.45rem; padding: 0.75rem; }
+    .ozellik-kopya p { font-size: 0.78rem; }
+  }
 
   /* --- Konsept şeridi öğeleri üzerine gelince hafifçe yükselir. ----------- */
   .konsept-oge {
@@ -1272,12 +1619,6 @@
   from { transform: translateX(0); }
   /* Yarım boşluk (gap 1.5rem / 2) düşülmezse ikinci kümeye geçişte zıplar. */
   to { transform: translateX(calc(-50% - 0.75rem)); }
-}
-
-@keyframes kart-suzul {
-  0%,
-  100% { translate: 0 0; }
-  50% { translate: 0 -7px; }
 }
 
 @keyframes marka-nefes {

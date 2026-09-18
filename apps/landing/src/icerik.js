@@ -552,15 +552,82 @@ export function konseptSeridiHtml() {
   ).join("");
 }
 
+const OZELLIK_DURUMLARI = {
+  qr: "Sipariş girişi",
+  mutfak: "Canlı operasyon",
+  yildiz: "Müşteri bağı",
+  kart: "Güvenli kapanış",
+  grafik: "Karar desteği",
+  marka: "Marka katmanı",
+};
+
+function ozellikVinyetiHtml(tur) {
+  const vinyetler = {
+    qr: `
+      <div class="ozellik-vinyet ozellik-vinyet--qr" aria-hidden="true">
+        <div class="ozellik-qr-kod">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="ozellik-qr-akis">
+          <small>QR OKUTULDU</small>
+          <strong>Masa siparişi</strong>
+          <span><i></i>Mutfağa iletilir</span>
+        </div>
+      </div>`,
+    mutfak: `
+      <div class="ozellik-vinyet ozellik-vinyet--mutfak" aria-hidden="true">
+        <div class="ozellik-fis ozellik-fis--yeni"><small>YENİ</small><span></span><span></span><b></b></div>
+        <div class="ozellik-fis ozellik-fis--hazirlik"><small>HAZIRLANIYOR</small><span></span><span></span><b></b></div>
+        <div class="ozellik-fis ozellik-fis--hazir"><small>HAZIR</small><span></span><span></span><b></b></div>
+      </div>`,
+    yildiz: `
+      <div class="ozellik-vinyet ozellik-vinyet--sadakat" aria-hidden="true">
+        <div class="ozellik-damga-satiri"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="ozellik-odul-cizgisi"><span>Sadakat döngüsü</span><b></b></div>
+      </div>`,
+    kart: `
+      <div class="ozellik-vinyet ozellik-vinyet--odeme" aria-hidden="true">
+        <span class="ozellik-kart-cipi"></span>
+        <div><small>ÖDEME AKIŞI</small><strong>Doğrulandı</strong></div>
+        <svg viewBox="0 0 24 24"><path d="m7 12 3 3 7-7"/></svg>
+      </div>`,
+    grafik: `
+      <div class="ozellik-vinyet ozellik-vinyet--rapor" aria-hidden="true">
+        <div class="ozellik-rapor-etiketleri"><span>Satış</span><span>Ürün</span><span>Operasyon</span></div>
+        <svg viewBox="0 0 420 112" preserveAspectRatio="none">
+          <path class="ozellik-grafik-alan" d="M0 98C48 92 61 49 108 63s60 20 101-7 67-34 105-14 54 1 106-28v98H0Z"/>
+          <path class="ozellik-grafik-cizgi" d="M0 98C48 92 61 49 108 63s60 20 101-7 67-34 105-14 54 1 106-28"/>
+          <circle cx="108" cy="63" r="4"/><circle cx="209" cy="56" r="4"/><circle cx="314" cy="42" r="4"/>
+        </svg>
+      </div>`,
+    marka: `
+      <div class="ozellik-vinyet ozellik-vinyet--marka" aria-hidden="true">
+        <div class="ozellik-marka-baslik"><span></span><b>MARKANIZ</b></div>
+        <div class="ozellik-renkler"><i></i><i></i><i></i></div>
+        <div class="ozellik-marka-satir"><span></span><span></span></div>
+      </div>`,
+  };
+  return vinyetler[tur] || "";
+}
+
 export function ozellikKartlariHtml() {
   return OZELLIKLER.map(
-    (ozellik) => `
-      <article class="ozellik-kart isik-kart cam-panel group rounded-2xl p-6 transition-colors duration-300 hover:border-marka-mavi/50">
-        <div class="ozellik-ikon mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-marka-mavi/[0.08] text-marka-mavi transition-colors group-hover:bg-marka-yesil/15 group-hover:text-marka-yesil">
-          <svg class="h-7 w-7" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(ozellik.ikon)}</svg>
+    (ozellik, sira) => `
+      <article class="ozellik-kart ozellik-kart--${ozellik.ikon} isik-kart group">
+        <div class="ozellik-kart-ust">
+          <span class="ozellik-istasyon">${String(sira + 1).padStart(2, "0")}</span>
+          <span class="ozellik-durum"><i aria-hidden="true"></i>${kacis(OZELLIK_DURUMLARI[ozellik.ikon] || "Platform özelliği")}</span>
         </div>
-        <h3 class="metin-akan metin-akan--yumusak mb-2 font-baslik text-lg font-semibold">${kacis(ozellik.baslik)}</h3>
-        <p class="text-sm leading-relaxed text-marka-gri-300">${kacis(ozellik.metin)}</p>
+        <div class="ozellik-kart-govde">
+          <div class="ozellik-kopya">
+            <div class="ozellik-ikon">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ikonCizimi(ozellik.ikon)}</svg>
+            </div>
+            <h3>${kacis(ozellik.baslik)}</h3>
+            <p>${kacis(ozellik.metin)}</p>
+          </div>
+          ${ozellikVinyetiHtml(ozellik.ikon)}
+        </div>
       </article>`,
   ).join("");
 }

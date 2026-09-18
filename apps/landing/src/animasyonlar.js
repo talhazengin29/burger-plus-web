@@ -313,12 +313,14 @@ function ozellikKartiEtkilesimi() {
   if (!masaustuMu()) return;
   document.querySelectorAll(".ozellik-kart").forEach((kart) => {
     const ikon = kart.querySelector(".ozellik-ikon");
+    const vinyet = kart.querySelector(".ozellik-vinyet");
     kart.addEventListener("mouseenter", () => {
-      animate(kart, { y: -8 }, { duration: 0.28, ease: "easeOut" });
-      if (ikon) animate(ikon, { rotate: [0, 8, 0] }, { duration: 0.5, ease: "easeInOut" });
+      if (ikon) animate(ikon, { scale: 1.06 }, { duration: 0.25, ease: "easeOut" });
+      if (vinyet) animate(vinyet, { scale: 1.018 }, { duration: 0.32, ease: "easeOut" });
     });
     kart.addEventListener("mouseleave", () => {
-      animate(kart, { y: 0 }, { duration: 0.32, ease: "easeOut" });
+      if (ikon) animate(ikon, { scale: 1 }, { duration: 0.3, ease: "easeOut" });
+      if (vinyet) animate(vinyet, { scale: 1 }, { duration: 0.34, ease: "easeOut" });
     });
   });
 }
