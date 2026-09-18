@@ -30,10 +30,6 @@
         </a>
         <h2 class="sr-only" id="altbilgi-marka-baslik">MasanPOS</h2>
         <p>{{ markaAciklamasi }}</p>
-        <a class="altbilgi-ana-aksiyon" href="#iletisim">
-          Kurulum görüşmesi
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
       </section>
 
       <nav class="altbilgi-menusu" aria-label="Alt bilgi menüsü">
@@ -46,13 +42,23 @@
 
     <div class="altbilgi-alt">
       <p>{{ telifSatiri }}</p>
-      <ol class="altbilgi-operasyon" aria-label="MasanPOS sipariş akışı">
-        <li><span>01</span>Masa</li>
-        <li><span>02</span>Mutfak</li>
-        <li><span>03</span>Servis</li>
-        <li><span>04</span>Kasa</li>
-      </ol>
-      <p class="altbilgi-sistem-durumu"><span aria-hidden="true"></span>Tüm sistemler çalışıyor</p>
+      <div class="altbilgi-operasyon-ozeti">
+        <ol class="altbilgi-operasyon" aria-label="MasanPOS sipariş akışı">
+          <li><span>01</span><strong>Masa</strong></li>
+          <li><span>02</span><strong>Mutfak</strong></li>
+          <li><span>03</span><strong>Servis</strong></li>
+          <li><span>04</span><strong>Kasa</strong></li>
+        </ol>
+        <div class="altbilgi-sistem-durumu">
+          <span class="altbilgi-durum-ikonu" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="m8.5 12 2.2 2.2 4.8-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3.5 19 6v5.3c0 4.4-2.9 7.7-7 9.2-4.1-1.5-7-4.8-7-9.2V6l7-2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="altbilgi-durum-metni">
+            <strong>Tek merkezden yönetim</strong>
+            <small>Masa, mutfak ve kasa aynı akışta</small>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
