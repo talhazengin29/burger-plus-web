@@ -1837,28 +1837,30 @@
   position: absolute;
   top: var(--akis-y);
   left: var(--akis-x);
-  max-width: 7.5rem;
-  border: 1px solid rgba(8, 47, 85, 0.13);
+  max-width: 7rem;
+  border: 1px solid rgba(255, 255, 255, 0.34);
   border-radius: 999px;
-  padding: 0.3rem 0.52rem;
-  background: rgba(247, 252, 253, 0.76);
-  color: #0a4762;
-  box-shadow: 0 8px 22px -14px rgba(3, 39, 57, 0.48), inset 0 1px rgba(255, 255, 255, 0.66);
+  padding: 0.22rem 0.48rem;
+  background: rgba(240, 250, 251, 0.42);
+  color: rgba(7, 62, 78, 0.78);
+  box-shadow: 0 5px 14px -10px rgba(3, 39, 57, 0.46), inset 0 1px rgba(255, 255, 255, 0.42);
   font-family: theme("fontFamily.govde");
-  font-size: clamp(0.5rem, 0.65vw, 0.62rem);
-  font-weight: 750;
+  font-size: clamp(0.48rem, 0.58vw, 0.57rem);
+  font-weight: 650;
+  letter-spacing: 0.01em;
   line-height: 1.1;
   text-align: center;
   white-space: nowrap;
-  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(8px) saturate(85%);
+  backdrop-filter: blur(8px) saturate(85%);
   transform: translate(-50%, -145%);
 }
 
 .dark .altbilgi-akis-adimlari li {
-  border-color: rgba(57, 216, 203, 0.2);
-  background: rgba(3, 27, 39, 0.72);
-  color: #d8fffa;
-  box-shadow: 0 9px 24px -14px rgba(0, 0, 0, 0.7), inset 0 1px rgba(255, 255, 255, 0.05);
+  border-color: rgba(111, 229, 219, 0.18);
+  background: rgba(4, 24, 34, 0.38);
+  color: rgba(224, 250, 247, 0.8);
+  box-shadow: 0 5px 16px -11px rgba(0, 0, 0, 0.72), inset 0 1px rgba(255, 255, 255, 0.04);
 }
 
 @media (max-width: 1023px) {
@@ -1904,9 +1906,8 @@
 
   .altbilgi-akis-adimlari li {
     max-width: 4rem;
-    border-radius: 0.55rem;
-    padding: 0.22rem 0.26rem;
-    font-size: 0.46rem;
+    padding: 0.18rem 0.28rem;
+    font-size: 0.43rem;
     line-height: 1.15;
     white-space: normal;
     transform: translate(-50%, -145%);
