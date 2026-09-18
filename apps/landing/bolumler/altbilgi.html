@@ -3,30 +3,12 @@
      özgün, panoramik alt bilgi.
      ========================================================================== -->
 <footer class="masanpos-altbilgi" id="altbilgi">
-  <section class="altbilgi-akis" aria-label="Restoran operasyonundan canlı durumlar">
-    <div class="altbilgi-akis-iz">
-      <ul class="altbilgi-akis-grubu">
-        <li><span>Masa 12</span><strong>Sipariş alındı</strong></li>
-        <li><span>Mutfak</span><strong>3 ürün hazırlanıyor</strong></li>
-        <li><span>Gel Al #184</span><strong>Teslime hazır</strong></li>
-        <li><span>Kasa</span><strong>Ödeme tamamlandı</strong></li>
-        <li><span>Stok</span><strong>Seviyeler normal</strong></li>
-      </ul>
-      <ul class="altbilgi-akis-grubu" aria-hidden="true">
-        <li><span>Masa 12</span><strong>Sipariş alındı</strong></li>
-        <li><span>Mutfak</span><strong>3 ürün hazırlanıyor</strong></li>
-        <li><span>Gel Al #184</span><strong>Teslime hazır</strong></li>
-        <li><span>Kasa</span><strong>Ödeme tamamlandı</strong></li>
-        <li><span>Stok</span><strong>Seviyeler normal</strong></li>
-      </ul>
-    </div>
-  </section>
-
   <div class="altbilgi-icerik">
     <div class="altbilgi-ana">
       <section class="altbilgi-marka" aria-labelledby="altbilgi-marka-baslik">
         <a class="altbilgi-logo" href="#ust" aria-label="MasanPOS — sayfa başına dön">
-          <img class="altbilgi-logo-gorseli" src="/gorseller/masanpos-logo-dark.webp" alt="MasanPOS" width="900" height="141" loading="lazy" decoding="async"/>
+          <img class="altbilgi-logo-gorseli marka-logo-gorseli--acik" src="/gorseller/masanpos-logo.webp" alt="MasanPOS" width="900" height="141" loading="lazy" decoding="async"/>
+          <img class="altbilgi-logo-gorseli marka-logo-gorseli--koyu" src="/gorseller/masanpos-logo-dark.webp" alt="" width="900" height="141" loading="lazy" decoding="async" aria-hidden="true"/>
         </a>
         <h2 class="sr-only" id="altbilgi-marka-baslik">MasanPOS</h2>
         <p>{{ markaAciklamasi }}</p>
@@ -42,28 +24,12 @@
 
     <div class="altbilgi-alt">
       <p>{{ telifSatiri }}</p>
-      <div class="altbilgi-operasyon-ozeti">
-        <ol class="altbilgi-operasyon" aria-label="MasanPOS sipariş akışı">
-          <li><span>01</span><strong>Masa</strong></li>
-          <li><span>02</span><strong>Mutfak</strong></li>
-          <li><span>03</span><strong>Servis</strong></li>
-          <li><span>04</span><strong>Kasa</strong></li>
-        </ol>
-        <div class="altbilgi-sistem-durumu">
-          <span class="altbilgi-durum-ikonu" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none"><path d="m8.5 12 2.2 2.2 4.8-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3.5 19 6v5.3c0 4.4-2.9 7.7-7 9.2-4.1-1.5-7-4.8-7-9.2V6l7-2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="altbilgi-durum-metni">
-            <strong>Tek merkezden yönetim</strong>
-            <small>Masa, mutfak ve kasa aynı akışta</small>
-          </span>
-        </div>
-      </div>
     </div>
   </div>
 
   <figure class="altbilgi-sahne" aria-label="MasanPOS ile yönetilen restoran operasyonu">
-    <img src="/gorseller/masanpos-gece-restoran-v2.png" alt="Masalardan mutfağa ve kasaya uzanan modern restoran operasyonu" width="2022" height="778" loading="lazy" decoding="async"/>
+    <img class="altbilgi-sahne-gorseli altbilgi-sahne-gorseli--gunduz" src="/gorseller/masanpos-gunduz-restoran-v2.png" alt="Gündüz açık olan modern restoranın salon, mutfak ve kasa alanları" width="2022" height="778" loading="lazy" decoding="async"/>
+    <img class="altbilgi-sahne-gorseli altbilgi-sahne-gorseli--gece" src="/gorseller/masanpos-gece-restoran-v2.png" alt="Gece açık olan modern restoranın salon, mutfak ve kasa alanları" width="2022" height="778" loading="lazy" decoding="async"/>
     <div class="altbilgi-sahne-perde" aria-hidden="true"></div>
   </figure>
 </footer>
