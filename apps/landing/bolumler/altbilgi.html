@@ -1,19 +1,26 @@
 <!-- ==========================================================================
-     MasanPOS kompakt alt bilgi.
-     Restoran operasyonu görseli ayrı bir vitrin olmak yerine yüzeyin içinde,
-     düşük yoğunluklu bir marka dokusu olarak kullanılır.
+     MasanPOS gece restoranı — kurumsal bilgi ve operasyon akışını birleştiren
+     özgün, panoramik alt bilgi.
      ========================================================================== -->
 <footer class="masanpos-altbilgi" id="altbilgi">
-  <img
-    class="altbilgi-ambiyans"
-    src="/gorseller/masanpos-gece-servisi.webp"
-    alt=""
-    width="1920"
-    height="739"
-    loading="lazy"
-    decoding="async"
-    aria-hidden="true"
-  />
+  <section class="altbilgi-akis" aria-label="Restoran operasyonundan canlı durumlar">
+    <div class="altbilgi-akis-iz">
+      <ul class="altbilgi-akis-grubu">
+        <li><span>Masa 12</span><strong>Sipariş alındı</strong></li>
+        <li><span>Mutfak</span><strong>3 ürün hazırlanıyor</strong></li>
+        <li><span>Gel Al #184</span><strong>Teslime hazır</strong></li>
+        <li><span>Kasa</span><strong>Ödeme tamamlandı</strong></li>
+        <li><span>Stok</span><strong>Seviyeler normal</strong></li>
+      </ul>
+      <ul class="altbilgi-akis-grubu" aria-hidden="true">
+        <li><span>Masa 12</span><strong>Sipariş alındı</strong></li>
+        <li><span>Mutfak</span><strong>3 ürün hazırlanıyor</strong></li>
+        <li><span>Gel Al #184</span><strong>Teslime hazır</strong></li>
+        <li><span>Kasa</span><strong>Ödeme tamamlandı</strong></li>
+        <li><span>Stok</span><strong>Seviyeler normal</strong></li>
+      </ul>
+    </div>
+  </section>
 
   <div class="altbilgi-icerik">
     <div class="altbilgi-ana">
@@ -35,15 +42,22 @@
       </nav>
     </div>
 
+    <div class="altbilgi-ayrac" aria-hidden="true"></div>
+
     <div class="altbilgi-alt">
       <p>{{ telifSatiri }}</p>
       <ol class="altbilgi-operasyon" aria-label="MasanPOS sipariş akışı">
-        <li><span aria-hidden="true"></span>Masa</li>
-        <li><span aria-hidden="true"></span>Mutfak</li>
-        <li><span aria-hidden="true"></span>Servis</li>
-        <li><span aria-hidden="true"></span>Kasa</li>
+        <li><span>01</span>Masa</li>
+        <li><span>02</span>Mutfak</li>
+        <li><span>03</span>Servis</li>
+        <li><span>04</span>Kasa</li>
       </ol>
       <p class="altbilgi-sistem-durumu"><span aria-hidden="true"></span>Tüm sistemler çalışıyor</p>
     </div>
   </div>
+
+  <figure class="altbilgi-sahne" aria-label="MasanPOS ile yönetilen restoran operasyonu">
+    <img src="/gorseller/masanpos-gece-restoran-v2.png" alt="Masalardan mutfağa ve kasaya uzanan modern restoran operasyonu" width="2022" height="778" loading="lazy" decoding="async"/>
+    <div class="altbilgi-sahne-perde" aria-hidden="true"></div>
+  </figure>
 </footer>
