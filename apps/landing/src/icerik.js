@@ -840,9 +840,9 @@ export function altbilgiIletisimHtml() {
   if (!satirlar.length) return "<!-- Altbilgi iletisim: ILETISIM alanlari bos. -->";
 
   return `
-      <div>
-        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-marka-metin">İletişim</h3>
-        <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${satirlar.join("")}
+      <div class="altbilgi-kolon">
+        <h3 class="altbilgi-kolon-baslik">İletişim</h3>
+        <ul class="altbilgi-baglanti-listesi">${satirlar.join("")}
         </ul>
       </div>`;
 }
@@ -850,9 +850,9 @@ export function altbilgiIletisimHtml() {
 export function altbilgiKolonlariHtml() {
   return ALTBILGI_KOLONLARI.map(
     (kolon) => `
-      <div>
-        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-marka-metin">${kacis(kolon.baslik)}</h3>
-        <ul class="flex flex-col gap-2 text-sm text-marka-gri-400">${kolon.baglantilar
+      <div class="altbilgi-kolon">
+        <h3 class="altbilgi-kolon-baslik">${kacis(kolon.baslik)}</h3>
+        <ul class="altbilgi-baglanti-listesi">${kolon.baglantilar
           .map(
             (baglanti) => `
           <li><a class="altbilgi-link transition-colors hover:text-marka-metin" href="${baglanti.hedef}">${kacis(baglanti.ad)}</a></li>`,
