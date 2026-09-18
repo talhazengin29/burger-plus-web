@@ -1821,8 +1821,12 @@
 .altbilgi-akis-haritasi {
   position: absolute;
   z-index: 2;
-  inset: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  aspect-ratio: 2022 / 778;
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .altbilgi-akis-adimlari {
@@ -1853,7 +1857,7 @@
   white-space: nowrap;
   -webkit-backdrop-filter: blur(8px) saturate(85%);
   backdrop-filter: blur(8px) saturate(85%);
-  transform: translate(-50%, -145%);
+  transform: translate(-50%, 0.42rem);
 }
 
 .dark .altbilgi-akis-adimlari li {
@@ -1910,7 +1914,12 @@
     font-size: 0.43rem;
     line-height: 1.15;
     white-space: normal;
-    transform: translate(-50%, -145%);
+    transform: translate(-50%, 0.32rem);
+  }
+
+  .altbilgi-akis-haritasi {
+    width: auto;
+    height: 100%;
   }
 }
 
