@@ -5,6 +5,17 @@ export default {
   // Yerleşim artık bolumler/*.html parçalarına bölündü, tekrarlayan kartların
   // sınıfları ise src/icerik.js içindeki şablon metinlerinde geçiyor.
   content: ["./index.html", "./bolumler/**/*.html", "./src/**/*.js"],
+  // Özellik kartının yerleşim sınıfı veri alanından üretiliyor
+  // (`ozellik-kart--${ozellik.ikon}`). Tailwind bu birleşimi statik olarak
+  // çözemediği için üretim CSS'inden atmasın.
+  safelist: [
+    "ozellik-kart--qr",
+    "ozellik-kart--mutfak",
+    "ozellik-kart--yildiz",
+    "ozellik-kart--kart",
+    "ozellik-kart--grafik",
+    "ozellik-kart--marka",
+  ],
   darkMode: "class",
   theme: {
     extend: {
