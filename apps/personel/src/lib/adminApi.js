@@ -61,11 +61,47 @@ async function nakitIstegi(yol, secenekler = {}) {
   return veri;
 }
 
+function idempotencyAnahtari(kapsam, yol) {
+  const slug = aktifIsletmeSlug();
+  const depoAnahtari = `bp_idempotency_${slug}_${kapsam}_${yol.replace(/[^a-zA-Z0-9]/g, "_")}`;
+  const simdi = Date.now();
+  try {
+    const mevcut = JSON.parse(sessionStorage.getItem(depoAnahtari) || "null");
+    const yas = simdi - Number(mevcut?.olusturma || 0);
+    const tamamlanmisYas = simdi - Number(mevcut?.tamamlandi || 0);
+    const tekrarKullanilabilir = mevcut?.tamamlandi
+      ? tamamlanmisYas < 30_000
+      : yas < 24 * 60 * 60 * 1000;
+    if (mevcut?.anahtar && tekrarKullanilabilir) {
+      return { depoAnahtari, anahtar: mevcut.anahtar };
+    }
+  } catch { /* Depo kapalıysa bu istek için geçici anahtar kullanılır. */ }
+  const rastgele = globalThis.crypto?.randomUUID?.()
+    || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  const kayit = { depoAnahtari, anahtar: `${kapsam}:${rastgele}` };
+  try { sessionStorage.setItem(depoAnahtari, JSON.stringify({ anahtar: kayit.anahtar, olusturma: simdi })); } catch { /* noop */ }
+  return kayit;
+}
+
+async function idempotentNakitIstegi(kapsam, yol, secenekler = {}) {
+  const kayit = idempotencyAnahtari(kapsam, yol);
+  const headers = new Headers(secenekler.headers || {});
+  headers.set("Idempotency-Key", kayit.anahtar);
+  const sonuc = await nakitIstegi(yol, { ...secenekler, headers });
+  try {
+    const mevcut = JSON.parse(sessionStorage.getItem(kayit.depoAnahtari) || "null");
+    if (mevcut?.anahtar === kayit.anahtar) {
+      sessionStorage.setItem(kayit.depoAnahtari, JSON.stringify({ ...mevcut, tamamlandi: Date.now() }));
+    }
+  } catch { /* noop */ }
+  return sonuc;
+}
+
 export const nakitMasalariniGetir = async () => (await nakitIstegi("/masalar")).masalar;
 export const nakitMasasiniAc = async (masaNo) => (await nakitIstegi(`/masalar/${encodeURIComponent(masaNo)}/ac`, { method: "POST" })).masa;
-export const nakitSiparisiOnayla = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/onayla`, { method: "POST" })).siparis;
-export const nakitSiparisiReddet = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/reddet`, { method: "POST" })).siparis;
-export const nakitSiparisiTahsilEt = async (id) => (await nakitIstegi(`/siparis/${encodeURIComponent(id)}/tahsil`, { method: "POST" })).siparis;
+export const nakitSiparisiOnayla = async (id) => (await idempotentNakitIstegi("nakit-onay", `/siparis/${encodeURIComponent(id)}/onayla`, { method: "POST" })).siparis;
+export const nakitSiparisiReddet = async (id) => (await idempotentNakitIstegi("nakit-red", `/siparis/${encodeURIComponent(id)}/reddet`, { method: "POST" })).siparis;
+export const nakitSiparisiTahsilEt = async (id) => (await idempotentNakitIstegi("nakit-tahsil", `/siparis/${encodeURIComponent(id)}/tahsil`, { method: "POST" })).siparis;
 
 async function personelCagriIstegi(yol = "", secenekler = {}) {
   const r = await istekAt(`/api/personel/personel-cagrilari${yol}`, secenekler);

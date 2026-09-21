@@ -99,6 +99,56 @@ async function jsonIstegi(yol, secenekler = {}, varsayilanHata = "İstek tamamla
   return veri;
 }
 
+function kisaOzet(metin) {
+  let ozet = 2166136261;
+  for (let index = 0; index < metin.length; index += 1) {
+    ozet ^= metin.charCodeAt(index);
+    ozet = Math.imul(ozet, 16777619);
+  }
+  return `${(ozet >>> 0).toString(36)}-${metin.length.toString(36)}`;
+}
+
+function yeniIdempotencyAnahtari(kapsam) {
+  const rastgele = globalThis.crypto?.randomUUID?.()
+    || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  return `${kapsam}:${rastgele}`;
+}
+
+function idempotencyKaydi(kapsam, yol, secenekler) {
+  const imza = `${String(secenekler.method || "POST").toUpperCase()}|${yol}|${String(secenekler.body || "")}`;
+  const imzaOzeti = kisaOzet(imza);
+  const depoAnahtari = tenantDepoAnahtari(`bp_idempotency_${kapsam}_${imzaOzeti}`);
+  const simdi = Date.now();
+  try {
+    const mevcut = JSON.parse(sessionStorage.getItem(depoAnahtari) || "null");
+    const yas = simdi - Number(mevcut?.olusturma || 0);
+    const tamamlanmisYas = simdi - Number(mevcut?.tamamlandi || 0);
+    const tekrarKullanilabilir = mevcut?.tamamlandi
+      ? tamamlanmisYas < 30_000
+      : yas < 24 * 60 * 60 * 1000;
+    if (mevcut?.imzaOzeti === imzaOzeti && mevcut?.anahtar && tekrarKullanilabilir) {
+      return { depoAnahtari, anahtar: mevcut.anahtar };
+    }
+  } catch { /* Depo kapalıysa bu istek için geçici anahtar kullanılır. */ }
+  const kayit = { depoAnahtari, anahtar: yeniIdempotencyAnahtari(kapsam) };
+  try { sessionStorage.setItem(depoAnahtari, JSON.stringify({ imzaOzeti, anahtar: kayit.anahtar, olusturma: simdi })); } catch { /* noop */ }
+  return kayit;
+}
+
+async function idempotentJsonIstegi(kapsam, yol, secenekler = {}, varsayilanHata) {
+  const kayit = idempotencyKaydi(kapsam, yol, secenekler);
+  const headers = new Headers(secenekler.headers || {});
+  headers.set("Idempotency-Key", kayit.anahtar);
+  const sonuc = await jsonIstegi(yol, { ...secenekler, headers }, varsayilanHata);
+  try {
+    const mevcut = JSON.parse(sessionStorage.getItem(kayit.depoAnahtari) || "null");
+    if (mevcut?.anahtar === kayit.anahtar) {
+      sessionStorage.setItem(kayit.depoAnahtari, JSON.stringify({ ...mevcut, tamamlandi: Date.now() }));
+    }
+  } catch { /* noop */ }
+  return sonuc;
+}
+
 export async function isletmeBilgisiniGetir(slug) {
   const temizSlug = encodeURIComponent(String(slug || "").trim().toLowerCase());
   const veri = await jsonIstegi(`/api/isletme/${temizSlug}`, { isletmeBasligi: false }, "İşletme bulunamadı.");
@@ -273,7 +323,7 @@ export async function kullaniciHediyesiniKullan(hediyeId, masaNo) {
 }
 
 export async function odemeTaslagiOlustur(veri) {
-  return (await jsonIstegi("/api/odeme/taslak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Ödeme taslağı oluşturulamadı.")).odeme;
+  return (await idempotentJsonIstegi("odeme-taslagi", "/api/odeme/taslak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) }, "Ödeme taslağı oluşturulamadı.")).odeme;
 }
 
 export async function nakitMasaDurumunuGetir(masaNo, masaToken) {
@@ -283,7 +333,7 @@ export async function nakitMasaDurumunuGetir(masaNo, masaToken) {
 }
 
 export async function nakitSiparisGonder(veri) {
-  return (await jsonIstegi("/api/nakit/siparis", {
+  return (await idempotentJsonIstegi("nakit-siparis", "/api/nakit/siparis", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(veri),
@@ -291,11 +341,13 @@ export async function nakitSiparisGonder(veri) {
 }
 
 export async function iyzicoOdemesiniBaslat(odemeId, alici) {
-  return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alici }) }, "İyzico ödeme formu başlatılamadı.")).paymentPageUrl;
+  const yol = `/api/odeme/${encodeURIComponent(odemeId)}/iyzico-baslat`;
+  return (await idempotentJsonIstegi("iyzico-baslat", yol, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alici }) }, "İyzico ödeme formu başlatılamadı.")).paymentPageUrl;
 }
 
 export async function iyzicoOdemesiniDogrula(odemeId) {
-  return (await jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/iyzico-dogrula`, { method: "POST" }, "İyzico ödeme sonucu doğrulanamadı.")).odeme;
+  const yol = `/api/odeme/${encodeURIComponent(odemeId)}/iyzico-dogrula`;
+  return (await idempotentJsonIstegi("iyzico-dogrula", yol, { method: "POST" }, "İyzico ödeme sonucu doğrulanamadı.")).odeme;
 }
 
 export async function odemeSonucunuGetir(odemeId) {
@@ -303,5 +355,6 @@ export async function odemeSonucunuGetir(odemeId) {
 }
 
 export async function cuzdanlaOdemeyiOnayla(odemeId) {
-  return jsonIstegi(`/api/odeme/${encodeURIComponent(odemeId)}/cuzdan-onay`, { method: "POST" }, "Cüzdan ödemesi tamamlanamadı.");
+  const yol = `/api/odeme/${encodeURIComponent(odemeId)}/cuzdan-onay`;
+  return idempotentJsonIstegi("cuzdan-onay", yol, { method: "POST" }, "Cüzdan ödemesi tamamlanamadı.");
 }
