@@ -12,6 +12,7 @@ import SalonKrokisiYonetimi from "./admin/SalonKrokisiYonetimi";
 import DegerlendirmeRaporu from "./admin/DegerlendirmeRaporu";
 import FinansYonetimi from "./admin/FinansYonetimi";
 import ReceteStokYonetimi from "./admin/ReceteStokYonetimi";
+import OperasyonPulse from "./admin/OperasyonPulse";
 import "./Admin.css";
 import "./AdminPolish.css";
 
@@ -42,6 +43,7 @@ const KAMPANYA_IKONLARI = [
 
 const BOLUMLER = [
   ["genel", "Genel Bakış", "dashboard", "genel-bakis"],
+  ["pulse", "MasanPOS Pulse", "activity", "pulse"],
   ["tema", "Tema", "palette", "tema"],
   ["urunler", "Ürünler", "products", "urunler"],
   ["stok", "Stok Takibi", "stock", "stok-takibi"],
@@ -66,7 +68,7 @@ const BOLUMLER = [
 const MENU_GRUPLARI = [
   { id: "finans", ad: "Finans", ikon: "receipt", aciklama: "Gider, kasa ve tedarikçi", bolumler: ["finans"] },
   { id: "uygulama", ad: "Uygulama", ikon: "products", aciklama: "Marka ve müşteri alanları", bolumler: ["tema", "urunler", "stok", "kampanyalar", "oduller", "cuzdan", "duyurular", "sikayetler"] },
-  { id: "operasyon", ad: "Operasyon", ikon: "activity", aciklama: "Anlık işletme yönetimi", bolumler: ["salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
+  { id: "operasyon", ad: "Operasyon", ikon: "activity", aciklama: "Anlık işletme yönetimi", bolumler: ["pulse", "salon-krokisi", "satislar", "mutfak-kayitlari", "personel"] },
   { id: "kayitlar", ad: "Kayıtlar", ikon: "receipt", aciklama: "Geçmiş ve denetim kayıtları", bolumler: ["gecmis-siparisler", "musteriler", "personel-kayitlari", "revizyonlar"] },
   { id: "analiz", ad: "Analiz", ikon: "chart", aciklama: "Satış ve performans", bolumler: ["raporlar", "degerlendirmeler"] },
 ];
@@ -717,6 +719,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
             {bolum === "salon-krokisi" && <SalonKrokisiYonetimi onKayitDurumu={setIslemDurumu} />}
             {bolum === "degerlendirmeler" && <DegerlendirmeRaporu />}
             {bolum === "finans" && <FinansYonetimi />}
+            {bolum === "pulse" && <OperasyonPulse />}
             {bolum === "genel" && dashboard && <>
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
