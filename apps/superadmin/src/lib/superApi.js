@@ -42,6 +42,32 @@ export const superGiris = (email, sifre) => superIstek("/giris", json("POST", { 
 export const superIkiFaktor = (ikiFaktorToken, kod) => superIstek("/giris/iki-faktor", json("POST", { ikiFaktorToken, kod }), false);
 export const superBen = () => superIstek("/ben");
 export const superCikis = () => superIstek("/cikis", { method: "POST" });
+export const backendAdresi = () => BACKEND_URL;
+export async function backendDurumuGetir() {
+  const denetleyici = new AbortController();
+  const zamanAsimi = setTimeout(() => denetleyici.abort(), 8_000);
+  const baslangic = performance.now();
+  try {
+    const yanit = await fetch(`${BACKEND_URL}/saglik`, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+      signal: denetleyici.signal,
+    });
+    const veri = await jsonOku(yanit);
+    if (!yanit.ok) throw new Error(veri.hata || `Sağlık kontrolü başarısız (HTTP ${yanit.status}).`);
+    return {
+      ...veri,
+      erisilebilir: veri.durum === "calisiyor",
+      gecikmeMs: Math.max(1, Math.round(performance.now() - baslangic)),
+      kontrolZamani: new Date().toISOString(),
+    };
+  } catch (hata) {
+    if (hata?.name === "AbortError") throw new Error("Backend sağlık kontrolü zaman aşımına uğradı.");
+    throw hata;
+  } finally {
+    clearTimeout(zamanAsimi);
+  }
+}
 export const ozetGetir = () => superIstek("/ozet");
 export const isletmeleriGetir = () => superIstek("/isletmeler");
 export const isletmeGetir = (id) => superIstek(`/isletmeler/${id}`);

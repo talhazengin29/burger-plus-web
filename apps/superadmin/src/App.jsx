@@ -8,6 +8,7 @@ import Raporlar from "./screens/Raporlar";
 import Abonelikler from "./screens/Abonelikler";
 import Kayitlar from "./screens/Kayitlar";
 import Basvurular from "./screens/Basvurular";
+import Docs from "./screens/Docs";
 import { Yukleme } from "./components/Ui";
 import PlatformAmblemi from "./components/PlatformAmblemi";
 
@@ -42,6 +43,7 @@ const NAV = [
   { yol: "/abonelikler", ad: "Abonelikler", ikon: "abonelik" },
   { yol: "/basvurular", ad: "Başvurular", ikon: "basvuru" },
   { yol: "/kayitlar", ad: "Denetim İzi", ikon: "kayit" },
+  { yol: "/docs", ad: "Docs", ikon: "docs" },
 ];
 const TEMEL = String(import.meta.env.BASE_URL || "/super-admin/").replace(/\/$/, "");
 
@@ -53,6 +55,7 @@ function PlatformIkonu({ tur }) {
     abonelik: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M3 10h18M7 15h4" /></>,
     basvuru: <><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /><path d="M17 11h4M19 9v4" /></>,
     kayit: <><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></>,
+    docs: <><path d="M4 5a3 3 0 0 1 3-3h5v18H7a3 3 0 0 0-3 3V5z" /><path d="M20 5a3 3 0 0 0-3-3h-5v18h5a3 3 0 0 1 3 3V5z" /></>,
     cikis: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M13 3h5a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-5" /></>,
   };
   return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{icerik[tur]}</svg>;
@@ -72,6 +75,7 @@ function Panel({ superAdmin, cikis, yol, git, koyu, temaDegistir }) {
     "/abonelikler": <Abonelikler />,
     "/basvurular": <Basvurular />,
     "/kayitlar": <Kayitlar />,
+    "/docs": <Docs />,
   };
   const aktifSayfa = NAV.find((oge) => oge.yol === yol) || NAV[0];
   const kullaniciHarfi = String(superAdmin.ad || "S").charAt(0).toUpperCase();
