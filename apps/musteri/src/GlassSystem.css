@@ -24,18 +24,18 @@
   --on-surface-variant: var(--text-secondary);
   --outline: var(--text-muted);
   --placeholder: rgba(225, 234, 241, 0.46);
-  --glass-bg: linear-gradient(145deg, rgba(225, 231, 232, 0.34), rgba(91, 103, 111, 0.23));
-  --glass-bg-soft: rgba(234, 239, 240, 0.2);
-  --glass-bg-strong: rgba(225, 231, 232, 0.38);
-  --glass-bg-solid: rgba(25, 34, 41, 0.82);
-  --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.055) 34%, transparent 62%);
-  --glass-border: rgba(255, 255, 255, 0.44);
-  --glass-border-soft: rgba(255, 255, 255, 0.29);
-  --glass-border-strong: rgba(255, 255, 255, 0.62);
+  --glass-bg: linear-gradient(145deg, rgba(225, 231, 232, 0.28), rgba(91, 103, 111, 0.17));
+  --glass-bg-soft: rgba(234, 239, 240, 0.15);
+  --glass-bg-strong: rgba(225, 231, 232, 0.32);
+  --glass-bg-solid: rgba(25, 34, 41, 0.74);
+  --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.27) 0%, rgba(255, 255, 255, 0.07) 34%, transparent 62%);
+  --glass-border: rgba(255, 255, 255, 0.52);
+  --glass-border-soft: rgba(255, 255, 255, 0.34);
+  --glass-border-strong: rgba(255, 255, 255, 0.7);
   --border-glass: var(--glass-border);
-  --glass-blur: saturate(132%) blur(26px);
-  --glass-blur-sm: saturate(128%) blur(16px);
-  --glass-blur-lg: saturate(136%) blur(32px);
+  --glass-blur: saturate(138%) blur(30px);
+  --glass-blur-sm: saturate(132%) blur(19px);
+  --glass-blur-lg: saturate(145%) blur(38px);
   --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.58), inset 1px 0 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 20px 46px rgba(0, 0, 0, 0.28), 0 1px 1px rgba(255, 255, 255, 0.08), var(--glass-inset);
   --glass-shadow-sm: 0 11px 28px rgba(0, 0, 0, 0.22), 0 1px 1px rgba(255, 255, 255, 0.06), var(--glass-inset);
@@ -136,7 +136,7 @@ body { background: var(--bg-deep); }
   padding: calc(10px + env(safe-area-inset-top, 0px)) 20px 9px;
   background:
     var(--glass-sheen),
-    linear-gradient(180deg, rgba(214, 221, 222, 0.29), rgba(87, 99, 107, 0.22));
+    linear-gradient(180deg, rgba(214, 221, 222, 0.24), rgba(87, 99, 107, 0.16));
   border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0;
@@ -162,7 +162,7 @@ body { background: var(--bg-deep); }
 :root[data-gorunum="acik"] .login-form {
   background:
     var(--glass-sheen),
-    linear-gradient(145deg, rgba(213, 220, 221, 0.34), rgba(31, 42, 50, 0.38));
+    linear-gradient(145deg, rgba(213, 220, 221, 0.29), rgba(31, 42, 50, 0.32));
   border: 1px solid rgba(255, 255, 255, 0.58);
   box-shadow: 0 22px 48px rgba(0, 0, 0, 0.32), var(--glass-inset);
 }
@@ -200,7 +200,7 @@ body { background: var(--bg-deep); }
   background:
     radial-gradient(circle at 94% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 38%),
     var(--glass-sheen),
-    linear-gradient(145deg, rgba(224, 230, 231, 0.33), rgba(89, 101, 108, 0.23));
+    linear-gradient(145deg, rgba(224, 230, 231, 0.27), rgba(89, 101, 108, 0.17));
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 24px;
   box-shadow: var(--glass-shadow);
@@ -232,7 +232,7 @@ body { background: var(--bg-deep); }
   margin-bottom: 9px;
   background:
     var(--glass-sheen),
-    linear-gradient(145deg, rgba(221, 227, 228, 0.31), rgba(81, 93, 101, 0.22));
+    linear-gradient(145deg, rgba(221, 227, 228, 0.25), rgba(81, 93, 101, 0.16));
   border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 22px;
   box-shadow: var(--glass-shadow-sm);
@@ -262,7 +262,7 @@ body { background: var(--bg-deep); }
   padding-left: 16px;
   background:
     var(--glass-sheen),
-    linear-gradient(145deg, rgba(225, 231, 232, 0.3), rgba(82, 94, 102, 0.23));
+    linear-gradient(145deg, rgba(225, 231, 232, 0.24), rgba(82, 94, 102, 0.17));
   border: 1px solid rgba(255, 255, 255, 0.56);
   box-shadow: var(--glass-shadow-sm);
 }
@@ -283,7 +283,7 @@ body { background: var(--bg-deep); }
   overflow: hidden;
   background:
     var(--glass-sheen),
-    linear-gradient(150deg, rgba(187, 196, 199, 0.38), rgba(62, 75, 84, 0.34));
+    linear-gradient(150deg, rgba(187, 196, 199, 0.31), rgba(62, 75, 84, 0.26));
   border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: 21px;
   box-shadow: var(--glass-shadow-sm);
@@ -294,7 +294,7 @@ body { background: var(--bg-deep); }
   padding: 10px 11px 11px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 52%),
-    linear-gradient(145deg, rgba(224, 231, 233, 0.22), rgba(91, 104, 112, 0.2));
+    linear-gradient(145deg, rgba(224, 231, 233, 0.18), rgba(91, 104, 112, 0.15));
   border-top: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   -webkit-backdrop-filter: var(--glass-blur);
