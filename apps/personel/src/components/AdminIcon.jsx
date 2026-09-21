@@ -34,6 +34,9 @@ const ikonlar = {
   drink: <><path d="M7 7h10l-1 14H8L7 7ZM6 3h9M14 3l4 4"/><path d="M9 11h6"/></>,
   card: <><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h3"/></>,
   bolt: <path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/>,
+  maximize: <><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></>,
+  minimize: <><path d="M8 8H3V3M16 8h5V3M8 16H3v5M16 16h5v5"/></>,
+  copy: <><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></>,
 };
 
 export default function AdminIcon({ name, size = 20, className = "", ...props }) {

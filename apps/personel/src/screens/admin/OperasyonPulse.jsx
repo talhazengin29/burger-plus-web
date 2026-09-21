@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { adminIstek } from "../../lib/adminApi";
+import { socket } from "../../lib/socket";
 import { useIsletmeNavigate } from "../../hooks/useIsletmeNavigate";
 import AdminIcon from "../../components/AdminIcon";
 import "./OperasyonPulse.css";
@@ -34,6 +35,28 @@ const AKSIYON_HEDEFLERI = {
   personel: "/yonetim/personel",
 };
 
+const CANLI_OLAY_ADLARI = {
+  siparis: "Yeni sipariş alındı",
+  nakit: "Nakit akışı güncellendi",
+  mutfak: "Mutfak durumu değişti",
+  masa: "Masa durumu değişti",
+  stok: "Stok hareketi işlendi",
+  urun: "Ürün durumu güncellendi",
+  personel: "Ekip bilgisi güncellendi",
+  vardiya: "Vardiya durumu değişti",
+};
+
+const CANLI_OLAY_IKONLARI = {
+  siparis: "receipt",
+  nakit: "card",
+  mutfak: "kitchen",
+  masa: "floor",
+  stok: "stock",
+  urun: "products",
+  personel: "users",
+  vardiya: "clock",
+};
+
 const METRIKLER = [
   ["bugunTahsilat", "Bugünkü tahsilat", "receipt", "para"],
   ["bugunSiparis", "Sipariş", "chart", "sayi"],
@@ -63,7 +86,20 @@ export default function OperasyonPulse() {
   const [yukleniyor, setYukleniyor] = useState(true);
   const [yenileniyor, setYenileniyor] = useState(false);
   const [hata, setHata] = useState("");
+  const [canliBagli, setCanliBagli] = useState(socket.connected);
+  const [sonCanliOlay, setSonCanliOlay] = useState(null);
+  const [canliOlaylar, setCanliOlaylar] = useState([]);
+  const [degisenMetrikler, setDegisenMetrikler] = useState([]);
+  const [sunumModu, setSunumModu] = useState(false);
+  const [ozetKopyalandi, setOzetKopyalandi] = useState(false);
   const istekSuruyor = useRef(false);
+  const canliYenileme = useRef(null);
+  const olayGizleme = useRef(null);
+  const degisimGizleme = useRef(null);
+  const kopyaGizleme = useRef(null);
+  const oncekiMetrikler = useRef(null);
+  const olaySirasi = useRef(0);
+  const pulseRef = useRef(null);
 
   const nabziYukle = useCallback(async ({ sessiz = false } = {}) => {
     if (istekSuruyor.current) return;
@@ -89,6 +125,91 @@ export default function OperasyonPulse() {
     return () => clearInterval(zamanlayici);
   }, [nabziYukle]);
 
+  useEffect(() => {
+    const baglandi = () => setCanliBagli(true);
+    const baglantiKesildi = () => setCanliBagli(false);
+    const nabizDegisti = (olay = {}) => {
+      const kayit = { ...olay, alindi: Date.now(), sira: ++olaySirasi.current };
+      setSonCanliOlay(kayit);
+      setCanliOlaylar((onceki) => [kayit, ...onceki].slice(0, 6));
+      clearTimeout(canliYenileme.current);
+      clearTimeout(olayGizleme.current);
+      canliYenileme.current = setTimeout(() => nabziYukle({ sessiz: true }), 240);
+      olayGizleme.current = setTimeout(() => setSonCanliOlay(null), 4_500);
+    };
+
+    socket.on("connect", baglandi);
+    socket.on("disconnect", baglantiKesildi);
+    socket.on("operasyon-nabzi-guncellendi", nabizDegisti);
+
+    return () => {
+      clearTimeout(canliYenileme.current);
+      clearTimeout(olayGizleme.current);
+      socket.off("connect", baglandi);
+      socket.off("disconnect", baglantiKesildi);
+      socket.off("operasyon-nabzi-guncellendi", nabizDegisti);
+    };
+  }, [nabziYukle]);
+
+  useEffect(() => {
+    const yeniMetrikler = veri?.metrikler;
+    if (!yeniMetrikler) return;
+    if (oncekiMetrikler.current) {
+      const degisenler = METRIKLER
+        .map(([alan]) => alan)
+        .filter((alan) => Number(oncekiMetrikler.current[alan] ?? 0) !== Number(yeniMetrikler[alan] ?? 0));
+      if (degisenler.length) {
+        setDegisenMetrikler(degisenler);
+        clearTimeout(degisimGizleme.current);
+        degisimGizleme.current = setTimeout(() => setDegisenMetrikler([]), 1_800);
+      }
+    }
+    oncekiMetrikler.current = { ...yeniMetrikler };
+  }, [veri]);
+
+  useEffect(() => {
+    const ekranDegisti = () => setSunumModu(document.fullscreenElement === pulseRef.current);
+    document.addEventListener("fullscreenchange", ekranDegisti);
+    return () => {
+      clearTimeout(degisimGizleme.current);
+      clearTimeout(kopyaGizleme.current);
+      document.removeEventListener("fullscreenchange", ekranDegisti);
+    };
+  }, []);
+
+  const sunumModunuDegistir = async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await pulseRef.current?.requestFullscreen?.();
+    } catch {
+      setSunumModu(false);
+    }
+  };
+
+  const ozetiKopyala = async () => {
+    const metin = veri?.yoneticiOzeti?.metin;
+    if (!metin) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(metin);
+      } else {
+        const alan = document.createElement("textarea");
+        alan.value = metin;
+        alan.style.position = "fixed";
+        alan.style.opacity = "0";
+        document.body.appendChild(alan);
+        alan.select();
+        document.execCommand("copy");
+        alan.remove();
+      }
+      setOzetKopyalandi(true);
+      clearTimeout(kopyaGizleme.current);
+      kopyaGizleme.current = setTimeout(() => setOzetKopyalandi(false), 2_000);
+    } catch {
+      setOzetKopyalandi(false);
+    }
+  };
+
   if (yukleniyor && !veri) {
     return <section className="pulse-yukleniyor" aria-label="Operasyon verileri yükleniyor">
       <span /><span /><span /><span />
@@ -111,11 +232,19 @@ export default function OperasyonPulse() {
   const aksiyonlar = veri.aksiyonlar || [];
   const stoklar = [...(veri.stok?.hammaddeler || []), ...(veri.stok?.paketliUrunler || [])];
   const yogunluk = YOGUNLUK[mutfak.yogunluk] || YOGUNLUK.sakin;
+  const ongoru = veri.ongoru || {};
+  const ongoruGuveni = ongoru.guven || {};
+  const ongoruPersoneli = ongoru.personel || {};
+  const yoneticiOzeti = veri.yoneticiOzeti || {
+    baslik: "Operasyon özeti hazırlanıyor",
+    durum: "normal",
+    metin: "Canlı operasyon verileri tamamlandığında yönetici özeti burada görünecek.",
+  };
 
-  return <section className="pulse-merkezi">
+  return <section className="pulse-merkezi" ref={pulseRef}>
     <header className="pulse-ust">
       <div className="pulse-ust-baslik">
-        <span><i /> CANLI OPERASYON</span>
+        <span className={canliBagli ? "bagli" : "baglanti-bekliyor"}><i /> {canliBagli ? "CANLI BAĞLI" : "YENİDEN BAĞLANIYOR"}</span>
         <h2>MasanPOS Pulse</h2>
         <p>{metrikler.aktifMasa || mutfak.kuyruktakiSiparis
           ? `${metrikler.aktifMasa || 0} aktif masa · ${mutfak.kuyruktakiSiparis || 0} sipariş mutfak kuyruğunda`
@@ -126,21 +255,79 @@ export default function OperasyonPulse() {
           <AdminIcon name="activity" />
           <span><small>MUTFAK YOĞUNLUĞU</small><b>{yogunluk.ad}</b></span>
         </div>
+        <button type="button" onClick={sunumModunuDegistir} title={sunumModu ? "Sunum modundan çık" : "Sunum moduna geç"}>
+          <AdminIcon name={sunumModu ? "minimize" : "maximize"} />
+        </button>
         <button type="button" className={yenileniyor ? "donuyor" : ""} onClick={() => nabziYukle({ sessiz: true })} disabled={yenileniyor} title="Operasyon verisini yenile">
           <AdminIcon name="refresh" />
         </button>
-        <time>Son güncelleme {tarihSaat(veri.uretimZamani)}</time>
+        <time>{sonCanliOlay
+          ? `${CANLI_OLAY_ADLARI[sonCanliOlay.tur] || "Operasyon güncellendi"}${sonCanliOlay.masaNo ? ` · Masa ${sonCanliOlay.masaNo}` : ""}`
+          : `Son güncelleme ${tarihSaat(veri.uretimZamani)}`}</time>
       </div>
     </header>
 
     {hata && <div className="pulse-uyari"><AdminIcon name="alert" /><span>Son yenileme tamamlanamadı: {hata}</span></div>}
 
     <div className="pulse-metrikler">
-      {METRIKLER.map(([alan, etiket, ikon, tur]) => <article key={alan} className={(alan === "kritikStok" && Number(metrikler[alan]) > 0) || (alan === "tahsilatBekleyenTutar" && Number(metrikler[alan]) > 0) ? "uyari" : ""}>
+      {METRIKLER.map(([alan, etiket, ikon, tur]) => <article key={alan} className={[
+        ((alan === "kritikStok" && Number(metrikler[alan]) > 0) || (alan === "tahsilatBekleyenTutar" && Number(metrikler[alan]) > 0)) ? "uyari" : "",
+        degisenMetrikler.includes(alan) ? "degisti" : "",
+      ].filter(Boolean).join(" ")}>
         <i><AdminIcon name={ikon} /></i>
         <span>{etiket}</span>
         <strong>{metrikDegeri(metrikler[alan], tur)}</strong>
       </article>)}
+    </div>
+
+    <section className={`pulse-ongoru ${ongoru.risk || "belirsiz"}`}>
+      <div className="pulse-ongoru-anlatim">
+        <i><AdminIcon name="bolt" /></i>
+        <div>
+          <span>30 DAKİKALIK OPERASYON ÖNGÖRÜSÜ</span>
+          <h3>{ongoru.baslik || "Tahmin için veri birikiyor"}</h3>
+          <p>{ongoru.aciklama || "Benzer gün verileri tamamlandığında öngörü burada görünecek."}</p>
+        </div>
+      </div>
+      <dl className="pulse-ongoru-metrikler">
+        <div><dt>Beklenen sipariş</dt><dd>{ongoru.hazir ? `~${Number(ongoru.beklenenSiparis || 0).toLocaleString("tr-TR")}` : "—"}</dd></div>
+        <div><dt>Beklenen ciro</dt><dd>{ongoru.hazir ? para(ongoru.beklenenCiro) : "—"}</dd></div>
+        <div><dt>Gün sonu tahmini</dt><dd>{ongoru.hazir ? para(ongoru.gunSonuCiroTahmini) : "—"}</dd></div>
+        <div><dt>Vardiya kapasitesi</dt><dd>{ongoru.hazir ? `${ongoruPersoneli.mevcut || 0} / ${ongoruPersoneli.onerilen || 0}` : "—"}</dd></div>
+      </dl>
+      <div className="pulse-ongoru-guven">
+        {ongoru.hazir && ongoru.tempoDegisimiYuzde != null && <b className={Number(ongoru.tempoDegisimiYuzde) >= 0 ? "pozitif" : "negatif"}>
+          Tempo {Number(ongoru.tempoDegisimiYuzde) >= 0 ? "+" : ""}{Number(ongoru.tempoDegisimiYuzde).toLocaleString("tr-TR")}%
+        </b>}
+        <span><small>Tahmin güveni</small><i><b style={{ width: `${Math.min(100, Math.max(0, Number(ongoruGuveni.oran || 0)))}%` }} /></i><strong>%{ongoruGuveni.oran || 0}</strong></span>
+        <em>{ongoruGuveni.aktifGun || 0}/{ongoruGuveni.ornekGun || 6} benzer gün</em>
+      </div>
+    </section>
+
+    <div className="pulse-sunum-grid">
+      <section className={`pulse-yonetici-ozeti ${yoneticiOzeti.durum || "normal"}`}>
+        <i><AdminIcon name="activity" /></i>
+        <div>
+          <span>YÖNETİCİ ÖZETİ</span>
+          <h3>{yoneticiOzeti.baslik}</h3>
+          <p>{yoneticiOzeti.metin}</p>
+        </div>
+        <button type="button" onClick={ozetiKopyala} title="Yönetici özetini kopyala">
+          <AdminIcon name={ozetKopyalandi ? "check" : "copy"} />
+          <span>{ozetKopyalandi ? "Kopyalandı" : "Kopyala"}</span>
+        </button>
+      </section>
+
+      <section className="pulse-canli-akis" aria-live="polite">
+        <header><div><span>CANLI OLAY AKIŞI</span><h3>Operasyon hareketleri</h3></div><small>{canliOlaylar.length || "—"}</small></header>
+        {canliOlaylar.length ? <div>
+          {canliOlaylar.map((olay) => <article key={olay.sira}>
+            <i><AdminIcon name={CANLI_OLAY_IKONLARI[olay.tur] || "activity"} /></i>
+            <span><b>{CANLI_OLAY_ADLARI[olay.tur] || "Operasyon güncellendi"}</b><small>{olay.masaNo ? (String(olay.masaNo) === "algotur" ? "Gel Al" : `Masa ${olay.masaNo}`) : "İşletme geneli"}</small></span>
+            <time>{tarihSaat(olay.zaman || olay.alindi)}</time>
+          </article>)}
+        </div> : <div className="pulse-akis-bos"><i /><span>Canlı bağlantı hazır</span></div>}
+      </section>
     </div>
 
     <div className="pulse-ana-grid">
@@ -150,7 +337,7 @@ export default function OperasyonPulse() {
           <small>{masalar.length} açık nokta</small>
         </header>
         {masalar.length ? <div className="pulse-masalar">
-          {masalar.map((masa) => <article className={`pulse-masa ${masa.durum}`} key={`${masa.tip}-${masa.masaNo}`}>
+          {masalar.map((masa) => <article className={`pulse-masa ${masa.durum}${sonCanliOlay?.masaNo && String(sonCanliOlay.masaNo) === String(masa.masaNo) ? " canli-degisti" : ""}`} key={`${masa.tip}-${masa.masaNo}`}>
             <header>
               <i><AdminIcon name={masa.tip === "gel_al" ? "receipt" : "floor"} /></i>
               <span><b>{masa.tip === "gel_al" ? "Gel Al" : `Masa ${masa.masaNo}`}</b><small>{MASA_DURUMLARI[masa.durum] || masa.durum}</small></span>
@@ -182,7 +369,7 @@ export default function OperasyonPulse() {
     </div>
 
     <div className="pulse-ikincil-grid">
-      <section className="pulse-panel pulse-mutfak-paneli">
+      <section className={`pulse-panel pulse-mutfak-paneli${["siparis", "mutfak"].includes(sonCanliOlay?.tur) ? " canli-degisti" : ""}`}>
         <header className="pulse-panel-baslik">
           <div><span>MUTFAK</span><h3>Kuyruk ve kapasite</h3></div>
           <small>{personel.vardiyada || 0}/{personel.toplam || 0} vardiyada</small>
@@ -203,7 +390,7 @@ export default function OperasyonPulse() {
         </dl>
       </section>
 
-      <section className="pulse-panel pulse-nakit-paneli">
+      <section className={`pulse-panel pulse-nakit-paneli${sonCanliOlay?.tur === "nakit" ? " canli-degisti" : ""}`}>
         <header className="pulse-panel-baslik">
           <div><span>NAKİT AKIŞI</span><h3>Bekleyen işlemler</h3></div>
           <small>{para(nakit.tahsilatBekleyenTutar)}</small>
@@ -215,7 +402,7 @@ export default function OperasyonPulse() {
         <div className="pulse-nakit-alt"><span>En eski bekleme</span><strong>{Math.round(nakit.enEskiBeklemeDakika || 0)} dk</strong></div>
       </section>
 
-      <section className="pulse-panel pulse-stok-paneli">
+      <section className={`pulse-panel pulse-stok-paneli${["stok", "urun"].includes(sonCanliOlay?.tur) ? " canli-degisti" : ""}`}>
         <header className="pulse-panel-baslik">
           <div><span>STOK RİSKİ</span><h3>Kritik kalemler</h3></div>
           <button type="button" onClick={() => git("/yonetim/stok-takibi")}>Tümünü aç</button>
