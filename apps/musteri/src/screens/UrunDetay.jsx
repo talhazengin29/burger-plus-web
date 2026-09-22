@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -21,6 +21,7 @@ const besinEtiketleri = [
 export default function UrunDetay() {
   const { t, yerelAlan } = useDil();
   const { id } = useParams();
+  const [aramaParametreleri] = useSearchParams();
   const git = useIsletmeNavigate();
   const { isletmeSlug } = useIsletme();
   const { sepeteEkle, indirimliFiyat, urunler } = useApp();
@@ -32,6 +33,7 @@ export default function UrunDetay() {
   const [icecekBoyutKodu, setIcecekBoyutKodu] = useState("");
   const [ekstraMalzemeIdleri, setEkstraMalzemeIdleri] = useState([]);
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
+  const sepetOnerisindenGeldi = aramaParametreleri.get("kaynak") === "sepet_onerisi";
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
@@ -130,7 +132,7 @@ export default function UrunDetay() {
       ekstraMalzemeler: seciliEkstraMalzemeler.map((secenek) => ({ id: String(secenek.id), ad: secenek.ad, fiyat: Number(secenek.fiyat || 0) })),
     };
     for (let i = 0; i < adet; i++) {
-      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi });
+      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi, ...(sepetOnerisindenGeldi ? { satisKaynagi: "sepet_onerisi" } : {}) });
     }
     git(-1);
   };

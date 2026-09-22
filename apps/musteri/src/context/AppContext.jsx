@@ -437,6 +437,7 @@ export function AppProvider({ children }) {
   // Backend'e gönderim ödeme anında olur (aşağıda odemeyiTamamla).
   const sepeteEkle = (urun) => {
     if (urun?.stokta === false) return false;
+    const oneridenEklendi = urun?.satisKaynagi === "sepet_onerisi";
     // Aktif kampanya varsa ürün sepete indirimli fiyatla girer — ödeme akışı
     // (sepetToplam, odemeyiTamamla) hiç değişmeden bu fiyatı kullanır.
     const indirim = indirimliFiyat(urun);
@@ -449,10 +450,12 @@ export function AppProvider({ children }) {
       const mevcut = onceki.find((s) => s.sepetAnahtari === sepetAnahtari);
       if (mevcut) {
         return onceki.map((s) =>
-          s.sepetAnahtari === sepetAnahtari ? { ...s, adet: s.adet + 1 } : s
+          s.sepetAnahtari === sepetAnahtari
+            ? { ...s, adet: s.adet + 1, oneriAdedi: Math.min(s.adet + 1, Number(s.oneriAdedi || 0) + (oneridenEklendi ? 1 : 0)) }
+            : s
         );
       }
-      return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1 }];
+      return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1, oneriAdedi: oneridenEklendi ? 1 : 0 }];
     });
     return true;
   };
@@ -471,7 +474,9 @@ export function AppProvider({ children }) {
   const adetAzalt = (anahtar) =>
     setSepet((o) =>
       o
-        .map((s) => (s.sepetAnahtari === anahtar ? { ...s, adet: s.adet - 1 } : s))
+        .map((s) => (s.sepetAnahtari === anahtar
+          ? { ...s, adet: s.adet - 1, oneriAdedi: Math.min(Number(s.oneriAdedi || 0), Math.max(0, s.adet - 1)) }
+          : s))
         .filter((s) => s.adet > 0)
     );
 

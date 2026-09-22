@@ -167,7 +167,8 @@ export default function Admin({ onCikis, temaKontrolu }) {
   const [cuzdanRaporu, setCuzdanRaporu] = useState({ toplamNakit: 0, toplamBonus: 0, bugunNakit: 0, yuklemeYapanMusteri: 0, dolasimdakiBakiye: 0 });
   const [rapor, setRapor] = useState({
     gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [],
-    ozet: { ciro: 0, adet: 0, siparis: 0 }, oncekiOzet: { ciro: 0, adet: 0, siparis: 0 },
+    ozet: { ciro: 0, adet: 0, siparis: 0, oneriCirosu: 0, oneriAdedi: 0, oneriSiparisi: 0 },
+    oncekiOzet: { ciro: 0, adet: 0, siparis: 0, oneriCirosu: 0, oneriAdedi: 0, oneriSiparisi: 0 },
   });
   const [canliSatislar, setCanliSatislar] = useState([]);
   const [gecmisSatislar, setGecmisSatislar] = useState([]);
@@ -264,6 +265,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
       setCanliSatislar((onceki) => [satis, ...onceki.filter((kayit) => kayit.siparis_no !== satis.siparisNo)].slice(0, 100));
       setCanliBildirim(`${satis.kisiAdi || "Yeni müşteri"} · ${para(satis.tutar)}`);
       adminIstek("/dashboard").then(setDashboard).catch(() => {});
+      adminIstek("/raporlar/satis?gun=30").then(setRapor).catch(() => {});
       adminIstek("/urunler").then((veri) => setUrunler(veri.urunler || [])).catch(() => {});
     };
     const satislarGeldi = (satislar) => setCanliSatislar(satislar || []);
@@ -540,11 +542,25 @@ export default function Admin({ onCikis, temaKontrolu }) {
 
   const kampanyaKaydet = async (e) => {
     e.preventDefault();
-    const veri = { ...kampanyaForm, indirimYuzde: Number(kampanyaForm.indirimYuzde), sira: Number(kampanyaForm.sira), baslangicSaat: Number(kampanyaForm.baslangicSaat), bitisSaat: Number(kampanyaForm.bitisSaat) };
+    const { taslakAnalizi: _taslakAnalizi, ...kampanyaVerisi } = kampanyaForm;
+    const veri = { ...kampanyaVerisi, indirimYuzde: Number(kampanyaForm.indirimYuzde), sira: Number(kampanyaForm.sira), baslangicSaat: Number(kampanyaForm.baslangicSaat), bitisSaat: Number(kampanyaForm.bitisSaat) };
     const taslak = kampanyaForm;
     setKampanyaForm(null);
     const basarili = await islem(() => adminIstek("/kampanyalar", jsonGonder("POST", veri)), "Kampanya uygulamaya kaydedildi.", "Kampanya kaydediliyor…");
     if (!basarili) setKampanyaForm(taslak);
+  };
+
+  const kampanyaTaslagiOlustur = async () => {
+    setHata("");
+    setIslemDurumu("Satış verilerinden kampanya taslağı hazırlanıyor…");
+    try {
+      const sonuc = await adminIstek("/kampanyalar/taslak?gun=30");
+      setKampanyaForm({ ...sonuc.taslak, taslakAnalizi: sonuc.analiz });
+    } catch (err) {
+      setHata(err.message);
+    } finally {
+      setIslemDurumu("");
+    }
   };
 
   const odulKaydet = async (e) => {
@@ -589,10 +605,14 @@ export default function Admin({ onCikis, temaKontrolu }) {
   const ciroTrend = useMemo(() => yuzdeDegisim(toplamCiro, rapor.oncekiOzet?.ciro), [toplamCiro, rapor]);
   const urunTrend = useMemo(() => yuzdeDegisim(toplamUrun, rapor.oncekiOzet?.adet), [toplamUrun, rapor]);
   const sepetTrend = useMemo(() => yuzdeDegisim(ortalamaSepet, oncekiOrtalamaSepet), [ortalamaSepet, oncekiOrtalamaSepet]);
+  const oneriCirosu = Number(rapor.ozet?.oneriCirosu || 0);
+  const oneriCiroPayi = toplamCiro > 0 ? (oneriCirosu / toplamCiro) * 100 : 0;
+  const oneriTrend = useMemo(() => yuzdeDegisim(oneriCirosu, Number(rapor.oncekiOzet?.oneriCirosu || 0)), [oneriCirosu, rapor]);
   const gunlukDoldurulmus = useMemo(() => sonOtuzGunuDoldur(rapor.gunluk), [rapor]);
   const ciroSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.ciro), [gunlukDoldurulmus]);
   const urunSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.adet), [gunlukDoldurulmus]);
   const sepetSpark = useMemo(() => gunlukDoldurulmus.map((g) => (g.siparis ? g.ciro / g.siparis : 0)), [gunlukDoldurulmus]);
+  const oneriSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.oneriCirosu || 0), [gunlukDoldurulmus]);
   const canliSatisToplami = useMemo(() => canliSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [canliSatislar]);
   const gecmisSatisToplami = useMemo(() => gecmisSatislar.reduce((toplam, satis) => toplam + Number(satis.tutar || 0), 0), [gecmisSatislar]);
   const tamamlananMutfak = useMemo(() => mutfakKayitlari.filter((kayit) => kayit.durum === "hazir"), [mutfakKayitlari]);
@@ -724,6 +744,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
               <section className="admin-metrikler">
                 <Metrik ad="Bugünkü ciro" deger={para(dashboard.bugunCiro)} alt={`${dashboard.bugunSiparis} sipariş`} renk="turuncu" />
                 <Metrik ad="Bugünkü sipariş" deger={dashboard.bugunSiparis} alt="Toplam sipariş" renk="yesil" />
+                <Metrik ad="Öneriden gelen ciro" deger={para(dashboard.bugunOneriCirosu || 0)} alt={`${dashboard.bugunOneriAdedi || 0} önerilen ürün`} renk="mavi" />
                 <Metrik ad="Menü" deger={urunler.length} alt="Katalogdaki ürünler" renk="mavi" />
                 <Metrik ad="Ekip" deger={`${dashboard.vardiyada}/${dashboard.personel}`} alt="Şu an vardiyada" renk="mor" />
                 <Metrik ad="Mutfak ortalaması" deger={dashboard.ortalamaHazirlamaDakika == null ? "—" : `${dashboard.ortalamaHazirlamaDakika} dk`} alt="Son 30 gün" renk="yesil" />
@@ -834,7 +855,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
             </>}
 
             {bolum === "kampanyalar" && <>
-              <BolumBaslik baslik="Kampanya yönetimi" aciklama="Uygulamada görünen kampanyaları, geçerli kategorileri ve indirim saatlerini yönetin." buton="+ Yeni kampanya" onClick={() => setKampanyaForm({ ...BOS_KAMPANYA, gecerliKategoriler: [] })} />
+              <BolumBaslik baslik="Kampanya yönetimi" aciklama="Uygulamada görünen kampanyaları, geçerli kategorileri ve indirim saatlerini yönetin." buton="+ Yeni kampanya" onClick={() => setKampanyaForm({ ...BOS_KAMPANYA, gecerliKategoriler: [] })} ikincilButon="Veriden taslak oluştur" ikincilOnClick={kampanyaTaslagiOlustur} ikincilIkon="target" />
               <div className="yonetim-kart-grid">{kampanyalar.length ? kampanyalar.map((kampanya) => (
                 <article className={`yonetim-kart kampanya-yonetim-kart ${!kampanya.aktif ? "pasif" : ""}`} key={kampanya.id}>
                   <div className="yonetim-kart-gorsel">
@@ -1032,13 +1053,14 @@ export default function Admin({ onCikis, temaKontrolu }) {
             </>}
 
             {bolum === "raporlar" && <>
-              <BolumBaslik baslik="Satış analizi" aciklama="Son 30 günün ürün, adet ve ciro performansı." />
+              <BolumBaslik baslik="Satış analizi" aciklama="Son 30 günün ürün, adet ve ciro performansı." buton="Kampanya taslağı oluştur" onClick={kampanyaTaslagiOlustur} butonIkon="target" />
               <section className="admin-metrikler rapor-metrik">
                 <Metrik ad="30 günlük ciro" deger={para(toplamCiro)} alt={`${toplamUrun} ürün`} renk="turuncu" trend={ciroTrend} spark={ciroSpark} />
                 <Metrik ad="Günlük ortalama" deger={para(toplamCiro / Math.max(1, rapor.gunluk.length))} alt={`${rapor.gunluk.length} aktif satış günü`} renk="mavi" trend={ciroTrend} spark={ciroSpark} />
                 <Metrik ad="Ortalama sepet tutarı" deger={para(ortalamaSepet)} alt={`${siparisSayisi} sipariş`} renk="kirmizi" trend={sepetTrend} spark={sepetSpark} />
                 <Metrik ad="Satılan ürün" deger={toplamUrun} alt={`${rapor.urunler.length} farklı ürün`} renk="yesil" trend={urunTrend} spark={urunSpark} />
                 <Metrik ad="Yoğun saat" deger={yogunSaat.saat == null ? "—" : `${String(yogunSaat.saat).padStart(2, "0")}:00`} alt={`${yogunSaat.adet} ürün satıldı`} renk="mor" />
+                <Metrik ad="Öneriden gelen ciro" deger={para(oneriCirosu)} alt={`${rapor.ozet?.oneriAdedi || 0} ürün · toplam cironun %${oneriCiroPayi.toFixed(1)}`} renk="mavi" trend={oneriTrend} spark={oneriSpark} />
               </section>
               <Panel baslik="Ciro ve sipariş trendi" alt="Son 30 gün"><SatisCizgiGrafigi veriler={rapor.gunluk} /></Panel>
               <section className="admin-grid-2">
@@ -1227,8 +1249,9 @@ export default function Admin({ onCikis, temaKontrolu }) {
         </Modal>
       )}
       {kampanyaForm && (
-        <Modal baslik={kampanyaForm.id ? "Kampanyayı düzenle" : "Yeni kampanya"} aciklama="Kaydettiğiniz değişiklikler müşteri uygulamasına anında yansır." sinif="admin-modal--yonetim" kapat={() => setKampanyaForm(null)}>
+        <Modal baslik={kampanyaForm.id ? "Kampanyayı düzenle" : kampanyaForm.taslakAnalizi ? "Veriye dayalı kampanya taslağı" : "Yeni kampanya"} aciklama={kampanyaForm.taslakAnalizi ? "Taslak pasif hazırlandı. İndirim oranını ve kârlılığı kontrol ederek yayınlayın." : "Kaydettiğiniz değişiklikler müşteri uygulamasına anında yansır."} sinif="admin-modal--yonetim" kapat={() => setKampanyaForm(null)}>
           <form className="admin-form" onSubmit={kampanyaKaydet}>
+            {kampanyaForm.taslakAnalizi && <KampanyaTaslakAnalizi analiz={kampanyaForm.taslakAnalizi} />}
             <section className="kampanya-ikon-editoru">
               <header><div><span><AdminIcon name={kampanyaOutlineIkonu(kampanyaForm)} /></span><div><b>Kampanya ikonu</b><small>Müşteri uygulamasındaki kampanya etiketini temsil eder.</small></div></div></header>
               <div>{KAMPANYA_IKONLARI.map((secenek) => <button type="button" key={secenek.deger} className={kampanyaForm.ikon === secenek.deger ? "secili" : ""} title={secenek.ad} aria-label={`${secenek.ad} ikonunu seç`} onClick={() => setKampanyaForm({ ...kampanyaForm, ikon: secenek.deger })}><span><AdminIcon name={secenek.ikon} /></span><small>{secenek.ad}</small></button>)}</div>
@@ -1300,7 +1323,20 @@ function MetrikSparkline({ veriler }) {
 }
 function Panel({ baslik, alt, children }) { return <section className="admin-panel"><header><h2>{baslik}</h2><span>{alt}</span></header>{children}</section>; }
 function Bos({ yazi }) { return <div className="admin-bos">{yazi}</div>; }
-function BolumBaslik({ baslik, aciklama, buton, onClick, ikincilButon, ikincilOnClick }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div><span className="admin-bolum-islemler">{ikincilButon && <button className="ikincil" onClick={ikincilOnClick}>{ikincilButon}</button>}{buton && <button onClick={onClick}>{buton}</button>}</span></div>; }
+function BolumBaslik({ baslik, aciklama, buton, onClick, butonIkon, ikincilButon, ikincilOnClick, ikincilIkon }) { return <div className="admin-bolum-baslik"><div><h2>{baslik}</h2><p>{aciklama}</p></div><span className="admin-bolum-islemler">{ikincilButon && <button type="button" className="ikincil" onClick={ikincilOnClick}>{ikincilIkon && <AdminIcon name={ikincilIkon} />}{ikincilButon}</button>}{buton && <button type="button" onClick={onClick}>{butonIkon && <AdminIcon name={butonIkon} />}{buton}</button>}</span></div>; }
+
+function KampanyaTaslakAnalizi({ analiz }) {
+  const kaynakMetni = analiz.strateji === "oneri_performansi"
+    ? `${analiz.kategori}, son ${analiz.gun} günde önerilerden ${para(analiz.oneriCirosu)} ciro ve ${analiz.oneriAdedi} ürün üretti.`
+    : analiz.strateji === "tamamlayici_satis"
+      ? `Henüz yeterli öneri dönüşümü yok; ${analiz.kategori} tamamlayıcı ürün satışlarına göre seçildi.`
+      : `Henüz satış verisi sınırlı; ${analiz.kategori} aktif katalog yapısına göre seçildi.`;
+  const saatMetni = analiz.saatVerisiyleBelirlendi
+    ? `${String(analiz.baslangicSaat).padStart(2, "0")}:00–${String(analiz.bitisSaat).padStart(2, "0")}:00 satış hareketine göre görece sakin aralık.`
+    : "Saat önerisi için yeterli dağılım oluşmadığından 14:00–17:00 başlangıç aralığı kullanıldı.";
+  const seviye = analiz.veriSeviyesi === "guclu" ? "GÜÇLÜ SİNYAL" : analiz.veriSeviyesi === "erken" ? "ERKEN SİNYAL" : "BAŞLANGIÇ";
+  return <section className="kampanya-taslak-analizi"><span><AdminIcon name="target" /></span><div><small>VERİ ÖNERİSİ · {seviye}</small><b>{kaynakMetni}</b><p>{saatMetni}</p></div></section>;
+}
 function SatisCizgiGrafigi({ veriler }) {
   const [secili, setSecili] = useState(null);
   const gunler = sonOtuzGunuDoldur(veriler);
@@ -1351,13 +1387,16 @@ function SatisCizgiGrafigi({ veriler }) {
 }
 
 function sonOtuzGunuDoldur(veriler) {
-  const kayitlar = new Map(veriler.map((g) => [String(g.gun).slice(0, 10), { ciro: Number(g.ciro || 0), adet: Number(g.adet || 0), siparis: Number(g.siparis || 0) }]));
+  const kayitlar = new Map(veriler.map((g) => [String(g.gun).slice(0, 10), {
+    ciro: Number(g.ciro || 0), adet: Number(g.adet || 0), siparis: Number(g.siparis || 0),
+    oneriCirosu: Number(g.oneriCirosu || 0), oneriAdedi: Number(g.oneriAdedi || 0),
+  }]));
   return Array.from({ length: 30 }, (_, i) => {
     const tarih = new Date();
     tarih.setHours(12, 0, 0, 0);
     tarih.setDate(tarih.getDate() - (29 - i));
     const gun = tarih.toISOString().slice(0, 10);
-    return { gun, ...(kayitlar.get(gun) || { ciro: 0, adet: 0, siparis: 0 }) };
+    return { gun, ...(kayitlar.get(gun) || { ciro: 0, adet: 0, siparis: 0, oneriCirosu: 0, oneriAdedi: 0 }) };
   });
 }
 

@@ -120,6 +120,123 @@
 .cart-sil:hover { color: var(--error); }
 .cart-sil svg { width: 20px; height: 20px; }
 
+.cart-oneriler {
+  margin-top: 24px;
+}
+.cart-oneriler > header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.cart-oneriler > header span {
+  display: block;
+  color: var(--primary-container);
+  font-size: 10px;
+  font-weight: 800;
+}
+.cart-oneriler > header h2 {
+  margin-top: 3px;
+  color: var(--on-surface);
+  font-family: var(--font-baslik);
+  font-size: 19px;
+  letter-spacing: 0;
+}
+.cart-oneriler > header small {
+  color: var(--outline);
+  font-size: 11px;
+  text-align: right;
+}
+.cart-oneri-listesi {
+  display: grid;
+  grid-auto-columns: minmax(230px, 78%);
+  grid-auto-flow: column;
+  gap: 10px;
+  padding: 2px 1px 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.cart-oneri-listesi::-webkit-scrollbar { display: none; }
+.cart-oneri {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  min-height: 94px;
+  padding: 9px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  box-shadow: var(--glass-shadow);
+  scroll-snap-align: start;
+}
+.cart-oneri-urun {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-align: left;
+}
+.cart-oneri-urun img,
+.cart-oneri-gorselsiz {
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+}
+.cart-oneri-urun img { object-fit: cover; }
+.cart-oneri-gorselsiz {
+  display: grid;
+  place-items: center;
+  background: var(--bg-card);
+  color: var(--primary-container);
+  font-family: var(--font-baslik);
+  font-weight: 800;
+}
+.cart-oneri-bilgi { min-width: 0; }
+.cart-oneri-bilgi b,
+.cart-oneri-bilgi small,
+.cart-oneri-bilgi strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cart-oneri-bilgi b {
+  color: var(--on-surface);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.cart-oneri-bilgi small {
+  min-height: 30px;
+  margin-top: 3px;
+  color: var(--on-surface-variant);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.cart-oneri-bilgi strong {
+  margin-top: 4px;
+  color: var(--primary-container);
+  font-size: 13px;
+}
+.cart-oneri-ekle {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+  color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.cart-oneri-ekle:active { transform: scale(0.94); }
+.cart-oneri-ekle svg { width: 19px; height: 19px; }
+
 /* Adet artır/azalt */
 .adet-kontrol {
   display: flex;
@@ -267,3 +384,15 @@
   transition: box-shadow 0.2s;
 }
 .sepet-bos-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
+
+@media (min-width: 700px) {
+  .cart-oneri-listesi { grid-auto-columns: minmax(260px, 34%); }
+}
+
+@media (max-width: 380px) {
+  .cart-oneriler > header small { display: none; }
+  .cart-oneri-listesi { grid-auto-columns: 92%; }
+  .cart-oneri-urun { grid-template-columns: 62px minmax(0, 1fr); }
+  .cart-oneri-urun img,
+  .cart-oneri-gorselsiz { width: 62px; height: 62px; }
+}

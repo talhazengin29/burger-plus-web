@@ -1,14 +1,30 @@
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag, IconTakeaway, IconTableService } from "../components/Icons";
-import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
+import { gramajMetni, haricMalzemeleriGetir, varsayilanSecimliUrunHazirla } from "../lib/urunSecimleri";
 import { useDil } from "../dil/DilContext";
 import "./Cart.css";
 
 export default function Cart() {
   const { t, yerelAlan } = useDil();
   const git = useIsletmeNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa } = useApp();
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, sepeteEkle, urunler } = useApp();
+
+  const oneriAciklamasi = (urun) => {
+    if (urun.oneriNedeni === "birlikte_aliniyor" && urun.oneriGuveni != null) {
+      return t("cart.frequentPair", { rate: urun.oneriGuveni });
+    }
+    if (urun.oneriNedeni === "isletme_secimi") return t("cart.restaurantPick");
+    return t("cart.popularPick");
+  };
+
+  const oneriyiEkle = (urun) => {
+    if (urun.ekstraMalzemeAyari?.aktif) {
+      git(`/urun/${urun.id}?kaynak=sepet_onerisi`);
+      return;
+    }
+    sepeteEkle({ ...varsayilanSecimliUrunHazirla(urun, urunler), satisKaynagi: "sepet_onerisi" });
+  };
 
   return (
     <div className="ekran cart">
@@ -62,6 +78,30 @@ export default function Cart() {
                 </article>
               ))}
             </div>
+
+            {oneriler.length > 0 && <section className="cart-oneriler">
+              <header>
+                <div><span>{t("cart.recommendationEyebrow")}</span><h2>{t("cart.completeOrder")}</h2></div>
+                <small>{t("cart.recommendationHint")}</small>
+              </header>
+              <div className="cart-oneri-listesi">
+                {oneriler.map((urun) => <article className="cart-oneri" key={urun.id}>
+                  <button type="button" className="cart-oneri-urun" onClick={() => git(`/urun/${urun.id}?kaynak=sepet_onerisi`)}>
+                    {urun.gorsel
+                      ? <img src={urun.gorsel} alt="" />
+                      : <span className="cart-oneri-gorselsiz">BP</span>}
+                    <span className="cart-oneri-bilgi">
+                      <b>{yerelAlan(urun, "ad", urun.ad)}</b>
+                      <small>{oneriAciklamasi(urun)}</small>
+                      <strong>₺{Number(urun.fiyat || 0).toFixed(2)}</strong>
+                    </span>
+                  </button>
+                  <button type="button" className="cart-oneri-ekle" onClick={() => oneriyiEkle(urun)} aria-label={t("cart.addRecommendation", { name: yerelAlan(urun, "ad", urun.ad) })}>
+                    <IconPlus />
+                  </button>
+                </article>)}
+              </div>
+            </section>}
           </div>
 
           {/* Alt sabit özet + sipariş tipi seçimi */}
