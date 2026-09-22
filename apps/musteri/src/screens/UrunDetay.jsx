@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Navigate, useSearchParams } from "react-router-dom";
+import { useParams, Navigate, useLocation, useSearchParams } from "react-router-dom";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
@@ -22,9 +22,10 @@ export default function UrunDetay() {
   const { t, yerelAlan } = useDil();
   const { id } = useParams();
   const [aramaParametreleri] = useSearchParams();
+  const konum = useLocation();
   const git = useIsletmeNavigate();
   const { isletmeSlug } = useIsletme();
-  const { sepeteEkle, indirimliFiyat, urunler } = useApp();
+  const { sepeteEkle, indirimliFiyat, urunler, oneriOlayiGonder } = useApp();
   const [adet, setAdet] = useState(1);
   const [haricMalzemeler, setHaricMalzemeler] = useState([]);
   const [gramajAdimi, setGramajAdimi] = useState(0);
@@ -34,6 +35,8 @@ export default function UrunDetay() {
   const [ekstraMalzemeIdleri, setEkstraMalzemeIdleri] = useState([]);
   const [eklenenOneriIdleri, setEklenenOneriIdleri] = useState([]);
   const sepetOnerisindenGeldi = aramaParametreleri.get("kaynak") === "sepet_onerisi";
+  const oneriReferansi = sepetOnerisindenGeldi && typeof konum.state?.oneriReferansi === "string"
+    ? konum.state.oneriReferansi : null;
 
   const urun = urunler.find((u) => String(u.id) === id);
   if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
@@ -102,7 +105,7 @@ export default function UrunDetay() {
     });
   };
 
-  const sepeteEkleyeBas = () => {
+  const sepeteEkleyeBas = async () => {
     if (stoktaYok || ekstraSecimiEksik) return;
     const dahilMalzemeler = malzemeListesi.filter((m) => !haricMalzemeler.includes(m));
     const secimler = {
@@ -131,8 +134,15 @@ export default function UrunDetay() {
       ekstraMalzemeIdleri,
       ekstraMalzemeler: seciliEkstraMalzemeler.map((secenek) => ({ id: String(secenek.id), ad: secenek.ad, fiyat: Number(secenek.fiyat || 0) })),
     };
+    let dogrulanmisReferans = null;
+    if (oneriReferansi) {
+      try {
+        await oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "sepete_eklendi", adet });
+        dogrulanmisReferans = oneriReferansi;
+      } catch { /* Ölçüm hatası siparişi engellemez. */ }
+    }
     for (let i = 0; i < adet; i++) {
-      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi, ...(sepetOnerisindenGeldi ? { satisKaynagi: "sepet_onerisi" } : {}) });
+      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi, ...(dogrulanmisReferans ? { oneriReferansi: dogrulanmisReferans } : {}) });
     }
     git(-1);
   };

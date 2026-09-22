@@ -207,7 +207,7 @@ export default function Payment() {
           urunler: sepet.map((u) => ({
             id: u.id,
             adet: u.adet,
-            oneriAdedi: u.oneriAdedi || 0,
+            oneriReferanslari: u.oneriReferanslari || [],
             secimler: u.secimler || {},
             haricMalzemeler: u.haricMalzemeler || [],
           })),
@@ -243,7 +243,7 @@ export default function Payment() {
         urunler: odenenUrunler.map((u) => ({
           id: u.id,
           adet: u.adet,
-          oneriAdedi: u.oneriAdedi || 0,
+          oneriReferanslari: u.oneriReferanslari || [],
           secimler: u.secimler || {},
           haricMalzemeler: u.haricMalzemeler || [],
         })),

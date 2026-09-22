@@ -169,6 +169,8 @@ export default function Admin({ onCikis, temaKontrolu }) {
     gunluk: [], urunler: [], kategoriler: [], saatlik: [], haftalik: [],
     ozet: { ciro: 0, adet: 0, siparis: 0, oneriCirosu: 0, oneriAdedi: 0, oneriSiparisi: 0 },
     oncekiOzet: { ciro: 0, adet: 0, siparis: 0, oneriCirosu: 0, oneriAdedi: 0, oneriSiparisi: 0 },
+    oneriHunisi: { goruntulenme: 0, tiklama: 0, sepeteEkleme: 0, satinAlma: 0, toplamDonusumOrani: 0 },
+    oncekiOneriHunisi: { toplamDonusumOrani: 0 }, oneriUrunleri: [],
   });
   const [canliSatislar, setCanliSatislar] = useState([]);
   const [gecmisSatislar, setGecmisSatislar] = useState([]);
@@ -608,6 +610,11 @@ export default function Admin({ onCikis, temaKontrolu }) {
   const oneriCirosu = Number(rapor.ozet?.oneriCirosu || 0);
   const oneriCiroPayi = toplamCiro > 0 ? (oneriCirosu / toplamCiro) * 100 : 0;
   const oneriTrend = useMemo(() => yuzdeDegisim(oneriCirosu, Number(rapor.oncekiOzet?.oneriCirosu || 0)), [oneriCirosu, rapor]);
+  const oneriHunisi = rapor.oneriHunisi || {};
+  const oneriDonusumTrendi = useMemo(
+    () => yuzdeDegisim(Number(oneriHunisi.toplamDonusumOrani || 0), Number(rapor.oncekiOneriHunisi?.toplamDonusumOrani || 0)),
+    [oneriHunisi, rapor.oncekiOneriHunisi]
+  );
   const gunlukDoldurulmus = useMemo(() => sonOtuzGunuDoldur(rapor.gunluk), [rapor]);
   const ciroSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.ciro), [gunlukDoldurulmus]);
   const urunSpark = useMemo(() => gunlukDoldurulmus.map((g) => g.adet), [gunlukDoldurulmus]);
@@ -1061,6 +1068,31 @@ export default function Admin({ onCikis, temaKontrolu }) {
                 <Metrik ad="Satılan ürün" deger={toplamUrun} alt={`${rapor.urunler.length} farklı ürün`} renk="yesil" trend={urunTrend} spark={urunSpark} />
                 <Metrik ad="Yoğun saat" deger={yogunSaat.saat == null ? "—" : `${String(yogunSaat.saat).padStart(2, "0")}:00`} alt={`${yogunSaat.adet} ürün satıldı`} renk="mor" />
                 <Metrik ad="Öneriden gelen ciro" deger={para(oneriCirosu)} alt={`${rapor.ozet?.oneriAdedi || 0} ürün · toplam cironun %${oneriCiroPayi.toFixed(1)}`} renk="mavi" trend={oneriTrend} spark={oneriSpark} />
+              </section>
+              <section className="oneri-analiz-grid">
+                <Panel baslik="Öneri dönüşüm akışı" alt={`${oneriHunisi.goruntulenmeOturumu || 0} öneri oturumu`}>
+                  <div className="oneri-hunisi">
+                    {[
+                      ["Görüntülendi", oneriHunisi.goruntulenme, null],
+                      ["Tıklandı", oneriHunisi.tiklama, oneriHunisi.tiklamaOrani],
+                      ["Sepete eklendi", oneriHunisi.sepeteEkleme, oneriHunisi.sepeteEklemeOrani],
+                      ["Satın alındı", oneriHunisi.satinAlma, oneriHunisi.satinAlmaOrani],
+                    ].map(([etiket, deger, oran], sira) => <div key={etiket} className="oneri-huni-adimi">
+                      <span>{String(sira + 1).padStart(2, "0")}</span>
+                      <small>{etiket}</small>
+                      <strong>{Number(deger || 0).toLocaleString("tr-TR")}</strong>
+                      {oran != null && <b>%{Number(oran || 0).toFixed(1)}</b>}
+                    </div>)}
+                  </div>
+                  <footer className="oneri-huni-ozeti">
+                    <span>Gösterimden satın almaya toplam dönüşüm</span>
+                    <strong>%{Number(oneriHunisi.toplamDonusumOrani || 0).toFixed(2)}</strong>
+                    {oneriDonusumTrendi != null && <i className={oneriDonusumTrendi >= 0 ? "arti" : "eksi"}>{oneriDonusumTrendi >= 0 ? "↑" : "↓"} %{Math.abs(oneriDonusumTrendi).toFixed(1)}</i>}
+                  </footer>
+                </Panel>
+                <Panel baslik="Önerilen ürün performansı" alt="İlk 20 ürün">
+                  {(rapor.oneriUrunleri || []).length ? <div className="admin-tablo-sarici"><table className="admin-tablo oneri-performans-tablosu"><thead><tr><th>Ürün</th><th>Gösterim</th><th>Sepet</th><th>Satış</th><th>Dönüşüm</th></tr></thead><tbody>{rapor.oneriUrunleri.map((urun) => <tr key={urun.urunId}><td><b>{urun.urunAd}</b></td><td>{urun.goruntulenme}</td><td>{urun.sepeteEkleme}</td><td><strong>{urun.satinAlma}</strong></td><td>%{Number(urun.toplamDonusumOrani || 0).toFixed(1)}</td></tr>)}</tbody></table></div> : <Bos yazi="Bu dönem için henüz öneri etkileşimi bulunmuyor." />}
+                </Panel>
               </section>
               <Panel baslik="Ciro ve sipariş trendi" alt="Son 30 gün"><SatisCizgiGrafigi veriler={rapor.gunluk} /></Panel>
               <section className="admin-grid-2">

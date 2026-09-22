@@ -226,6 +226,7 @@ export function AppProvider({ children }) {
   // Gel Al (masasız) için YEREL sepet.
   const [sepet, setSepet] = useState([]);
   const [oneriler, setOneriler] = useState([]);
+  const [oneriReferansi, setOneriReferansi] = useState(null);
 
   // Aktif masa: QR ile karşılama ekranından gelince set edilir.
   // null ise Gel Al; dolu ise masaya servis. Sipariş tipini bu belirler.
@@ -437,7 +438,7 @@ export function AppProvider({ children }) {
   // Backend'e gönderim ödeme anında olur (aşağıda odemeyiTamamla).
   const sepeteEkle = (urun) => {
     if (urun?.stokta === false) return false;
-    const oneridenEklendi = urun?.satisKaynagi === "sepet_onerisi";
+    const gelenOneriReferansi = typeof urun?.oneriReferansi === "string" ? urun.oneriReferansi : null;
     // Aktif kampanya varsa ürün sepete indirimli fiyatla girer — ödeme akışı
     // (sepetToplam, odemeyiTamamla) hiç değişmeden bu fiyatı kullanır.
     const indirim = indirimliFiyat(urun);
@@ -451,11 +452,13 @@ export function AppProvider({ children }) {
       if (mevcut) {
         return onceki.map((s) =>
           s.sepetAnahtari === sepetAnahtari
-            ? { ...s, adet: s.adet + 1, oneriAdedi: Math.min(s.adet + 1, Number(s.oneriAdedi || 0) + (oneridenEklendi ? 1 : 0)) }
+            ? { ...s, adet: s.adet + 1, oneriReferanslari: gelenOneriReferansi
+              ? [...new Set([...(s.oneriReferanslari || []), gelenOneriReferansi])]
+              : (s.oneriReferanslari || []) }
             : s
         );
       }
-      return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1, oneriAdedi: oneridenEklendi ? 1 : 0 }];
+      return [...onceki, { ...eklenecek, sepetAnahtari, adet: 1, oneriReferanslari: gelenOneriReferansi ? [gelenOneriReferansi] : [] }];
     });
     return true;
   };
@@ -475,7 +478,7 @@ export function AppProvider({ children }) {
     setSepet((o) =>
       o
         .map((s) => (s.sepetAnahtari === anahtar
-          ? { ...s, adet: s.adet - 1, oneriAdedi: Math.min(Number(s.oneriAdedi || 0), Math.max(0, s.adet - 1)) }
+          ? { ...s, adet: s.adet - 1 }
           : s))
         .filter((s) => s.adet > 0)
     );
@@ -488,22 +491,40 @@ export function AppProvider({ children }) {
   const sepetToplam = sepet.reduce((t, s) => t + s.fiyat * s.adet, 0);
   const sepetAdet = sepet.reduce((t, s) => t + s.adet, 0);
 
+  const oneriOlayiGonder = useCallback(async ({ referans = oneriReferansi, urunId, olay, adet = 1 }) => {
+    if (!referans) return false;
+    const yanit = await istekAt("/api/oneriler/olay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ referans, urunId, olay, adet, olayAnahtari: crypto.randomUUID() }),
+    });
+    if (!yanit.ok) {
+      const veri = await yanit.json().catch(() => ({}));
+      throw new Error(veri.hata || "Öneri olayı kaydedilemedi.");
+    }
+    return true;
+  }, [oneriReferansi]);
+
   // Sepet değiştikten kısa süre sonra çapraz satış önerilerini katalogdan al.
   // Debounce, adet artırma/azaltmada gereksiz ağ isteğini önler.
   useEffect(() => {
     const urunIdleri = [...new Set(sepet.map((urun) => Number(urun.id)).filter((id) => Number.isInteger(id) && id > 0))];
     if (!urunIdleri.length) {
       setOneriler([]);
+      setOneriReferansi(null);
       return undefined;
     }
     let iptalEdildi = false;
     const zamanlayici = setTimeout(() => {
       istekAt(`/api/oneriler?urunler=${encodeURIComponent(urunIdleri.join(","))}`)
         .then((yanit) => yanit.ok ? yanit.json() : Promise.reject())
-        .then(({ urunler: uzakUrunler }) => {
-          if (!iptalEdildi && Array.isArray(uzakUrunler)) setOneriler(kataloguBirlestir(uzakUrunler, isletmeSlug));
+        .then(({ urunler: uzakUrunler, oneriReferansi: yeniReferans }) => {
+          if (!iptalEdildi && Array.isArray(uzakUrunler)) {
+            setOneriler(kataloguBirlestir(uzakUrunler, isletmeSlug));
+            setOneriReferansi(typeof yeniReferans === "string" ? yeniReferans : null);
+          }
         })
-        .catch(() => { if (!iptalEdildi) setOneriler([]); });
+        .catch(() => { if (!iptalEdildi) { setOneriler([]); setOneriReferansi(null); } });
     }, 300);
     return () => {
       iptalEdildi = true;
@@ -678,6 +699,8 @@ export function AppProvider({ children }) {
     sepetToplam,
     sepetAdet,
     oneriler,
+    oneriReferansi,
+    oneriOlayiGonder,
     // ödeme
     sonOdeme,
     odemeyiTamamla,

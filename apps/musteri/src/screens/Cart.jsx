@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { useApp } from "../context/AppContext";
 import { IconBack, IconPlus, IconMinus, IconTrash, IconBag, IconTakeaway, IconTableService } from "../components/Icons";
@@ -8,22 +9,41 @@ import "./Cart.css";
 export default function Cart() {
   const { t, yerelAlan } = useDil();
   const git = useIsletmeNavigate();
-  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, sepeteEkle, urunler } = useApp();
+  const { sepet, adetArtir, adetAzalt, sepettenCikar, sepetToplam, aktifMasa, oneriler, oneriReferansi, oneriOlayiGonder, sepeteEkle, urunler } = useApp();
+
+  useEffect(() => {
+    if (!oneriReferansi) return;
+    oneriler.forEach((urun) => {
+      oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "goruntulendi" }).catch(() => {});
+    });
+  }, [oneriReferansi, oneriler, oneriOlayiGonder]);
 
   const oneriAciklamasi = (urun) => {
     if (urun.oneriNedeni === "birlikte_aliniyor" && urun.oneriGuveni != null) {
       return t("cart.frequentPair", { rate: urun.oneriGuveni });
     }
     if (urun.oneriNedeni === "isletme_secimi") return t("cart.restaurantPick");
+    if (urun.oneriNedeni === "iyi_donusum") return t("cart.highConversionPick");
     return t("cart.popularPick");
   };
 
-  const oneriyiEkle = (urun) => {
+  const oneriyiAc = (urun) => {
+    oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "tiklandi" }).catch(() => {});
+    git(`/urun/${urun.id}?kaynak=sepet_onerisi`, { state: { oneriReferansi } });
+  };
+
+  const oneriyiEkle = async (urun) => {
     if (urun.ekstraMalzemeAyari?.aktif) {
-      git(`/urun/${urun.id}?kaynak=sepet_onerisi`);
+      oneriyiAc(urun);
       return;
     }
-    sepeteEkle({ ...varsayilanSecimliUrunHazirla(urun, urunler), satisKaynagi: "sepet_onerisi" });
+    oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "tiklandi" }).catch(() => {});
+    let dogrulanmisReferans = null;
+    try {
+      await oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "sepete_eklendi" });
+      dogrulanmisReferans = oneriReferansi;
+    } catch { /* Öneri ölçümü kullanıcıyı sepete eklemekten alıkoymaz. */ }
+    sepeteEkle({ ...varsayilanSecimliUrunHazirla(urun, urunler), ...(dogrulanmisReferans ? { oneriReferansi: dogrulanmisReferans } : {}) });
   };
 
   return (
@@ -86,7 +106,7 @@ export default function Cart() {
               </header>
               <div className="cart-oneri-listesi">
                 {oneriler.map((urun) => <article className="cart-oneri" key={urun.id}>
-                  <button type="button" className="cart-oneri-urun" onClick={() => git(`/urun/${urun.id}?kaynak=sepet_onerisi`)}>
+                  <button type="button" className="cart-oneri-urun" onClick={() => oneriyiAc(urun)}>
                     {urun.gorsel
                       ? <img src={urun.gorsel} alt="" />
                       : <span className="cart-oneri-gorselsiz">BP</span>}
