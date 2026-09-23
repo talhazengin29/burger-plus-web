@@ -51,3 +51,108 @@
 @media(max-width:1000px){.admin-sidebar{width:82px}.admin-main{margin-left:82px}.admin-nav-arama{display:none}.admin-sidebar nav button b svg{width:20px;height:20px}.admin-sidebar nav button{font-size:0}.admin-menu-grup-baslik strong,.admin-nav-ana span{font-size:0}.admin-menu-grup-baslik>span{display:none}}
 @media(max-width:680px){.admin-sidebar{width:auto}.admin-main{margin-left:0}.admin-ust{min-height:72px;padding:11px 14px}.admin-ust h1{font-size:19px}.admin-ust-sag>button{width:38px;padding:0;justify-content:center;font-size:0}.admin-ust-sag>button svg{width:18px;height:18px}.admin-avatar{width:38px;height:38px}.admin-mobil-durumlar{top:72px;padding:7px 12px}.admin-icerik{padding:18px 12px 96px}.admin-sidebar nav button b svg{width:19px;height:19px}.admin-nav-ana span,.admin-menu-grup-baslik strong{font-size:8px!important}.admin-menu-grup-baslik>span{display:flex}.admin-menu-alt>button{font-size:11px!important}.admin-metrikler{grid-template-columns:1fr}.admin-metrik{min-height:104px}.admin-grid-2,.admin-grid-3{gap:12px}.admin-panel{padding:16px}.admin-panel>header{align-items:flex-start;gap:8px}.admin-bolum-baslik{flex-direction:column;gap:12px}.admin-bolum-islemler{width:100%;display:grid;grid-template-columns:1fr}.admin-bolum-islemler button{width:100%}.admin-modal-perde{padding:0}.admin-modal{width:100%;height:100%;max-height:none;border:0;border-radius:0}.admin-modal>header{padding:16px}.admin-form,.urun-duzenleme-form{padding:16px 16px 0}.urun-duzenleme-form>.form-alt{margin-inline:-16px}.admin-ikili{grid-template-columns:1fr}.admin-tablo-sarici{overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}.admin-tablo--kart{width:100%;min-width:0!important;border-collapse:separate}.admin-tablo--kart thead{display:none}.admin-tablo--kart,.admin-tablo--kart tbody{display:block}.admin-tablo--kart tbody{display:grid;gap:12px}.admin-tablo--kart tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--panel-2);box-shadow:var(--admin-shadow-1)}.admin-tablo--kart td,.admin-tablo--kart td:first-child{position:static!important;display:flex;min-width:0;min-height:58px;flex-direction:column;justify-content:center;gap:3px;padding:11px 12px!important;border-bottom:1px solid var(--border);background:transparent!important;box-shadow:none!important;overflow-wrap:anywhere}.admin-tablo--kart td:nth-last-child(-n+2){border-bottom:0}.admin-tablo--kart td:nth-child(odd){border-right:1px solid var(--border)}.admin-tablo--kart td.admin-kart-genis{grid-column:1/-1;border-right:0}.admin-tablo--kart td.admin-kart-genis+td{border-right:1px solid var(--border)}.admin-tablo--kart td::before{content:attr(data-label);margin-bottom:2px;color:var(--metin-soluk);font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.admin-tablo--kart .mutfak-sure-akisi{grid-template-columns:1fr;gap:8px;min-width:0}.admin-tablo--kart .mutfak-sure-akisi>div:not(:last-child)::after{top:25px;right:auto;bottom:-8px;left:12px;width:1px;height:auto}.admin-tablo--kart .mutfak-sure-akisi span,.admin-tablo--kart tr:nth-child(even) .mutfak-sure-akisi span{background:transparent}.urun-form-gezinme{margin-inline:-2px;overflow-x:auto;grid-template-columns:repeat(5,minmax(74px,1fr));scrollbar-width:none}.urun-form-gezinme::-webkit-scrollbar{display:none}.kampanya-ikon-editoru>div{grid-template-columns:repeat(3,1fr)}.tema-yonetimi{gap:14px}.tema-baslik,.kroki-ust{padding:18px}.deger-metrikler{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.admin-shell *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/*
+ * Okunabilirlik katmani
+ *
+ * Yonetim ekranlari genis masaustu gorunumunde 7-9px'e kadar inen eski
+ * sunum olceklerini kullaniyordu. Ana panelde metin icin 11px'i gercek bir
+ * alt sinir olarak kabul ediyoruz. Musteri telefonu onizlemesi bilerek
+ * olceklendirildigi icin bu kuralin disinda tutulur.
+ */
+.admin-shell{font-size:15px}
+.admin-icerik :where(p):not(:where(.tema-telefon *,.pulse-merkezi *)){font-size:12px;line-height:1.55}
+.admin-icerik :where(small,dt,dd,time,figcaption):not(:where(.tema-telefon *,.pulse-merkezi *)){font-size:11px;line-height:1.5}
+/* Duz metin tasiyan elemanlar icin ekranlar arasi ortak alt olcek. */
+:is(.admin-icerik,.finans-modal,.recete-modal) :where(span,label,em):not(:where(.tema-telefon *,.pulse-merkezi *,.kroki-tuval *,.gorunum-ornek *)){font-size:11px}
+:is(.admin-icerik,.finans-modal,.recete-modal) :where(b,button):not(:where(.tema-telefon *,.pulse-merkezi *,.kroki-tuval *,.gorunum-ornek *)){font-size:12px}
+:is(.admin-icerik,.finans-modal,.recete-modal) :where(input,select,textarea):not(:where(.tema-telefon *,.pulse-merkezi *)){font-size:13px}
+.admin-nav-arama input{font-size:13px}
+.admin-sidebar nav button,.admin-nav-ana span,.admin-menu-grup-baslik strong{font-size:14px}
+.admin-menu-grup-baslik small{font-size:11px}
+.admin-menu-alt>button{font-size:13px!important}
+.admin-sidebar-alt{font-size:12px}
+.admin-kicker{font-size:11px}
+.admin-hizli-durum{font-size:12px}
+.admin-hizli-durum b{font-size:13px}
+.admin-panel>header h2{font-size:18px}
+.admin-panel>header span,.admin-metrik span,.admin-metrik small{font-size:12px}
+.admin-bolum-baslik p{font-size:13px}
+.admin-bolum-islemler button{font-size:13px}
+.admin-tablo th{font-size:12px}
+.admin-tablo td,.admin-tablo td b{font-size:13px}
+.admin-tablo td small{font-size:11px}
+.admin-alan>span{font-size:12px}
+.admin-alan>small{font-size:11px}
+.form-alt button{font-size:13px}
+
+/* Operasyon merkezi: ekrandaki butun bilgi katmanlarini ayni olcege getir. */
+.pulse-merkezi{gap:18px}
+.pulse-ust-baslik>span{font-size:11px}
+.pulse-ust p{font-size:13px}
+.pulse-ust-durum>time{font-size:11px}
+.pulse-yogunluk-etiketi small{font-size:11px}
+.pulse-yogunluk-etiketi b{font-size:14px}
+.pulse-uyari,.pulse-hata{font-size:12px}
+.pulse-hata>div b{font-size:15px}
+.pulse-hata>button{font-size:12px}
+.pulse-metrikler{gap:12px}
+.pulse-metrikler article{min-height:132px;padding:18px}
+.pulse-metrikler article>i{right:16px;top:16px;width:36px;height:36px}
+.pulse-metrikler article>span{font-size:12px}
+.pulse-metrikler article>strong{margin-top:28px;font-size:24px}
+.pulse-ongoru{grid-template-columns:minmax(320px,1.35fr) minmax(470px,1fr) 200px}
+.pulse-ongoru-anlatim{padding:19px 21px}
+.pulse-ongoru-anlatim span{font-size:10px}
+.pulse-ongoru-anlatim h3{font-size:16px}
+.pulse-ongoru-anlatim p{font-size:11px}
+.pulse-ongoru-metrikler dt{font-size:10px}
+.pulse-ongoru-metrikler dd{font-size:13px}
+.pulse-ongoru-guven>b,.pulse-ongoru-guven small,.pulse-ongoru-guven em{font-size:10px}
+.pulse-ongoru-guven strong{font-size:11px}
+.pulse-yonetici-ozeti{padding:18px 19px}
+.pulse-yonetici-ozeti>div>span,.pulse-canli-akis header span{font-size:10px}
+.pulse-yonetici-ozeti h3,.pulse-canli-akis h3{font-size:15px}
+.pulse-yonetici-ozeti p{font-size:11px}
+.pulse-yonetici-ozeti>button{font-size:11px}
+.pulse-canli-akis>header small{font-size:11px}
+.pulse-canli-akis article b{font-size:11px}
+.pulse-canli-akis article small,.pulse-canli-akis article time,.pulse-akis-bos{font-size:10px}
+.pulse-panel-baslik{min-height:76px;padding:16px 18px}
+.pulse-panel-baslik>div>span{font-size:10px}
+.pulse-panel-baslik h3{font-size:17px}
+.pulse-panel-baslik>small,.pulse-panel-baslik>button{font-size:11px}
+.pulse-masa header b{font-size:13px}
+.pulse-masa header small,.pulse-masa footer{font-size:10px}
+.pulse-masa>strong{font-size:20px}
+.pulse-aksiyonlar>button{padding:13px}
+.pulse-aksiyonlar>button b{font-size:12px}
+.pulse-aksiyonlar>button small{font-size:10px}
+.pulse-bos b{font-size:14px}
+.pulse-bos span{font-size:11px}
+.pulse-yogunluk-cubugu>div{font-size:11px}
+.pulse-mutfak-adimlari b{font-size:17px}
+.pulse-mutfak-adimlari small,.pulse-mutfak-detay dt{font-size:10px}
+.pulse-mutfak-detay dd{font-size:13px}
+.pulse-nakit-sayilar b{font-size:19px}
+.pulse-nakit-sayilar small{font-size:10px}
+.pulse-nakit-alt{font-size:11px}
+.pulse-nakit-alt strong{font-size:14px}
+.pulse-stok-listesi b,.pulse-stok-listesi strong{font-size:12px}
+.pulse-stok-listesi small{font-size:10px}
+.pulse-siparis-listesi>article>span b{font-size:12px}
+.pulse-siparis-listesi>article>span small,.pulse-siparis-listesi>article>small,.pulse-siparis-listesi time{font-size:10px}
+.pulse-siparis-listesi em{font-size:11px}
+.pulse-siparis-listesi>strong{font-size:13px}
+.pulse-siparis-durum{font-size:10px}
+
+@media(max-width:1250px){.pulse-ongoru{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){.pulse-ongoru{grid-template-columns:1fr}}
+@media(max-width:680px){
+  .admin-shell{font-size:14px}
+  .admin-nav-ana span,.admin-menu-grup-baslik strong{font-size:10px!important}
+  .admin-metrikler{grid-template-columns:1fr 1fr}
+  .pulse-metrikler article{min-height:112px;padding:14px}
+  .pulse-metrikler article>span{font-size:11px}
+  .pulse-metrikler article>strong{font-size:20px}
+}
