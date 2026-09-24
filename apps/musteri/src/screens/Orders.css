@@ -156,6 +156,10 @@
   width: 100%;
   margin-top: 10px;
   padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
   color: #fff;
@@ -164,6 +168,7 @@
   box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: box-shadow 0.2s;
 }
+.siparis-tekrar-btn svg { width: 18px; height: 18px; flex: 0 0 18px; stroke-width: 2; }
 .siparis-tekrar-btn:hover { box-shadow: 0 4px 16px var(--accent-glow), var(--glow); }
 .siparis-tekrar-btn:active { transform: scale(0.98); }
 

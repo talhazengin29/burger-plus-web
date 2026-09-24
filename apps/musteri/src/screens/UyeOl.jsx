@@ -1,5 +1,5 @@
 import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
-import { IconStar } from "../components/Icons";
+import { IconBag, IconGift, IconReceipt, IconStar } from "../components/Icons";
 import DilSecici from "../components/DilSecici";
 import { useDil } from "../dil/DilContext";
 import "./UyeOl.css";
@@ -25,10 +25,10 @@ export default function UyeOl({ baslik, aciklama, dilSecici = false }) {
         <p className="uyeol-alt">{aciklama || t("membership.intro")}</p>
 
         <ul className="uyeol-avantaj">
-          <li>🎁 {t("membership.benefitPoints")}</li>
-          <li>🍔 {t("membership.benefitRedeem")}</li>
-          <li>⭐ {t("membership.benefitRewards")}</li>
-          <li>📋 {t("membership.benefitHistory")}</li>
+          <li><IconGift aria-hidden="true" /> <span>{t("membership.benefitPoints")}</span></li>
+          <li><IconBag aria-hidden="true" /> <span>{t("membership.benefitRedeem")}</span></li>
+          <li><IconStar aria-hidden="true" /> <span>{t("membership.benefitRewards")}</span></li>
+          <li><IconReceipt aria-hidden="true" /> <span>{t("membership.benefitHistory")}</span></li>
         </ul>
 
         <button className="uyeol-btn" onClick={() => git("/")}>

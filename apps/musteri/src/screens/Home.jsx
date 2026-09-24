@@ -104,7 +104,6 @@ export default function Home() {
         >
           <div className="damga-ust">
             <div>
-              <span className="damga-rozet">{yerelAlan(damgaKarti, "kartEtiketi", damgaKarti.kartEtiketi)}</span>
               <h2 className="damga-baslik">{yerelAlan(damgaKarti, "baslik", damgaKarti.baslik)}</h2>
               <p className="damga-aciklama">{yerelAlan(damgaKarti, "aciklama", damgaKarti.aciklama)}</p>
             </div>

@@ -3,7 +3,7 @@ import { useIsletmeNavigate } from "../hooks/useIsletmeNavigate";
 import { motion, AnimatePresence } from "framer-motion";
 import { kampanyaDurumu } from "../lib/katalogKurallari";
 import { useApp } from "../context/AppContext";
-import { IconClock, IconInvite } from "../components/Icons";
+import { IconClock, IconInvite, IconLock } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { siraliKonteyner, siraliOge, fadeIn, asagiAcilma } from "../lib/animasyonlar";
@@ -117,7 +117,7 @@ export default function Campaigns() {
                     </div>
                     <p className="camp-aciklama">{yerelAlan(k, "aciklama", k.aciklama)}</p>
                     {siparisVerilebilir && misafir && (
-                      <span className="camp-uye-rozet">{t("campaigns.membersOnly")}</span>
+                      <span className="camp-uye-rozet"><IconLock aria-hidden="true" /> {t("campaigns.membersOnly")}</span>
                     )}
                     {davetKampanyasi && davetAcik ? (
                       <div className="davet-kodu-kutu">

@@ -116,6 +116,10 @@ export const IconArrowRight = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M5 12h13M13 6l6 6-6 6" /></svg>
 );
 
+export const IconRepeat = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M17 2l4 4-4 4" /><path d="M3 11V9a3 3 0 0 1 3-3h15" /><path d="m7 22-4-4 4-4" /><path d="M21 13v2a3 3 0 0 1-3 3H3" /></svg>
+);
+
 export const IconFlame = (p) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M12 3s5 4.2 5 9a5 5 0 0 1-10 0c0-1.6.6-2.9 1.4-4 .2 1.2.9 2 1.9 2 1.4 0 2-1.3 2-3 0-1.6-.3-3-.3-4z" /></svg>
 );
@@ -165,6 +169,10 @@ export const IconShield = (p) => (
     <path d="M12 3 19 6v5c0 4.8-2.9 8-7 10-4.1-2-7-5.2-7-10V6z" />
     <path d="m9 12 2 2 4-4" />
   </svg>
+);
+
+export const IconLock = (p) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
 );
 
 export const IconGoogle = (p) => (

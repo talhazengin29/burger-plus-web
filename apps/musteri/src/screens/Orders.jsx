@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../context/AppContext";
-import { IconBag, IconTakeaway, IconTableService } from "../components/Icons";
+import { IconBag, IconRepeat, IconTakeaway, IconTableService } from "../components/Icons";
 import OrtakHeader from "../components/OrtakHeader";
 import SayfaSarici from "../components/SayfaSarici";
 import { gramajMetni, haricMalzemeleriGetir } from "../lib/urunSecimleri";
@@ -92,7 +92,8 @@ function SiparisKart({ s, durum, gecmis, onTekrarSiparisVer, onDegerlendir, t, l
       </div>
       <p className="siparis-not siparis-not--odendi">{t("orders.paid")}</p>
       <button className="siparis-tekrar-btn" onClick={() => onTekrarSiparisVer(s)}>
-        {t("orders.reorder")}
+        <IconRepeat aria-hidden="true" />
+        <span>{t("orders.reorder")}</span>
       </button>
       {gecmis && !s.misafir && (s.degerlendirildi ? <div className="siparis-degerlendirildi"><span>{"★".repeat(s.degerlendirmePuani || 5)}</span> {t("orders.reviewed")}</div> : <button className="siparis-degerlendir-btn" onClick={() => onDegerlendir(s)}>{t("orders.review")}</button>)}
     </article>

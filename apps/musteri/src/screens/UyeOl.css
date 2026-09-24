@@ -53,12 +53,22 @@
   margin-bottom: 28px;
 }
 .uyeol-avantaj li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
   padding: 13px 0;
   border-bottom: 1px solid var(--hairline);
   font-size: 15px;
   font-weight: 500;
   text-align: left;
   color: var(--on-surface-variant);
+}
+.uyeol-avantaj li svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  color: var(--primary-container);
+  stroke-width: 1.9;
 }
 .uyeol-avantaj li:last-child { border-bottom: none; }
 
