@@ -101,7 +101,7 @@ export default function QrGenerator() {
             <div key={q.no} className="qr-kart">
               <div className="qr-kart-baslik">Masa {q.no}</div>
               <img className="qr-kart-img" src={q.dataUrl} alt={`Masa ${q.no} QR`} />
-              <div className="qr-kart-marka">{isletme?.ad || "Burger Plus"}</div>
+              <div className="qr-kart-marka">{isletme?.ad || "MasanPOS"}</div>
               <div className="qr-kart-alt">Okut · Sipariş Ver · Öde</div>
             </div>
           ))}

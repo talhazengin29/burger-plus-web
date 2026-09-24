@@ -1,5 +1,5 @@
 # ============================================================================
-# Burger Plus — İki aşamalı (multi-stage) Docker imajı
+# MasanPOS müşteri uygulaması — İki aşamalı (multi-stage) Docker imajı
 #
 # 1. AŞAMA (build): Node ile projeyi derler, dist/ klasörünü üretir.
 # 2. AŞAMA (serve): Sadece dist/ çıktısını hafif bir nginx sunucusuna kopyalar.

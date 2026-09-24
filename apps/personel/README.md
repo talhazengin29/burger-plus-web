@@ -1,4 +1,4 @@
-# Burger Plus — Personel Uygulaması
+# MasanPOS — Personel Uygulaması
 
 Mutfak + Salon rollerini içeren personel paneli.
 Vite + React + Socket.io. Port 5174.
@@ -26,7 +26,7 @@ npm install
 npm run dev        # http://localhost:5174
 ```
 
-Backend (burger-plus-backend) çalışıyor olmalı.
+Backend (`masanpos-backend`) çalışıyor olmalı.
 
 ## Şifreleri değiştirme
 

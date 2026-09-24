@@ -1,4 +1,4 @@
-# Burger Plus 🍔
+# MasanPOS
 
 Yerel restoran/kafeler için sadakat + QR ödeme uygulaması. React (Vite) ile geliştirildi.
 
@@ -70,19 +70,19 @@ taşınır) → puan kazanır. Aracı bir QR platformu kullanılmaz, QR'lar kend
 
 ## Backend bağlantısı (çok telefon + canlı sipariş)
 
-Uygulama artık gerçek zamanlı sipariş için **burger-plus-backend** sunucusuna
+Uygulama artık gerçek zamanlı sipariş için **masanpos-backend** sunucusuna
 bağlanıyor. İki projeyi birlikte çalıştır:
 
 **1. Backend'i başlat** (ayrı terminal):
 ```bash
-cd burger-plus-backend
+cd masanpos-backend
 npm install
 npm start        # http://localhost:4000
 ```
 
 **2. Frontend'i başlat:**
 ```bash
-cd burger-plus
+cd masanpos-web/apps/musteri
 npm run dev
 ```
 

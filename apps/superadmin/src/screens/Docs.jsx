@@ -138,7 +138,7 @@ export default function Docs() {
       </section>
 
       <section className="docs-bolum">
-        <header className="docs-bolum-baslik"><div><span>04 / KOD HARİTASI</span><h3>Backend modülleri</h3></div><small>Kaynak: burger-plus-backend güncel modül yapısı</small></header>
+        <header className="docs-bolum-baslik"><div><span>04 / KOD HARİTASI</span><h3>Backend modülleri</h3></div><small>Kaynak: masanpos-backend güncel modül yapısı</small></header>
         <div className="docs-katmanlar">
           {KATMANLAR.map((katman, index) => <article key={katman.ad}><span>{String(index + 1).padStart(2, "0")}</span><div><h4>{katman.ad}</h4><code>{katman.dosyalar}</code><p>{katman.aciklama}</p></div></article>)}
         </div>

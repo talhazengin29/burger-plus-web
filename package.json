@@ -1,9 +1,9 @@
 {
-  "name": "burger-plus-web",
+  "name": "masanpos-web",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Burger Plus — musteri, personel ve super admin uygulamalari tek catida (Vercel)",
+  "description": "MasanPOS — musteri, personel ve super admin uygulamalari tek catida",
   "scripts": {
     "install:all": "cd apps/landing && npm install && cd ../musteri && npm install && cd ../personel && npm install && cd ../superadmin && npm install",
     "build:landing": "cd apps/landing && npm install && npm run build",

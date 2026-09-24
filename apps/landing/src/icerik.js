@@ -132,7 +132,7 @@ export const WHATSAPP = {
 
 // --- Ücretsiz deneme ---------------------------------------------------------
 // Deneme, abonelik kaydı "deneme" durumuyla açılarak veriliyor
-// (bkz. burger-plus-backend/superAdminDb.js → abonelikOlustur).
+// (bkz. masanpos-backend/superAdminDb.js → abonelikOlustur).
 // Otomatik değil: talep geldikten sonra kurulum ekip tarafından yapılıyor.
 export const DENEME = {
   gunSayisi: 14,
@@ -246,7 +246,7 @@ export const NAV_BAGLANTILARI = [
 
 // --- Konsept şeridi ----------------------------------------------------------
 // Uydurma müşteri logoları yerine backend'in gerçekten desteklediği konseptler
-// gösteriliyor (bkz. burger-plus-backend/konseptler.js).
+// gösteriliyor (bkz. masanpos-backend/konseptler.js).
 export const KONSEPTLER = [
   { ad: "Burger", ikon: "burger" },
   { ad: "Cafe", ikon: "kahve" },

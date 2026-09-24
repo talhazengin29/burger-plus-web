@@ -1,6 +1,6 @@
 # Docker ile Çalıştırma ve Telefonda Açma
 
-Bu kılavuz Burger Plus'ı Docker ile çalıştırmayı ve telefonda açmayı adım adım anlatır.
+Bu kılavuz MasanPOS müşteri uygulamasını Docker ile çalıştırmayı ve telefonda açmayı adım adım anlatır.
 
 ---
 
@@ -25,16 +25,16 @@ Bir sürüm numarası görürsen hazırsın.
 Proje klasörüne gir (Dockerfile'ın olduğu yer):
 
 ```
-cd C:\Users\HP\Desktop\burger-plus
+cd C:\Users\HP\Desktop\masanpos-web\apps\musteri
 ```
 
 İmajı oluştur (sondaki nokta önemli — "buradaki Dockerfile'ı kullan" demek):
 
 ```
-docker build -t burger-plus .
+docker build -t masanpos-customer .
 ```
 
-- `-t burger-plus` → imaja "burger-plus" adını verir.
+- `-t masanpos-customer` → imaja "masanpos-customer" adını verir.
 - İlk sefer birkaç dakika sürer (Node imajını indirir, kütüphaneleri kurar,
   projeyi derler). Sonraki seferler çok daha hızlı olur.
 
@@ -44,14 +44,14 @@ Bittiğinde imajı görmek için:
 docker images
 ```
 
-Listede `burger-plus` görünmeli.
+Listede `masanpos-customer` görünmeli.
 
 ---
 
 ## 3. Konteyneri çalıştır (run)
 
 ```
-docker run -d -p 8080:80 --name burger burger-plus
+docker run -d -p 8080:80 --name masanpos-customer masanpos-customer
 ```
 
 Ne demek bu komut:
@@ -125,20 +125,20 @@ QR sistemi, uygulamanın açıldığı adresi kullanır. Yani:
 
 ```
 docker ps                  # Çalışan konteynerleri gör
-docker stop burger         # Konteyneri durdur
-docker start burger        # Tekrar başlat
-docker rm burger           # Konteyneri sil (önce durdur)
-docker logs burger         # Konteyner loglarını gör
-docker rmi burger-plus     # İmajı sil
+docker stop masanpos-customer         # Konteyneri durdur
+docker start masanpos-customer        # Tekrar başlat
+docker rm masanpos-customer           # Konteyneri sil (önce durdur)
+docker logs masanpos-customer         # Konteyner loglarını gör
+docker rmi masanpos-customer     # İmajı sil
 ```
 
 Kodda değişiklik yaptıysan, yeniden build alıp yeni konteyner çalıştır:
 
 ```
-docker stop burger
-docker rm burger
-docker build -t burger-plus .
-docker run -d -p 8080:80 --name burger burger-plus
+docker stop masanpos-customer
+docker rm masanpos-customer
+docker build -t masanpos-customer .
+docker run -d -p 8080:80 --name masanpos-customer masanpos-customer
 ```
 
 ---
@@ -146,9 +146,9 @@ docker run -d -p 8080:80 --name burger burger-plus
 ## Özet (hızlı başlangıç)
 
 ```
-cd C:\Users\HP\Desktop\burger-plus
-docker build -t burger-plus .
-docker run -d -p 8080:80 --name burger burger-plus
+cd C:\Users\HP\Desktop\masanpos-web\apps\musteri
+docker build -t masanpos-customer .
+docker run -d -p 8080:80 --name masanpos-customer masanpos-customer
 ```
 
 Sonra: bilgisayarda `http://localhost:8080`, telefonda `http://<bilgisayar-IP>:8080`

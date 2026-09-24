@@ -1,5 +1,5 @@
 /*
-  Burger Plus — Animasyon Ayarları
+  MasanPOS — Animasyon Ayarları
   Tüm animasyonlar buradan beslenir → tek yerden değiştirilebilir, tutarlı kalır.
 
   Felsefe: sıcak, iştah açıcı, hızlı ama abartısız.

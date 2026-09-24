@@ -1,5 +1,5 @@
 # ============================================
-# Burger Plus Web — Kod Kontrolü
+# MasanPOS Web — Kod Kontrolü
 # Her push ve PR'da otomatik çalışır.
 # Build bozuksa veya lint hatası varsa uyarır.
 # ============================================
