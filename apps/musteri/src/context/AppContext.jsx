@@ -421,16 +421,21 @@ export function AppProvider({ children }) {
   // Kampanya indirimleri sadece giriş yapmış (üye) kullanıcılar içindir — misafir
   // kampanyayı görebilir ama fiyat indirimi/otomatik uygulama misafire yapılmaz.
   const indirimliFiyat = (urun) => {
-    if (!kullanici) return null;
-    const k = aktifKampanyalar
-      .filter((kk) => kk.gecerliKategoriler?.includes(urun.kategori) && Number(kk.indirimYuzde) > 0)
-      .sort((a, b) => Number(b.indirimYuzde) - Number(a.indirimYuzde))[0];
-    if (!k) return null;
-    return {
-      kampanya: k,
-      orijinalFiyat: urun.fiyat,
-      fiyat: Math.round(urun.fiyat * (1 - k.indirimYuzde / 100) * 100) / 100,
-    };
+    const normalFiyat = Number(urun.normalFiyat ?? urun.fiyat);
+    let enIyi = Number(urun.oneriIndirimYuzde) > 0 && Number(urun.fiyat) < normalFiyat
+      ? { kaynak: "oneri", kampanya: null, fiyat: Number(urun.fiyat) }
+      : { kaynak: null, kampanya: null, fiyat: normalFiyat };
+    if (kullanici) {
+      const kampanya = aktifKampanyalar
+        .filter((aday) => aday.gecerliKategoriler?.includes(urun.kategori) && Number(aday.indirimYuzde) > 0)
+        .sort((a, b) => Number(b.indirimYuzde) - Number(a.indirimYuzde))[0];
+      const kampanyaFiyati = kampanya
+        ? Math.round(normalFiyat * (1 - Number(kampanya.indirimYuzde) / 100) * 100) / 100
+        : normalFiyat;
+      if (kampanyaFiyati < enIyi.fiyat) enIyi = { kaynak: "kampanya", kampanya, fiyat: kampanyaFiyati };
+    }
+    if (!enIyi.kaynak) return null;
+    return { ...enIyi, orijinalFiyat: normalFiyat };
   };
 
   // --- Sepet (tamamen yerel/kişisel) ---
@@ -444,7 +449,7 @@ export function AppProvider({ children }) {
     const indirim = indirimliFiyat(urun);
     const ekstraFiyat = Number(urun.gramajFiyatArtisi) || 0;
     const eklenecek = indirim
-      ? { ...urun, fiyat: indirim.fiyat + ekstraFiyat, orijinalFiyat: indirim.orijinalFiyat + ekstraFiyat }
+      ? { ...urun, fiyat: indirim.fiyat + ekstraFiyat, orijinalFiyat: indirim.orijinalFiyat + ekstraFiyat, uygulananIndirimKaynagi: indirim.kaynak }
       : { ...urun, fiyat: urun.fiyat + ekstraFiyat };
     const sepetAnahtari = sepetAnahtariOlustur(urun);
     setSepet((onceki) => {
@@ -453,7 +458,7 @@ export function AppProvider({ children }) {
         return onceki.map((s) =>
           s.sepetAnahtari === sepetAnahtari
             ? { ...s, adet: s.adet + 1, oneriReferanslari: gelenOneriReferansi
-              ? [...new Set([...(s.oneriReferanslari || []), gelenOneriReferansi])]
+              ? [...new Set([...(s.oneriReferanslari || []), gelenOneriReferansi])].slice(-5)
               : (s.oneriReferanslari || []) }
             : s
         );
@@ -471,8 +476,17 @@ export function AppProvider({ children }) {
     setAvatar(gorsel || null);
   };
 
-  const adetArtir = (anahtar) =>
+  const adetArtir = async (anahtar) => {
+    const urun = sepet.find((satir) => satir.sepetAnahtari === anahtar);
+    const referans = urun?.oneriReferanslari?.at(-1);
+    if (referans) {
+      try {
+        await oneriOlayiGonder({ referans, urunId: urun.id, olay: "sepete_eklendi" });
+      } catch { return false; }
+    }
     setSepet((o) => o.map((s) => (s.sepetAnahtari === anahtar ? { ...s, adet: s.adet + 1 } : s)));
+    return true;
+  };
 
   const adetAzalt = (anahtar) =>
     setSepet((o) =>

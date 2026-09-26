@@ -24,3 +24,10 @@ test("yapilandirilan urun detay sayfasinda oneri kaynagi korunur", () => {
   assert.match(detayKodu, /aramaParametreleri\.get\("kaynak"\) === "sepet_onerisi"/);
   assert.match(detayKodu, /konum\.state\?\.oneriReferansi/);
 });
+
+test("sepete ozel fiyat ve normal fiyat oneriden urun detayina tasinir", () => {
+  assert.match(sepetKodu, /oneriFirsati/);
+  assert.match(sepetKodu, /normalFiyat: urun\.normalFiyat/);
+  assert.match(sepetKodu, /oneriIndirimYuzde: urun\.oneriIndirimYuzde/);
+  assert.match(detayKodu, /oneriFirsati/);
+});

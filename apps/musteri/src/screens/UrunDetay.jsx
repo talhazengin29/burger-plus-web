@@ -38,8 +38,11 @@ export default function UrunDetay() {
   const oneriReferansi = sepetOnerisindenGeldi && typeof konum.state?.oneriReferansi === "string"
     ? konum.state.oneriReferansi : null;
 
-  const urun = urunler.find((u) => String(u.id) === id);
-  if (!urun) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
+  const katalogUrunu = urunler.find((u) => String(u.id) === id);
+  if (!katalogUrunu) return <Navigate to={`/${isletmeSlug}/anasayfa`} replace />;
+  const oneriFirsati = oneriReferansi && Number(konum.state?.oneriFirsati?.id) === Number(katalogUrunu.id)
+    ? konum.state.oneriFirsati : null;
+  const urun = oneriFirsati ? { ...katalogUrunu, ...oneriFirsati } : katalogUrunu;
   const stoktaYok = urun.stokta === false;
   const urunAdi = yerelAlan(urun, "ad", urun.ad);
   const urunAciklamasi = yerelAlan(urun, "aciklama", urun.aciklama);
@@ -141,8 +144,9 @@ export default function UrunDetay() {
         dogrulanmisReferans = oneriReferansi;
       } catch { /* Ölçüm hatası siparişi engellemez. */ }
     }
+    const sepeteGirecekUrun = dogrulanmisReferans ? urun : katalogUrunu;
     for (let i = 0; i < adet; i++) {
-      sepeteEkle({ ...urun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi, ...(dogrulanmisReferans ? { oneriReferansi: dogrulanmisReferans } : {}) });
+      sepeteEkle({ ...sepeteGirecekUrun, haricMalzemeler, secimler, gramajFiyatArtisi: toplamFiyatArtisi, ...(dogrulanmisReferans ? { oneriReferansi: dogrulanmisReferans } : {}) });
     }
     git(-1);
   };

@@ -29,7 +29,17 @@ export default function Cart() {
 
   const oneriyiAc = (urun) => {
     oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "tiklandi" }).catch(() => {});
-    git(`/urun/${urun.id}?kaynak=sepet_onerisi`, { state: { oneriReferansi } });
+    git(`/urun/${urun.id}?kaynak=sepet_onerisi`, {
+      state: {
+        oneriReferansi,
+        oneriFirsati: {
+          id: urun.id,
+          fiyat: urun.fiyat,
+          normalFiyat: urun.normalFiyat,
+          oneriIndirimYuzde: urun.oneriIndirimYuzde,
+        },
+      },
+    });
   };
 
   const oneriyiEkle = async (urun) => {
@@ -43,7 +53,10 @@ export default function Cart() {
       await oneriOlayiGonder({ referans: oneriReferansi, urunId: urun.id, olay: "sepete_eklendi" });
       dogrulanmisReferans = oneriReferansi;
     } catch { /* Öneri ölçümü kullanıcıyı sepete eklemekten alıkoymaz. */ }
-    sepeteEkle({ ...varsayilanSecimliUrunHazirla(urun, urunler), ...(dogrulanmisReferans ? { oneriReferansi: dogrulanmisReferans } : {}) });
+    const hazirUrun = varsayilanSecimliUrunHazirla(urun, urunler);
+    sepeteEkle(dogrulanmisReferans
+      ? { ...hazirUrun, oneriReferansi: dogrulanmisReferans }
+      : { ...hazirUrun, fiyat: Number(urun.normalFiyat ?? urun.fiyat), normalFiyat: undefined, oneriIndirimYuzde: 0 });
   };
 
   return (
@@ -76,8 +89,12 @@ export default function Cart() {
                     {u.hediyeMi ? (
                       <span className="cart-hediye-etiket">{t("cart.gift")}</span>
                     ) : (
-                      <span className="cart-birim">₺{u.fiyat.toFixed(2)}</span>
+                      <span className="cart-birim">
+                        {u.uygulananIndirimKaynagi === "oneri" && Number(u.orijinalFiyat) > Number(u.fiyat) && <del>₺{u.orijinalFiyat.toFixed(2)}</del>}
+                        ₺{u.fiyat.toFixed(2)}
+                      </span>
                     )}
+                    {u.uygulananIndirimKaynagi === "oneri" && <span className="cart-sepete-ozel">{t("cart.cartOnlyDiscount", { rate: u.oneriIndirimYuzde })}</span>}
                     {gramajMetni(u.secimler) && (
                       <span className="cart-gramaj">{gramajMetni(u.secimler)}</span>
                     )}
@@ -113,7 +130,11 @@ export default function Cart() {
                     <span className="cart-oneri-bilgi">
                       <b>{yerelAlan(urun, "ad", urun.ad)}</b>
                       <small>{oneriAciklamasi(urun)}</small>
-                      <strong>₺{Number(urun.fiyat || 0).toFixed(2)}</strong>
+                      {Number(urun.normalFiyat) > Number(urun.fiyat) ? <span className="cart-oneri-fiyat">
+                        <del>₺{Number(urun.normalFiyat).toFixed(2)}</del>
+                        <strong>₺{Number(urun.fiyat || 0).toFixed(2)}</strong>
+                        <em>{t("cart.discountBadge", { rate: urun.oneriIndirimYuzde })}</em>
+                      </span> : <strong>₺{Number(urun.fiyat || 0).toFixed(2)}</strong>}
                     </span>
                   </button>
                   <button type="button" className="cart-oneri-ekle" onClick={() => oneriyiEkle(urun)} aria-label={t("cart.addRecommendation", { name: yerelAlan(urun, "ad", urun.ad) })}>

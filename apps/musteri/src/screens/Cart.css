@@ -224,6 +224,12 @@
   color: var(--primary-container);
   font-size: 13px;
 }
+.cart-oneri-fiyat {display:flex;align-items:center;gap:6px;margin-top:4px;white-space:nowrap}
+.cart-oneri-fiyat del{color:var(--outline);font-size:10px}
+.cart-oneri-fiyat strong{margin:0}
+.cart-oneri-fiyat em,.cart-sepete-ozel{display:inline-flex;width:max-content;padding:3px 6px;border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);border-radius:5px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--primary-container);font-size:8px;font-style:normal;font-weight:800}
+.cart-birim del{margin-right:6px;color:var(--outline);font-size:10px}
+.cart-sepete-ozel{margin-top:5px}
 .cart-oneri-ekle {
   display: grid;
   width: 42px;

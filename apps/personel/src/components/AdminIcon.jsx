@@ -23,6 +23,7 @@ const ikonlar = {
   chevron: <path d="m8 10 4 4 4-4"/>,
   search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
   alert: <><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5M12 17.5h.01"/></>,
+  shield: <><path d="M12 3 20 6v6c0 5-3.4 8.2-8 9-4.6-.8-8-4-8-9V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></>,
   check: <path d="m5 12 4 4L19 6"/>,
   close: <><path d="m6 6 12 12M18 6 6 18"/></>,
   target: <><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/></>,

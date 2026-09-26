@@ -29,6 +29,7 @@ const BOS_KATEGORI = { ad: "", gorsel: "", sira: 10 };
 const BOS_PERSONEL = { ad: "", soyad: "", rol: "Mutfak", email: "", telefon: "", saatlikUcret: "", sifre: "" };
 const BOS_DUYURU = { baslik: "", mesaj: "", hedef: "/anasayfa" };
 const BOS_KAMPANYA = { etiket: "", baslik: "", aciklama: "", buton: "Sipariş Ver", butonTipi: "primary", gorsel: "", ikon: "🎯", aktif: true, baslangicSaat: 14, bitisSaat: 17, indirimYuzde: 10, gecerliKategoriler: [], kampanyaTipi: "surekli", sira: 10 };
+const BOS_ONERI_INDIRIM_AYARI = { aktif: false, indirimYuzde: 10 };
 const BOS_ODUL = { ad: "", puan: 300, urunId: "", gorsel: "", aktif: true };
 const BOS_DAMGA_KARTI = { aktif: false, hedefAdet: 5, kategori: "", odulUrunId: "", odulMetni: "Hediye", kartEtiketi: "YE KAZAN", baslik: "Lezzet yolculuğun", aciklama: "Her uygun üründe bir damga kazan, kartını tamamla ve hediyeni kap.", damgaBirimi: "ürün", tamamlanmaMetni: "Hediyen hazır!", ikon: "★" };
 const BOS_CUZDAN_AYARI = { aktif: true, bonusAktif: true, bonusYuzde: 5, minYukleme: 100, maxYukleme: 10000, kampanyaBasligi: "Nakit yüklemene ekstra bakiye", kampanyaAciklamasi: "Kasadan nakit yükle, bonus bakiyeni anında kullan." };
@@ -161,6 +162,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
   const [personeller, setPersoneller] = useState([]);
   const [duyurular, setDuyurular] = useState([]);
   const [kampanyalar, setKampanyalar] = useState([]);
+  const [oneriIndirimAyari, setOneriIndirimAyari] = useState(BOS_ONERI_INDIRIM_AYARI);
   const [oduller, setOduller] = useState([]);
   const [damgaKarti, setDamgaKarti] = useState(BOS_DAMGA_KARTI);
   const [cuzdanAyari, setCuzdanAyari] = useState(BOS_CUZDAN_AYARI);
@@ -213,7 +215,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
       const istekler = [
         ["Genel bakış", "/dashboard"], ["Ürünler", "/urunler"], ["Personel", "/personeller"],
         ["Satış raporları", "/raporlar/satis?gun=30"], ["Duyurular", "/duyurular"], ["Kategoriler", "/kategoriler"],
-        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"], ["Damga kartı", "/sadakat-ayari"], ["Cüzdan", "/cuzdan-ayari"], ["Cüzdan raporu", "/cuzdan-raporu"], ["Şikayetler", "/sikayetler"],
+        ["Kampanyalar", "/kampanyalar"], ["Puan marketi", "/oduller"], ["Damga kartı", "/sadakat-ayari"], ["Cüzdan", "/cuzdan-ayari"], ["Cüzdan raporu", "/cuzdan-raporu"], ["Şikayetler", "/sikayetler"], ["Öneri indirimi", "/oneri-indirim-ayari"],
       ];
       const sonuclar = await Promise.allSettled(istekler.map(([, yol]) => adminIstek(yol)));
       const yetkiHatasi = sonuclar.find((sonuc) =>
@@ -224,7 +226,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
         return;
       }
 
-      const [d, u, p, r, duy, k, kamp, od, sadakatAyari, cuzdanVerisi, cuzdanRaporVerisi, sikayetVerisi] = sonuclar.map((sonuc) =>
+      const [d, u, p, r, duy, k, kamp, od, sadakatAyari, cuzdanVerisi, cuzdanRaporVerisi, sikayetVerisi, oneriIndirimVerisi] = sonuclar.map((sonuc) =>
         sonuc.status === "fulfilled" ? sonuc.value : null
       );
       if (d) setDashboard(d);
@@ -240,6 +242,7 @@ export default function Admin({ onCikis, temaKontrolu }) {
       if (cuzdanVerisi?.cuzdanAyari) setCuzdanAyari({ ...BOS_CUZDAN_AYARI, ...cuzdanVerisi.cuzdanAyari });
       if (cuzdanRaporVerisi?.cuzdanRaporu) setCuzdanRaporu(cuzdanRaporVerisi.cuzdanRaporu);
       if (sikayetVerisi) setSikayetler(sikayetVerisi.sikayetler || []);
+      if (oneriIndirimVerisi?.ayar) setOneriIndirimAyari({ ...BOS_ONERI_INDIRIM_AYARI, ...oneriIndirimVerisi.ayar });
 
       const hatalar = sonuclar.flatMap((sonuc, index) =>
         sonuc.status === "rejected" ? [`${istekler[index][0]}: ${sonuc.reason.message}`] : []
@@ -565,6 +568,18 @@ export default function Admin({ onCikis, temaKontrolu }) {
     }
   };
 
+  const oneriIndirimAyariniKaydet = async (e) => {
+    e.preventDefault();
+    await islem(
+      () => adminIstek("/oneri-indirim-ayari", jsonGonder("PUT", {
+        aktif: oneriIndirimAyari.aktif === true,
+        indirimYuzde: Number(oneriIndirimAyari.indirimYuzde),
+      })),
+      oneriIndirimAyari.aktif ? "Sepete özel öneri indirimi güncellendi." : "Sepete özel öneri indirimi kapatıldı.",
+      "Öneri indirimi kaydediliyor…"
+    );
+  };
+
   const odulKaydet = async (e) => {
     e.preventDefault();
     const veri = { ...odulForm, puan: Number(odulForm.puan), urunId: Number(odulForm.urunId) };
@@ -862,6 +877,18 @@ export default function Admin({ onCikis, temaKontrolu }) {
             </>}
 
             {bolum === "kampanyalar" && <>
+              <form className={`oneri-indirim-ayari ${oneriIndirimAyari.aktif ? "aktif" : "pasif"}`} onSubmit={oneriIndirimAyariniKaydet}>
+                <header>
+                  <div><span>SEPETE ÖZEL FİYAT</span><h2>Öneriyi fırsata dönüştür</h2><p>Sepette önerilen ürünleri normal fiyatından daha avantajlı göstererek tamamlayıcı ürün satışını artırın.</p></div>
+                  <label className="admin-switch" aria-label="Sepete özel öneri indirimini aç veya kapat"><input type="checkbox" checked={oneriIndirimAyari.aktif === true} onChange={(e) => setOneriIndirimAyari({ ...oneriIndirimAyari, aktif: e.target.checked })} /><span /></label>
+                </header>
+                <div className="oneri-indirim-ayar-govde">
+                  <label><span>İndirim oranı</span><div><input required type="number" min="1" max="50" step="0.1" value={oneriIndirimAyari.indirimYuzde} onChange={(e) => setOneriIndirimAyari({ ...oneriIndirimAyari, indirimYuzde: e.target.value })} /><b>%</b></div><small>Yalnızca sepet önerisinden eklenen ürünlerde geçerlidir.</small></label>
+                  <div className="oneri-indirim-onizleme"><small>MÜŞTERİYE GÖRÜNEN</small><del>{oneriIndirimAyari.aktif ? para(100) : ""}</del><strong>{para(100 * (1 - (oneriIndirimAyari.aktif ? Number(oneriIndirimAyari.indirimYuzde || 0) : 0) / 100))}</strong><span>{oneriIndirimAyari.aktif ? `Sepete özel %${oneriIndirimAyari.indirimYuzde || 0}` : "Özellik kapalı"}</span></div>
+                  <div className="oneri-indirim-kural"><AdminIcon name="shield" /><span><b>Güvenli fiyatlandırma</b><small>İndirim ödeme sırasında sunucuda doğrulanır. Aktif kampanya varsa müşteri için daha düşük olan fiyat uygulanır.</small></span></div>
+                  <button className="primary" type="submit">Ayarı kaydet</button>
+                </div>
+              </form>
               <BolumBaslik baslik="Kampanya yönetimi" aciklama="Uygulamada görünen kampanyaları, geçerli kategorileri ve indirim saatlerini yönetin." buton="+ Yeni kampanya" onClick={() => setKampanyaForm({ ...BOS_KAMPANYA, gecerliKategoriler: [] })} ikincilButon="Veriden taslak oluştur" ikincilOnClick={kampanyaTaslagiOlustur} ikincilIkon="target" />
               <div className="yonetim-kart-grid">{kampanyalar.length ? kampanyalar.map((kampanya) => (
                 <article className={`yonetim-kart kampanya-yonetim-kart ${!kampanya.aktif ? "pasif" : ""}`} key={kampanya.id}>
